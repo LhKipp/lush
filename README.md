@@ -1,6 +1,4 @@
-# LUSH - Lua Shell
-# TSH - ?
-# TYSH
+# LUSH - Lua based Unix Shell
 
 ## Goals
 
@@ -189,7 +187,7 @@ fn git bisect { # Okay
 }
 
 struct GCHash{
-    let val: String
+    val: String
     fn ctor(val: String) { 
         assert $val ~= "[a-fA-F0-9]+" 
         $self.val = $val
