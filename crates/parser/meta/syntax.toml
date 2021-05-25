@@ -1,0 +1,44 @@
+# The keywords of our language.
+keywords = [
+    "let",
+    "fn",
+    "elif",
+    "else",
+    "if",
+    "while",
+]
+
+# Literal data embedded in the source.
+literals = [
+    ["number", "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)"],
+    ["bare word", "[.]+"],
+]
+
+# Symbols alongside names for them.
+punctuation = [
+    ['(', "left parenthesis"],
+    [')', "right parenthesis"],
+    ['{', "left curly brackets"],
+    ['}', "right curly brackets"],
+    ['+', "plus sign"],
+    ['-', "minus"],
+    ['<', "less than sign"],
+    ['=', "assign sign"],
+    ['>>', "right stream"],
+    ['|', "pipe"],
+    ['$', "dollar"],
+    ['.', "point"],
+    ['/', "file sep"],
+]
+
+# Tokens that don't fall into one of the above categories.
+# "error" is for errors: when we encounter something unexpected.
+# "whitespace" is the white space between tokens, and is explicit in our lexer.
+tokens = [
+    ["eof", ""],
+    ["tombstone", ""],
+    ["whitespace", "[ ]+"],
+    ["newline", "\\n"],
+    # ["error", "#[error]" //embedded special
+]
+
