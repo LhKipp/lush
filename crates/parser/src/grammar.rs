@@ -31,6 +31,7 @@
 mod cmd_stmt;
 mod expr;
 mod fn_stmt;
+mod signature;
 
 use log::debug;
 

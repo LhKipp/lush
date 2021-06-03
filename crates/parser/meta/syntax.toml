@@ -20,6 +20,8 @@ punctuation = [
     [')', "right parenthesis"],
     ['{', "left curly brackets"],
     ['}', "right curly brackets"],
+    ['[', "left rectangular brackets"],
+    [']', "right rectangular brackets"],
     ['+', "plus sign"],
     ['-', "minus"],
     ['<', "less than sign"],

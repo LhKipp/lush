@@ -1,6 +1,7 @@
 #[allow(unused_imports)]
 use super::*;
 
+use crate::T;
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
@@ -14,9 +15,20 @@ pub(crate) fn opt_value_expr(p: &mut Parser) -> bool {
         Dollar => expect_value_path(p),
         SingleQuote | DoubleQuote => expect_string_expr(p),
         BareWord => expect_cmd_stmt(p),
+        T!["["] => expect_table_or_array(p),
         _ => return false,
     }
     true
+}
+
+fn expect_table_or_array(p: &mut Parser) -> () {
+    assert!(p.at(T!["["]));
+    let m = p.start();
+    let next = p.next_non(CMT_NL_WS);
+    if next == T!["("] {
+        expect_signature(p);
+        // check whether table or array comes
+    }
 }
 
 pub(crate) fn _value_expr(_p: &mut Parser) {}

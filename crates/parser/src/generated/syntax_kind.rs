@@ -59,6 +59,10 @@ pub enum SyntaxKind {
     LeftCurlyBrackets,
     #[token("}")]
     RightCurlyBrackets,
+    #[token("[")]
+    LeftRectangularBrackets,
+    #[token("]")]
+    RightRectangularBrackets,
     #[token("+")]
     PlusSign,
     #[token("-")]
@@ -117,6 +121,8 @@ impl SyntaxKind{
             SyntaxKind::RightParenthesis => "RightParenthesis",
             SyntaxKind::LeftCurlyBrackets => "LeftCurlyBrackets",
             SyntaxKind::RightCurlyBrackets => "RightCurlyBrackets",
+            SyntaxKind::LeftRectangularBrackets => "LeftRectangularBrackets",
+            SyntaxKind::RightRectangularBrackets => "RightRectangularBrackets",
             SyntaxKind::PlusSign => "PlusSign",
             SyntaxKind::Minus => "Minus",
             SyntaxKind::LessThanSign => "LessThanSign",
@@ -161,6 +167,8 @@ macro_rules! T {
     [")"] => {$crate::SyntaxKind::RightParenthesis };
     ["{"] => {$crate::SyntaxKind::LeftCurlyBrackets };
     ["}"] => {$crate::SyntaxKind::RightCurlyBrackets };
+    ["["] => {$crate::SyntaxKind::LeftRectangularBrackets };
+    ["]"] => {$crate::SyntaxKind::RightRectangularBrackets };
     [+] => {$crate::SyntaxKind::PlusSign };
     [-] => {$crate::SyntaxKind::Minus };
     [<] => {$crate::SyntaxKind::LessThanSign };
