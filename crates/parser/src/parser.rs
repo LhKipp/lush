@@ -4,24 +4,28 @@ use std::cell::Cell;
 
 use drop_bomb::DropBomb;
 
+#[allow(unused)]
 #[macro_use]
 use crate::T;
 
 use crate::{
     event::Event,
     ParseError,
-    SyntaxKind::{self, Eof, Error, Tombstone},
+    SyntaxKind::{self, Comment, Eof, Error, Newline, Tombstone, *},
     TokenSet, TokenSource,
 };
 
-pub(crate) struct Parser<'t> {
-    token_source: &'t mut dyn TokenSource,
+pub(crate) const CMT_NL_WS: TokenSet = TokenSet::new(&[Comment, Newline, Whitespace]);
+
+pub struct Parser {
+    token_source: TokenSource,
     events: Vec<Event>,
     steps: Cell<u32>,
 }
 
-impl<'t> Parser<'t> {
-    pub(super) fn new(token_source: &'t mut dyn TokenSource) -> Parser<'t> {
+#[allow(unused)]
+impl Parser {
+    pub fn new(token_source: TokenSource) -> Parser {
         Parser {
             token_source,
             events: Vec::new(),
@@ -40,6 +44,10 @@ impl<'t> Parser<'t> {
         self.nth(0)
     }
 
+    pub(crate) fn next(&self) -> SyntaxKind {
+        self.nth(1)
+    }
+
     /// Lookahead operation: returns the kind of the next nth
     /// token.
     pub(crate) fn nth(&self, n: usize) -> SyntaxKind {
@@ -49,37 +57,76 @@ impl<'t> Parser<'t> {
         assert!(steps <= 10_000_000, "the parser seems stuck");
         self.steps.set(steps + 1);
 
-        self.token_source.lookahead_nth(n).kind
-    }
-
-    /// Checks if the current token is `kind`.
-    pub(crate) fn at(&self, kind: SyntaxKind) -> bool {
-        self.nth_at(0, kind)
+        self.token_source[n].kind
     }
 
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
-        self.token_source.lookahead_nth(n).kind == kind
+        self.token_source[n].kind == kind
     }
 
+    /// next token not in ts
+    pub(crate) fn next_non(&self, ts: TokenSet) -> SyntaxKind {
+        self.token_source
+            .iter()
+            .skip_while(|t| ts.contains(t.kind))
+            .next()
+            .expect("TokenSource will provide Eof on exhaustion")
+            .kind
+    }
+
+    // /// Checks if all tokens until are kind are skippable. Expects kind to be present
+    // pub(crate) fn is_skippable_until(&self, kind: SyntaxKind) -> bool {
+    //     self.next_non_skippable() == kind
+    // }
+
     /// Consume the next token if `kind` matches.
-    pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
-        if !self.at(kind) {
+    pub(crate) fn eat<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
+        if !self.at(kinds) {
             return false;
         }
         //TODO is bump by 1 always correct?
-        self.do_bump(kind, 1);
+        self.do_bump(self.current(), 1);
         true
     }
 
+    /// Consume the next token if `kind` matches.
+    pub(crate) fn eat_while<TS: Into<TokenSet> + Copy>(&mut self, ts: TS) {
+        while !self.at(ts) {
+            self.bump_any();
+        }
+    }
+
+    /// Consume the next token until kind == current
+    pub(crate) fn eat_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) {
+        while !self.at(kinds) {
+            self.bump_any();
+        }
+    }
+
+    pub(crate) fn eat_empty_or_cmt_line(&mut self) -> bool {
+        if self
+            .token_source
+            .iter()
+            .take_while(|t| t.kind != Newline)
+            .all(|t| t.kind == Comment || t.kind == Whitespace)
+        {
+            self.eat_until(Newline);
+            true
+        } else {
+            false
+        }
+    }
+
     /// Checks if the current token is in `kinds`.
-    pub(crate) fn at_ts(&self, kinds: TokenSet) -> bool {
+    pub(crate) fn at<TS: Into<TokenSet>>(&self, kinds: TS) -> bool {
+        let kinds: TokenSet = kinds.into();
         kinds.contains(self.current())
     }
 
-    /// Checks if the current token is contextual keyword with text `t`.
-    pub(crate) fn at_contextual_kw(&self, kw: &str) -> bool {
-        self.token_source.is_keyword(kw)
-    }
+    // /// Checks if the current token is contextual keyword with text `t`.
+    // pub(crate) fn at_contextual_kw(&self, kw: &str) -> bool {
+    //     self.token_source.is_keyword(kw)
+    // }
 
     /// Starts a new node in the syntax tree. All nodes and tokens
     /// consumed between the `start` and the corresponding `Marker::complete`
@@ -148,7 +195,7 @@ impl<'t> Parser<'t> {
             _ => (),
         }
 
-        if self.at_ts(recovery) {
+        if self.at(recovery) {
             self.error(message);
             return;
         }
@@ -178,6 +225,7 @@ pub(crate) struct Marker {
     bomb: DropBomb,
 }
 
+#[allow(unused)]
 impl Marker {
     fn new(pos: u32) -> Marker {
         Marker {
@@ -220,12 +268,14 @@ impl Marker {
     }
 }
 
+#[allow(unused)]
 pub(crate) struct CompletedMarker {
     start_pos: u32,
     finish_pos: u32,
     kind: SyntaxKind,
 }
 
+#[allow(unused)]
 impl CompletedMarker {
     fn new(start_pos: u32, finish_pos: u32, kind: SyntaxKind) -> Self {
         CompletedMarker {

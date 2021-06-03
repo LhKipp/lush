@@ -6,6 +6,7 @@ keywords = [
     "else",
     "if",
     "while",
+    "end",
 ]
 
 # Literal data embedded in the source.
@@ -29,6 +30,8 @@ punctuation = [
     ['$', "dollar"],
     ['.', "point"],
     ['/', "file sep"],
+    ['\"', "double quote"],
+    ["'", "single quote"],
 ]
 
 # Tokens that don't fall into one of the above categories.
@@ -36,9 +39,18 @@ punctuation = [
 # "whitespace" is the white space between tokens, and is explicit in our lexer.
 tokens = [
     ["eof", ""],
+    ["source file", ""],
     ["tombstone", ""],
     ["whitespace", "[ ]+"],
+    ["comment", "#.*\\n"],
     ["newline", "\\n"],
+    ["let stmt", ""],
+    ["fn stmt", ""],
+    ["cmd stmt", ""],
+    ["math expr", ""],
+    ["double quoted string", ""],
+    ["single quoted string", ""],
+    ["value path", ""],
     # ["error", "#[error]" //embedded special
 ]
 

@@ -127,15 +127,22 @@ fn main() -> Result<(), Box<dyn Error>> {
         );
         // panic!("opt_quoted ");
         tera.register_filter(
-            "quoted",
-            make_filter_fn("quoted", |s: String| {
-                // panic!("opt_quoted {}", s);
+            "quote_brackets",
+            make_filter_fn("quote_brackets", |s: String| {
                 if "{}()[]".contains(&s) {
                     format!("\"{}\"", s)
+                } else if "\\\"" == s {
+                    "DoubleQuote".into()
+                } else if "\'" == s {
+                    "SingleQuote".into()
                 } else {
                     s
                 }
             }),
+        );
+        tera.register_filter(
+            "quoted",
+            make_filter_fn("quoted", |s: String| format!("\"{}\"", s)),
         );
         tera
     };

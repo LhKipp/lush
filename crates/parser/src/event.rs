@@ -16,7 +16,7 @@ use crate::{generated::*, ParseError, TreeSink};
 /// They are converted to a tree-structure in
 /// a separate pass, via `TreeBuilder`.
 #[derive(Debug)]
-pub(crate) enum Event {
+pub enum Event {
     /// This event signifies the start of the node.
     /// It should be either abandoned (in which case the
     /// `kind` is `Tombstone`, and the event is ignored),
@@ -88,6 +88,7 @@ impl Event {
 }
 
 /// Generate the syntax tree with the control of events.
+#[allow(unused)]
 pub(super) fn process(sink: &mut dyn TreeSink, mut events: Vec<Event>) {
     let mut forward_parents = Vec::new();
 

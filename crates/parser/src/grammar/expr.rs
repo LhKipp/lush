@@ -1,0 +1,72 @@
+#[allow(unused_imports)]
+use super::*;
+
+#[allow(unused_imports)]
+use crate::{
+    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
+    SyntaxKind::{self, *},
+    TokenSet,
+};
+
+macro_rules! matched {
+    ($rule:expr) => {{
+        $rule;
+        true
+    }};
+}
+
+pub(crate) fn opt_value_expr(p: &mut Parser) -> bool {
+    match p.current() {
+        Number => {
+            matched!(expect_math_expr(p))
+        }
+        Dollar => matched!(expect_value_path(p)),
+        SingleQuote | DoubleQuote => matched!(expect_string_expr(p)),
+        BareWord => matched!(expect_cmd_stmt(p)),
+        _ => false,
+    }
+}
+
+pub(crate) fn _value_expr(_p: &mut Parser) {}
+
+pub(crate) fn expect_math_expr(p: &mut Parser) {
+    // TODO for now just number
+    assert!(p.at(Number));
+    let m = p.start();
+    p.eat(Number);
+    m.complete(p, MathExpr);
+}
+
+pub(crate) fn expect_string_expr(p: &mut Parser) {
+    assert!(p.at(&[DoubleQuote, SingleQuote]));
+    let m = p.start();
+    let quote_type = p.current();
+    p.eat(p.current());
+    p.eat_until(&[quote_type, Newline]);
+
+    if p.current() == Newline {
+        p.error("Unterminated string literal");
+    }
+
+    match quote_type {
+        DoubleQuote => m.complete(p, DoubleQuotedString),
+        SingleQuote => m.complete(p, SingleQuotedString),
+        _ => unreachable!("quote type either double or signle"),
+    };
+}
+
+pub(crate) fn expect_value_path(p: &mut Parser) {
+    p.eat_while(CMT_NL_WS);
+    assert!(p.at(Dollar));
+    let m = p.start();
+    p.eat(Dollar);
+    loop {
+        if !p.expect(BareWord) {
+            break;
+        }
+        if !p.at(Point) {
+            break;
+        }
+    }
+    m.complete(p, ValuePath);
+}
