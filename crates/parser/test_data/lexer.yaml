@@ -1,0 +1,22 @@
+1
+===
+fn ls ()
+  echo "hi"
+end
+---
+- Fn: 2
+- Whitespace: 1
+- BareWord: 2
+- Whitespace: 1
+- LeftParenthesis: 1
+- RightParenthesis: 1
+- Newline: 1
+- Whitespace: 2
+- BareWord: 4
+- Whitespace: 1
+- DoubleQuote: 1
+- BareWord: 2
+- DoubleQuote: 1
+- Newline: 1
+- End: 3
+...

@@ -1,5 +1,6 @@
 //! See [`Parser`].
 
+use log::debug;
 use std::cell::Cell;
 
 use drop_bomb::DropBomb;
@@ -11,7 +12,7 @@ use crate::T;
 use crate::{
     event::Event,
     ParseError,
-    SyntaxKind::{self, Comment, Eof, Error, Newline, Tombstone, *},
+    SyntaxKind::{self, Comment, Error, Newline, Tombstone, *},
     TokenSet, TokenSource,
 };
 
@@ -57,21 +58,23 @@ impl Parser {
         assert!(steps <= 10_000_000, "the parser seems stuck");
         self.steps.set(steps + 1);
 
-        self.token_source[n].kind
+        let token = self.token_source[n].kind;
+        debug!("token[{}]: {:?}", n, token);
+        token
     }
 
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
-        self.token_source[n].kind == kind
+        self.nth(n) == kind
     }
 
     /// next token not in ts
     pub(crate) fn next_non(&self, ts: TokenSet) -> SyntaxKind {
         self.token_source
             .iter()
-            .skip_while(|t| ts.contains(t.kind))
+            .map(|t| t.kind)
+            .skip_while(|t| ts.contains(*t))
             .next()
-            .expect("TokenSource will provide Eof on exhaustion")
-            .kind
+            .unwrap_or(Eof)
     }
 
     // /// Checks if all tokens until are kind are skippable. Expects kind to be present
@@ -91,7 +94,7 @@ impl Parser {
 
     /// Consume the next token if `kind` matches.
     pub(crate) fn eat_while<TS: Into<TokenSet> + Copy>(&mut self, ts: TS) {
-        while !self.at(ts) {
+        while self.at(ts) {
             self.bump_any();
         }
     }
@@ -145,9 +148,6 @@ impl Parser {
     /// Advances the parser by one token
     pub(crate) fn bump_any(&mut self) {
         let kind = self.nth(0);
-        if kind == Eof {
-            return;
-        }
         self.do_bump(kind, 1)
     }
 
@@ -207,6 +207,7 @@ impl Parser {
     }
 
     fn do_bump(&mut self, kind: SyntaxKind, n_raw_tokens: u8) {
+        debug!("Eating: {:?}", kind);
         for _ in 0..n_raw_tokens {
             self.token_source.bump();
         }

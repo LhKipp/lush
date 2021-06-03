@@ -7,10 +7,17 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-logos = "0.12.0"
 derive-new = "0.5"
 drop_bomb = "0.1.4"
 itertools = "0.10.0"
+log = "0.4.14"
+logos = "0.12.0"
+serde = "1.0.126"
+
+[dev-dependencies]
+conformance = "0.2.0"
+pretty_env_logger = "0.4.0"
+serde_yaml = "0.8.17"
 
 [build-dependencies]
 glob = "0.3.0"

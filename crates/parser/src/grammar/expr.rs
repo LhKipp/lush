@@ -8,23 +8,15 @@ use crate::{
     TokenSet,
 };
 
-macro_rules! matched {
-    ($rule:expr) => {{
-        $rule;
-        true
-    }};
-}
-
 pub(crate) fn opt_value_expr(p: &mut Parser) -> bool {
     match p.current() {
-        Number => {
-            matched!(expect_math_expr(p))
-        }
-        Dollar => matched!(expect_value_path(p)),
-        SingleQuote | DoubleQuote => matched!(expect_string_expr(p)),
-        BareWord => matched!(expect_cmd_stmt(p)),
-        _ => false,
+        Number => expect_math_expr(p),
+        Dollar => expect_value_path(p),
+        SingleQuote | DoubleQuote => expect_string_expr(p),
+        BareWord => expect_cmd_stmt(p),
+        _ => return false,
     }
+    true
 }
 
 pub(crate) fn _value_expr(_p: &mut Parser) {}

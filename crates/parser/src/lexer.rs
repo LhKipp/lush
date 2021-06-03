@@ -1,4 +1,4 @@
-use std::ops::{Index, Range};
+use std::ops::{Index, Range, RangeFrom};
 
 use logos::Logos;
 
@@ -40,7 +40,18 @@ impl Index<Range<usize>> for TokenVec {
     fn index(&self, n: Range<usize>) -> &Self::Output {
         let r = Range {
             start: self.cur_elem + n.start,
-            end: n.end,
+            end: self.cur_elem + n.end,
+        };
+        &self.tokens[r]
+    }
+}
+
+impl Index<RangeFrom<usize>> for TokenVec {
+    type Output = [Token];
+
+    fn index(&self, n: RangeFrom<usize>) -> &Self::Output {
+        let r = RangeFrom {
+            start: self.cur_elem + n.start,
         };
         &self.tokens[r]
     }
@@ -54,19 +65,21 @@ impl TokenVec {
         }
     }
     pub fn iter(&self) -> impl Iterator<Item = &Token> {
-        self.tokens[self.cur_elem..].iter()
+        self[0..].iter()
     }
     pub fn bump(&mut self) {
         self.cur_elem = self.cur_elem + 1;
     }
 }
 
-pub fn lex<'a>(input: &'a str) -> TokenVec {
+pub fn lex_tokens(input: &str) -> Vec<Token> {
     let lex = SyntaxKind::lexer(input).spanned();
-    TokenVec::new(
-        lex.map(|(kind, span)| Token::new(kind, span.len() as i32))
-            .collect(),
-    )
+    lex.map(|(kind, span)| Token::new(kind, span.len() as i32))
+        .collect()
+}
+
+pub fn lex(input: &str) -> TokenVec {
+    TokenVec::new(lex_tokens(input))
 }
 
 #[cfg(test)]

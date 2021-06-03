@@ -1,0 +1,7 @@
+#!/bin/fish
+function unescape
+    set s "$argv"
+    printf '%b\n' "$s"
+end
+
+cargo test $argv[1] 2>/dev/null | sed -n -e '/left:/p' | xargs -0 unescape | sed -n '/- /p'

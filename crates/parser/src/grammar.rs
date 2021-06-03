@@ -32,6 +32,8 @@ mod cmd_stmt;
 mod expr;
 mod fn_stmt;
 
+use log::debug;
+
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
@@ -40,6 +42,14 @@ use crate::{
 };
 
 use self::{cmd_stmt::expect_cmd_stmt, fn_stmt::expect_fn_stmt};
+
+// #[macro_use]
+// macro_rules! matched {
+//     ($rule:expr) => {{
+//         $rule;
+//         true
+//     }};
+// }
 
 pub(crate) fn root(p: &mut Parser) {
     let m = p.start();
@@ -50,18 +60,25 @@ pub(crate) fn root(p: &mut Parser) {
 
 fn statements(p: &mut Parser) {
     while p.next_non(CMT_NL_WS) != Eof {
+        debug!("Parsing statement");
         statement(p);
     }
 }
 
 fn block(p: &mut Parser) {
+    debug!("Parsing block");
     while p.next_non(CMT_NL_WS) != End {
+        debug!("Parsing block statement");
         statement(p);
     }
+    p.eat_while(CMT_NL_WS);
+    p.eat(End);
 }
 
 pub(crate) fn statement(p: &mut Parser) {
-    match p.next_non(CMT_NL_WS) {
+    let next = p.next_non(CMT_NL_WS);
+    debug!("next_non: {:?}", next);
+    match next {
         Let => {
             // m.complete(p, LetStmt);
         }
@@ -78,8 +95,8 @@ pub(crate) fn statement(p: &mut Parser) {
     }
 }
 
-pub(crate) fn newline(p: &mut Parser) {
-    if !p.eat(Newline) {
-        p.error(format!("Expected a newline. Found {:?}", p.current()));
-    }
-}
+// pub(crate) fn newline(p: &mut Parser) {
+//     if !p.eat(Newline) {
+//         p.error(format!("Expected a newline. Found {:?}", p.current()));
+//     }
+// }

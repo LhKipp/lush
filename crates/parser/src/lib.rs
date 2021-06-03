@@ -6,13 +6,14 @@ pub(crate) mod generated;
 mod grammar;
 mod lexer;
 mod parser;
+mod serde;
 mod token_set;
 
 use lexer::TokenVec;
 
 pub use crate::event::Event;
 pub use crate::generated::SyntaxKind;
-pub use crate::lexer::{lex, Token};
+pub use crate::lexer::{lex, lex_tokens, Token};
 pub use crate::parser::Parser;
 pub(crate) use crate::token_set::TokenSet;
 
