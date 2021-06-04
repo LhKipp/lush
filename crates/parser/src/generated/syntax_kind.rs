@@ -37,6 +37,11 @@ pub enum SyntaxKind {
     DoubleQuotedString,
     SingleQuotedString,
     ValuePath,
+    Signature,
+    Array,
+    Table,
+    ValueExpr,
+    StringExpr,
     #[token("let")]
     Let,
     #[token("fn")]
@@ -110,6 +115,11 @@ impl SyntaxKind{
             SyntaxKind::DoubleQuotedString=> "DoubleQuotedString",
             SyntaxKind::SingleQuotedString=> "SingleQuotedString",
             SyntaxKind::ValuePath=> "ValuePath",
+            SyntaxKind::Signature=> "Signature",
+            SyntaxKind::Array=> "Array",
+            SyntaxKind::Table=> "Table",
+            SyntaxKind::ValueExpr=> "ValueExpr",
+            SyntaxKind::StringExpr=> "StringExpr",
             SyntaxKind::Let=> "Let",
             SyntaxKind::Fn=> "Fn",
             SyntaxKind::Elif=> "Elif",
@@ -156,6 +166,11 @@ macro_rules! T {
     [DoubleQuotedString] => {$crate::SyntaxKind::DoubleQuotedString };
     [SingleQuotedString] => {$crate::SyntaxKind::SingleQuotedString };
     [ValuePath] => {$crate::SyntaxKind::ValuePath };
+    [Signature] => {$crate::SyntaxKind::Signature };
+    [Array] => {$crate::SyntaxKind::Array };
+    [Table] => {$crate::SyntaxKind::Table };
+    [ValueExpr] => {$crate::SyntaxKind::ValueExpr };
+    [StringExpr] => {$crate::SyntaxKind::StringExpr };
     [let] => {$crate::SyntaxKind::Let };
     [fn] => {$crate::SyntaxKind::Fn };
     [elif] => {$crate::SyntaxKind::Elif };

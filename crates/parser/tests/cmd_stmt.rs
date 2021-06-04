@@ -10,5 +10,5 @@ fn parses_cmd_name() {
     end
     "#,
     );
-    assert_eq!(events.len(), 29);
+    assert_eq!(events.len(), 31);
 }

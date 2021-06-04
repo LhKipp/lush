@@ -1,7 +1,5 @@
-use super::*;
-use log::debug;
+use super::{signature::SignatureRule, Rule, *};
 
-use crate::T;
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
@@ -9,18 +7,27 @@ use crate::{
     TokenSet,
 };
 
-pub(crate) fn expect_fn_stmt(p: &mut Parser) {
-    debug!("Parsing fn_stmt");
-    p.eat_while(CMT_NL_WS);
-    assert!(p.at(Fn));
-    let m = p.start();
-    p.eat(Fn);
-    //consume all ws delimited bare words
-    p.eat_while(&[BareWord, Whitespace]);
-    p.eat_while(CMT_NL_WS);
-    opt_signature(p);
-    p.eat_while(CMT_NL_WS);
-    block(p);
+pub(crate) struct FnStmtRule;
+impl Rule for FnStmtRule {
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == Fn
+    }
 
-    m.complete(p, FnStmt);
+    fn name(&self) -> String {
+        "FnStmt".into()
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.eat_while(CMT_NL_WS);
+        let m = p.start();
+        p.eat(Fn);
+        //consume all ws delimited bare words
+        p.eat_while(&[BareWord, Whitespace]);
+        p.eat_while(CMT_NL_WS);
+        SignatureRule {}.opt(p);
+        p.eat_while(CMT_NL_WS);
+        block(p);
+
+        m.complete(p, FnStmt);
+    }
 }

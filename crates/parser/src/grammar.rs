@@ -31,10 +31,13 @@
 mod cmd_stmt;
 mod expr;
 mod fn_stmt;
+mod let_stmt;
 mod signature;
 
+use itertools::Itertools;
 use log::debug;
 
+use crate::grammar::{cmd_stmt::CmdStmtRule, fn_stmt::FnStmtRule, let_stmt::LetStmtRule};
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
@@ -42,7 +45,11 @@ use crate::{
     TokenSet,
 };
 
-use self::{cmd_stmt::expect_cmd_stmt, fn_stmt::expect_fn_stmt};
+// pub(crate) use cmd_stmt::*;
+// pub(crate) use expr::*;
+// pub(crate) use fn_stmt::*;
+// pub(crate) use let_stmt::*;
+// pub(crate) use signature::*;
 
 // #[macro_use]
 // macro_rules! matched {
@@ -51,6 +58,82 @@ use self::{cmd_stmt::expect_cmd_stmt, fn_stmt::expect_fn_stmt};
 //         true
 //     }};
 // }
+
+pub trait Rule {
+    fn name(&self) -> String;
+    fn matches(&self, p: &mut Parser) -> bool;
+    fn parse_rule(&self, p: &mut Parser);
+
+    fn expect(&self, p: &mut Parser) {
+        debug!("Expecting {:?}", self.name());
+        assert!(self.matches(p));
+        self.parse(p);
+    }
+
+    fn opt(&self, p: &mut Parser) -> bool {
+        debug!("Testing for optional {:?}", self.name());
+        if self.matches(p) {
+            self.parse(p);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Parse this rule. If it doesn't match a error event will be generated
+    fn parse(&self, p: &mut Parser) {
+        debug!("Parsing {:?}", self.name());
+        self.parse_rule(p)
+    }
+}
+
+impl Rule for SyntaxKind {
+    fn name(&self) -> String {
+        format!("{:?}", self)
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.current() == *self
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.expect(*self);
+    }
+}
+
+pub struct OrRule {
+    /// kind to specify this or Rule (if left empty, or1 | or2 | ... is used)
+    kind: Option<String>,
+    rules: Vec<Box<dyn Rule>>,
+}
+
+impl OrRule {
+    fn fmt_names(&self) -> String {
+        self.rules.iter().map(|rule| rule.name()).join(" | ")
+    }
+}
+
+impl Rule for OrRule {
+    fn name(&self) -> String {
+        self.kind.clone().unwrap_or(self.fmt_names())
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        self.rules.iter().any(|rule| rule.matches(p))
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        if let Some(rule) = self.rules.iter().find(|rule| rule.matches(p)) {
+            rule.parse(p);
+        } else {
+            p.error(format!(
+                "Expected {}, but found {:?}",
+                self.name(),
+                p.current()
+            ));
+        }
+    }
+}
 
 pub(crate) fn root(p: &mut Parser) {
     let m = p.start();
@@ -61,8 +144,7 @@ pub(crate) fn root(p: &mut Parser) {
 
 fn statements(p: &mut Parser) {
     while p.next_non(CMT_NL_WS) != Eof {
-        debug!("Parsing statement");
-        statement(p);
+        top_level_stmt().parse(p);
     }
 }
 
@@ -70,29 +152,27 @@ fn block(p: &mut Parser) {
     debug!("Parsing block");
     while p.next_non(CMT_NL_WS) != End {
         debug!("Parsing block statement");
-        statement(p);
+        block_stmt().parse(p);
     }
     p.eat_while(CMT_NL_WS);
     p.eat(End);
 }
 
-pub(crate) fn statement(p: &mut Parser) {
-    let next = p.next_non(CMT_NL_WS);
-    debug!("next_non: {:?}", next);
-    match next {
-        Let => {
-            // m.complete(p, LetStmt);
-        }
-        Fn => {
-            expect_fn_stmt(p);
-        }
-        BareWord => {
-            expect_cmd_stmt(p);
-        }
-        Eof => {}
-        _ => {
-            unreachable!("expected let, fn or cmd, found {:?}", p.current());
-        }
+fn top_level_stmt() -> OrRule {
+    OrRule {
+        kind: None,
+        rules: vec![
+            Box::new(LetStmtRule {}),
+            Box::new(FnStmtRule {}),
+            Box::new(CmdStmtRule {}),
+        ],
+    }
+}
+
+fn block_stmt() -> OrRule {
+    OrRule {
+        kind: None,
+        rules: vec![Box::new(LetStmtRule {}), Box::new(CmdStmtRule {})],
     }
 }
 

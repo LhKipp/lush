@@ -52,6 +52,11 @@ tokens = [
     ["double quoted string", ""],
     ["single quoted string", ""],
     ["value path", ""],
-    # ["error", "#[error]" //embedded special
+    ["signature", ""],
+    ["array", ""],
+    ["table", ""],
+    #meta rules
+    ["value expr", ""],
+    ["string expr", ""],
 ]
 

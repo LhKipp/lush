@@ -68,7 +68,8 @@ impl Parser {
     }
 
     /// next token not in ts
-    pub(crate) fn next_non(&self, ts: TokenSet) -> SyntaxKind {
+    pub(crate) fn next_non<TS: Into<TokenSet>>(&self, ts: TS) -> SyntaxKind {
+        let ts = ts.into();
         self.token_source
             .iter()
             .map(|t| t.kind)

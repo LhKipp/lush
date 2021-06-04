@@ -5,72 +5,141 @@ use crate::T;
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
-    SyntaxKind::{self, *},
+    SyntaxKind::{self, ValueExpr, *},
     TokenSet,
 };
 
-pub(crate) fn opt_value_expr(p: &mut Parser) -> bool {
-    match p.current() {
-        Number => expect_math_expr(p),
-        Dollar => expect_value_path(p),
-        SingleQuote | DoubleQuote => expect_string_expr(p),
-        BareWord => expect_cmd_stmt(p),
-        T!["["] => expect_table_or_array(p),
-        _ => return false,
-    }
-    true
-}
-
-fn expect_table_or_array(p: &mut Parser) -> () {
-    assert!(p.at(T!["["]));
-    let m = p.start();
-    let next = p.next_non(CMT_NL_WS);
-    if next == T!["("] {
-        expect_signature(p);
-        // check whether table or array comes
+pub(crate) fn value_expr_rule() -> OrRule {
+    OrRule {
+        kind: Some("value expr".into()),
+        rules: vec![
+            Box::new(NumberRule {}),
+            Box::new(ValuePathRule {}),
+            Box::new(StringRule {}),
+            Box::new(BareWord),
+            Box::new(table_or_array_rule()),
+        ],
     }
 }
 
-pub(crate) fn _value_expr(_p: &mut Parser) {}
-
-pub(crate) fn expect_math_expr(p: &mut Parser) {
-    // TODO for now just number
-    assert!(p.at(Number));
-    let m = p.start();
-    p.eat(Number);
-    m.complete(p, MathExpr);
+pub(crate) fn table_or_array_rule() -> OrRule {
+    OrRule {
+        kind: None,
+        rules: vec![Box::new(TableRule {}), Box::new(ArrayRule {})],
+    }
 }
 
-pub(crate) fn expect_string_expr(p: &mut Parser) {
-    assert!(p.at(&[DoubleQuote, SingleQuote]));
-    let m = p.start();
-    let quote_type = p.current();
-    p.eat(p.current());
-    p.eat_until(&[quote_type, Newline]);
-
-    if p.current() == Newline {
-        p.error("Unterminated string literal");
+pub struct ArrayRule;
+impl Rule for ArrayRule {
+    fn name(&self) -> String {
+        "Array".into()
     }
 
-    match quote_type {
-        DoubleQuote => m.complete(p, DoubleQuotedString),
-        SingleQuote => m.complete(p, SingleQuotedString),
-        _ => unreachable!("quote type either double or signle"),
-    };
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == T!["["]
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.eat_while(CMT_NL_WS);
+        let m = p.start();
+        p.expect(T!["["]);
+        // arrays are allowed to span multiple lines
+        while p.eat(&[Whitespace, Newline]) || { value_expr_rule().opt(p) } {}
+        p.expect(T!["]"]);
+        m.complete(p, Array);
+    }
 }
 
-pub(crate) fn expect_value_path(p: &mut Parser) {
-    p.eat_while(CMT_NL_WS);
-    assert!(p.at(Dollar));
-    let m = p.start();
-    p.eat(Dollar);
-    loop {
-        if !p.expect(BareWord) {
-            break;
+pub struct TableRule;
+impl Rule for TableRule {
+    fn name(&self) -> String {
+        "Table".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == T!["["]
+            && p.next_non(&[Comment, Newline, Whitespace, T!["["]]) == T!["("]
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.eat_while(CMT_NL_WS);
+        let m = p.start();
+        p.eat(T!["["]);
+        // arrays are allowed to span multiple lines
+        while p.eat(&[Whitespace, Newline]) || { value_expr_rule().opt(p) } {}
+        p.expect(T!["]"]);
+        m.complete(p, Table);
+    }
+}
+
+pub struct NumberRule;
+impl Rule for NumberRule {
+    fn name(&self) -> String {
+        "Number".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == Number
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.eat(Number);
+    }
+}
+
+pub struct StringRule;
+impl Rule for StringRule {
+    fn name(&self) -> String {
+        "StringExpr".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        let next = p.next_non(CMT_NL_WS);
+        next == SingleQuote || next == DoubleQuote
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.eat_while(CMT_NL_WS);
+
+        let m = p.start();
+        let quote_type = p.current();
+        p.eat(quote_type);
+        p.eat_until(&[quote_type, Newline]);
+
+        if p.current() == Newline {
+            p.error("Unterminated string literal");
         }
-        if !p.at(Point) {
-            break;
-        }
+
+        match quote_type {
+            DoubleQuote => m.complete(p, DoubleQuotedString),
+            SingleQuote => m.complete(p, SingleQuotedString),
+            _ => unreachable!("quote type either double or single"),
+        };
     }
-    m.complete(p, ValuePath);
+}
+
+struct ValuePathRule;
+impl Rule for ValuePathRule {
+    fn name(&self) -> String {
+        "ValuePath".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == T![$]
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        p.eat_while(CMT_NL_WS);
+        let m = p.start();
+        p.eat(Dollar);
+        loop {
+            if !p.expect(BareWord) {
+                break;
+            }
+            if !p.at(Point) {
+                break;
+            }
+        }
+        m.complete(p, ValuePath);
+    }
 }

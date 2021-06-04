@@ -31,8 +31,8 @@ const fn mask(kind: SyntaxKind) -> u128 {
     1u128 << (kind as usize)
 }
 
-impl From<&[SyntaxKind; 2]> for TokenSet {
-    fn from(arr: &[SyntaxKind; 2]) -> Self {
+impl<const N: usize> From<&[SyntaxKind; N]> for TokenSet {
+    fn from(arr: &[SyntaxKind; N]) -> Self {
         TokenSet::new(arr)
     }
 }
