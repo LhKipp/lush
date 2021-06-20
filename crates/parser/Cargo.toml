@@ -17,6 +17,7 @@ serde = "1.0.126"
 [dev-dependencies]
 conformance = "0.2.0"
 pretty_env_logger = "0.4.0"
+serde_json = "1.0.64"
 serde_yaml = "0.8.17"
 
 [build-dependencies]

@@ -11,11 +11,12 @@ use std::mem;
 
 use crate::SyntaxKind::Tombstone;
 use crate::{generated::*, ParseError, TreeSink};
+use ::serde::{Deserialize, Serialize};
 
 /// `Parser` produces a flat list of `Event`s.
 /// They are converted to a tree-structure in
 /// a separate pass, via `TreeBuilder`.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Event {
     /// This event signifies the start of the node.
     /// It should be either abandoned (in which case the

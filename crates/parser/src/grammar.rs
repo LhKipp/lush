@@ -51,14 +51,6 @@ use crate::{
 // pub(crate) use let_stmt::*;
 // pub(crate) use signature::*;
 
-// #[macro_use]
-// macro_rules! matched {
-//     ($rule:expr) => {{
-//         $rule;
-//         true
-//     }};
-// }
-
 pub trait Rule {
     fn name(&self) -> String;
     fn matches(&self, p: &mut Parser) -> bool;
@@ -67,13 +59,13 @@ pub trait Rule {
     fn expect(&self, p: &mut Parser) {
         debug!("Expecting {:?}", self.name());
         assert!(self.matches(p));
-        self.parse(p);
+        self.parse_rule(p);
     }
 
     fn opt(&self, p: &mut Parser) -> bool {
         debug!("Testing for optional {:?}", self.name());
         if self.matches(p) {
-            self.parse(p);
+            self.parse_rule(p);
             true
         } else {
             false
@@ -101,7 +93,7 @@ impl Rule for SyntaxKind {
     }
 }
 
-pub struct OrRule {
+pub(crate) struct OrRule {
     /// kind to specify this or Rule (if left empty, or1 | or2 | ... is used)
     kind: Option<String>,
     rules: Vec<Box<dyn Rule>>,
@@ -124,7 +116,7 @@ impl Rule for OrRule {
 
     fn parse_rule(&self, p: &mut Parser) {
         if let Some(rule) = self.rules.iter().find(|rule| rule.matches(p)) {
-            rule.parse(p);
+            rule.parse_rule(p);
         } else {
             p.error(format!(
                 "Expected {}, but found {:?}",
@@ -135,16 +127,27 @@ impl Rule for OrRule {
     }
 }
 
-pub(crate) fn root(p: &mut Parser) {
-    let m = p.start();
-    //SourceFile => statement % newline
-    statements(p);
-    m.complete(p, SourceFile);
+pub struct RootRule;
+impl Rule for RootRule {
+    fn name(&self) -> String {
+        "lu file".into()
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        let m = p.start();
+        //SourceFile => statement % newline
+        statements(p);
+        m.complete(p, SourceFile);
+    }
+
+    fn matches(&self, _: &mut Parser) -> bool {
+        true
+    }
 }
 
 fn statements(p: &mut Parser) {
     while p.next_non(CMT_NL_WS) != Eof {
-        top_level_stmt().parse(p);
+        top_level_stmt().parse_rule(p);
     }
 }
 
@@ -152,7 +155,7 @@ fn block(p: &mut Parser) {
     debug!("Parsing block");
     while p.next_non(CMT_NL_WS) != End {
         debug!("Parsing block statement");
-        block_stmt().parse(p);
+        block_stmt().parse_rule(p);
     }
     p.eat_while(CMT_NL_WS);
     p.eat(End);

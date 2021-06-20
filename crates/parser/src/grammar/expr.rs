@@ -9,6 +9,21 @@ use crate::{
     TokenSet,
 };
 
+pub(crate) struct ExpressionsRule;
+impl Rule for ExpressionsRule {
+    fn name(&self) -> String {
+        "expressions".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        value_expr_rule().matches(p)
+    }
+
+    fn parse_rule(&self, p: &mut Parser) {
+        value_expr_rule().parse_rule(p)
+    }
+}
+
 pub(crate) fn value_expr_rule() -> OrRule {
     OrRule {
         kind: Some("value expr".into()),

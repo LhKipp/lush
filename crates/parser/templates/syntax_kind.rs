@@ -3,6 +3,7 @@
     | concat(with=literals)
     | concat(with=tokens) -%}
 use logos::Logos;
+use ::serde::{Deserialize, Serialize};
 
 #[allow(unused)]
 const KEYWORD_STRINGS: &'static [&'static str] = &[
@@ -12,7 +13,7 @@ const KEYWORD_STRINGS: &'static [&'static str] = &[
 ];
 
 #[allow(bad_style, missing_docs, unreachable_pub)]
-#[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 pub enum SyntaxKind {
     #[error]
     Error,

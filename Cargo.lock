@@ -440,6 +440,7 @@ dependencies = [
  "logos",
  "pretty_env_logger",
  "serde",
+ "serde_json",
  "serde_yaml",
  "tera",
  "toml",

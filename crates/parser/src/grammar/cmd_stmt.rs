@@ -26,3 +26,17 @@ impl Rule for CmdStmtRule {
         m.complete(p, CmdStmt);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{parse_from_tokens, Event};
+
+    use super::CmdStmtRule;
+
+    use {conformance, serde_json};
+
+    #[conformance::tests(exact, serde=serde_json, file="test_data/cmd_stmts.json")]
+    fn parse_cmds(s: &str) -> Vec<Event> {
+        parse_from_tokens(s, &CmdStmtRule {})
+    }
+}

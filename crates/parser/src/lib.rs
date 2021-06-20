@@ -1,14 +1,17 @@
 #[macro_use]
 extern crate derive_new;
 
+use ::serde::{Deserialize, Serialize};
+
 mod event;
 pub(crate) mod generated;
-mod grammar;
+pub mod grammar;
 mod lexer;
 mod parser;
 mod serde;
 mod token_set;
 
+use grammar::{RootRule, Rule};
 use lexer::TokenVec;
 
 pub use crate::event::Event;
@@ -34,20 +37,17 @@ pub trait TreeSink {
     fn error(&mut self, error: ParseError);
 }
 
-fn parse_from_tokens<F>(input: &str, f: F) -> Vec<Event>
-where
-    F: FnOnce(&mut parser::Parser),
-{
+pub fn parse_from_tokens(input: &str, rule: &dyn Rule) -> Vec<Event> {
     let tokens = lexer::lex(input);
     let mut p = parser::Parser::new(tokens);
-    f(&mut p);
+    rule.parse(&mut p);
     p.finish()
 }
 
-/// Parse given tokens into the given sink as a rust file.
+/// Parse given tokens into the given sink as a lu file.
 pub fn parse(input: &str) -> Vec<Event> {
-    parse_from_tokens(input, grammar::root)
+    parse_from_tokens(input, &RootRule {})
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ParseError(pub Box<String>);
