@@ -20,3 +20,13 @@ end
 - Newline: 1
 - End: 3
 ...
+2
+===
+fn | |
+---
+- Fn: 2
+- Whitespace: 1
+- Pipe: 1
+- Whitespace: 1
+- Pipe: 1
+...

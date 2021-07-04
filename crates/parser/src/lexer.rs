@@ -85,15 +85,10 @@ pub fn lex(input: &str) -> TokenVec {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::SyntaxKind;
-    #[test]
-    fn test_lex() {
-        let tokens = lex("fn | |");
-        assert_eq!(tokens[0], Token::new(SyntaxKind::Fn, 2));
-        assert_eq!(tokens[1], Token::new(SyntaxKind::Whitespace, 1));
-        assert_eq!(tokens[2], Token::new(SyntaxKind::Pipe, 1));
-        assert_eq!(tokens[3], Token::new(SyntaxKind::Whitespace, 1));
-        assert_eq!(tokens[4], Token::new(SyntaxKind::Pipe, 1));
-        assert_eq!(tokens[5], Token::eof());
+    use {conformance, serde_yaml};
+
+    #[conformance::tests(exact, serde=serde_yaml, file="test_data/lexer.yaml")]
+    fn lex(s: &str) -> Vec<Token> {
+        lex_tokens(s)
     }
 }
