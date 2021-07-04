@@ -117,6 +117,7 @@ impl Rule for StringRule {
         p.eat_while(CMT_NL_WS);
 
         let m = p.start();
+        // TODO assert is quote type
         let quote_type = p.current();
         p.eat(quote_type);
         p.eat_until(&[quote_type, Newline]);
@@ -126,8 +127,14 @@ impl Rule for StringRule {
         }
 
         match quote_type {
-            DoubleQuote => m.complete(p, DoubleQuotedString),
-            SingleQuote => m.complete(p, SingleQuotedString),
+            DoubleQuote => {
+                p.eat(DoubleQuote);
+                m.complete(p, DoubleQuotedString);
+            }
+            SingleQuote => {
+                p.eat(SingleQuote);
+                m.complete(p, SingleQuotedString);
+            }
             _ => unreachable!("quote type either double or single"),
         };
     }

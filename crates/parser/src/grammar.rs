@@ -116,6 +116,7 @@ impl Rule for OrRule {
 
     fn parse_rule(&self, p: &mut Parser) {
         if let Some(rule) = self.rules.iter().find(|rule| rule.matches(p)) {
+            debug!("OrRule {}: Parsing rule {}", self.name(), rule.name());
             rule.parse_rule(p);
         } else {
             p.error(format!(

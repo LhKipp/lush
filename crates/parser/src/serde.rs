@@ -1,4 +1,4 @@
-use crate::Token;
+use crate::{Event, Token};
 use ::serde::{Serialize, Serializer};
 
 impl Serialize for Token {
@@ -15,6 +15,40 @@ impl Serialize for Token {
             self.kind.name(),
             // The data payload of the serialized newtype variant
             &self.len,
+        )
+    }
+}
+
+impl Serialize for Event {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let data = match self {
+            Event::Start {
+                kind,
+                forward_parent,
+            } => match forward_parent {
+                Some(idx) => {
+                    format!("{} (parent: {})", kind.name(), idx)
+                }
+                None => kind.name().into(),
+            },
+            Event::Finish => "".into(),
+            Event::Token { kind, n_raw_tokens } => {
+                format!("{} (tokens: {})", kind.name(), n_raw_tokens)
+            }
+            Event::Error { msg } => msg.error.clone(),
+        };
+        serializer.serialize_newtype_variant(
+            // The name of the type
+            "Event",
+            // TokenKind is `#[repr(u16)]`, so this cast is legal
+            self.index(),
+            // Using our added helper to get the name of the kind
+            self.into(),
+            // The data payload of the serialized newtype variant
+            &data,
         )
     }
 }

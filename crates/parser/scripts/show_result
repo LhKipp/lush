@@ -4,4 +4,17 @@ function unescape
     printf '%b\n' "$s"
 end
 
-cargo test $argv[1] 2>/dev/null | sed -n -e '/left:/p' | xargs -0 unescape | sed -n '/- /p'
+function run_yaml
+    cargo test $argv[1] 2>/dev/null | sed -n -e '/left:/p' | xargs -0 unescape | sed -n '/- /p'
+end
+
+function run_json
+    cargo test | sed -n -e '/left:/p' | xargs -0 unescape | grep -o "\"\[.*]\"" | sed -e 's/^"//' -e 's/"$//'| jq
+end
+
+switch $argv[1]
+    case "lex"
+        run_yaml $argv
+    case "*"
+        run_yaml $argv
+end

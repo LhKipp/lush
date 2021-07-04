@@ -1,0 +1,14 @@
+1
+===
+echo "hi"
+---
+- Start: CmdStmt
+- Token: "BareWord (tokens: 1)"
+- Token: "Whitespace (tokens: 1)"
+- Start: DoubleQuotedString
+- Token: "DoubleQuote (tokens: 1)"
+- Token: "BareWord (tokens: 1)"
+- Token: "DoubleQuote (tokens: 1)"
+- Finish: ""
+- Finish: ""
+...

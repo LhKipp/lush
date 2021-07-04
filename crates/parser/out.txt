@@ -1,0 +1,36 @@
+   Compiling parser v0.1.0 (/home/leo/repos/lush/crates/parser)
+    Finished test [unoptimized + debuginfo] target(s) in 1.82s
+     Running unittests (/home/leo/repos/lush/target/debug/deps/parser-19e584b856d95086)
+[2021-06-20T14:05:32Z DEBUG parser::grammar] Parsing "command"
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] Eating: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: Whitespace
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: Whitespace
+[2021-06-20T14:05:32Z DEBUG parser::parser] Eating: Whitespace
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::grammar] Testing for optional "value expr"
+[2021-06-20T14:05:32Z DEBUG parser::grammar] OrRule value expr: Parsing rule StringExpr
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] Eating: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] Eating: BareWord
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] Eating: DoubleQuote
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: Eof
+[2021-06-20T14:05:32Z DEBUG parser::grammar] Testing for optional "value expr"
+[2021-06-20T14:05:32Z DEBUG parser::parser] token[0]: Eof
+Error: Error("invalid number", line: 1, column: 2)
+thread 'grammar::cmd_stmt::tests::cmd_stmts_1' panicked at 'assertion failed: `(left == right)`
+  left: `1`,
+ right: `0`: the test returned a termination value with a non-zero status code (1) which indicates a failure', /home/leo/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/test/src/lib.rs:193:5
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass '--lib'

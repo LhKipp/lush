@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate derive_new;
+extern crate strum_macros;
 
 use ::serde::{Deserialize, Serialize};
 
@@ -49,5 +50,7 @@ pub fn parse(input: &str) -> Vec<Event> {
     parse_from_tokens(input, &RootRule {})
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct ParseError(pub Box<String>);
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, new)]
+pub struct ParseError {
+    error: String,
+}
