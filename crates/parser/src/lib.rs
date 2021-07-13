@@ -10,6 +10,7 @@ pub mod grammar;
 mod lexer;
 mod parser;
 mod serde;
+mod syntax_kind;
 mod token_set;
 
 use grammar::{RootRule, Rule};
@@ -45,12 +46,12 @@ pub fn parse_from_tokens(input: &str, rule: &dyn Rule) -> Vec<Event> {
     p.finish()
 }
 
-/// Parse given tokens into the given sink as a lu file.
+/// Parse input str
 pub fn parse(input: &str) -> Vec<Event> {
     parse_from_tokens(input, &RootRule {})
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, new)]
 pub struct ParseError {
-    error: String,
+    pub error: String,
 }

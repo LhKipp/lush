@@ -14,6 +14,7 @@ const KEYWORD_STRINGS: &'static [&'static str] = &[
 
 #[allow(bad_style, missing_docs, unreachable_pub)]
 #[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
+#[repr(u16)]
 pub enum SyntaxKind {
     #[error]
     Error,
@@ -34,6 +35,7 @@ pub enum SyntaxKind {
     #[token("{{punc.character}}")]
     {{ punc.name | camel_case }},
     {% endfor -%}
+    __LAST,
 }
 
 impl SyntaxKind{
