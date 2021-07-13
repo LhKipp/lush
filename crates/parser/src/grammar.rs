@@ -52,28 +52,32 @@ use crate::{
 // pub(crate) use signature::*;
 
 pub trait Rule {
+    /// Returns the name of the rule
     fn name(&self) -> String;
+    /// Returns whether parser state matches this rule
     fn matches(&self, p: &mut Parser) -> bool;
-    fn parse_rule(&self, p: &mut Parser);
+    /// Internal function
+    fn parse_rule(&self, p: &mut Parser) -> CompletedMarker;
 
+    /// Expect this rule. If rule does not match, panic!
     fn expect(&self, p: &mut Parser) {
         debug!("Expecting {:?}", self.name());
         assert!(self.matches(p));
         self.parse_rule(p);
     }
 
-    fn opt(&self, p: &mut Parser) -> bool {
+    /// Only parse if this rule matches
+    fn opt(&self, p: &mut Parser) -> Option<CompletedMarker> {
         debug!("Testing for optional {:?}", self.name());
         if self.matches(p) {
-            self.parse_rule(p);
-            true
+            Some(self.parse_rule(p))
         } else {
-            false
+            None
         }
     }
 
     /// Parse this rule. If it doesn't match a error event will be generated
-    fn parse(&self, p: &mut Parser) {
+    fn parse(&self, p: &mut Parser) -> CompletedMarker {
         debug!("Parsing {:?}", self.name());
         self.parse_rule(p)
     }
