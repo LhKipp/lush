@@ -136,5 +136,7 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
             parser::Event::Error { msg } => sink.error(msg),
         }
     }
-    sink.finish()
+    sink.finish();
+
+    (tree, parser_errors)
 }
