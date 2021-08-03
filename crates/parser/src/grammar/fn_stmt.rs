@@ -17,7 +17,7 @@ impl Rule for FnStmtRule {
         "FnStmt".into()
     }
 
-    fn parse_rule(&self, p: &mut Parser) {
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
         p.eat(Fn);
@@ -28,6 +28,6 @@ impl Rule for FnStmtRule {
         p.eat_while(CMT_NL_WS);
         block(p);
 
-        m.complete(p, FnStmt);
+        Some(m.complete(p, FnStmt))
     }
 }

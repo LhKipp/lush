@@ -73,9 +73,23 @@ pub enum SyntaxKind {
     #[token("+")]
     PlusSign,
     #[token("-")]
-    Minus,
+    MinusSign,
+    #[token("*")]
+    MultSign,
+    #[token("/")]
+    DivSign,
     #[token("<")]
     LessThanSign,
+    #[token("<=")]
+    LessOrEqualSign,
+    #[token("==")]
+    EqualitySign,
+    #[token("!=")]
+    InequalitySign,
+    #[token(">")]
+    BiggerThanSign,
+    #[token(">=")]
+    BiggerOrEqualSign,
     #[token("=")]
     AssignSign,
     #[token(">>")]
@@ -86,8 +100,6 @@ pub enum SyntaxKind {
     Dollar,
     #[token(".")]
     Point,
-    #[token("/")]
-    FileSep,
     #[token("\"")]
     DoubleQuote,
     #[token("'")]
@@ -137,14 +149,20 @@ impl SyntaxKind{
             SyntaxKind::LeftRectangularBrackets => "LeftRectangularBrackets",
             SyntaxKind::RightRectangularBrackets => "RightRectangularBrackets",
             SyntaxKind::PlusSign => "PlusSign",
-            SyntaxKind::Minus => "Minus",
+            SyntaxKind::MinusSign => "MinusSign",
+            SyntaxKind::MultSign => "MultSign",
+            SyntaxKind::DivSign => "DivSign",
             SyntaxKind::LessThanSign => "LessThanSign",
+            SyntaxKind::LessOrEqualSign => "LessOrEqualSign",
+            SyntaxKind::EqualitySign => "EqualitySign",
+            SyntaxKind::InequalitySign => "InequalitySign",
+            SyntaxKind::BiggerThanSign => "BiggerThanSign",
+            SyntaxKind::BiggerOrEqualSign => "BiggerOrEqualSign",
             SyntaxKind::AssignSign => "AssignSign",
             SyntaxKind::RightStream => "RightStream",
             SyntaxKind::Pipe => "Pipe",
             SyntaxKind::Dollar => "Dollar",
             SyntaxKind::Point => "Point",
-            SyntaxKind::FileSep => "FileSep",
             SyntaxKind::DoubleQuote => "DoubleQuote",
             SyntaxKind::SingleQuote => "SingleQuote",
             #[allow(unreachable_patterns)]
@@ -188,14 +206,20 @@ macro_rules! T {
     ["["] => {$crate::SyntaxKind::LeftRectangularBrackets };
     ["]"] => {$crate::SyntaxKind::RightRectangularBrackets };
     [+] => {$crate::SyntaxKind::PlusSign };
-    [-] => {$crate::SyntaxKind::Minus };
+    [-] => {$crate::SyntaxKind::MinusSign };
+    [*] => {$crate::SyntaxKind::MultSign };
+    [/] => {$crate::SyntaxKind::DivSign };
     [<] => {$crate::SyntaxKind::LessThanSign };
+    [<=] => {$crate::SyntaxKind::LessOrEqualSign };
+    [==] => {$crate::SyntaxKind::EqualitySign };
+    [!=] => {$crate::SyntaxKind::InequalitySign };
+    [>] => {$crate::SyntaxKind::BiggerThanSign };
+    [>=] => {$crate::SyntaxKind::BiggerOrEqualSign };
     [=] => {$crate::SyntaxKind::AssignSign };
     [>>] => {$crate::SyntaxKind::RightStream };
     [|] => {$crate::SyntaxKind::Pipe };
     [$] => {$crate::SyntaxKind::Dollar };
     [.] => {$crate::SyntaxKind::Point };
-    [/] => {$crate::SyntaxKind::FileSep };
     [DoubleQuote] => {$crate::SyntaxKind::DoubleQuote };
     [SingleQuote] => {$crate::SyntaxKind::SingleQuote };
     }

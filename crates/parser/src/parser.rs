@@ -270,8 +270,7 @@ impl Marker {
     }
 }
 
-#[allow(unused)]
-pub(crate) struct CompletedMarker {
+pub struct CompletedMarker {
     start_pos: u32,
     finish_pos: u32,
     kind: SyntaxKind,

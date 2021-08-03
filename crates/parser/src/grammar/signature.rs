@@ -32,11 +32,11 @@ impl Rule for SignatureRule {
         p.next_non(CMT_NL_WS) == T!["("]
     }
 
-    fn parse_rule(&self, p: &mut Parser) {
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
         p.eat_while(CMT_NL_WS);
         p.expect(T!["("]);
         p.expect(T![")"]);
-        m.complete(p, Signature);
+        Some(m.complete(p, Signature))
     }
 }

@@ -17,7 +17,7 @@ impl Rule for LetStmtRule {
         p.next_non(CMT_NL_WS) == Let
     }
 
-    fn parse_rule(&self, _p: &mut Parser) {
+    fn parse_rule(&self, _p: &mut Parser) -> Option<CompletedMarker> {
         todo!();
     }
 }

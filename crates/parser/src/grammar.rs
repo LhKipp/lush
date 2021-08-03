@@ -57,7 +57,7 @@ pub trait Rule {
     /// Returns whether parser state matches this rule
     fn matches(&self, p: &mut Parser) -> bool;
     /// Internal function
-    fn parse_rule(&self, p: &mut Parser) -> CompletedMarker;
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker>;
 
     /// Expect this rule. If rule does not match, panic!
     fn expect(&self, p: &mut Parser) {
@@ -70,14 +70,14 @@ pub trait Rule {
     fn opt(&self, p: &mut Parser) -> Option<CompletedMarker> {
         debug!("Testing for optional {:?}", self.name());
         if self.matches(p) {
-            Some(self.parse_rule(p))
+            self.parse_rule(p)
         } else {
             None
         }
     }
 
     /// Parse this rule. If it doesn't match a error event will be generated
-    fn parse(&self, p: &mut Parser) -> CompletedMarker {
+    fn parse(&self, p: &mut Parser) -> Option<CompletedMarker> {
         debug!("Parsing {:?}", self.name());
         self.parse_rule(p)
     }
@@ -92,8 +92,10 @@ impl Rule for SyntaxKind {
         p.current() == *self
     }
 
-    fn parse_rule(&self, p: &mut Parser) {
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
         p.expect(*self);
+        Some(m.complete(p, *self))
     }
 }
 
@@ -118,16 +120,17 @@ impl Rule for OrRule {
         self.rules.iter().any(|rule| rule.matches(p))
     }
 
-    fn parse_rule(&self, p: &mut Parser) {
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         if let Some(rule) = self.rules.iter().find(|rule| rule.matches(p)) {
             debug!("OrRule {}: Parsing rule {}", self.name(), rule.name());
-            rule.parse_rule(p);
+            rule.parse_rule(p)
         } else {
             p.error(format!(
                 "Expected {}, but found {:?}",
                 self.name(),
                 p.current()
             ));
+            None
         }
     }
 }
@@ -138,11 +141,11 @@ impl Rule for RootRule {
         "lu file".into()
     }
 
-    fn parse_rule(&self, p: &mut Parser) {
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
         //SourceFile => statement % newline
         statements(p);
-        m.complete(p, SourceFile);
+        Some(m.complete(p, SourceFile))
     }
 
     fn matches(&self, _: &mut Parser) -> bool {

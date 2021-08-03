@@ -12,3 +12,51 @@ echo "hi"
 - Finish: ""
 - Finish: ""
 ...
+Sum expr
+===
+echo 1 + 1
+---
+- Start: CmdStmt
+- Token: "BareWord (tokens: 1)"
+- Token: "Whitespace (tokens: 1)"
+- Start: "Number (parent: 4)"
+- Token: "Number (tokens: 1)"
+- Finish: ""
+- Token: "Whitespace (tokens: 1)"
+- Start: MathExpr
+- Token: "PlusSign (tokens: 1)"
+- Start: Number
+- Token: "Whitespace (tokens: 1)"
+- Token: "Number (tokens: 1)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...
+Math expr
+===
+echo 1 + 2 * 3
+---
+- Start: CmdStmt
+- Token: "BareWord (tokens: 1)"
+- Token: "Whitespace (tokens: 1)"
+- Start: "Number (parent: 4)"
+- Token: "Number (tokens: 1)"
+- Finish: ""
+- Token: "Whitespace (tokens: 1)"
+- Start: MathExpr
+- Token: "PlusSign (tokens: 1)"
+- Start: "Number (parent: 5)"
+- Token: "Whitespace (tokens: 1)"
+- Token: "Number (tokens: 1)"
+- Finish: ""
+- Token: "Whitespace (tokens: 1)"
+- Start: MathExpr
+- Token: "MultSign (tokens: 1)"
+- Start: Number
+- Token: "Whitespace (tokens: 1)"
+- Token: "Number (tokens: 1)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...

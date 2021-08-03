@@ -3,12 +3,12 @@ mod syntax_error;
 mod syntax_node;
 
 use std::{marker::PhantomData, sync::Arc};
+use syntax_node::SyntaxNode;
 
-pub use parser::SyntaxKind;
+pub use parser::{SyntaxKind, Token};
 pub use rowan::{
     Direction, GreenNode, NodeOrToken, SyntaxText, TextRange, TextSize, TokenAtOffset, WalkEvent,
 };
-use syntax_node::SyntaxNode;
 
 pub use crate::syntax_error::SyntaxError;
 
