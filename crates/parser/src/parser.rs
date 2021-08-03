@@ -13,7 +13,7 @@ use crate::{
     event::Event,
     ParseError,
     SyntaxKind::{self, Comment, Error, Newline, Tombstone, *},
-    TokenSet, TokenSource,
+    Token, TokenSet, TokenSource,
 };
 
 pub(crate) const CMT_NL_WS: TokenSet = TokenSet::new(&[Comment, Newline, Whitespace]);
@@ -43,6 +43,10 @@ impl Parser {
     /// the special `Eof` kind is returned.
     pub(crate) fn current(&self) -> SyntaxKind {
         self.nth(0)
+    }
+
+    pub(crate) fn current_token(&self) -> &Token {
+        &self.token_source[0]
     }
 
     pub(crate) fn next(&self) -> SyntaxKind {
@@ -89,7 +93,7 @@ impl Parser {
             return false;
         }
         //TODO is bump by 1 always correct?
-        self.do_bump(self.current(), 1);
+        self.do_bump();
         true
     }
 
@@ -148,8 +152,7 @@ impl Parser {
 
     /// Advances the parser by one token
     pub(crate) fn bump_any(&mut self) {
-        let kind = self.nth(0);
-        self.do_bump(kind, 1)
+        self.do_bump()
     }
 
     /// Emit error with the `message`
@@ -207,13 +210,10 @@ impl Parser {
         m.complete(self, Error);
     }
 
-    fn do_bump(&mut self, kind: SyntaxKind, n_raw_tokens: u8) {
-        debug!("Eating: {:?}", kind);
-        for _ in 0..n_raw_tokens {
-            self.token_source.bump();
-        }
-
-        self.push_event(Event::Token { kind, n_raw_tokens });
+    fn do_bump(&mut self) {
+        let cur_token = self.token_source.take_and_advance();
+        debug!("Eating: {:?}", cur_token.kind);
+        self.push_event(Event::Token(cur_token));
     }
 
     fn push_event(&mut self, event: Event) {

@@ -14,7 +14,7 @@ impl Serialize for Token {
             // Using our added helper to get the name of the kind
             self.kind.name(),
             // The data payload of the serialized newtype variant
-            &self.len,
+            &u32::from(self.len),
         )
     }
 }
@@ -35,8 +35,8 @@ impl Serialize for Event {
                 None => kind.name().into(),
             },
             Event::Finish => "".into(),
-            Event::Token { kind, n_raw_tokens } => {
-                format!("{} (tokens: {})", kind.name(), n_raw_tokens)
+            Event::Token(token) => {
+                format!("{} (len: {})", token.kind.name(), u32::from(token.len))
             }
             Event::Error { msg } => msg.error.clone(),
         };

@@ -453,6 +453,7 @@ dependencies = [
  "glob",
  "heck",
  "itertools",
+ "lazy_static",
  "log",
  "logos",
  "pretty_env_logger",
@@ -462,6 +463,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "tera",
+ "text-size",
  "toml",
 ]
 
@@ -756,6 +758,7 @@ version = "0.1.0"
 dependencies = [
  "parser",
  "rowan",
+ "text-size",
 ]
 
 [[package]]

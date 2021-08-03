@@ -1,19 +1,29 @@
-use std::ops::{Index, Range, RangeFrom};
+use lazy_static::lazy_static;
+use std::{
+    convert::TryInto,
+    ops::{Index, Range, RangeFrom},
+};
 
 use logos::Logos;
+use text_size::TextSize;
 
 use crate::{SyntaxKind, SyntaxKind::*};
 
 #[derive(Debug, PartialEq, new, Clone, Copy)]
 pub struct Token {
     pub kind: SyntaxKind,
-    pub len: i32,
+    pub len: TextSize,
 }
 
-pub const T_EOF: Token = Token::eof();
+lazy_static! {
+    static ref T_EOF: Token = Token::eof();
+}
 impl Token {
-    pub const fn eof() -> Token {
-        Token { kind: Eof, len: 0 }
+    pub fn eof() -> Token {
+        Token {
+            kind: Eof,
+            len: 0u32.into(),
+        }
     }
 }
 
@@ -70,11 +80,16 @@ impl TokenVec {
     pub fn bump(&mut self) {
         self.cur_elem = self.cur_elem + 1;
     }
+    pub fn take_and_advance(&mut self) -> Token {
+        let current = self[0];
+        self.bump();
+        return current;
+    }
 }
 
 pub fn lex_tokens(input: &str) -> Vec<Token> {
     let lex = SyntaxKind::lexer(input).spanned();
-    lex.map(|(kind, span)| Token::new(kind, span.len() as i32))
+    lex.map(|(kind, span)| Token::new(kind, span.len().try_into().unwrap()))
         .collect()
 }
 
