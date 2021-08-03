@@ -462,6 +462,7 @@ dependencies = [
  "serde_yaml",
  "strum",
  "strum_macros",
+ "syntax_elements",
  "tera",
  "text-size",
  "toml",
@@ -759,6 +760,16 @@ dependencies = [
  "parser",
  "rowan",
  "text-size",
+]
+
+[[package]]
+name = "syntax_elements"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tera",
+ "toml",
 ]
 
 [[package]]
