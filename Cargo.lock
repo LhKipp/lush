@@ -757,9 +757,15 @@ dependencies = [
 name = "syntax"
 version = "0.1.0"
 dependencies = [
+ "glob",
+ "heck",
  "parser",
  "rowan",
+ "serde",
+ "syntax_elements",
+ "tera",
  "text-size",
+ "toml",
 ]
 
 [[package]]

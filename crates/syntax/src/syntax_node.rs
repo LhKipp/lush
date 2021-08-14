@@ -46,13 +46,8 @@ impl SyntaxTreeBuilder {
         (green, self.errors)
     }
 
-    pub fn finish(self) -> Parse<SyntaxNode> {
+    pub fn finish(self) -> Parse {
         let (green, errors) = self.finish_raw();
-        // if cfg!(debug_assertions) {
-        //     let node = SyntaxNode::new_root(green.clone());
-        //     crate::validation::validate_block_structure(&node);
-        //     123
-        // }
         Parse::new(green, errors)
     }
 
