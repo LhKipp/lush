@@ -15,17 +15,18 @@ use crate::{
 };
 
 {% for node in node_kinds -%}
-{% set node_camel = node | camel_case %}
+{% set syntax_kind_name = node | to_syntax_kind_name %}
+{% set node_name = node | to_node_name %}
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct {{ node_camel }} {
+pub struct {{ node_name }} {
     pub(crate) syntax: SyntaxNode,
 }
 
-impl {{ node_camel }} {
+impl {{ node_name }} {
 }
 
-impl AstNode for {{ node_camel }} {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::{{node_camel}} }
+impl AstNode for {{ node_name }} {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::{{syntax_kind_name}} }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })

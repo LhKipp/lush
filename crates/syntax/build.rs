@@ -54,27 +54,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         let mut tera = Tera::new(&root.join(templates).to_string_lossy())?;
         // Add the `camel_case` filter using `heck`.
         tera.register_filter(
-            "camel_case",
-            make_filter_fn("camel_case", |s: String| s.to_camel_case()),
-        );
-        // panic!("opt_quoted ");
-        tera.register_filter(
-            "quote_brackets",
-            make_filter_fn("quote_brackets", |s: String| {
-                if "{}()[]".contains(&s) {
-                    format!("\"{}\"", s)
-                } else if "\\\"" == s {
-                    "DoubleQuote".into()
-                } else if "\'" == s {
-                    "SingleQuote".into()
-                } else {
-                    s
-                }
-            }),
+            "to_syntax_kind_name",
+            make_filter_fn("to_syntax_kind_name", |s: String| s.to_camel_case()),
         );
         tera.register_filter(
-            "quoted",
-            make_filter_fn("quoted", |s: String| format!("\"{}\"", s)),
+            "to_node_name",
+            make_filter_fn("to_node_name", |s: String| s.to_camel_case() + "Node"),
         );
         tera
     };

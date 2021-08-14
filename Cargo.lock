@@ -112,6 +112,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "commands"
+version = "0.1.0"
+
+[[package]]
 name = "conformance"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -307,6 +311,14 @@ dependencies = [
  "thread_local",
  "walkdir",
  "winapi-util",
+]
+
+[[package]]
+name = "interpreter"
+version = "0.1.0"
+dependencies = [
+ "parser",
+ "syntax",
 ]
 
 [[package]]
