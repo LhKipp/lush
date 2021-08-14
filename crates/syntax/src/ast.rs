@@ -1,6 +1,6 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
+#![allow(dead_code)]
 mod generated;
-
 use std::marker::PhantomData;
 
 use crate::{
@@ -36,6 +36,21 @@ pub trait AstNode {
         Self: Sized,
     {
         Self::cast(self.syntax().clone()).unwrap()
+    }
+}
+
+pub trait AstToken {
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized;
+
+    fn cast(syntax: SyntaxToken) -> Option<Self>
+    where
+        Self: Sized;
+
+    fn syntax(&self) -> &SyntaxToken;
+    fn text(&self) -> &str {
+        self.syntax().text()
     }
 }
 

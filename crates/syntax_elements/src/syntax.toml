@@ -1,67 +1,62 @@
-# The keywords of our language.
-keywords = [
-    "let",
-    "fn",
-    "elif",
-    "else",
-    "if",
-    "while",
-    "end",
-]
+syntax_elements = [
+  # [kind_name                  , token_text , regex                                 , is_token , is_node]
 
-# Literal data embedded in the source.
-literals = [
-    ["number", "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)"],
-]
+   # keywords
+   [ "LetKeyword"               , "let"      , ""                                    , true     , false]   ,
+   [ "FnKeyword"                , "fn"       , ""                                    , true     , false]   ,
+   [ "ElifKeyword"              , "elif"     , ""                                    , true     , false]   ,
+   [ "ElseKeyword"              , "else"     , ""                                    , true     , false]   ,
+   [ "IfKeyword"                , "if"       , ""                                    , true     , false]   ,
+   [ "WhileKeyword"             , "while"    , ""                                    , true     , false]   ,
+   [ "EndKeyword"               , "end"      , ""                                    , true     , false]   ,
 
-# Symbols alongside names for them.
-punctuation = [
-    ['(', "left parenthesis"],
-    [')', "right parenthesis"],
-    ['{', "left curly brackets"],
-    ['}', "right curly brackets"],
-    ['[', "left rectangular brackets"],
-    [']', "right rectangular brackets"],
-    ['+', "plus sign"],
-    ['-', "minus sign"],
-    ['*', "mult sign"],
-    ['/', "div sign"],
-    ['<', "less than sign"],
-    ['<=', "less or equal sign"],
-    ['==', "equality sign"],
-    ['!=', "inequality sign"],
-    ['>', "bigger than sign"],
-    ['>=', "bigger or equal sign"],
-    ['=', "assign sign"],
-    ['>>', "right stream"],
-    ['|', "pipe"],
-    ['$', "dollar"],
-    ['.', "point"],
-    ['\"', "double quote"],
-    ["'", "single quote"],
-]
+    # punctuation
+    ["LeftParenthesis"          , '('        , ""                                    , true     , false]   ,
+    ["RightParenthesis"         , ')'        , ""                                    , true     , false]   ,
+    ["LeftCurlyBrackets"        , '{'        , ""                                    , true     , false]   ,
+    ["RightCurlyBrackets"       , '}'        , ""                                    , true     , false]   ,
+    ["LeftRectangularBrackets"  , '['        , ""                                    , true     , false]   ,
+    ["RightRectangularBrackets" , ']'        , ""                                    , true     , false]   ,
+    ["PlusSign"                 , '+'        , ""                                    , true     , false]   ,
+    ["MinusSign"                , '-'        , ""                                    , true     , false]   ,
+    ["MultSign"                 , '*'        , ""                                    , true     , false]   ,
+    ["DivSign"                  , '/'        , ""                                    , true     , false]   ,
+    ["LessThanSign"             , '<'        , ""                                    , true     , false]   ,
+    ["LessOrEqualSign"          , '<='       , ""                                    , true     , false]   ,
+    ["EqualitySign"             , '=='       , ""                                    , true     , false]   ,
+    ["InequalitySign"           , '!='       , ""                                    , true     , false]   ,
+    ["BiggerThanSign"           , '>'        , ""                                    , true     , false]   ,
+    ["BiggerOrEqualSign"        , '>='       , ""                                    , true     , false]   ,
+    ["AssignSign"               , '='        , ""                                    , true     , false]   ,
+    ["RightStream"              , '>>'       , ""                                    , true     , false]   ,
+    ["Pipe"                     , '|'        , ""                                    , true     , false]   ,
+    ["Dollar"                   , '$'        , ""                                    , true     , false]   ,
+    ["Point"                    , '.'        , ""                                    , true     , false]   ,
+    ["DoubleQuote"              , '\"'       , ""                                    , true     , false]   ,
+    ["SingleQuote"              , "'"        , ""                                    , true     , false]   ,
 
-# Tokens that don't fall into one of the above categories.
-# "error" is for errors: when we encounter something unexpected.
-# "whitespace" is the white space between tokens, and is explicit in our lexer.
-tokens = [
-    ["eof", ""],
-    ["source file", ""],
-    ["tombstone", ""],
-    ["whitespace", "[ ]+"],
-    ["comment", "#.*\\n"],
-    ["newline", "\\n"],
-    ["let stmt", ""],
-    ["fn stmt", ""],
-    ["cmd stmt", ""],
-    ["math expr", ""],
-    ["double quoted string", ""],
-    ["single quoted string", ""],
-    ["value path", ""],
-    ["signature", ""],
-    ["array", ""],
-    ["table", ""],
+    # various tokens
+    ["Whitespace"               , ""         , "[ ]+"                                , true     , false]   ,
+    ["Comment"                  , ""         , "#.*\\n"                              , true     , false]   ,
+    ["Newline"                  , ""         , "\\n"                                 , true     , false]   ,
+    ["Number"                   , ""         , "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , true     , false]   ,
+
+    ["Error"                    , ""         , ""                                    , true     , false]   ,
+    ["BareWord"                 , ""         , "[a-zA-Z]+"                           , true     , false]   ,
     #meta rules
-    ["value expr", ""],
-    ["string expr", ""],
+    ["Eof"                      , ""         , ""                                    , false    , true]    ,
+    ["SourceFile"               , ""         , ""                                    , false    , true]    ,
+    ["Tombstone"                , ""         , ""                                    , false    , true]    ,
+    ["LetStmt"                  , ""         , ""                                    , false    , true]    ,
+    ["FnStmt"                   , ""         , ""                                    , false    , true]    ,
+    ["CmdStmt"                  , ""         , ""                                    , false    , true]    ,
+    ["MathExpr"                 , ""         , ""                                    , false    , true]    ,
+    ["DoubleQuotedString"       , ""         , ""                                    , false    , true]    , # TODO should this be a simple token?
+    ["SingleQuotedString"       , ""         , ""                                    , false    , true]    , # TODO should this be a simple token?
+    ["ValuePath"                , ""         , ""                                    , false    , true]    ,
+    ["Signature"                , ""         , ""                                    , false    , true]    ,
+    ["Array"                    , ""         , ""                                    , false    , true]    ,
+    ["Table"                    , ""         , ""                                    , false    , true]    ,
+    ["ValueExpr"                , ""         , ""                                    , false    , true]    ,
+    ["StringExpr"               , ""         , ""                                    , false    , true]    ,
 ]

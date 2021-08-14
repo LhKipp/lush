@@ -3,9 +3,8 @@ use syntax_elements::syntax_elements_as_tera_context;
 // https://dev.to/cad97/what-is-a-lexer-anyway-4kdo
 use {
     glob::glob,
-    heck::*,
-    std::{collections::HashMap, env, error::Error, fs, path::Path},
-    tera::{self, Tera, Value},
+    std::{env, error::Error, fs, path::Path},
+    tera::{self, Tera},
 };
 
 /// The manifest directory.
@@ -24,18 +23,6 @@ fn project_root() -> &'static Path {
     Path::new(MANIFEST).ancestors().nth(2).unwrap()
 }
 
-/// A helper function to make Tera filter functions `(value, keys) -> Value`
-/// out of a simpler `(T) -> T` transformation.
-fn make_filter_fn<'a, T: Into<Value> + serde::de::DeserializeOwned>(
-    name: &'a str,
-    f: impl Fn(T) -> T + Sync + Send + 'a,
-) -> impl tera::Filter + 'a {
-    move |value: &Value, _: &HashMap<String, Value>| -> tera::Result<Value> {
-        let val = tera::try_get_value!(name, "value", T, value);
-        Ok(f(val).into())
-    }
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let root = project_root();
     let parser_root = root.join("crates/syntax");
@@ -49,20 +36,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("cargo:rerun-if-changed={}", path?.to_string_lossy());
     }
 
-    let tera = {
-        // Initialize Tera.
-        let mut tera = Tera::new(&root.join(templates).to_string_lossy())?;
-        // Add the `camel_case` filter using `heck`.
-        tera.register_filter(
-            "to_syntax_kind_name",
-            make_filter_fn("to_syntax_kind_name", |s: String| s.to_camel_case()),
-        );
-        tera.register_filter(
-            "to_node_name",
-            make_filter_fn("to_node_name", |s: String| s.to_camel_case() + "Node"),
-        );
-        tera
-    };
+    // Initialize Tera.
+    let tera = Tera::new(&root.join(templates).to_string_lossy())?;
 
     let context = syntax_elements_as_tera_context()?;
     // Write out the generated file.

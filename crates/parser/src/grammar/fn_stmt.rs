@@ -10,7 +10,7 @@ use crate::{
 pub(crate) struct FnStmtRule;
 impl Rule for FnStmtRule {
     fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == Fn
+        p.next_non(CMT_NL_WS) == FnKeyword
     }
 
     fn name(&self) -> String {
@@ -20,7 +20,7 @@ impl Rule for FnStmtRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
-        p.eat(Fn);
+        p.eat(FnKeyword);
         //consume all ws delimited bare words
         p.eat_while(&[BareWord, Whitespace]);
         p.eat_while(CMT_NL_WS);

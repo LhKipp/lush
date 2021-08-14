@@ -1,10 +1,14 @@
+#![allow(dead_code)]
 pub mod ast;
 mod build_tree;
 mod syntax_error;
 mod syntax_node;
 
 use std::sync::Arc;
-use syntax_node::SyntaxNode;
+
+pub use syntax_node::{
+    SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
+};
 
 pub use parser::{SyntaxKind, Token};
 pub use rowan::{
@@ -12,7 +16,7 @@ pub use rowan::{
 };
 
 pub use crate::syntax_error::SyntaxError;
-pub use ast::AstNode;
+pub use ast::{AstNode, AstToken};
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of
 /// errors.
@@ -73,4 +77,5 @@ impl Parse {
 #[test]
 fn comp() {
     assert_eq!(1 + 1, 2);
+    // Parse::source_file("echo hi");
 }

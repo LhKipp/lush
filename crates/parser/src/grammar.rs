@@ -161,12 +161,12 @@ fn statements(p: &mut Parser) {
 
 fn block(p: &mut Parser) {
     debug!("Parsing block");
-    while p.next_non(CMT_NL_WS) != End {
+    while p.next_non(CMT_NL_WS) != EndKeyword {
         debug!("Parsing block statement");
         block_stmt().parse_rule(p);
     }
     p.eat_while(CMT_NL_WS);
-    p.eat(End);
+    p.eat(EndKeyword);
 }
 
 fn top_level_stmt() -> OrRule {

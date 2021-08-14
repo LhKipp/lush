@@ -10,10 +10,7 @@ use toml;
 /// and Deserialize to deserialize from the metadata file.
 #[derive(Serialize, Deserialize)]
 pub struct SyntaxConfig {
-    keywords: Vec<String>,
-    literals: Vec<RegexToken>,
-    punctuation: Vec<PunctuationConfig>,
-    tokens: Vec<RegexToken>,
+    syntax_elements: Vec<SyntaxElement>,
 }
 
 /// A punctuation config item, represented in toml as `["character", "name"]`.
@@ -25,45 +22,29 @@ pub struct SyntaxConfig {
 /// does not work, as the two formats do not line up. This is only ok to do
 /// here because these are the _only_ de/serialization tasks we care about.
 #[derive(Serialize)]
-pub struct PunctuationConfig {
-    character: String,
+pub struct SyntaxElement {
     name: String,
-}
-
-impl<'de> Deserialize<'de> for PunctuationConfig {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::de::Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(rename = "PunctuationConfig")]
-        struct Helper(String, String);
-        // We implement deserialize by just delegating to a helper tuple struct type.
-        Helper::deserialize(deserializer).map(|helper| PunctuationConfig {
-            character: helper.0,
-            name: helper.1,
-        })
-    }
-}
-
-#[derive(Serialize)]
-pub struct RegexToken {
-    name: String,
+    token_text: String,
     regex: String,
+    is_token: bool,
+    is_node: bool,
 }
 
-impl<'de> Deserialize<'de> for RegexToken {
+impl<'de> Deserialize<'de> for SyntaxElement {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::de::Deserializer<'de>,
     {
         #[derive(Deserialize)]
-        #[serde(rename = "PunctuationConfig")]
-        struct Helper(String, String);
+        #[serde(rename = "SyntaxElement")]
+        struct Helper(String, String, String, bool, bool);
         // We implement deserialize by just delegating to a helper tuple struct type.
-        Helper::deserialize(deserializer).map(|helper| RegexToken {
+        Helper::deserialize(deserializer).map(|helper| SyntaxElement {
             name: helper.0,
-            regex: helper.1,
+            token_text: helper.1,
+            regex: helper.2,
+            is_token: helper.3,
+            is_node: helper.4,
         })
     }
 }

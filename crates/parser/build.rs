@@ -3,7 +3,6 @@ use syntax_elements::syntax_elements_as_tera_context;
 // https://dev.to/cad97/what-is-a-lexer-anyway-4kdo
 use {
     glob::glob,
-    heck::*,
     std::{collections::HashMap, env, error::Error, fs, path::Path},
     tera::{self, Tera, Value},
 };
@@ -52,11 +51,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let tera = {
         // Initialize Tera.
         let mut tera = Tera::new(&root.join(templates).to_string_lossy())?;
-        // Add the `camel_case` filter using `heck`.
-        tera.register_filter(
-            "camel_case",
-            make_filter_fn("camel_case", |s: String| s.to_camel_case()),
-        );
         // panic!("opt_quoted ");
         tera.register_filter(
             "quote_brackets",
