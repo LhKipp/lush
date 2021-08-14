@@ -1,0 +1,11 @@
+[package]
+name = "interpreter"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+parser = { version = "0.1.0", path = "../parser" }
+syntax = { version = "0.1.0", path = "../syntax" }
+value = { version = "0.1.0", path = "../value" }

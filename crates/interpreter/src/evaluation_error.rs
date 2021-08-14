@@ -1,0 +1,2 @@
+
+pub type EvalErr = String;
