@@ -1,6 +1,8 @@
 pub enum Value {
+    Nil,
     Number(f64),
     String(String),
+    BareWord(String),
 }
 
 #[cfg(test)]
