@@ -1,9 +1,9 @@
 #[allow(unused_imports)]
 
 use crate::{
-    ast::{self, support, AstChildren, AstNode, AstToken},
+    ast::{self, support, AstChildren, AstNode, AstToken, AstElement},
     SyntaxKind::{self, *},
-    SyntaxNode, SyntaxToken
+    SyntaxNode, SyntaxToken, SyntaxElement
 };
 
 
@@ -927,90 +927,6 @@ impl AstNode for CmdStmtNode {
 
 
 
-pub struct MathExprNode {
-    pub(crate) syntax: SyntaxNode,
-}
-
-impl MathExprNode {
-}
-impl AstNode for MathExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MathExpr }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-
-
-
-pub struct DoubleQuotedStringNode {
-    pub(crate) syntax: SyntaxNode,
-}
-
-impl DoubleQuotedStringNode {
-}
-impl AstNode for DoubleQuotedStringNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::DoubleQuotedString }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-
-
-
-pub struct SingleQuotedStringNode {
-    pub(crate) syntax: SyntaxNode,
-}
-
-impl SingleQuotedStringNode {
-}
-impl AstNode for SingleQuotedStringNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::SingleQuotedString }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-
-
-
-pub struct ValuePathNode {
-    pub(crate) syntax: SyntaxNode,
-}
-
-impl ValuePathNode {
-}
-impl AstNode for ValuePathNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ValuePath }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-
-
-
 pub struct SignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1032,56 +948,14 @@ impl AstNode for SignatureNode {
 
 
 
-pub struct ArrayNode {
+pub struct MathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 
-impl ArrayNode {
+impl MathExprNode {
 }
-impl AstNode for ArrayNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Array }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-
-
-
-pub struct TableNode {
-    pub(crate) syntax: SyntaxNode,
-}
-
-impl TableNode {
-}
-impl AstNode for TableNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Table }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-
-
-
-pub struct ValueExprNode {
-    pub(crate) syntax: SyntaxNode,
-}
-
-impl ValueExprNode {
-}
-impl AstNode for ValueExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ValueExpr }
+impl AstNode for MathExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MathExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1112,4 +986,113 @@ impl AstNode for StringExprNode {
     }
 
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+
+
+pub struct ValuePathExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl ValuePathExprNode {
+}
+impl AstNode for ValuePathExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ValuePathExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+
+
+pub struct ArrayExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl ArrayExprNode {
+}
+impl AstNode for ArrayExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArrayExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+
+
+pub struct TableExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl TableExprNode {
+}
+impl AstNode for TableExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::TableExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+pub enum ExpressionNode {
+    BareWord(BareWordToken),
+    Number(NumberToken),
+    MathExpr(MathExprNode),
+    StringExpr(StringExprNode),
+    ValuePathExpr(ValuePathExprNode),
+    ArrayExpr(ArrayExprNode),
+    TableExpr(TableExprNode),
+    }
+
+impl ExpressionNode {
+}
+
+impl AstElement for ExpressionNode {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        match kind{
+            BareWord | Number | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        let res = match syntax.kind() {
+            BareWord => ExpressionNode::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            Number => ExpressionNode::Number(NumberToken { syntax: syntax.into_token().unwrap() }),
+            MathExpr => ExpressionNode::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
+            StringExpr => ExpressionNode::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
+            ValuePathExpr => ExpressionNode::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
+            ArrayExpr => ExpressionNode::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
+            TableExpr => ExpressionNode::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            ExpressionNode::BareWord(it) => it.syntax.clone().into(),
+            ExpressionNode::Number(it) => it.syntax.clone().into(),
+            ExpressionNode::MathExpr(it) => it.syntax.clone().into(),
+            ExpressionNode::StringExpr(it) => it.syntax.clone().into(),
+            ExpressionNode::ValuePathExpr(it) => it.syntax.clone().into(),
+            ExpressionNode::ArrayExpr(it) => it.syntax.clone().into(),
+            ExpressionNode::TableExpr(it) => it.syntax.clone().into(),
+            }
+    }
 }

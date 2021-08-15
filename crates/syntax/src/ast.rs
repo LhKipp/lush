@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 
 use crate::{
     syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken},
-    SyntaxKind,
+    SyntaxElement, SyntaxKind,
 };
 
 pub use self::generated::nodes::*;
@@ -52,6 +52,18 @@ pub trait AstToken {
     fn text(&self) -> &str {
         self.syntax().text()
     }
+}
+
+pub trait AstElement {
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized;
+
+    fn cast(syntax: SyntaxElement) -> Option<Self>
+    where
+        Self: Sized;
+
+    fn syntax(&self) -> SyntaxElement;
 }
 
 /// An iterator over `SyntaxNode` children of a particular AST type.

@@ -1,9 +1,9 @@
 #[allow(unused_imports)]
 
 use crate::{
-    ast::{self, support, AstChildren, AstNode, AstToken},
+    ast::{self, support, AstChildren, AstNode, AstToken, AstElement},
     SyntaxKind::{self, *},
-    SyntaxNode, SyntaxToken
+    SyntaxNode, SyntaxToken, SyntaxElement
 };
 
 {% for syn_elem in syntax_elements -%}
@@ -51,4 +51,46 @@ impl AstNode for {{ node_name }} {
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
 {% endif -%}
+{% endfor -%}
+
+{% for gen_elem in generic_elements -%}
+
+pub enum {{ gen_elem.enum_name }} {
+    {% for represented in gen_elem.represents -%}
+    {{represented.name}}({{represented.struct_name}}),
+    {% endfor -%}
+}
+
+impl {{ gen_elem.enum_name }} {
+}
+
+impl AstElement for {{ gen_elem.enum_name }} {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        match kind{
+            {{ gen_elem.represents | map(attribute="name") | join(sep=" | ") }} => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        let res = match syntax.kind() {
+            {% for represented in gen_elem.represents -%}
+            {% if represented.is_token  -%}
+            {{represented.name}} => {{gen_elem.enum_name}}::{{represented.name}}({{represented.struct_name}} { syntax: syntax.into_token().unwrap() }),
+            {% elif represented.is_node  -%}
+            {{represented.name}} => {{gen_elem.enum_name}}::{{represented.name}}({{represented.struct_name}} { syntax: syntax.into_node().unwrap() }),
+            {% endif -%}
+            {% endfor -%}
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            {% for represented in gen_elem.represents -%}
+            {{gen_elem.enum_name}}::{{represented.name}}(it) => it.syntax.clone().into(),
+            {% endfor -%}
+        }
+    }
+}
 {% endfor -%}

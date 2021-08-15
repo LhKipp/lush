@@ -50,13 +50,18 @@ syntax_elements = [
     ["LetStmt"                  , ""         , ""                                    , false    , true]    ,
     ["FnStmt"                   , ""         , ""                                    , false    , true]    ,
     ["CmdStmt"                  , ""         , ""                                    , false    , true]    ,
-    ["MathExpr"                 , ""         , ""                                    , false    , true]    ,
-    ["DoubleQuotedString"       , ""         , ""                                    , false    , true]    , # TODO should this be a simple token?
-    ["SingleQuotedString"       , ""         , ""                                    , false    , true]    , # TODO should this be a simple token?
-    ["ValuePath"                , ""         , ""                                    , false    , true]    ,
     ["Signature"                , ""         , ""                                    , false    , true]    ,
-    ["Array"                    , ""         , ""                                    , false    , true]    ,
-    ["Table"                    , ""         , ""                                    , false    , true]    ,
-    ["ValueExpr"                , ""         , ""                                    , false    , true]    ,
-    ["StringExpr"               , ""         , ""                                    , false    , true]    ,
+    ["MathExpr"                 , ""         , ""                                    , false    , true]    ,
+    ["StringExpr"       , ""         , ""                                    , false    , true]    ,
+    ["ValuePathExpr"                , ""         , ""                                    , false    , true]    ,
+    ["ArrayExpr"                    , ""         , ""                                    , false    , true]    ,
+    ["TableExpr"                    , ""         , ""                                    , false    , true]    ,
+]
+
+
+# Elements that can be one of the above (represented as enums)
+generic_elements = [
+    # Element name, can represent
+    # An Expression is a syntax_element which directly represents a Value (see value crate)
+    ["Expression", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"]]
 ]

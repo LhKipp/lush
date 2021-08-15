@@ -5,7 +5,7 @@ use crate::T;
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
-    SyntaxKind::{self, ValueExpr, *},
+    SyntaxKind::{self, *},
     TokenSet,
 };
 
@@ -87,6 +87,7 @@ impl Rule for ExpressionsRule {
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        // This func parses rules of value_expr_rule but with pratt parsing and math nodes
         let expr_ = expr(p);
         if expr_.is_none() {
             p.error("Expected an expression");
@@ -132,7 +133,7 @@ impl Rule for ArrayRule {
         // arrays are allowed to span multiple lines
         while p.eat(&[Whitespace, Newline]) || { value_expr_rule().opt(p).is_some() } {}
         p.expect(T!["]"]);
-        Some(m.complete(p, Array))
+        Some(m.complete(p, ArrayExpr))
     }
 }
 
@@ -154,7 +155,7 @@ impl Rule for TableRule {
         // arrays are allowed to span multiple lines
         while p.eat(&[Whitespace, Newline]) || { value_expr_rule().opt(p).is_some() } {}
         p.expect(T!["]"]);
-        Some(m.complete(p, Table))
+        Some(m.complete(p, TableExpr))
     }
 }
 
@@ -200,19 +201,8 @@ impl Rule for StringRule {
             p.error("Unterminated string literal");
         }
 
-        let quote_type = match quote_type {
-            DoubleQuote => {
-                p.eat(DoubleQuote);
-                DoubleQuotedString
-            }
-            SingleQuote => {
-                p.eat(SingleQuote);
-                SingleQuotedString
-            }
-            _ => unreachable!("quote type either double or single"),
-        };
-
-        Some(m.complete(p, quote_type))
+        p.eat(quote_type);
+        Some(m.complete(p, StringExpr))
     }
 }
 
@@ -238,6 +228,6 @@ impl Rule for ValuePathRule {
                 break;
             }
         }
-        Some(m.complete(p, ValuePath))
+        Some(m.complete(p, ValuePathExpr))
     }
 }

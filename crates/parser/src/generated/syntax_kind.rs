@@ -1,10 +1,11 @@
-use ::serde::{Deserialize, Serialize};
 use logos::Logos;
+use ::serde::{Deserialize, Serialize};
 
 #[allow(bad_style, missing_docs, unreachable_pub)]
 #[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 #[repr(u16)]
 pub enum SyntaxKind {
+    
     #[token("let")]
     LetKeyword,
     #[token("fn")]
@@ -83,19 +84,16 @@ pub enum SyntaxKind {
     LetStmt,
     FnStmt,
     CmdStmt,
-    MathExpr,
-    DoubleQuotedString,
-    SingleQuotedString,
-    ValuePath,
     Signature,
-    Array,
-    Table,
-    ValueExpr,
+    MathExpr,
     StringExpr,
+    ValuePathExpr,
+    ArrayExpr,
+    TableExpr,
     __LAST,
 }
 
-impl SyntaxKind {
+impl SyntaxKind{
     pub const fn name(self) -> &'static str {
         match self {
             SyntaxKind::LetKeyword => "LetKeyword",
@@ -140,15 +138,12 @@ impl SyntaxKind {
             SyntaxKind::LetStmt => "LetStmt",
             SyntaxKind::FnStmt => "FnStmt",
             SyntaxKind::CmdStmt => "CmdStmt",
-            SyntaxKind::MathExpr => "MathExpr",
-            SyntaxKind::DoubleQuotedString => "DoubleQuotedString",
-            SyntaxKind::SingleQuotedString => "SingleQuotedString",
-            SyntaxKind::ValuePath => "ValuePath",
             SyntaxKind::Signature => "Signature",
-            SyntaxKind::Array => "Array",
-            SyntaxKind::Table => "Table",
-            SyntaxKind::ValueExpr => "ValueExpr",
+            SyntaxKind::MathExpr => "MathExpr",
             SyntaxKind::StringExpr => "StringExpr",
+            SyntaxKind::ValuePathExpr => "ValuePathExpr",
+            SyntaxKind::ArrayExpr => "ArrayExpr",
+            SyntaxKind::TableExpr => "TableExpr",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }
