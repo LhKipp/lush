@@ -93,7 +93,7 @@ impl Parser {
             return false;
         }
         //TODO is bump by 1 always correct?
-        self.do_bump();
+        self.do_bump_cur();
         true
     }
 
@@ -109,6 +109,15 @@ impl Parser {
         while !self.at(kinds) {
             self.bump_any();
         }
+    }
+
+    /// Discards all token until `kinds`. Returns all discarded tokens
+    pub(crate) fn discard_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) -> Vec<Token> {
+        let mut discarded = Vec::new();
+        while !self.at(kinds) {
+            discarded.push(self.token_source.take_and_advance())
+        }
+        discarded
     }
 
     pub(crate) fn eat_empty_or_cmt_line(&mut self) -> bool {
@@ -152,7 +161,7 @@ impl Parser {
 
     /// Advances the parser by one token
     pub(crate) fn bump_any(&mut self) {
-        self.do_bump()
+        self.do_bump_cur()
     }
 
     /// Emit error with the `message`
@@ -166,11 +175,12 @@ impl Parser {
 
     /// Consume the next token if it is `kind` or emit an error
     /// otherwise.
-    pub(crate) fn expect(&mut self, kind: SyntaxKind) -> bool {
-        if self.eat(kind) {
+    pub(crate) fn expect<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
+        let kinds: TokenSet = kinds.into();
+        if self.eat(kinds) {
             return true;
         }
-        self.error(format!("expected {:?}", kind));
+        self.error(format!("expected {:?}", kinds));
         false
     }
 
@@ -210,10 +220,14 @@ impl Parser {
         m.complete(self, Error);
     }
 
-    fn do_bump(&mut self) {
-        let cur_token = self.token_source.take_and_advance();
-        debug!("Eating: {:?}", cur_token.kind);
-        self.push_event(Event::Token(cur_token));
+    pub(crate) fn do_bump_cur(&mut self) {
+        let cur = self.token_source.take_and_advance();
+        self.do_bump(cur);
+    }
+
+    pub(crate) fn do_bump(&mut self, token: Token) {
+        debug!("Eating: {:?}", token.kind);
+        self.push_event(Event::Token(token));
     }
 
     fn push_event(&mut self, event: Event) {

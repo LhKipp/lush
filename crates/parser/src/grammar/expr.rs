@@ -1,13 +1,13 @@
 #[allow(unused_imports)]
 use super::*;
 
-use crate::T;
 #[allow(unused_imports)]
 use crate::{
     parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
     SyntaxKind::{self, *},
     TokenSet,
 };
+use crate::{Token, T};
 
 /// Binding powers of operators for a Pratt parser.
 ///
@@ -149,6 +149,7 @@ impl Rule for TableRule {
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        // TODO proper table parsing
         p.eat_while(CMT_NL_WS);
         let m = p.start();
         p.eat(T!["["]);
@@ -194,8 +195,17 @@ impl Rule for StringRule {
         let m = p.start();
         // TODO assert is quote type
         let quote_type = p.current();
-        p.eat(quote_type);
-        p.eat_until(&[quote_type, Newline]);
+        if !p.expect(&[DoubleQuote, SingleQuote]) {
+            // If quote_type is not " or ' we better don't eat any more tokens
+            return None;
+        }
+        // We don't eat the content, as that would produce the string content as many
+        // multiple tokens. We want the content as one token
+        let str_content = p.discard_until(&[quote_type, Newline]);
+        p.do_bump(Token::new(
+            SyntaxKind::StringContent,
+            str_content.iter().map(|t| t.len).sum(),
+        ));
 
         if p.current() == Newline {
             p.error("Unterminated string literal");

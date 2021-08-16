@@ -5,9 +5,23 @@ echo "hi"
 - Start: CmdStmt
 - Token: "BareWord (len: 4)"
 - Token: "Whitespace (len: 1)"
-- Start: DoubleQuotedString
+- Start: StringExpr
 - Token: "DoubleQuote (len: 1)"
-- Token: "BareWord (len: 2)"
+- Token: "StringContent (len: 2)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Finish: ""
+...
+String content should be one token
+===
+echo "Contents withing strings should be one token () ! [] {} || \n"
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 61)"
 - Token: "DoubleQuote (len: 1)"
 - Finish: ""
 - Finish: ""

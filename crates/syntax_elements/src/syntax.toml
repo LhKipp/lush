@@ -53,6 +53,7 @@ syntax_elements = [
     ["Signature"                , ""         , ""                                    , false    , true]    ,
     ["MathExpr"                 , ""         , ""                                    , false    , true]    ,
     ["StringExpr"       , ""         , ""                                    , false    , true]    ,
+    ["StringContent"       , ""         , ""                                    , true    , false]    ,
     ["ValuePathExpr"                , ""         , ""                                    , false    , true]    ,
     ["ArrayExpr"                    , ""         , ""                                    , false    , true]    ,
     ["TableExpr"                    , ""         , ""                                    , false    , true]    ,
