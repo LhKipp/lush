@@ -5,7 +5,6 @@ use ::serde::{Deserialize, Serialize};
 #[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 #[repr(u16)]
 pub enum SyntaxKind {
-    
     #[token("let")]
     LetKeyword,
     #[token("fn")]
