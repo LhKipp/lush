@@ -197,6 +197,7 @@ impl Rule for StringRule {
         let quote_type = p.current();
         if !p.expect(&[DoubleQuote, SingleQuote]) {
             // If quote_type is not " or ' we better don't eat any more tokens
+            m.abandon(p);
             return None;
         }
         // We don't eat the content, as that would produce the string content as many
