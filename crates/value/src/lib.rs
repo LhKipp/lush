@@ -3,6 +3,7 @@ pub enum Value {
     Number(f64),
     String(String),
     BareWord(String),
+    Array(Vec<Value>),
 }
 
 #[cfg(test)]
