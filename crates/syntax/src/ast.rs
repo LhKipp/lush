@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 
 use crate::{
     syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken},
-    SyntaxElement, SyntaxKind,
+    SyntaxElement, SyntaxElementChildren, SyntaxKind,
 };
 
 pub use self::generated::nodes::*;
@@ -68,21 +68,44 @@ pub trait AstElement {
 
 /// An iterator over `SyntaxNode` children of a particular AST type.
 #[derive(Debug, Clone)]
-pub struct AstChildren<N> {
+pub struct AstNodeChildren<N> {
     inner: SyntaxNodeChildren,
     ph: PhantomData<N>,
 }
 
-impl<N> AstChildren<N> {
+impl<N> AstNodeChildren<N> {
     fn new(parent: &SyntaxNode) -> Self {
-        AstChildren {
+        AstNodeChildren {
             inner: parent.children(),
             ph: PhantomData,
         }
     }
 }
 
-impl<N: AstNode> Iterator for AstChildren<N> {
+impl<N: AstNode> Iterator for AstNodeChildren<N> {
+    type Item = N;
+    fn next(&mut self) -> Option<N> {
+        self.inner.find_map(N::cast)
+    }
+}
+
+/// An iterator over `SyntaxElement` children of a particular AST type.
+#[derive(Debug, Clone)]
+pub struct AstElementChildren<N> {
+    inner: SyntaxElementChildren,
+    ph: PhantomData<N>,
+}
+
+impl<N> AstElementChildren<N> {
+    fn new(parent: &SyntaxNode) -> Self {
+        AstElementChildren {
+            inner: parent.children_with_tokens(),
+            ph: PhantomData,
+        }
+    }
+}
+
+impl<N: AstElement> Iterator for AstElementChildren<N> {
     type Item = N;
     fn next(&mut self) -> Option<N> {
         self.inner.find_map(N::cast)
@@ -90,20 +113,26 @@ impl<N: AstNode> Iterator for AstChildren<N> {
 }
 
 mod support {
-    use super::{AstChildren, AstNode, SyntaxKind, SyntaxNode, SyntaxToken};
+    use crate::{AstElement, AstToken, SyntaxElement};
 
-    pub(super) fn child<N: AstNode>(parent: &SyntaxNode) -> Option<N> {
+    use super::{AstElementChildren, AstNode, AstNodeChildren, SyntaxNode};
+
+    pub(super) fn node_child<N: AstNode>(parent: &SyntaxNode) -> Option<N> {
         parent.children().find_map(N::cast)
     }
 
-    pub(super) fn children<N: AstNode>(parent: &SyntaxNode) -> AstChildren<N> {
-        AstChildren::new(parent)
-    }
-
-    pub(super) fn token(parent: &SyntaxNode, kind: SyntaxKind) -> Option<SyntaxToken> {
+    pub(super) fn token_child<N: AstToken>(parent: &SyntaxNode) -> Option<N> {
         parent
             .children_with_tokens()
-            .filter_map(|it| it.into_token())
-            .find(|it| it.kind() == kind)
+            .filter_map(SyntaxElement::into_token)
+            .find_map(N::cast)
+    }
+
+    pub(super) fn node_children<N: AstNode>(parent: &SyntaxNode) -> AstNodeChildren<N> {
+        AstNodeChildren::new(parent)
+    }
+
+    pub(super) fn element_children<N: AstElement>(parent: &SyntaxNode) -> AstElementChildren<N> {
+        AstElementChildren::new(parent)
     }
 }

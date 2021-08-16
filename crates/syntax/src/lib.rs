@@ -16,7 +16,7 @@ pub use rowan::{
 };
 
 pub use crate::syntax_error::SyntaxError;
-pub use ast::{AstNode, AstToken};
+pub use ast::{AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken};
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of
 /// errors.
