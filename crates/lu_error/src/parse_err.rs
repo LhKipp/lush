@@ -1,22 +1,24 @@
+use serde::{Deserialize, Serialize};
 #[allow(unused)]
 #[allow(dead_code)]
 use std::ops::Range;
 
 use thiserror::Error;
-#[derive(Error, Debug, new)]
+
+#[derive(Error, Debug, new, Deserialize, Serialize)]
 // TODO impl display
 #[error("Parse Error")]
 pub struct ParseErrs {
     pub errs: Vec<ParseErr>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum ParseErrKind {
     /// Catch-all
     Message(String),
 }
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Deserialize, Serialize)]
 #[error("Parse Error")]
 pub struct ParseErr {
     pub kind: ParseErrKind,
