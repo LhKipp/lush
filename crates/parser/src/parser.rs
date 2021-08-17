@@ -3,6 +3,8 @@
 use log::debug;
 use std::cell::Cell;
 
+use lu_error::{ParseErr, ParseErrKind};
+
 use drop_bomb::DropBomb;
 
 #[allow(unused)]
@@ -11,7 +13,6 @@ use crate::T;
 
 use crate::{
     event::Event,
-    ParseError,
     SyntaxKind::{self, Comment, Error, Newline, Tombstone, *},
     Token, TokenSet, TokenSource,
 };
@@ -164,13 +165,9 @@ impl Parser {
         self.do_bump_cur()
     }
 
-    /// Emit error with the `message`
-    /// FIXME: this should be much more fancy and support
-    /// structured errors with spans and notes, like rustc
-    /// does.
-    pub(crate) fn error<T: Into<String>>(&mut self, message: T) {
-        let msg = ParseError::new(message.into());
-        self.push_event(Event::Error { msg })
+    /// Emit error `err`
+    pub(crate) fn error<E: Into<ParseErr>>(&mut self, err: E) {
+        self.push_event(Event::Error(err.into()));
     }
 
     /// Consume the next token if it is `kind` or emit an error
@@ -180,7 +177,10 @@ impl Parser {
         if self.eat(kinds) {
             return true;
         }
-        self.error(format!("expected {:?}", kinds));
+        self.error(ParseErr::new(ParseErrKind::Message(format!(
+            "expected {:?}",
+            kinds
+        ))));
         false
     }
 

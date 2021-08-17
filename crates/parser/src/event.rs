@@ -9,7 +9,8 @@
 //! this stream to a real tree.
 
 use crate::SyntaxKind::Tombstone;
-use crate::{generated::*, ParseError, Token};
+use crate::{generated::*, Token};
+use lu_error::ParseErr;
 use strum_macros::IntoStaticStr;
 
 /// `Parser` produces a flat list of `Event`s.
@@ -67,9 +68,7 @@ pub enum Event {
     /// Produce a single leaf-element.
     Token(Token),
 
-    Error {
-        msg: ParseError,
-    },
+    Error(ParseErr),
 }
 
 impl Event {

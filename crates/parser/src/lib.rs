@@ -2,8 +2,6 @@
 extern crate derive_new;
 extern crate strum_macros;
 
-use ::serde::{Deserialize, Serialize};
-
 mod event;
 pub(crate) mod generated;
 pub mod grammar;
@@ -34,9 +32,4 @@ pub fn parse_from_tokens(input: &str, rule: &dyn Rule) -> Vec<Event> {
 /// Parse input str
 pub fn parse(input: &str) -> Vec<Event> {
     parse_from_tokens(input, &RootRule {})
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, new)]
-pub struct ParseError {
-    pub error: String,
 }

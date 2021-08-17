@@ -36,6 +36,7 @@ mod signature;
 
 use itertools::Itertools;
 use log::debug;
+use lu_error::{ParseErr, ParseErrKind};
 
 use crate::grammar::{cmd_stmt::CmdStmtRule, fn_stmt::FnStmtRule, let_stmt::LetStmtRule};
 #[allow(unused_imports)]
@@ -125,11 +126,11 @@ impl Rule for OrRule {
             debug!("OrRule {}: Parsing rule {}", self.name(), rule.name());
             rule.parse_rule(p)
         } else {
-            p.error(format!(
+            p.error(ParseErr::new(ParseErrKind::Message(format!(
                 "Expected {}, but found {:?}",
                 self.name(),
                 p.current()
-            ));
+            ))));
             None
         }
     }
