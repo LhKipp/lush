@@ -1,0 +1,30 @@
+1
+===
+fn ls ()
+  echo "hi"
+end
+---
+- Start: FnStmt
+- Token: "FnKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "Whitespace (len: 2)"
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 2)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+...

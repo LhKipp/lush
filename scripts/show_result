@@ -1,0 +1,36 @@
+#!/bin/fish
+function unescape
+    set s "$argv"
+    printf '%b\n' "$s"
+end
+
+function debug
+    echo $argv > dbg_out
+    echo $argv
+end
+
+function run_test
+    set result (cargo test $argv 2>/dev/null |
+        sed -n -e '/left:/p' |   # Left is the computed value, right is the stored value
+        grep -o "`.*`" | # take only text inside "``"
+        xargs -0 unescape)
+    # extract text in "``"  
+    string sub --start 3 --end -3 "$result"
+end
+
+function print_yaml
+    echo $argv | 
+        sed 's/- /\n- /g' | # split lines into: "- kind len"
+        tail -n +3 # first 2 lines are trash
+end
+
+function print_json
+    echo $argv | jq
+end
+
+set val (run_test $argv)
+if string match --quiet --regex "^{" -- $val
+    print_json $val
+else if string match --quiet --regex "^-" -- $val
+    print_yaml $val
+end
