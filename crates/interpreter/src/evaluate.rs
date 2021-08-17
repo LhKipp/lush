@@ -1,9 +1,14 @@
+use lu_error::LuResult;
 use value::Value;
 
-use crate::{evaluation_error::EvalErr, Interpreter};
+use crate::Interpreter;
 
 mod cmd_call;
+mod expr;
+mod source_file;
+mod statement;
 
 pub trait Evaluable {
-    fn evaluate(&self, state: &mut Interpreter) -> (Value, EvalErr);
+    /// Evaluate the AST-Node/Token given the state.
+    fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value>;
 }

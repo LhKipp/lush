@@ -1,28 +1,13 @@
-mod evaluate;
-mod evaluation_error;
-mod interpreter;
+// #[macro_use]
+// extern crate derive_new;
+// extern crate strum_macros;
 
-use value::Value;
+mod command;
+mod evaluate;
+mod interpreter;
+mod scope;
 
 pub use crate::evaluate::Evaluable;
-pub use crate::interpreter::Interpreter;
-
-pub type ShellError = String;
-
-pub struct CommandArgs {
-    /// The value which comes from stdin
-    pub input: Value,
-}
-
-pub trait Command {
-    fn name(&self) -> &str;
-    fn run(&self, args: CommandArgs, state: &mut Interpreter) -> Result<Value, ShellError>;
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+pub use crate::interpreter::{CommandStorage, Interpreter};
+pub use command::Command;
+pub use scope::{Scope, ScopeFrame, SimpleScopeFrame};
