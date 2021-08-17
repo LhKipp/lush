@@ -2,7 +2,7 @@
 pub(crate) mod nodes;
 pub use nodes::*;
 
-use crate::{AstElementChildren, AstNode, AstToken};
+use crate::{AstElementChildren, AstNode, AstNodeChildren, AstToken};
 
 use super::support;
 
@@ -37,5 +37,11 @@ impl StringExprNode {
             .unwrap()
             .text()
             .to_string()
+    }
+}
+
+impl SourceFileNode {
+    pub fn statements(&self) -> AstNodeChildren<StatementNode> {
+        support::node_children(self.syntax())
     }
 }

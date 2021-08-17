@@ -64,5 +64,6 @@ syntax_elements = [
 generic_elements = [
     # Element name, can represent
     # An Expression is a syntax_element which directly represents a Value (see value crate)
-    ["Expression", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"]]
+    ["Expression", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"]],
+    ["Statement" , ["LetStmt" , "FnStmt", "CmdStmt"]],
 ]

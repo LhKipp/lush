@@ -1,10 +1,11 @@
-use ::serde::{Deserialize, Serialize};
 use logos::Logos;
+use ::serde::{Deserialize, Serialize};
 
 #[allow(bad_style, missing_docs, unreachable_pub)]
 #[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 #[repr(u16)]
 pub enum SyntaxKind {
+    
     #[token("let")]
     LetKeyword,
     #[token("fn")]
@@ -93,7 +94,7 @@ pub enum SyntaxKind {
     __LAST,
 }
 
-impl SyntaxKind {
+impl SyntaxKind{
     pub const fn name(self) -> &'static str {
         match self {
             SyntaxKind::LetKeyword => "LetKeyword",

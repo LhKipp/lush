@@ -74,6 +74,7 @@ pub struct GenericElement {
     enum_name: String,
     represents_element_names: Vec<String>,
     represents: Vec<SyntaxElement>,
+    impl_trait: String,
 }
 
 impl<'de> Deserialize<'de> for GenericElement {
@@ -90,6 +91,7 @@ impl<'de> Deserialize<'de> for GenericElement {
             enum_name: String::new(),
             represents_element_names: helper.1,
             represents: Vec::new(),
+            impl_trait: "Set in Finish".to_string(),
         })
     }
 }
@@ -111,7 +113,15 @@ impl GenericElement {
                     ))
             })
             .cloned()
-            .collect()
+            .collect();
+
+        // If every child is a node, we can impl AstNode, otherwise more generic AstElement
+        self.impl_trait = if self.represents.iter().all(|e| e.is_node) {
+            "AstNode"
+        } else {
+            "AstElement"
+        }
+        .to_string()
     }
 }
 
