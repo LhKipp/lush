@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
+use log::debug;
 use std::mem;
 
 // TODO remove dead code when all done
@@ -40,6 +41,7 @@ impl<'a> TextTreeSink<'a> {
     }
 
     fn start_node(&mut self, kind: SyntaxKind) {
+        debug!("BuildTree: Starting node: {:?}", kind);
         if self.state == State::PendingFinish {
             self.inner.finish_node();
         }
@@ -48,6 +50,7 @@ impl<'a> TextTreeSink<'a> {
     }
 
     fn finish_node(&mut self) {
+        debug!("BuildTree: finishing node");
         match mem::replace(&mut self.state, State::PendingFinish) {
             State::PendingStart => unreachable!(),
             State::PendingFinish => self.inner.finish_node(),
@@ -56,6 +59,7 @@ impl<'a> TextTreeSink<'a> {
     }
 
     fn error(&mut self, error: ParseErr) {
+        debug!("BuildTree: error {}", error);
         self.inner.error(error)
     }
 
@@ -78,6 +82,7 @@ impl<'a> TextTreeSink<'a> {
     }
 
     fn do_token(&mut self, token: Token) {
+        debug!("BuildTree: doing token: {:?}", token);
         let range = TextRange::at(self.text_pos, token.len);
         let text = &self.text[range];
         self.text_pos += token.len;
@@ -130,7 +135,7 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<ParseErr>) {
                     sink.start_node(kind);
                 }
             }
-            parser::Event::Finish => {}
+            parser::Event::Finish => sink.finish_node(),
             parser::Event::Token(token) => {
                 sink.token(token);
             }
