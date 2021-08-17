@@ -1,3 +1,11 @@
+mod parse_err;
+
+#[macro_use]
+extern crate derive_new;
+extern crate strum_macros;
+
+pub use parse_err::{ParseErr, ParseErrKind, ParseErrs};
+
 use std::{io, path::PathBuf, result};
 use thiserror::Error;
 
@@ -18,18 +26,22 @@ pub struct FsErr {
     pub source: InnerIoErr,
 }
 
-#[derive(Error, Debug)]
-#[error("Parse Error")]
-pub enum ParseErr {}
-
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
 #[error("Eval Error")]
 pub enum EvalErr {}
 
 #[derive(Error, Debug)]
-#[error(transparent)]
+#[error("{0}")]
 pub enum LuErr {
-    Parsing(#[from] ParseErr),
+    Parse(#[from] ParseErr),
+    ParseErrs(#[from] ParseErrs),
     Eval(#[from] EvalErr),
     FS(#[from] FsErr),
+    Internal(String),
+}
+
+impl<S: Into<String>> From<S> for LuErr {
+    fn from(s: S) -> Self {
+        LuErr::Internal(s.into())
+    }
 }

@@ -7,3 +7,6 @@ edition = "2018"
 
 [dependencies]
 thiserror = "1.0.26"
+strum = "0.21"
+strum_macros = "0.21"
+derive-new = "0.5"
