@@ -3,12 +3,12 @@
 use std::mem;
 
 // TODO remove dead code when all done
-use parser::{Event, ParseError};
+use lu_error::ParseErr;
+use parser::Event;
 use rowan::GreenNode;
 
 use crate::{
     syntax_node::SyntaxTreeBuilder,
-    SyntaxError,
     SyntaxKind::{self, *},
     TextRange, TextSize, Token,
 };
@@ -55,8 +55,8 @@ impl<'a> TextTreeSink<'a> {
         }
     }
 
-    fn error(&mut self, error: ParseError) {
-        self.inner.error(error, self.text_pos)
+    fn error(&mut self, error: ParseErr) {
+        self.inner.error(error)
     }
 
     pub(super) fn new(text: &'a str) -> Self {
@@ -68,7 +68,7 @@ impl<'a> TextTreeSink<'a> {
         }
     }
 
-    pub(super) fn finish(mut self) -> (GreenNode, Vec<SyntaxError>) {
+    pub(super) fn finish(mut self) -> (GreenNode, Vec<ParseErr>) {
         match mem::replace(&mut self.state, State::Normal) {
             State::PendingFinish => self.inner.finish_node(),
             State::PendingStart | State::Normal => unreachable!(),
@@ -85,7 +85,8 @@ impl<'a> TextTreeSink<'a> {
     }
 }
 
-pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
+/// Parse the text as a source file
+pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<ParseErr>) {
     let mut sink = TextTreeSink::new(text);
     let mut events = parser::parse(text);
     let mut forward_parents = Vec::new();
@@ -133,7 +134,7 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
             parser::Event::Token(token) => {
                 sink.token(token);
             }
-            parser::Event::Error { msg } => sink.error(msg),
+            parser::Event::Error(e) => sink.error(e),
         }
     }
     sink.finish()

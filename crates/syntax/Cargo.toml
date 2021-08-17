@@ -7,6 +7,8 @@ edition = "2018"
 
 [dependencies]
 parser = { version = "0.1.0", path = "../parser" }
+lu_error = { version = "0.1.0", path = "../lu_error" }
+
 rowan = "0.10.6"
 text-size = "1.1.0"
 

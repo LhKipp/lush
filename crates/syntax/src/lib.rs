@@ -1,10 +1,9 @@
 #![allow(dead_code)]
 pub mod ast;
 mod build_tree;
-mod syntax_error;
 mod syntax_node;
 
-use std::sync::Arc;
+use lu_error::{LuErr, LuResult, ParseErr, ParseErrs};
 
 pub use syntax_node::{
     SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
@@ -15,7 +14,6 @@ pub use rowan::{
     Direction, GreenNode, NodeOrToken, SyntaxText, TextRange, TextSize, TokenAtOffset, WalkEvent,
 };
 
-pub use crate::syntax_error::SyntaxError;
 pub use ast::{AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken};
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of
@@ -25,51 +23,43 @@ pub use ast::{AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken
 /// files.
 ///
 /// Currently the green node will always be a SourceFileNode
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug)]
 pub struct Parse {
     green: GreenNode,
-    errors: Arc<Vec<SyntaxError>>,
+    errors: Vec<ParseErr>,
 }
 
 impl Parse {
-    fn source_file(text: &str) -> Parse {
+    pub fn source_file(text: &str) -> Parse {
         let (green, errors) = build_tree::parse_text(text);
-        let root = SyntaxNode::new_root(green.clone());
 
         // TODO add validation here
         // errors.extend(validation::validate(&root));
 
-        assert_eq!(root.kind(), SyntaxKind::SourceFile);
-        Parse {
-            green,
-            errors: Arc::new(errors),
-        }
+        Parse::new(green, errors)
     }
 
-    fn new(green: GreenNode, errors: Vec<SyntaxError>) -> Parse {
-        Parse {
-            green,
-            errors: Arc::new(errors),
-        }
+    fn new(green: GreenNode, errors: Vec<ParseErr>) -> Parse {
+        Parse { green, errors }
     }
 
     pub fn syntax_node(&self) -> SyntaxNode {
         SyntaxNode::new_root(self.green.clone())
     }
 
-    pub fn tree<T: AstNode>(&self) -> T {
-        T::cast(self.syntax_node()).unwrap()
+    pub fn cast<T: AstNode>(&self) -> Option<T> {
+        T::cast(self.syntax_node())
     }
 
-    pub fn errors(&self) -> &[SyntaxError] {
+    pub fn errors(&self) -> &[ParseErr] {
         &*self.errors
     }
 
-    pub fn ok<T: AstNode>(self) -> Result<T, Arc<Vec<SyntaxError>>> {
+    pub fn ok<T: AstNode>(self) -> LuResult<T> {
         if self.errors.is_empty() {
-            Ok(self.tree())
+            Ok(self.cast::<T>().unwrap())
         } else {
-            Err(self.errors)
+            Err(LuErr::ParseErrs(ParseErrs::new(self.errors)))
         }
     }
 }

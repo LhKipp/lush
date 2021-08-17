@@ -7,9 +7,10 @@
 //! module just wraps its API.
 #![allow(dead_code)] // TODO remove dead code when all done
 
+use lu_error::ParseErr;
 use rowan::{GreenNodeBuilder, Language, SmolStr};
 
-use crate::{Parse, SyntaxError, SyntaxKind, TextSize};
+use crate::{Parse, SyntaxKind};
 
 #[allow(unused_imports)]
 pub(crate) use rowan::{GreenNode, GreenToken, NodeOrToken};
@@ -36,12 +37,12 @@ pub type SyntaxElementChildren = rowan::SyntaxElementChildren<LuLanguage>;
 
 #[derive(Default)]
 pub struct SyntaxTreeBuilder {
-    errors: Vec<SyntaxError>,
+    errors: Vec<ParseErr>,
     inner: GreenNodeBuilder<'static>,
 }
 
 impl SyntaxTreeBuilder {
-    pub(crate) fn finish_raw(self) -> (GreenNode, Vec<SyntaxError>) {
+    pub(crate) fn finish_raw(self) -> (GreenNode, Vec<ParseErr>) {
         let green = self.inner.finish();
         (green, self.errors)
     }
@@ -65,8 +66,7 @@ impl SyntaxTreeBuilder {
         self.inner.finish_node()
     }
 
-    pub fn error(&mut self, error: parser::ParseError, text_pos: TextSize) {
-        self.errors
-            .push(SyntaxError::new_at_offset(error.error, text_pos))
+    pub fn error(&mut self, error: ParseErr) {
+        self.errors.push(error)
     }
 }
