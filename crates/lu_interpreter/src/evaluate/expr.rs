@@ -1,12 +1,12 @@
 use lu_error::LuResult;
-use lu_value::Value;
-use syntax::{
+use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, ExpressionNode, MathExprNode, NumberToken, StringExprNode,
         TableExprNode, ValuePathExprNode,
     },
     AstToken,
 };
+use lu_value::Value;
 
 use crate::Evaluable;
 

@@ -1,6 +1,6 @@
 use lu_error::LuResult;
+use lu_syntax::ast::SourceFileNode;
 use lu_value::Value;
-use syntax::ast::SourceFileNode;
 
 use crate::{Evaluable, Interpreter};
 

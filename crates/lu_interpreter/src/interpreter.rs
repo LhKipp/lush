@@ -3,9 +3,9 @@
 mod command_storage;
 
 use lu_error::{LuErr, LuResult, ParseErr};
+use lu_syntax::{ast::SourceFileNode, Parse};
 use lu_text_util::SourceCode;
 use lu_value::Value;
-use syntax::{ast::SourceFileNode, Parse};
 
 use parking_lot::Mutex;
 use std::{path::PathBuf, sync::Arc};

@@ -1,6 +1,6 @@
 use lu_error::LuResult;
+use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
-use syntax::ast::CmdStmtNode;
 
 use crate::{Evaluable, Interpreter};
 
