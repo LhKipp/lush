@@ -177,10 +177,20 @@ impl Parser {
         if self.eat(kinds) {
             return true;
         }
-        self.error(ParseErr::new(ParseErrKind::Message(format!(
-            "expected {:?}",
-            kinds
-        ))));
+        let err: ParseErr = format!("expected {:?}", kinds).into();
+        self.error(err);
+        false
+    }
+
+    /// Consume the next token if it is `kind` or emit an error
+    /// otherwise.
+    pub(crate) fn expect_as<TS: Into<TokenSet>>(&mut self, kinds: TS, as_: SyntaxKind) -> bool {
+        let kinds: TokenSet = kinds.into();
+        if self.eat_as(kinds, as_) {
+            return true;
+        }
+        let err: ParseErr = format!("expected {:?}", kinds).into();
+        self.error(err);
         false
     }
 
