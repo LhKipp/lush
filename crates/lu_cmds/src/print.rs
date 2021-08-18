@@ -1,6 +1,6 @@
-use interpreter::{Command, Interpreter};
 use log::debug;
 use lu_error::LuResult;
+use lu_interpreter::{Command, Interpreter};
 use value::Value;
 
 #[derive(Debug)]

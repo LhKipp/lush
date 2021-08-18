@@ -5,9 +5,9 @@ use pretty_env_logger::env_logger;
 
 use std::collections::HashMap;
 
-use interpreter::{Command, Interpreter};
 use lu_cmds::PrintCmd;
 use lu_error::LuResult;
+use lu_interpreter::{Command, Interpreter};
 use lu_text_util::SourceCode;
 use value::Value;
 use {conformance, serde_json};

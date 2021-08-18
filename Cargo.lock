@@ -323,28 +323,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "interpreter"
-version = "0.1.0"
-dependencies = [
- "conformance",
- "derive-new",
- "indextree",
- "log",
- "lu_cmds",
- "lu_error",
- "lu_fs",
- "lu_text_util",
- "parking_lot",
- "parser",
- "pretty_env_logger",
- "serde_json",
- "serde_yaml",
- "syntax",
- "value",
- "vec_box",
-]
-
-[[package]]
 name = "itertools"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -423,9 +401,9 @@ dependencies = [
 name = "lu_cmds"
 version = "0.1.0"
 dependencies = [
- "interpreter",
  "log",
  "lu_error",
+ "lu_interpreter",
  "pretty_env_logger",
  "value",
 ]
@@ -446,6 +424,28 @@ name = "lu_fs"
 version = "0.1.0"
 dependencies = [
  "lu_error",
+]
+
+[[package]]
+name = "lu_interpreter"
+version = "0.1.0"
+dependencies = [
+ "conformance",
+ "derive-new",
+ "indextree",
+ "log",
+ "lu_cmds",
+ "lu_error",
+ "lu_fs",
+ "lu_text_util",
+ "parking_lot",
+ "parser",
+ "pretty_env_logger",
+ "serde_json",
+ "serde_yaml",
+ "syntax",
+ "value",
+ "vec_box",
 ]
 
 [[package]]
