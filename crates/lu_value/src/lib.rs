@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about
     // pure functions with inputs. However, copying large structs (Array, Table, ...)
