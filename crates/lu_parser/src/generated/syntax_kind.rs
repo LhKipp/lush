@@ -10,6 +10,8 @@ pub enum SyntaxKind {
     LetKeyword,
     #[token("fn")]
     FnKeyword,
+    #[token("for")]
+    ForKeyword,
     #[token("elif")]
     ElifKeyword,
     #[token("else")]
@@ -20,6 +22,8 @@ pub enum SyntaxKind {
     WhileKeyword,
     #[token("end")]
     EndKeyword,
+    #[token("in")]
+    InKeyword,
     #[token("(")]
     LeftParenthesis,
     #[token(")")]
@@ -83,6 +87,7 @@ pub enum SyntaxKind {
     Tombstone,
     LetStmt,
     FnStmt,
+    ForStmt,
     CmdStmt,
     Signature,
     MathExpr,
@@ -99,11 +104,13 @@ impl SyntaxKind{
         match self {
             SyntaxKind::LetKeyword => "LetKeyword",
             SyntaxKind::FnKeyword => "FnKeyword",
+            SyntaxKind::ForKeyword => "ForKeyword",
             SyntaxKind::ElifKeyword => "ElifKeyword",
             SyntaxKind::ElseKeyword => "ElseKeyword",
             SyntaxKind::IfKeyword => "IfKeyword",
             SyntaxKind::WhileKeyword => "WhileKeyword",
             SyntaxKind::EndKeyword => "EndKeyword",
+            SyntaxKind::InKeyword => "InKeyword",
             SyntaxKind::LeftParenthesis => "LeftParenthesis",
             SyntaxKind::RightParenthesis => "RightParenthesis",
             SyntaxKind::LeftCurlyBrackets => "LeftCurlyBrackets",
@@ -138,6 +145,7 @@ impl SyntaxKind{
             SyntaxKind::Tombstone => "Tombstone",
             SyntaxKind::LetStmt => "LetStmt",
             SyntaxKind::FnStmt => "FnStmt",
+            SyntaxKind::ForStmt => "ForStmt",
             SyntaxKind::CmdStmt => "CmdStmt",
             SyntaxKind::Signature => "Signature",
             SyntaxKind::MathExpr => "MathExpr",
@@ -156,11 +164,13 @@ impl SyntaxKind{
 macro_rules! T {
     [let] => {$crate::SyntaxKind::LetKeyword };
     [fn] => {$crate::SyntaxKind::FnKeyword };
+    [for] => {$crate::SyntaxKind::ForKeyword };
     [elif] => {$crate::SyntaxKind::ElifKeyword };
     [else] => {$crate::SyntaxKind::ElseKeyword };
     [if] => {$crate::SyntaxKind::IfKeyword };
     [while] => {$crate::SyntaxKind::WhileKeyword };
     [end] => {$crate::SyntaxKind::EndKeyword };
+    [in] => {$crate::SyntaxKind::InKeyword };
     ["("] => {$crate::SyntaxKind::LeftParenthesis };
     [")"] => {$crate::SyntaxKind::RightParenthesis };
     ["{"] => {$crate::SyntaxKind::LeftCurlyBrackets };

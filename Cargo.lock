@@ -461,6 +461,7 @@ dependencies = [
  "logos",
  "lu_error",
  "lu_syntax_elements",
+ "lu_test_support",
  "pretty_env_logger",
  "serde",
  "serde_json",

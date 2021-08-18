@@ -1,8 +1,8 @@
 use lu_error::LuResult;
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, ExpressionNode, MathExprNode, NumberToken, StringExprNode,
-        TableExprNode, ValuePathExprNode,
+        ArrayExprNode, BareWordToken, MathExprNode, NumberToken, StringExprNode, TableExprNode,
+        ValueExprNode, ValuePathExprNode,
     },
     AstToken,
 };
@@ -10,16 +10,16 @@ use lu_value::Value;
 
 use crate::Evaluable;
 
-impl Evaluable for ExpressionNode {
+impl Evaluable for ValueExprNode {
     fn evaluate(&self, state: &mut crate::Interpreter) -> LuResult<Value> {
         match self {
-            ExpressionNode::BareWord(n) => n.evaluate(state),
-            ExpressionNode::Number(n) => n.evaluate(state),
-            ExpressionNode::MathExpr(n) => n.evaluate(state),
-            ExpressionNode::StringExpr(n) => n.evaluate(state),
-            ExpressionNode::ValuePathExpr(n) => n.evaluate(state),
-            ExpressionNode::ArrayExpr(n) => n.evaluate(state),
-            ExpressionNode::TableExpr(n) => n.evaluate(state),
+            ValueExprNode::BareWord(n) => n.evaluate(state),
+            ValueExprNode::Number(n) => n.evaluate(state),
+            ValueExprNode::MathExpr(n) => n.evaluate(state),
+            ValueExprNode::StringExpr(n) => n.evaluate(state),
+            ValueExprNode::ValuePathExpr(n) => n.evaluate(state),
+            ValueExprNode::ArrayExpr(n) => n.evaluate(state),
+            ValueExprNode::TableExpr(n) => n.evaluate(state),
         }
     }
 }

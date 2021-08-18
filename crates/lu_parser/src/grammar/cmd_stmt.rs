@@ -1,4 +1,4 @@
-use super::{expr::ExpressionsRule, Rule};
+use super::{expr::ValueExprRule, Rule};
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::*,
@@ -18,7 +18,7 @@ impl Rule for CmdStmtRule {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
         //consume all ws delimited cmd's and arguments
-        while p.eat(&[BareWord, Whitespace]) || { ExpressionsRule {}.opt(p).is_some() } {}
+        while p.eat(&[BareWord, Whitespace]) || { ValueExprRule {}.opt(p).is_some() } {}
         Some(m.complete(p, CmdStmt))
     }
 }

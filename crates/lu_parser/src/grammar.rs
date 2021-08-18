@@ -31,6 +31,7 @@
 mod cmd_stmt;
 mod expr;
 mod fn_stmt;
+mod for_stmt;
 mod let_stmt;
 mod signature;
 
@@ -44,8 +45,11 @@ use crate::{
 };
 
 pub use cmd_stmt::CmdStmtRule;
-pub use expr::{ArrayExprRule, NumberRule, StringExprRule, TableExprRule, ValuePathExprRule};
+pub use expr::{
+    ArrayExprRule, NumberRule, StringExprRule, TableExprRule, ValueExprRule, ValuePathExprRule,
+};
 pub use fn_stmt::FnStmtRule;
+pub use for_stmt::ForStmtRule;
 pub use let_stmt::LetStmtRule;
 pub use signature::SignatureRule;
 

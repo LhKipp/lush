@@ -6,6 +6,27 @@ use crate::{
 };
 use crate::{Token, T};
 
+/// An expression is a source code element resembling a lu-Value
+pub struct ValueExprRule;
+impl Rule for ValueExprRule {
+    fn name(&self) -> String {
+        "expressions".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        value_expr_rule().matches(p)
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        // This func parses rules of value_expr_rule but with pratt parsing and math nodes
+        let expr_ = expr(p);
+        if expr_.is_none() {
+            p.error("Expected an expression");
+        }
+        expr_
+    }
+}
+
 /// Binding powers of operators for a Pratt parser.
 ///
 /// See <https://www.oilshell.org/blog/2016/11/03.html>
@@ -70,27 +91,6 @@ fn expr_bp(p: &mut Parser, bp: u8) -> Option<CompletedMarker> {
 
 fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
     value_expr_rule().opt(p)
-}
-
-/// A expression is a combination of values by operators
-pub(crate) struct ExpressionsRule;
-impl Rule for ExpressionsRule {
-    fn name(&self) -> String {
-        "expressions".into()
-    }
-
-    fn matches(&self, p: &mut Parser) -> bool {
-        value_expr_rule().matches(p)
-    }
-
-    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        // This func parses rules of value_expr_rule but with pratt parsing and math nodes
-        let expr_ = expr(p);
-        if expr_.is_none() {
-            p.error("Expected an expression");
-        }
-        expr_
-    }
 }
 
 pub(crate) fn value_expr_rule() -> OrRule {

@@ -55,6 +55,28 @@ impl AstToken for FnKeywordToken {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ForKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+
+impl ForKeywordToken {
+}
+impl AstToken for ForKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ForKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ElifKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -151,6 +173,28 @@ impl EndKeywordToken {
 }
 impl AstToken for EndKeywordToken {
     fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::EndKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+
+impl InKeywordToken {
+}
+impl AstToken for InKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::InKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -935,6 +979,34 @@ impl AstNode for FnStmtNode {
 
 
 
+use lu_parser::grammar::ForStmtRule;
+impl HasRule for ForStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ForStmtRule{})
+    }
+}
+
+pub struct ForStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl ForStmtNode {
+}
+impl AstNode for ForStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ForStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+
+
 use lu_parser::grammar::CmdStmtRule;
 impl HasRule for CmdStmtNode{
     fn get_belonging_rule() -> Box<dyn Rule>{
@@ -1143,7 +1215,7 @@ impl AstNode for TableExprNode {
 
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-pub enum ExpressionNode {
+pub enum ValueExprNode {
     BareWord(BareWordToken),
     Number(NumberToken),
     MathExpr(MathExprNode),
@@ -1153,10 +1225,10 @@ pub enum ExpressionNode {
     TableExpr(TableExprNode),
     }
 
-impl ExpressionNode {
+impl ValueExprNode {
 }
 
-impl AstElement for ExpressionNode {
+impl AstElement for ValueExprNode {
     fn can_cast(kind: SyntaxKind) -> bool { 
         match kind{
             BareWord | Number | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
@@ -1165,13 +1237,13 @@ impl AstElement for ExpressionNode {
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
         let res = match syntax.kind() {
-            BareWord => ExpressionNode::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
-            Number => ExpressionNode::Number(NumberToken { syntax: syntax.into_token().unwrap() }),
-            MathExpr => ExpressionNode::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
-            StringExpr => ExpressionNode::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
-            ValuePathExpr => ExpressionNode::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
-            ArrayExpr => ExpressionNode::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
-            TableExpr => ExpressionNode::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
+            BareWord => ValueExprNode::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            Number => ValueExprNode::Number(NumberToken { syntax: syntax.into_token().unwrap() }),
+            MathExpr => ValueExprNode::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
+            StringExpr => ValueExprNode::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
+            ValuePathExpr => ValueExprNode::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
+            ArrayExpr => ValueExprNode::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
+            TableExpr => ValueExprNode::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -1179,13 +1251,13 @@ impl AstElement for ExpressionNode {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
-            ExpressionNode::BareWord(it) => it.syntax.clone().into(),
-            ExpressionNode::Number(it) => it.syntax.clone().into(),
-            ExpressionNode::MathExpr(it) => it.syntax.clone().into(),
-            ExpressionNode::StringExpr(it) => it.syntax.clone().into(),
-            ExpressionNode::ValuePathExpr(it) => it.syntax.clone().into(),
-            ExpressionNode::ArrayExpr(it) => it.syntax.clone().into(),
-            ExpressionNode::TableExpr(it) => it.syntax.clone().into(),
+            ValueExprNode::BareWord(it) => it.syntax.clone().into(),
+            ValueExprNode::Number(it) => it.syntax.clone().into(),
+            ValueExprNode::MathExpr(it) => it.syntax.clone().into(),
+            ValueExprNode::StringExpr(it) => it.syntax.clone().into(),
+            ValueExprNode::ValuePathExpr(it) => it.syntax.clone().into(),
+            ValueExprNode::ArrayExpr(it) => it.syntax.clone().into(),
+            ValueExprNode::TableExpr(it) => it.syntax.clone().into(),
             }
     }
 }

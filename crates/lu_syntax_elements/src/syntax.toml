@@ -4,11 +4,13 @@ syntax_elements = [
    # keywords
    [ "LetKeyword"               , "let"      , ""                                    , true     , false   , false]    ,
    [ "FnKeyword"                , "fn"       , ""                                    , true     , false   , false]    ,
+   [ "ForKeyword"                , "for"       , ""                                    , true     , false   , false]    ,
    [ "ElifKeyword"              , "elif"     , ""                                    , true     , false   , false]    ,
    [ "ElseKeyword"              , "else"     , ""                                    , true     , false   , false]    ,
    [ "IfKeyword"                , "if"       , ""                                    , true     , false   , false]    ,
    [ "WhileKeyword"             , "while"    , ""                                    , true     , false   , false]    ,
    [ "EndKeyword"               , "end"      , ""                                    , true     , false   , false]    ,
+   [ "InKeyword"               , "in"      , ""                                    , true     , false   , false]    ,
 
     # punctuation
     ["LeftParenthesis"          , '('        , ""                                    , true     , false   , false]    ,
@@ -49,6 +51,7 @@ syntax_elements = [
     ["Tombstone"                , ""         , ""                                    , false    , true    , false]    ,
     ["LetStmt"                  , ""         , ""                                    , false    , true    , true]    ,
     ["FnStmt"                   , ""         , ""                                    , false    , true    , true]    ,
+    ["ForStmt"                   , ""         , ""                                    , false    , true    , true]    ,
     ["CmdStmt"                  , ""         , ""                                    , false    , true    , true]    ,
     ["Signature"                , ""         , ""                                    , false    , true    , true]    ,
     ["MathExpr"                 , ""         , ""                                    , false    , true    , false]    , # TODO MathExprRule is not yet taken out of pratt parsing.. But could be
@@ -64,7 +67,6 @@ syntax_elements = [
 generic_elements = [
     # Element name, can represent, has_rule
 
-    # An Expression is a syntax_element which directly represents a Value (see value crate)
-    ["Expression", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"], true],
+    ["ValueExpr", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"], true],
     ["Statement" , ["LetStmt" , "FnStmt", "CmdStmt"], true],
 ]
