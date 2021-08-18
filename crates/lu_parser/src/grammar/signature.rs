@@ -1,13 +1,10 @@
-#[allow(unused_imports)]
-use super::*;
-
 use crate::T;
-#[allow(unused_imports)]
 use crate::{
-    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
-    SyntaxKind::{self, Signature},
-    TokenSet,
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    SyntaxKind::Signature,
 };
+
+use super::Rule;
 
 ///This function is used to parse the parameter and flag list (signature)
 ///Such a signature can be of the following format:

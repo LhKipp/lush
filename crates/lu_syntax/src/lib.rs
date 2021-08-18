@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 pub mod ast;
 mod build_tree;
 mod syntax_node;

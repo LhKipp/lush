@@ -1,10 +1,8 @@
 use super::{signature::SignatureRule, Rule, *};
 
-#[allow(unused_imports)]
 use crate::{
-    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
-    SyntaxKind::{self, *},
-    TokenSet,
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    SyntaxKind::*,
 };
 
 pub(crate) struct FnStmtRule;

@@ -1,11 +1,8 @@
-#[allow(unused_imports)]
 use super::*;
 
-#[allow(unused_imports)]
 use crate::{
-    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::{self, *},
-    TokenSet,
 };
 use crate::{Token, T};
 

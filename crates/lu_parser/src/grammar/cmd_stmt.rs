@@ -1,11 +1,7 @@
-use super::expr::ExpressionsRule;
-#[allow(unused_imports)]
-use super::*;
-#[allow(unused_imports)]
+use super::{expr::ExpressionsRule, Rule};
 use crate::{
-    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
-    SyntaxKind::{self, *},
-    TokenSet,
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    SyntaxKind::*,
 };
 
 pub(crate) struct CmdStmtRule;

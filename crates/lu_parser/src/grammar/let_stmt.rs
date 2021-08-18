@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
-use super::*;
-#[allow(unused_imports)]
 use crate::{
-    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
-    SyntaxKind::{self, *},
-    TokenSet,
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    SyntaxKind::*,
 };
+
+use super::Rule;
 
 pub(crate) struct LetStmtRule;
 impl Rule for LetStmtRule {

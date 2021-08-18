@@ -7,8 +7,6 @@ use lu_error::{ParseErr, ParseErrKind};
 
 use drop_bomb::DropBomb;
 
-#[allow(unused)]
-#[macro_use]
 use crate::T;
 
 use crate::{
@@ -185,21 +183,6 @@ impl Parser {
     }
 
     /// Create an error node and consume the next token.
-    pub(crate) fn err_and_bump(&mut self, message: &str) {
-        // match self.current() {
-        // L_DOLLAR | R_DOLLAR => {
-        //     let m = self.start();
-        //     self.error(message);
-        //     self.bump_any();
-        //     m.complete(self, Error);
-        // }
-        // _ => {
-        self.err_recover(message, TokenSet::EMPTY);
-        // }
-        // }
-    }
-
-    /// Create an error node and consume the next token.
     pub(crate) fn err_recover(&mut self, message: &str, recovery: TokenSet) {
         match self.current() {
             T!["{"] | T!["}"] => {
@@ -241,7 +224,6 @@ pub(crate) struct Marker {
     bomb: DropBomb,
 }
 
-#[allow(unused)]
 impl Marker {
     fn new(pos: u32) -> Marker {
         Marker {
@@ -269,6 +251,7 @@ impl Marker {
 
     /// Abandons the syntax tree node. All its children
     /// are attached to its parent instead.
+    #[allow(unused)]
     pub(crate) fn abandon(mut self, p: &mut Parser) {
         self.bomb.defuse();
         let idx = self.pos as usize;

@@ -1,5 +1,4 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
-#![allow(dead_code)]
 mod generated;
 use std::marker::PhantomData;
 
@@ -117,6 +116,7 @@ mod support {
 
     use super::{AstElementChildren, AstNode, AstNodeChildren, SyntaxNode};
 
+    #[allow(unused)]
     pub(super) fn node_child<N: AstNode>(parent: &SyntaxNode) -> Option<N> {
         parent.children().find_map(N::cast)
     }

@@ -5,15 +5,13 @@
 //!
 //! The *real* implementation is in the (language-agnostic) `rowan` crate, this
 //! module just wraps its API.
-#![allow(dead_code)] // TODO remove dead code when all done
 
 use lu_error::ParseErr;
 use rowan::{GreenNodeBuilder, Language, SmolStr};
 
 use crate::{Parse, SyntaxKind};
 
-#[allow(unused_imports)]
-pub(crate) use rowan::{GreenNode, GreenToken, NodeOrToken};
+pub(crate) use rowan::GreenNode;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum LuLanguage {}
@@ -47,6 +45,7 @@ impl SyntaxTreeBuilder {
         (green, self.errors)
     }
 
+    #[allow(unused)]
     pub fn finish(self) -> Parse {
         let (green, errors) = self.finish_raw();
         Parse::new(green, errors)

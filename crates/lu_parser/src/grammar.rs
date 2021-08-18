@@ -39,11 +39,9 @@ use log::debug;
 use lu_error::{ParseErr, ParseErrKind};
 
 use crate::grammar::{cmd_stmt::CmdStmtRule, fn_stmt::FnStmtRule, let_stmt::LetStmtRule};
-#[allow(unused_imports)]
 use crate::{
-    parser::{CompletedMarker, Marker, Parser, CMT_NL_WS},
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::{self, *},
-    TokenSet,
 };
 
 // pub(crate) use cmd_stmt::*;
@@ -187,9 +185,3 @@ fn block_stmt() -> OrRule {
         rules: vec![Box::new(LetStmtRule {}), Box::new(CmdStmtRule {})],
     }
 }
-
-// pub(crate) fn newline(p: &mut Parser) {
-//     if !p.eat(Newline) {
-//         p.error(format!("Expected a newline. Found {:?}", p.current()));
-//     }
-// }
