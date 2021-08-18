@@ -5,20 +5,20 @@ use std::ops::Range;
 
 use thiserror::Error;
 
-#[derive(Error, Debug, new, Deserialize, Serialize)]
+#[derive(Error, Debug, new, Deserialize, Serialize, PartialEq, Eq)]
 // TODO impl display
 #[error("Parse Error")]
 pub struct ParseErrs {
     pub errs: Vec<ParseErr>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum ParseErrKind {
     /// Catch-all
     Message(String),
 }
 
-#[derive(Error, Debug, Deserialize, Serialize)]
+#[derive(Error, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[error("Parse Error")]
 pub struct ParseErr {
     pub kind: ParseErrKind,

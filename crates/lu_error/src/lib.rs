@@ -15,7 +15,7 @@ use thiserror::Error;
 
 pub type LuResult<T> = result::Result<T, LuErr>;
 
-#[derive(Error, Debug, Deserialize, Serialize)]
+#[derive(Error, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[error("{0}")]
 pub enum LuErr {
     Parse(#[from] ParseErr),
