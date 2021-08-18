@@ -1,4 +1,4 @@
-use super::{signature::SignatureRule, Rule, *};
+use super::*;
 
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
@@ -24,7 +24,9 @@ impl Rule for FnStmtRule {
         p.eat_while(CMT_NL_WS);
         SignatureRule {}.opt(p);
         p.eat_while(CMT_NL_WS);
-        block(p);
+        statements_until(p, EndKeyword);
+        p.eat_while(CMT_NL_WS);
+        p.expect(EndKeyword);
 
         Some(m.complete(p, FnStmt))
     }

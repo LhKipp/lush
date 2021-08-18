@@ -22,6 +22,8 @@ pub enum SyntaxKind {
     WhileKeyword,
     #[token("end")]
     EndKeyword,
+    #[token("begin")]
+    BeginKeyword,
     #[token("in")]
     InKeyword,
     #[token("(")]
@@ -90,6 +92,7 @@ pub enum SyntaxKind {
     FnStmt,
     ForStmt,
     CmdStmt,
+    BlockStmt,
     Signature,
     MathExpr,
     StringExpr,
@@ -111,6 +114,7 @@ impl SyntaxKind{
             SyntaxKind::IfKeyword => "IfKeyword",
             SyntaxKind::WhileKeyword => "WhileKeyword",
             SyntaxKind::EndKeyword => "EndKeyword",
+            SyntaxKind::BeginKeyword => "BeginKeyword",
             SyntaxKind::InKeyword => "InKeyword",
             SyntaxKind::LeftParenthesis => "LeftParenthesis",
             SyntaxKind::RightParenthesis => "RightParenthesis",
@@ -149,6 +153,7 @@ impl SyntaxKind{
             SyntaxKind::FnStmt => "FnStmt",
             SyntaxKind::ForStmt => "ForStmt",
             SyntaxKind::CmdStmt => "CmdStmt",
+            SyntaxKind::BlockStmt => "BlockStmt",
             SyntaxKind::Signature => "Signature",
             SyntaxKind::MathExpr => "MathExpr",
             SyntaxKind::StringExpr => "StringExpr",
@@ -172,6 +177,7 @@ macro_rules! T {
     [if] => {$crate::SyntaxKind::IfKeyword };
     [while] => {$crate::SyntaxKind::WhileKeyword };
     [end] => {$crate::SyntaxKind::EndKeyword };
+    [begin] => {$crate::SyntaxKind::BeginKeyword };
     [in] => {$crate::SyntaxKind::InKeyword };
     ["("] => {$crate::SyntaxKind::LeftParenthesis };
     [")"] => {$crate::SyntaxKind::RightParenthesis };

@@ -28,6 +28,7 @@
 //! Non-opt rules typically start with `assert!(p.at(FIRST_TOKEN))`, the
 //! caller is responsible for branching on the first token.
 
+mod block_stmt;
 mod cmd_stmt;
 mod expr;
 mod fn_stmt;
@@ -44,6 +45,7 @@ use crate::{
     SyntaxKind::{self, *},
 };
 
+pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;
 pub use expr::{
     ArrayExprRule, NumberRule, StringExprRule, TableExprRule, ValueExprRule, ValuePathExprRule,
@@ -155,20 +157,17 @@ impl Rule for SourceFileRule {
     }
 }
 
-fn statements(p: &mut Parser) {
-    while p.next_non(CMT_NL_WS) != Eof {
+// TODO make proper StatementRule
+fn statements_until(p: &mut Parser, end: SyntaxKind) {
+    while p.next_non(CMT_NL_WS) != end {
         top_level_stmt().parse_rule(p);
     }
 }
 
-fn block(p: &mut Parser) {
-    debug!("Parsing block");
-    while p.next_non(CMT_NL_WS) != EndKeyword {
-        debug!("Parsing block statement");
-        block_stmt().parse(p);
+fn statements(p: &mut Parser) {
+    while p.next_non(CMT_NL_WS) != Eof {
+        top_level_stmt().parse_rule(p);
     }
-    p.eat_while(CMT_NL_WS);
-    p.eat(EndKeyword);
 }
 
 fn top_level_stmt() -> OrRule {
@@ -179,12 +178,5 @@ fn top_level_stmt() -> OrRule {
             Box::new(FnStmtRule {}),
             Box::new(CmdStmtRule {}),
         ],
-    }
-}
-
-fn block_stmt() -> OrRule {
-    OrRule {
-        kind: None,
-        rules: vec![Box::new(LetStmtRule {}), Box::new(CmdStmtRule {})],
     }
 }
