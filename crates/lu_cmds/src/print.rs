@@ -17,6 +17,6 @@ impl Command for PrintCmd {
             _ => unreachable!(),
         };
         debug!("{:?} returning {:?}", self.name(), args);
-        Ok(Value::Array(args))
+        Ok(Value::new_array(args))
     }
 }

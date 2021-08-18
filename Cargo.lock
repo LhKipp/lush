@@ -514,6 +514,7 @@ dependencies = [
 name = "lu_value"
 version = "0.1.0"
 dependencies = [
+ "ordered-float",
  "serde",
 ]
 
@@ -575,6 +576,16 @@ name = "opaque-debug"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2839e79665f131bdb5782e51f2c6c9599c133c6098982a54c794358bf432529c"
+
+[[package]]
+name = "ordered-float"
+version = "2.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "039f02eb0f69271f26abe3202189275d7aa2258b903cb0281b5de710a2570ff3"
+dependencies = [
+ "num-traits",
+ "serde",
+]
 
 [[package]]
 name = "parking_lot"

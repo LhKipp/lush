@@ -37,7 +37,7 @@ impl Evaluable for NumberToken {
             .text()
             .parse()
             .map_err(|_| "Error parsing to number".to_string())?;
-        Ok(Value::Number(val))
+        Ok(Value::Number(val.into()))
     }
 }
 
@@ -65,7 +65,7 @@ impl Evaluable for ArrayExprNode {
         for val in self.values() {
             values.push(val.evaluate(state)?);
         }
-        Ok(Value::Array(values))
+        Ok(Value::new_array(values))
     }
 }
 

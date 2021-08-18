@@ -30,7 +30,7 @@ impl Evaluable for CmdStmtNode {
                 .scope
                 .lock()
                 .cur_mut_frame()
-                .insert_var("args".to_string(), Value::Array(args));
+                .insert_var("args".to_string(), Value::new_array(args));
 
             cmd.run(state)
         } else {
