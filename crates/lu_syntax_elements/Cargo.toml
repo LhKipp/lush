@@ -1,5 +1,5 @@
 [package]
-name = "syntax_elements"
+name = "lu_syntax_elements"
 version = "0.1.0"
 edition = "2018"
 

@@ -462,13 +462,13 @@ dependencies = [
  "log",
  "logos",
  "lu_error",
+ "lu_syntax_elements",
  "pretty_env_logger",
  "serde",
  "serde_json",
  "serde_yaml",
  "strum",
  "strum_macros",
- "syntax_elements",
  "tera",
  "text-size",
  "toml",
@@ -483,11 +483,21 @@ dependencies = [
  "log",
  "lu_error",
  "lu_parser",
+ "lu_syntax_elements",
  "rowan",
  "serde",
- "syntax_elements",
  "tera",
  "text-size",
+ "toml",
+]
+
+[[package]]
+name = "lu_syntax_elements"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tera",
  "toml",
 ]
 
@@ -904,16 +914,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-xid",
-]
-
-[[package]]
-name = "syntax_elements"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tera",
- "toml",
 ]
 
 [[package]]

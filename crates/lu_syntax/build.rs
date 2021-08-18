@@ -1,4 +1,4 @@
-use syntax_elements::syntax_elements_as_tera_context;
+use lu_syntax_elements::syntax_elements_as_tera_context;
 
 // https://dev.to/cad97/what-is-a-lexer-anyway-4kdo
 use {
