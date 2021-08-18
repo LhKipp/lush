@@ -34,7 +34,7 @@ impl Rule for FnStmtRule {
 mod tests {
     use pretty_env_logger::env_logger;
 
-    use crate::{parse_from_tokens, Event};
+    use crate::{parse_as, Event};
 
     use super::FnStmtRule;
 
@@ -43,6 +43,6 @@ mod tests {
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/fn_stmt/fn_simple.yaml_test")]
     fn parse_cmds(s: &str) -> Vec<Event> {
         let _ = env_logger::builder().is_test(true).try_init();
-        parse_from_tokens(s, &FnStmtRule {})
+        parse_as(s, &FnStmtRule {})
     }
 }

@@ -27,7 +27,7 @@ impl Rule for CmdStmtRule {
 mod tests {
     use pretty_env_logger::env_logger;
 
-    use crate::{parse_from_tokens, Event};
+    use crate::{parse_as, Event};
 
     use super::CmdStmtRule;
 
@@ -36,6 +36,6 @@ mod tests {
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/cmd_stmt/cmd_simple.yaml_test")]
     fn parse_cmds(s: &str) -> Vec<Event> {
         let _ = env_logger::builder().is_test(true).try_init();
-        parse_from_tokens(s, &CmdStmtRule {})
+        parse_as(s, &CmdStmtRule {})
     }
 }

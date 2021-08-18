@@ -22,14 +22,14 @@ pub(crate) use crate::token_set::TokenSet;
 
 pub type TokenSource = TokenVec;
 
-pub fn parse_from_tokens(input: &str, rule: &dyn Rule) -> Vec<Event> {
+pub fn parse_as(input: &str, rule: &dyn Rule) -> Vec<Event> {
     let tokens = lexer::lex(input);
     let mut p = parser::Parser::new(tokens);
     rule.parse(&mut p);
     p.finish()
 }
 
-/// Parse input str
+/// Parse input str as SourceFile
 pub fn parse(input: &str) -> Vec<Event> {
-    parse_from_tokens(input, &RootRule {})
+    parse_as(input, &RootRule {})
 }
