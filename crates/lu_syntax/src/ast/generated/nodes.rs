@@ -187,6 +187,28 @@ impl AstToken for EndKeywordToken {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BeginKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+
+impl BeginKeywordToken {
+}
+impl AstToken for BeginKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BeginKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1044,6 +1066,34 @@ impl CmdStmtNode {
 }
 impl AstNode for CmdStmtNode {
     fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::CmdStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+
+
+use lu_parser::grammar::BlockStmtRule;
+impl HasRule for BlockStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(BlockStmtRule{})
+    }
+}
+
+pub struct BlockStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl BlockStmtNode {
+}
+impl AstNode for BlockStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BlockStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })

@@ -10,6 +10,7 @@ syntax_elements = [
    [ "IfKeyword"                , "if"       , ""                                    , true     , false   , false]    ,
    [ "WhileKeyword"             , "while"    , ""                                    , true     , false   , false]    ,
    [ "EndKeyword"               , "end"      , ""                                    , true     , false   , false]    ,
+   [ "BeginKeyword"               , "begin"      , ""                                    , true     , false   , false]    ,
    [ "InKeyword"               , "in"      , ""                                    , true     , false   , false]    ,
 
     # punctuation
@@ -44,7 +45,6 @@ syntax_elements = [
     ["Comment"                  , ""         , "#.*\\n"                              , true     , false   , false]    ,
     ["Newline"                  , ""         , "\\n"                                 , true     , false   , false]    ,
     ["Number"                   , ""         , "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , true     , false   , true]    ,
-    # A variable decl name
     ["VarDeclName"                      , ""         , ""                                    , true    , false    , false]    ,
 
     #meta rules
@@ -55,6 +55,7 @@ syntax_elements = [
     ["FnStmt"                   , ""         , ""                                    , false    , true    , true]    ,
     ["ForStmt"                   , ""         , ""                                    , false    , true    , true]    ,
     ["CmdStmt"                  , ""         , ""                                    , false    , true    , true]    ,
+    ["BlockStmt"                  , ""         , ""                                    , false    , true    , true]    ,
     ["Signature"                , ""         , ""                                    , false    , true    , true]    ,
     ["MathExpr"                 , ""         , ""                                    , false    , true    , false]    , # TODO MathExprRule is not yet taken out of pratt parsing.. But could be
     ["StringExpr"               , ""         , ""                                    , false    , true    , true]    ,

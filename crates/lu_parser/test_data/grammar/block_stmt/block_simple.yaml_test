@@ -1,0 +1,23 @@
+1
+===
+begin
+    print "hi"
+end
+---
+- Start: BlockStmt
+- Token: "BeginKeyword (len: 5)"
+- Token: "Newline (len: 1)"
+- Token: "Whitespace (len: 4)"
+- Start: CmdStmt
+- Token: "BareWord (len: 5)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 2)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+...

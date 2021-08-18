@@ -43,4 +43,7 @@ impl ForStmtNode {
     pub fn iterated_value(&self) -> Option<ValueExprNode> {
         support::element_child(self.syntax())
     }
+    pub fn statements(&self) -> AstNodeChildren<StatementNode> {
+        support::node_children(self.syntax())
+    }
 }
