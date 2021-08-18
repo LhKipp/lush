@@ -434,18 +434,16 @@ dependencies = [
  "derive-new",
  "indextree",
  "log",
- "lu_cmds",
  "lu_error",
  "lu_fs",
  "lu_parser",
  "lu_syntax",
+ "lu_test_support",
  "lu_text_util",
  "lu_value",
  "parking_lot",
- "pretty_env_logger",
  "serde_json",
  "serde_yaml",
- "vec_box",
 ]
 
 [[package]]
@@ -499,6 +497,18 @@ dependencies = [
  "serde_json",
  "tera",
  "toml",
+]
+
+[[package]]
+name = "lu_test_support"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "lu_cmds",
+ "lu_interpreter",
+ "lu_value",
+ "pretty_env_logger",
+ "vec_box",
 ]
 
 [[package]]
