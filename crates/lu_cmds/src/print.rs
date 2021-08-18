@@ -1,7 +1,7 @@
 use log::debug;
 use lu_error::LuResult;
 use lu_interpreter::{Command, Interpreter};
-use value::Value;
+use lu_value::Value;
 
 #[derive(Debug)]
 pub struct PrintCmd {}

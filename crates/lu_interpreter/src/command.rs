@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use lu_error::LuResult;
-use value::Value;
+use lu_value::Value;
 
 use crate::Interpreter;
 

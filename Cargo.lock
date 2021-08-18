@@ -404,8 +404,8 @@ dependencies = [
  "log",
  "lu_error",
  "lu_interpreter",
+ "lu_value",
  "pretty_env_logger",
- "value",
 ]
 
 [[package]]
@@ -438,13 +438,13 @@ dependencies = [
  "lu_error",
  "lu_fs",
  "lu_text_util",
+ "lu_value",
  "parking_lot",
  "parser",
  "pretty_env_logger",
  "serde_json",
  "serde_yaml",
  "syntax",
- "value",
  "vec_box",
 ]
 
@@ -454,7 +454,14 @@ version = "0.1.0"
 dependencies = [
  "lu_error",
  "lu_fs",
- "value",
+ "lu_value",
+]
+
+[[package]]
+name = "lu_value"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -1074,13 +1081,6 @@ name = "utf8-ranges"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4ae116fef2b7fea257ed6440d3cfcff7f190865f170cdad00bb6465bf18ecba"
-
-[[package]]
-name = "value"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "vec_box"

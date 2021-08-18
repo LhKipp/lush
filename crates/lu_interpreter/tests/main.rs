@@ -9,7 +9,7 @@ use lu_cmds::PrintCmd;
 use lu_error::LuResult;
 use lu_interpreter::{Command, Interpreter};
 use lu_text_util::SourceCode;
-use value::Value;
+use lu_value::Value;
 use {conformance, serde_json};
 
 #[conformance::tests(exact, serde=serde_json, file="test_data/general.json_test")]

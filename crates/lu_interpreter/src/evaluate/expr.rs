@@ -1,4 +1,5 @@
 use lu_error::LuResult;
+use lu_value::Value;
 use syntax::{
     ast::{
         ArrayExprNode, BareWordToken, ExpressionNode, MathExprNode, NumberToken, StringExprNode,
@@ -6,7 +7,6 @@ use syntax::{
     },
     AstToken,
 };
-use value::Value;
 
 use crate::Evaluable;
 

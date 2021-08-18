@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 lu_interpreter = { version = "0.1.0", path = "../lu_interpreter" }
 lu_error = { version = "0.1.0", path = "../lu_error" }
-value = { version = "0.1.0", path = "../value" }
+lu_value = { version = "0.1.0", path = "../lu_value" }
 
 log = "0.4.14"
 

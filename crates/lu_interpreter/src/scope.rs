@@ -1,7 +1,7 @@
 use indextree::{Arena, NodeId};
 use std::collections::HashMap;
 
-use value::Value;
+use lu_value::Value;
 
 pub trait ScopeFrame {
     fn get_tag(&self) -> ScopeFrameTag;

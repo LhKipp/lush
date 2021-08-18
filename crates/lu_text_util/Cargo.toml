@@ -8,4 +8,4 @@ edition = "2018"
 [dependencies]
 lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_fs = { version = "0.1.0", path = "../lu_fs" }
-value = { version = "0.1.0", path = "../value" }
+lu_value = { version = "0.1.0", path = "../lu_value" }
