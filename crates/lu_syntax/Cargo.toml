@@ -7,6 +7,7 @@ edition = "2018"
 
 [dependencies]
 lu_parser = { version = "0.1.0", path = "../lu_parser" }
+lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_error = { version = "0.1.0", path = "../lu_error" }
 
 rowan = "0.10.6"

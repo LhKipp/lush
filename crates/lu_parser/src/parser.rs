@@ -3,7 +3,7 @@
 use log::debug;
 use std::cell::Cell;
 
-use lu_error::{ParseErr, ParseErrKind};
+use lu_error::ParseErr;
 
 use drop_bomb::DropBomb;
 
@@ -95,6 +95,18 @@ impl Parser {
         }
         //TODO is bump by 1 always correct?
         self.do_bump_cur();
+        true
+    }
+
+    /// Consume the next token if kinds matches, but as a SyntaxKind of as_
+    pub(crate) fn eat_as<TS: Into<TokenSet>>(&mut self, kinds: TS, as_: SyntaxKind) -> bool {
+        if !self.at(kinds) {
+            return false;
+        }
+        let cur = self.token_source.take_and_advance();
+        debug!("Eating {:?} as {:?}", cur, as_);
+        let new = Token::new(as_, cur.len);
+        self.do_bump(new);
         true
     }
 

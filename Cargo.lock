@@ -122,6 +122,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "contracts"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5a9006c4f456f14dad414612e77f05f95f2230439c20c2d0997a14caf303285"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "crossbeam-utils"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -431,6 +442,7 @@ name = "lu_interpreter"
 version = "0.1.0"
 dependencies = [
  "conformance",
+ "contracts",
  "derive-new",
  "indextree",
  "log",
@@ -477,12 +489,14 @@ dependencies = [
 name = "lu_syntax"
 version = "0.1.0"
 dependencies = [
+ "contracts",
  "glob",
  "heck",
  "log",
  "lu_error",
  "lu_parser",
  "lu_syntax_elements",
+ "lu_value",
  "rowan",
  "serde",
  "tera",

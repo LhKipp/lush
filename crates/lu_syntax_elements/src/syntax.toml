@@ -38,13 +38,15 @@ syntax_elements = [
     ["SingleQuote"              , "'"        , ""                                    , true     , false   , false]    ,
 
     # various tokens
+    ["Error"                    , ""         , ""                                    , true     , false   , false]    ,
+    ["BareWord"                 , ""         , "[a-zA-Z]+"                           , true     , false   , false]    ,
     ["Whitespace"               , ""         , "[ ]+"                                , true     , false   , false]    ,
     ["Comment"                  , ""         , "#.*\\n"                              , true     , false   , false]    ,
     ["Newline"                  , ""         , "\\n"                                 , true     , false   , false]    ,
     ["Number"                   , ""         , "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , true     , false   , true]    ,
+    # A variable decl name
+    ["VarDeclName"                      , ""         , ""                                    , true    , false    , false]    ,
 
-    ["Error"                    , ""         , ""                                    , true     , false   , false]    ,
-    ["BareWord"                 , ""         , "[a-zA-Z]+"                           , true     , false   , false]    ,
     #meta rules
     ["Eof"                      , ""         , ""                                    , false    , true    , false]    ,
     ["SourceFile"               , ""         , ""                                    , false    , true    , true]    ,

@@ -32,12 +32,7 @@ impl Evaluable for BareWordToken {
 
 impl Evaluable for NumberToken {
     fn evaluate(&self, _state: &mut crate::Interpreter) -> LuResult<Value> {
-        // TODO parsing of number as binary num (0b1110), hex (0xF) or decimal
-        let val: f64 = self
-            .text()
-            .parse()
-            .map_err(|_| "Error parsing to number".to_string())?;
-        Ok(Value::Number(val.into()))
+        Ok(self.value())
     }
 }
 

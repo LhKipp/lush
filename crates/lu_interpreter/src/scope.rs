@@ -52,7 +52,7 @@ impl ScopeFrame for SimpleScopeFrame {
 pub struct Scope {
     pub arena: Arena<Box<dyn ScopeFrame>>,
     /// Always a valid id
-    pub current_id: NodeId,
+    cur_frame_id: NodeId,
 }
 
 impl Scope {
@@ -63,24 +63,24 @@ impl Scope {
             arena.new_node(Box::new(SimpleScopeFrame::new(ScopeFrameTag::GlobalFrame)));
         Scope {
             arena,
-            current_id: global_frame,
+            cur_frame_id: global_frame,
         }
     }
 
     pub fn cur_frame(&self) -> &dyn ScopeFrame {
-        self.arena.get(self.current_id).unwrap().get().as_ref()
+        self.arena.get(self.cur_frame_id).unwrap().get().as_ref()
     }
 
     pub fn cur_mut_frame(&mut self) -> &mut dyn ScopeFrame {
         self.arena
-            .get_mut(self.current_id)
+            .get_mut(self.cur_frame_id)
             .unwrap()
             .get_mut()
             .as_mut()
     }
 
     pub fn get_var(&self, name: &str) -> Option<&Value> {
-        self.current_id
+        self.cur_frame_id
             .ancestors(&self.arena)
             .map(|n_id| {
                 self.arena
@@ -90,5 +90,24 @@ impl Scope {
             })
             .flat_map(|frame| frame.get_var(name))
             .next()
+    }
+
+    pub fn push_frame(&mut self) {
+        self.cur_frame_id = self
+            .arena
+            .new_node(Box::new(SimpleScopeFrame::new(ScopeFrameTag::GlobalFrame)));
+    }
+
+    pub fn pop_frame(&mut self) {
+        let parent = self.cur_parent_frame();
+        self.cur_frame_id.remove(&mut self.arena);
+        self.cur_frame_id = parent;
+    }
+
+    /// Returns the parent frame of the current frame
+    fn cur_parent_frame(&self) -> NodeId {
+        self.arena[self.cur_frame_id]
+            .parent()
+            .expect("The global frame should never be deallocated")
     }
 }

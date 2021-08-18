@@ -1,4 +1,5 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
+mod expr;
 mod generated;
 use std::marker::PhantomData;
 
@@ -132,6 +133,18 @@ mod support {
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
             .find_map(N::cast)
+    }
+
+    pub(super) fn element_child<N: AstElement>(parent: &SyntaxNode) -> Option<N> {
+        parent.children_with_tokens().find_map(N::cast)
+    }
+
+    pub(super) fn token_children<N: AstToken>(parent: &SyntaxNode) -> Vec<N> {
+        parent
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .filter_map(N::cast)
+            .collect()
     }
 
     pub(super) fn node_children<N: AstNode>(parent: &SyntaxNode) -> AstNodeChildren<N> {

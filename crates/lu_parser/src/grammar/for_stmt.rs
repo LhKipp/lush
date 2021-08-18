@@ -20,17 +20,20 @@ impl Rule for ForStmtRule {
         let m = p.start();
         p.expect(ForKeyword);
         p.eat_while(CMT_NL_WS);
-        p.expect(BareWord); // There should be at least 1 var being declared
+        p.expect_as(BareWord, VarDeclName); // There should be at least 1 var being declared
 
         //consume all ws delimited bare words
-        p.eat_while(&[BareWord, Whitespace]);
+        while p.eat(Whitespace) {
+            p.eat_as(BareWord, VarDeclName);
+        }
         p.eat_while(CMT_NL_WS);
         p.expect(InKeyword);
         p.eat_while(CMT_NL_WS);
         ValueExprRule {}.parse(p);
         p.eat_until(Newline);
         p.expect(Newline);
-        block(p);
+        statements_until(p, EndKeyword);
+        p.expect(EndKeyword);
         Some(m.complete(p, ForStmt))
     }
 }

@@ -715,6 +715,50 @@ impl AstToken for SingleQuoteToken {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ErrorToken {
+    pub(crate) syntax: SyntaxToken,
+}
+
+impl ErrorToken {
+}
+impl AstToken for ErrorToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Error }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BareWordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+
+impl BareWordToken {
+}
+impl AstToken for BareWordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BareWord }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WhitespaceToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -810,36 +854,14 @@ impl AstToken for NumberToken {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ErrorToken {
+pub struct VarDeclNameToken {
     pub(crate) syntax: SyntaxToken,
 }
 
-impl ErrorToken {
+impl VarDeclNameToken {
 }
-impl AstToken for ErrorToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Error }
-    fn cast(syntax: SyntaxToken) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxToken { &self.syntax }
-}
-
-
-
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct BareWordToken {
-    pub(crate) syntax: SyntaxToken,
-}
-
-impl BareWordToken {
-}
-impl AstToken for BareWordToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BareWord }
+impl AstToken for VarDeclNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::VarDeclName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })

@@ -70,6 +70,10 @@ pub enum SyntaxKind {
     DoubleQuote,
     #[token("'")]
     SingleQuote,
+    #[error]
+    Error,
+    #[regex("[a-zA-Z]+", priority = 0)]
+    BareWord,
     #[regex("[ ]+")]
     Whitespace,
     #[regex("#.*\n")]
@@ -78,10 +82,7 @@ pub enum SyntaxKind {
     Newline,
     #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
     Number,
-    #[error]
-    Error,
-    #[regex("[a-zA-Z]+", priority = 0)]
-    BareWord,
+    VarDeclName,
     Eof,
     SourceFile,
     Tombstone,
@@ -134,12 +135,13 @@ impl SyntaxKind{
             SyntaxKind::Point => "Point",
             SyntaxKind::DoubleQuote => "DoubleQuote",
             SyntaxKind::SingleQuote => "SingleQuote",
+            SyntaxKind::Error => "Error",
+            SyntaxKind::BareWord => "BareWord",
             SyntaxKind::Whitespace => "Whitespace",
             SyntaxKind::Comment => "Comment",
             SyntaxKind::Newline => "Newline",
             SyntaxKind::Number => "Number",
-            SyntaxKind::Error => "Error",
-            SyntaxKind::BareWord => "BareWord",
+            SyntaxKind::VarDeclName => "VarDeclName",
             SyntaxKind::Eof => "Eof",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::Tombstone => "Tombstone",

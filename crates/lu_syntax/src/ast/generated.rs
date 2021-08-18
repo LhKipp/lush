@@ -25,23 +25,22 @@ impl CmdStmtNode {
     }
 }
 
-impl ArrayExprNode {
-    pub fn values(&self) -> AstElementChildren<ValueExprNode> {
-        support::element_children::<ValueExprNode>(self.syntax())
-    }
-}
-
-impl StringExprNode {
-    pub fn text(&self) -> String {
-        support::token_child::<StringContentToken>(self.syntax())
-            .unwrap()
-            .text()
-            .to_string()
-    }
-}
-
 impl SourceFileNode {
     pub fn statements(&self) -> AstNodeChildren<StatementNode> {
         support::node_children(self.syntax())
+    }
+}
+
+impl ForStmtNode {
+    /// The variables being declared in the for loop
+    /// Example:
+    /// for x in [] ...
+    /// returns [x]
+    pub fn var_names(&self) -> Vec<VarDeclNameToken> {
+        support::token_children(self.syntax())
+    }
+    /// The value over which is iterated
+    pub fn iterated_value(&self) -> Option<ValueExprNode> {
+        support::element_child(self.syntax())
     }
 }
