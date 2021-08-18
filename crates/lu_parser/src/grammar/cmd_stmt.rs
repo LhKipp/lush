@@ -4,7 +4,7 @@ use crate::{
     SyntaxKind::*,
 };
 
-pub(crate) struct CmdStmtRule;
+pub struct CmdStmtRule;
 impl Rule for CmdStmtRule {
     fn name(&self) -> String {
         "command".into()

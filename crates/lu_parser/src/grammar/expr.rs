@@ -98,8 +98,8 @@ pub(crate) fn value_expr_rule() -> OrRule {
         kind: Some("value expr".into()),
         rules: vec![
             Box::new(NumberRule {}),
-            Box::new(ValuePathRule {}),
-            Box::new(StringRule {}),
+            Box::new(ValuePathExprRule {}),
+            Box::new(StringExprRule {}),
             Box::new(BareWord),
             Box::new(table_or_array_rule()),
         ],
@@ -109,12 +109,12 @@ pub(crate) fn value_expr_rule() -> OrRule {
 pub(crate) fn table_or_array_rule() -> OrRule {
     OrRule {
         kind: None,
-        rules: vec![Box::new(TableRule {}), Box::new(ArrayRule {})],
+        rules: vec![Box::new(TableExprRule {}), Box::new(ArrayExprRule {})],
     }
 }
 
-pub struct ArrayRule;
-impl Rule for ArrayRule {
+pub struct ArrayExprRule;
+impl Rule for ArrayExprRule {
     fn name(&self) -> String {
         "Array".into()
     }
@@ -134,8 +134,8 @@ impl Rule for ArrayRule {
     }
 }
 
-pub struct TableRule;
-impl Rule for TableRule {
+pub struct TableExprRule;
+impl Rule for TableExprRule {
     fn name(&self) -> String {
         "Table".into()
     }
@@ -175,8 +175,8 @@ impl Rule for NumberRule {
     }
 }
 
-pub struct StringRule;
-impl Rule for StringRule {
+pub struct StringExprRule;
+impl Rule for StringExprRule {
     fn name(&self) -> String {
         "StringExpr".into()
     }
@@ -214,8 +214,8 @@ impl Rule for StringRule {
     }
 }
 
-struct ValuePathRule;
-impl Rule for ValuePathRule {
+pub struct ValuePathExprRule;
+impl Rule for ValuePathExprRule {
     fn name(&self) -> String {
         "ValuePath".into()
     }

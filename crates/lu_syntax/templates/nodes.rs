@@ -1,13 +1,24 @@
 #[allow(unused_imports)]
 
 use crate::{
-    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement},
+    Rule,
+    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule},
     SyntaxKind::{self, *},
     SyntaxNode, SyntaxToken, SyntaxElement
 };
 
 {% for syn_elem in syntax_elements -%}
 {% set syntax_kind_name = syn_elem.name %}
+
+{% if syn_elem.has_rule -%}
+{% set rule_name = syn_elem.name ~ "Rule" %}
+use lu_parser::grammar::{{rule_name}};
+impl HasRule for {{syn_elem.struct_name}}{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new({{rule_name}}{})
+    }
+}
+{% endif -%}
 
 {% if syn_elem.is_token -%}
 {% set token_name = syn_elem.name ~ "Token"  %}

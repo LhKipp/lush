@@ -3,7 +3,10 @@
 mod command_storage;
 
 use lu_error::{LuErr, LuResult, ParseErr};
-use lu_syntax::{ast::SourceFileNode, Parse};
+use lu_syntax::{
+    ast::{HasRule, SourceFileNode},
+    AstNode, Parse,
+};
 use lu_text_util::SourceCode;
 use lu_value::Value;
 
@@ -29,9 +32,17 @@ impl Interpreter {
     }
 
     pub fn evaluate(&mut self, code: SourceCode) -> LuResult<Value> {
-        let parse_result = Parse::source_file(&code.to_string()?);
+        self.evaluate_as::<SourceFileNode>(code)
+    }
+
+    /// Evaluate code as T
+    pub fn evaluate_as<T: Evaluable + HasRule + AstNode>(
+        &mut self,
+        code: SourceCode,
+    ) -> LuResult<Value> {
+        let parse_result = Parse::rule(&code.to_string()?, &*T::get_belonging_rule());
         // We don't allow evaluation if errors happend.
-        let source_file = parse_result.ok::<SourceFileNode>()?;
+        let source_file = parse_result.ok::<T>()?;
         source_file.evaluate(self)
     }
 

@@ -1,7 +1,8 @@
 #[allow(unused_imports)]
 
 use crate::{
-    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement},
+    Rule,
+    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule},
     SyntaxKind::{self, *},
     SyntaxNode, SyntaxToken, SyntaxElement
 };
@@ -735,6 +736,13 @@ impl AstToken for NewlineToken {
 
 
 
+use lu_parser::grammar::NumberRule;
+impl HasRule for NumberToken{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(NumberRule{})
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NumberToken {
     pub(crate) syntax: SyntaxToken,
@@ -822,6 +830,13 @@ impl AstNode for EofNode {
 
 
 
+use lu_parser::grammar::SourceFileRule;
+impl HasRule for SourceFileNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(SourceFileRule{})
+    }
+}
+
 pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -864,6 +879,13 @@ impl AstNode for TombstoneNode {
 
 
 
+use lu_parser::grammar::LetStmtRule;
+impl HasRule for LetStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(LetStmtRule{})
+    }
+}
+
 pub struct LetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -884,6 +906,13 @@ impl AstNode for LetStmtNode {
 }
 
 
+
+use lu_parser::grammar::FnStmtRule;
+impl HasRule for FnStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(FnStmtRule{})
+    }
+}
 
 pub struct FnStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -906,6 +935,13 @@ impl AstNode for FnStmtNode {
 
 
 
+use lu_parser::grammar::CmdStmtRule;
+impl HasRule for CmdStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(CmdStmtRule{})
+    }
+}
+
 pub struct CmdStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -926,6 +962,13 @@ impl AstNode for CmdStmtNode {
 }
 
 
+
+use lu_parser::grammar::SignatureRule;
+impl HasRule for SignatureNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(SignatureRule{})
+    }
+}
 
 pub struct SignatureNode {
     pub(crate) syntax: SyntaxNode,
@@ -968,6 +1011,13 @@ impl AstNode for MathExprNode {
 }
 
 
+
+use lu_parser::grammar::StringExprRule;
+impl HasRule for StringExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(StringExprRule{})
+    }
+}
 
 pub struct StringExprNode {
     pub(crate) syntax: SyntaxNode,
@@ -1012,6 +1062,13 @@ impl AstToken for StringContentToken {
 
 
 
+use lu_parser::grammar::ValuePathExprRule;
+impl HasRule for ValuePathExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ValuePathExprRule{})
+    }
+}
+
 pub struct ValuePathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1033,6 +1090,13 @@ impl AstNode for ValuePathExprNode {
 
 
 
+use lu_parser::grammar::ArrayExprRule;
+impl HasRule for ArrayExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ArrayExprRule{})
+    }
+}
+
 pub struct ArrayExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1053,6 +1117,13 @@ impl AstNode for ArrayExprNode {
 }
 
 
+
+use lu_parser::grammar::TableExprRule;
+impl HasRule for TableExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(TableExprRule{})
+    }
+}
 
 pub struct TableExprNode {
     pub(crate) syntax: SyntaxNode,

@@ -2,12 +2,18 @@
 mod generated;
 use std::marker::PhantomData;
 
+use lu_parser::grammar::Rule;
+
 use crate::{
     syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken},
     SyntaxElement, SyntaxElementChildren, SyntaxKind,
 };
 
 pub use self::generated::nodes::*;
+
+pub trait HasRule {
+    fn get_belonging_rule() -> Box<dyn Rule>;
+}
 
 /// The main trait to go from untyped `SyntaxNode` to a typed ast. The
 /// conversion itself has zero runtime cost: ast and syntax nodes have exactly

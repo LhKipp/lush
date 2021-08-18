@@ -5,7 +5,7 @@ use crate::{
     SyntaxKind::*,
 };
 
-pub(crate) struct FnStmtRule;
+pub struct FnStmtRule;
 impl Rule for FnStmtRule {
     fn matches(&self, p: &mut Parser) -> bool {
         p.next_non(CMT_NL_WS) == FnKeyword

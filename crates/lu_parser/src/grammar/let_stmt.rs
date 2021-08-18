@@ -5,7 +5,7 @@ use crate::{
 
 use super::Rule;
 
-pub(crate) struct LetStmtRule;
+pub struct LetStmtRule;
 impl Rule for LetStmtRule {
     fn name(&self) -> String {
         "let statement".into()

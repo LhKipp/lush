@@ -38,17 +38,16 @@ use itertools::Itertools;
 use log::debug;
 use lu_error::{ParseErr, ParseErrKind};
 
-use crate::grammar::{cmd_stmt::CmdStmtRule, fn_stmt::FnStmtRule, let_stmt::LetStmtRule};
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::{self, *},
 };
 
-// pub(crate) use cmd_stmt::*;
-// pub(crate) use expr::*;
-// pub(crate) use fn_stmt::*;
-// pub(crate) use let_stmt::*;
-// pub(crate) use signature::*;
+pub use cmd_stmt::CmdStmtRule;
+pub use expr::{ArrayExprRule, NumberRule, StringExprRule, TableExprRule, ValuePathExprRule};
+pub use fn_stmt::FnStmtRule;
+pub use let_stmt::LetStmtRule;
+pub use signature::SignatureRule;
 
 pub trait Rule {
     /// Returns the name of the rule

@@ -2,7 +2,10 @@ pub mod ast;
 mod build_tree;
 mod syntax_node;
 
+use build_tree::TreeBuilder;
 use lu_error::{LuErr, LuResult, ParseErr, ParseErrs};
+
+use lu_parser::grammar::{Rule, SourceFileRule};
 
 pub use syntax_node::{
     SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
@@ -29,13 +32,17 @@ pub struct Parse {
 }
 
 impl Parse {
-    pub fn source_file(text: &str) -> Parse {
-        let (green, errors) = build_tree::parse_text(text);
+    pub fn rule(text: &str, rule: &dyn Rule) -> Self {
+        let (green, errors) = TreeBuilder::build(text, rule);
 
         // TODO add validation here
         // errors.extend(validation::validate(&root));
 
         Parse::new(green, errors)
+    }
+
+    pub fn source_file(text: &str) -> Parse {
+        Self::rule(text, &SourceFileRule {})
     }
 
     fn new(green: GreenNode, errors: Vec<ParseErr>) -> Parse {

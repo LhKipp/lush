@@ -36,6 +36,7 @@ pub struct SyntaxElement {
     regex: String,
     is_token: bool,
     is_node: bool,
+    has_rule: bool,
 }
 
 impl SyntaxElement {
@@ -55,7 +56,7 @@ impl<'de> Deserialize<'de> for SyntaxElement {
     {
         #[derive(Deserialize)]
         #[serde(rename = "SyntaxElement")]
-        struct Helper(String, String, String, bool, bool);
+        struct Helper(String, String, String, bool, bool, bool);
         // We implement deserialize by just delegating to a helper tuple struct type.
         Helper::deserialize(deserializer).map(|helper| SyntaxElement {
             name: helper.0,
@@ -63,6 +64,7 @@ impl<'de> Deserialize<'de> for SyntaxElement {
             regex: helper.2,
             is_token: helper.3,
             is_node: helper.4,
+            has_rule: helper.5,
             struct_name: String::new(),
         })
     }
@@ -75,6 +77,7 @@ pub struct GenericElement {
     represents_element_names: Vec<String>,
     represents: Vec<SyntaxElement>,
     impl_trait: String,
+    has_rule: bool,
 }
 
 impl<'de> Deserialize<'de> for GenericElement {
@@ -84,12 +87,13 @@ impl<'de> Deserialize<'de> for GenericElement {
     {
         #[derive(Deserialize)]
         #[serde(rename = "GenericElement")]
-        struct Helper(String, Vec<String>);
+        struct Helper(String, Vec<String>, bool);
         // We implement deserialize by just delegating to a helper tuple struct type.
         Helper::deserialize(deserializer).map(|helper| GenericElement {
             name: helper.0,
-            enum_name: String::new(),
             represents_element_names: helper.1,
+            has_rule: helper.2,
+            enum_name: String::new(),
             represents: Vec::new(),
             impl_trait: "Set in Finish".to_string(),
         })
