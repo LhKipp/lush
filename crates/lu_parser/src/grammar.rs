@@ -134,8 +134,8 @@ impl Rule for OrRule {
     }
 }
 
-pub struct RootRule;
-impl Rule for RootRule {
+pub struct SourceFileRule;
+impl Rule for SourceFileRule {
     fn name(&self) -> String {
         "lu file".into()
     }

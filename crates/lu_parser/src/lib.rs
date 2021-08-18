@@ -11,7 +11,7 @@ mod serde;
 mod syntax_kind;
 mod token_set;
 
-use grammar::{RootRule, Rule};
+use grammar::{Rule, SourceFileRule};
 use lexer::TokenVec;
 
 pub use crate::event::Event;
@@ -31,5 +31,5 @@ pub fn parse_as(input: &str, rule: &dyn Rule) -> Vec<Event> {
 
 /// Parse input str as SourceFile
 pub fn parse(input: &str) -> Vec<Event> {
-    parse_as(input, &RootRule {})
+    parse_as(input, &SourceFileRule {})
 }
