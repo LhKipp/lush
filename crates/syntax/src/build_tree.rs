@@ -5,7 +5,7 @@ use std::mem;
 
 // TODO remove dead code when all done
 use lu_error::ParseErr;
-use parser::Event;
+use lu_parser::Event;
 use rowan::GreenNode;
 
 use crate::{
@@ -93,7 +93,7 @@ impl<'a> TextTreeSink<'a> {
 /// Parse the text as a source file
 pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<ParseErr>) {
     let mut sink = TextTreeSink::new(text);
-    let mut events = parser::parse(text);
+    let mut events = lu_parser::parse(text);
     let mut forward_parents = Vec::new();
     for i in 0..events.len() {
         match mem::replace(&mut events[i], Event::tombstone()) {
@@ -135,11 +135,11 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<ParseErr>) {
                     sink.start_node(kind);
                 }
             }
-            parser::Event::Finish => sink.finish_node(),
-            parser::Event::Token(token) => {
+            Event::Finish => sink.finish_node(),
+            Event::Token(token) => {
                 sink.token(token);
             }
-            parser::Event::Error(e) => sink.error(e),
+            Event::Error(e) => sink.error(e),
         }
     }
     sink.finish()

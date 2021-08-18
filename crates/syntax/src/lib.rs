@@ -9,7 +9,7 @@ pub use syntax_node::{
     SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
 };
 
-pub use parser::{SyntaxKind, Token};
+pub use lu_parser::{SyntaxKind, Token};
 pub use rowan::{
     Direction, GreenNode, NodeOrToken, SyntaxText, TextRange, TextSize, TokenAtOffset, WalkEvent,
 };

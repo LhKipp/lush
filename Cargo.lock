@@ -437,15 +437,41 @@ dependencies = [
  "lu_cmds",
  "lu_error",
  "lu_fs",
+ "lu_parser",
  "lu_text_util",
  "lu_value",
  "parking_lot",
- "parser",
  "pretty_env_logger",
  "serde_json",
  "serde_yaml",
  "syntax",
  "vec_box",
+]
+
+[[package]]
+name = "lu_parser"
+version = "0.1.0"
+dependencies = [
+ "conformance",
+ "derive-new",
+ "drop_bomb",
+ "glob",
+ "heck",
+ "itertools",
+ "lazy_static",
+ "log",
+ "logos",
+ "lu_error",
+ "pretty_env_logger",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "strum",
+ "strum_macros",
+ "syntax_elements",
+ "tera",
+ "text-size",
+ "toml",
 ]
 
 [[package]]
@@ -555,32 +581,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c705f256449c60da65e11ff6626e0c16a0a0b96aaa348de61376b249bc340f41"
 dependencies = [
  "regex",
-]
-
-[[package]]
-name = "parser"
-version = "0.1.0"
-dependencies = [
- "conformance",
- "derive-new",
- "drop_bomb",
- "glob",
- "heck",
- "itertools",
- "lazy_static",
- "log",
- "logos",
- "lu_error",
- "pretty_env_logger",
- "serde",
- "serde_json",
- "serde_yaml",
- "strum",
- "strum_macros",
- "syntax_elements",
- "tera",
- "text-size",
- "toml",
 ]
 
 [[package]]
@@ -897,7 +897,7 @@ dependencies = [
  "heck",
  "log",
  "lu_error",
- "parser",
+ "lu_parser",
  "rowan",
  "serde",
  "syntax_elements",

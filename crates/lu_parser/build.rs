@@ -37,7 +37,7 @@ fn make_filter_fn<'a, T: Into<Value> + serde::de::DeserializeOwned>(
 
 fn main() -> Result<(), Box<dyn Error>> {
     let root = project_root();
-    let parser_root = root.join("crates/parser");
+    let parser_root = root.join("crates/lu_parser");
     let templates = parser_root.join(TEMPLATE_DIR).join("**/*.rs");
     // All generated files go into `$OUT_DIR` and are `include!`d from there.
     let out = parser_root.join(GENERATED_SRC_DIR);
