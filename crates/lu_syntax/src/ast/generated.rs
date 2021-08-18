@@ -20,14 +20,14 @@ impl CmdStmtNode {
     }
 
     /// All arguments of this command. This does include the command name parts.
-    pub fn args(&self) -> AstElementChildren<ExpressionNode> {
-        support::element_children::<ExpressionNode>(self.syntax())
+    pub fn args(&self) -> AstElementChildren<ValueExprNode> {
+        support::element_children::<ValueExprNode>(self.syntax())
     }
 }
 
 impl ArrayExprNode {
-    pub fn values(&self) -> AstElementChildren<ExpressionNode> {
-        support::element_children::<ExpressionNode>(self.syntax())
+    pub fn values(&self) -> AstElementChildren<ValueExprNode> {
+        support::element_children::<ValueExprNode>(self.syntax())
     }
 }
 

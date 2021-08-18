@@ -165,7 +165,7 @@ fn block(p: &mut Parser) {
     debug!("Parsing block");
     while p.next_non(CMT_NL_WS) != EndKeyword {
         debug!("Parsing block statement");
-        block_stmt().parse_rule(p);
+        block_stmt().parse(p);
     }
     p.eat_while(CMT_NL_WS);
     p.eat(EndKeyword);

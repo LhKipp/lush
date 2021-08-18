@@ -9,7 +9,10 @@ use lu_cmds::{PrintCmd, TestPrintCmd};
 use lu_interpreter::{Command, Interpreter};
 
 pub fn init_logger() {
-    let _ = env_logger::builder().is_test(true).try_init();
+    env_logger::builder()
+        .is_test(true)
+        .try_init()
+        .expect("could init");
 }
 
 pub fn make_test_interpreter() -> Interpreter {

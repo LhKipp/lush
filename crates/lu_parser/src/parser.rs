@@ -58,7 +58,9 @@ impl Parser {
         assert!(n <= 3);
 
         let steps = self.steps.get();
-        assert!(steps <= 10_000_000, "the parser seems stuck");
+        if steps > 1500 {
+            panic!("the parser seems stuck")
+        }
         self.steps.set(steps + 1);
 
         let token = self.token_source[n].kind;
@@ -105,7 +107,7 @@ impl Parser {
 
     /// Consume the next token until kind == current
     pub(crate) fn eat_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) {
-        while !self.at(kinds) {
+        while !self.at(kinds) && !self.at(Eof) {
             self.bump_any();
         }
     }
@@ -113,7 +115,7 @@ impl Parser {
     /// Discards all token until `kinds`. Returns all discarded tokens
     pub(crate) fn discard_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) -> Vec<Token> {
         let mut discarded = Vec::new();
-        while !self.at(kinds) {
+        while !self.at(kinds) && !self.at(Eof) {
             discarded.push(self.token_source.take_and_advance())
         }
         discarded
@@ -267,6 +269,7 @@ impl Marker {
     }
 }
 
+#[derive(Debug)]
 pub struct CompletedMarker {
     start_pos: u32,
     finish_pos: u32,

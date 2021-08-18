@@ -1,0 +1,33 @@
+1
+===
+for x in [ 1 2 3 ]
+end
+---
+- Start: ForStmt
+- Token: "ForKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Token: "InKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Start: ArrayExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: Number
+- Token: "Number (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: Number
+- Token: "Number (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: Number
+- Token: "Number (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+...
