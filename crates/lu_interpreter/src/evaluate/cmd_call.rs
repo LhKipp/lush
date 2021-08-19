@@ -47,7 +47,7 @@ impl Evaluable for CmdStmtNode {
 #[cfg(test)]
 mod test {
     use lu_error::LuResult;
-    use lu_syntax::ast::CmdStmtNode;
+    use lu_syntax::ast::SourceFileNode;
     use lu_test_support::{init_logger, make_test_interpreter};
     use lu_text_util::SourceCode;
     use lu_value::Value;
@@ -58,6 +58,6 @@ mod test {
         init_logger();
         let mut itprt = make_test_interpreter();
 
-        itprt.evaluate_as::<CmdStmtNode>(SourceCode::Text(s.to_string()))
+        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
     }
 }

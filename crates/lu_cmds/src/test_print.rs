@@ -1,3 +1,4 @@
+use log::debug;
 // use log::debug;
 use lu_error::LuResult;
 use lu_interpreter::{Command, Interpreter};
@@ -11,7 +12,7 @@ impl Command for TestPrintCmd {
         "tprint"
     }
 
-    fn run(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_run(&self, state: &mut Interpreter) -> LuResult<Value> {
         let args = match state.scope.lock().cur_frame().get_var("args").unwrap() {
             Value::Array(vals) => vals[1..].to_vec(), // Always erase $arg.0 (cmd name)
             _ => unreachable!(),
@@ -22,6 +23,7 @@ impl Command for TestPrintCmd {
             let vals = test_print_vars.expect_array();
             vals.extend(args)
         } else {
+            debug!("Inserted t_printed");
             global_f.insert_var("t_printed".to_string(), Value::new_array(args));
         }
         Ok(Value::Nil)

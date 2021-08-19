@@ -11,7 +11,7 @@ impl Command for PrintCmd {
         "print"
     }
 
-    fn run(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_run(&self, state: &mut Interpreter) -> LuResult<Value> {
         let args = match state.scope.lock().cur_frame().get_var("args").unwrap() {
             Value::Array(vals) => vals[1..].to_vec(), // Always erase $arg.0 (cmd name)
             _ => unreachable!(),
