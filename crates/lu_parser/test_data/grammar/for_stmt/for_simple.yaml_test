@@ -31,3 +31,35 @@ end
 - Token: "EndKeyword (len: 3)"
 - Finish: ""
 ...
+2
+===
+for x in "123"
+    tprint $x
+end
+---
+- Start: ForStmt
+- Token: "ForKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Token: "VarDeclName (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Token: "InKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 3)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "Whitespace (len: 4)"
+- Start: CmdStmt
+- Token: "BareWord (len: 6)"
+- Token: "Whitespace (len: 1)"
+- Start: ValuePathExpr
+- Token: "Dollar (len: 1)"
+- Token: "BareWord (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+...

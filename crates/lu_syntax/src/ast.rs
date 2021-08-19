@@ -1,6 +1,7 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
 mod expr;
 mod generated;
+mod value_path_expr;
 use std::marker::PhantomData;
 
 use lu_parser::grammar::Rule;
