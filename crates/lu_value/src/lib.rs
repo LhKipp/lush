@@ -23,4 +23,11 @@ impl Value {
     pub fn new_array(vals: Vec<Value>) -> Self {
         Value::Array(Rc::new(vals))
     }
+
+    pub fn expect_array(&mut self) -> &mut Vec<Value> {
+        match self {
+            Value::Array(vals) => Rc::make_mut(vals),
+            _ => unreachable!(),
+        }
+    }
 }
