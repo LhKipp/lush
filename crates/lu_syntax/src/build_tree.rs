@@ -57,7 +57,7 @@ impl<'a> TreeBuilder<'a> {
     }
 
     fn error(&mut self, error: ParseErr) {
-        debug!("BuildTree: error {}", error);
+        debug!("BuildTree: error {:?}", error);
         self.inner.error(error)
     }
 

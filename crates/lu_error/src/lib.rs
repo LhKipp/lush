@@ -11,7 +11,7 @@ extern crate strum_macros;
 
 pub use eval_err::EvalErr;
 pub use fs_err::FsErr;
-pub use parse_err::{ParseErr, ParseErrKind, ParseErrs};
+pub use parse_err::{ParseErr, ParseErrs};
 
 use std::result;
 

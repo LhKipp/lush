@@ -895,6 +895,32 @@ impl AstToken for ErrorToken {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ParserInternalToken {
+    pub(crate) syntax: SyntaxToken,
+}
+
+impl HasSyntaxKind for ParserInternalToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl AstToken for ParserInternalToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParserInternal }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BareWordToken {
     pub(crate) syntax: SyntaxToken,
 }

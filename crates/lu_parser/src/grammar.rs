@@ -38,7 +38,6 @@ mod signature;
 
 use itertools::Itertools;
 use log::debug;
-use lu_error::{ParseErr, ParseErrKind};
 
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
@@ -83,7 +82,9 @@ pub trait Rule {
     /// Parse this rule. If it doesn't match a error event will be generated
     fn parse(&self, p: &mut Parser) -> Option<CompletedMarker> {
         debug!("Parsing {:?}", self.name());
-        self.parse_rule(p)
+        let result = self.parse_rule(p);
+        debug!("Finished Parsing {:?}, Result: {:?}", self.name(), result);
+        result
     }
 }
 
@@ -129,11 +130,11 @@ impl Rule for OrRule {
             debug!("OrRule {}: Parsing rule {}", self.name(), rule.name());
             rule.parse_rule(p)
         } else {
-            p.error(ParseErr::new(ParseErrKind::Message(format!(
+            p.error(format!(
                 "Expected {}, but found {:?}",
                 self.name(),
                 p.current()
-            ))));
+            ));
             None
         }
     }
@@ -160,13 +161,13 @@ impl Rule for SourceFileRule {
 // TODO make proper StatementRule
 fn statements_until(p: &mut Parser, end: SyntaxKind) {
     while p.next_non(CMT_NL_WS) != end {
-        top_level_stmt().parse_rule(p);
+        top_level_stmt().parse(p);
     }
 }
 
 fn statements(p: &mut Parser) {
     while p.next_non(CMT_NL_WS) != Eof {
-        top_level_stmt().parse_rule(p);
+        top_level_stmt().parse(p);
     }
 }
 

@@ -33,8 +33,6 @@ impl Rule for ForStmtRule {
         p.eat_until(Newline);
         p.expect(Newline);
         statements_until(p, EndKeyword);
-        p.eat_until(Newline);
-        p.expect(Newline);
         p.eat_while(CMT_NL_WS);
         p.expect(EndKeyword);
         Some(m.complete(p, ForStmt))

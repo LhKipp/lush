@@ -38,7 +38,7 @@ impl Serialize for Event {
             Event::Token(token) => {
                 format!("{} (len: {})", token.kind.name(), u32::from(token.len))
             }
-            Event::Error(e) => e.to_string(),
+            Event::Error(e) => format!("{:?}", e),
         };
         serializer.serialize_newtype_variant(
             // The name of the type

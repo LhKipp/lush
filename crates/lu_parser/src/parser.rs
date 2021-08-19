@@ -2,6 +2,7 @@
 
 use log::debug;
 use std::cell::Cell;
+use tap::prelude::*;
 
 use lu_error::ParseErr;
 
@@ -15,7 +16,7 @@ use crate::{
     Token, TokenSet, TokenSource,
 };
 
-pub(crate) const CMT_NL_WS: TokenSet = TokenSet::new(&[Comment, Newline, Whitespace]);
+pub const CMT_NL_WS: [SyntaxKind; 3] = [Comment, Newline, Whitespace];
 
 pub struct Parser {
     token_source: TokenSource,
@@ -64,7 +65,6 @@ impl Parser {
         self.steps.set(steps + 1);
 
         let token = self.token_source[n].kind;
-        debug!("token[{}]: {:?}", n, token);
         token
     }
 
@@ -74,13 +74,15 @@ impl Parser {
 
     /// next token not in ts
     pub(crate) fn next_non<TS: Into<TokenSet>>(&self, ts: TS) -> SyntaxKind {
-        let ts = ts.into();
+        let ts: TokenSet = ts.into();
+        debug!("Looking for next non {:?}", ts);
         self.token_source
             .iter()
             .map(|t| t.kind)
             .skip_while(|t| ts.contains(*t))
             .next()
             .unwrap_or(Eof)
+            .tap(|kind| debug!("Result: {:?}", kind))
     }
 
     // /// Checks if all tokens until are kind are skippable. Expects kind to be present
@@ -90,9 +92,12 @@ impl Parser {
 
     /// Consume the next token if `kind` matches.
     pub(crate) fn eat<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
+        let kinds: TokenSet = kinds.into();
         if !self.at(kinds) {
+            debug!("Could not eat for ts {:?}", kinds);
             return false;
         }
+        debug!("Eating {:?} (kinds was: {:?})", self.current(), kinds);
         //TODO is bump by 1 always correct?
         self.do_bump_cur();
         true
@@ -100,11 +105,18 @@ impl Parser {
 
     /// Consume the next token if kinds matches, but as a SyntaxKind of as_
     pub(crate) fn eat_as<TS: Into<TokenSet>>(&mut self, kinds: TS, as_: SyntaxKind) -> bool {
+        let kinds: TokenSet = kinds.into();
         if !self.at(kinds) {
+            debug!("Could not eat for ts {:?} as {:?}", kinds, as_);
             return false;
         }
         let cur = self.token_source.take_and_advance();
-        debug!("Eating {:?} as {:?}", cur, as_);
+        debug!(
+            "Eating {:?} as {:?} (kinds was: {:?})",
+            self.current(),
+            as_,
+            kinds
+        );
         let new = Token::new(as_, cur.len);
         self.do_bump(new);
         true
@@ -112,13 +124,17 @@ impl Parser {
 
     /// Consume the next token if `kind` matches.
     pub(crate) fn eat_while<TS: Into<TokenSet> + Copy>(&mut self, ts: TS) {
-        while self.at(ts) {
+        let kinds: TokenSet = ts.into();
+        debug!("Eating while {:?}", kinds);
+        while self.at(kinds) {
             self.bump_any();
         }
     }
 
     /// Consume the next token until kind == current
     pub(crate) fn eat_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) {
+        let kinds: TokenSet = kinds.into();
+        debug!("Eating until {:?}", kinds);
         while !self.at(kinds) && !self.at(Eof) {
             self.bump_any();
         }
@@ -127,6 +143,8 @@ impl Parser {
     /// Discards all token until `kinds`. Returns all discarded tokens
     pub(crate) fn discard_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) -> Vec<Token> {
         let mut discarded = Vec::new();
+        let kinds: TokenSet = kinds.into();
+        debug!("Discarding until {:?}", kinds);
         while !self.at(kinds) && !self.at(Eof) {
             discarded.push(self.token_source.take_and_advance())
         }
@@ -179,7 +197,9 @@ impl Parser {
 
     /// Emit error `err`
     pub(crate) fn error<E: Into<ParseErr>>(&mut self, err: E) {
-        self.push_event(Event::Error(err.into()));
+        let err = err.into();
+        debug!("Parser error: {:?}", err);
+        self.push_event(Event::Error(err));
     }
 
     /// Consume the next token if it is `kind` or emit an error
@@ -187,8 +207,10 @@ impl Parser {
     pub(crate) fn expect<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
         let kinds: TokenSet = kinds.into();
         if self.eat(kinds) {
+            debug!("Expected {:?} and found one of them", kinds);
             return true;
         }
+        debug!("Expected {:?}, but found none. Creating error.", kinds);
         let err: ParseErr = format!("expected {:?}", kinds).into();
         self.error(err);
         false
@@ -199,8 +221,10 @@ impl Parser {
     pub(crate) fn expect_as<TS: Into<TokenSet>>(&mut self, kinds: TS, as_: SyntaxKind) -> bool {
         let kinds: TokenSet = kinds.into();
         if self.eat_as(kinds, as_) {
+            debug!("Expected_as {:?} and found one of them", kinds);
             return true;
         }
+        debug!("Expected_as {:?}, but found none. Creating error.", kinds);
         let err: ParseErr = format!("expected {:?}", kinds).into();
         self.error(err);
         false

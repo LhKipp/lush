@@ -74,6 +74,7 @@ pub enum SyntaxKind {
     SingleQuote,
     #[error]
     Error,
+    ParserInternal,
     #[regex("[_a-zA-Z]+", priority = 0)]
     BareWord,
     #[regex("[ ]+")]
@@ -140,6 +141,7 @@ impl SyntaxKind{
             SyntaxKind::DoubleQuote => "DoubleQuote",
             SyntaxKind::SingleQuote => "SingleQuote",
             SyntaxKind::Error => "Error",
+            SyntaxKind::ParserInternal => "ParserInternal",
             SyntaxKind::BareWord => "BareWord",
             SyntaxKind::Whitespace => "Whitespace",
             SyntaxKind::Comment => "Comment",
