@@ -5,7 +5,7 @@ use lu_value::Value;
 
 use crate::Interpreter;
 
-mod cmd_call;
+mod cmd_stmt;
 mod expr;
 mod for_stmt;
 mod source_file;
