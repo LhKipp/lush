@@ -17,6 +17,10 @@ pub trait HasRule {
     fn get_belonging_rule() -> Box<dyn Rule>;
 }
 
+pub trait HasSyntaxKind {
+    fn get_syntax_kind(&self) -> SyntaxKind;
+}
+
 /// The main trait to go from untyped `SyntaxNode` to a typed ast. The
 /// conversion itself has zero runtime cost: ast and syntax nodes have exactly
 /// the same representation: a pointer to the tree root and a pointer to the

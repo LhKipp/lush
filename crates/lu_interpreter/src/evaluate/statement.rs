@@ -5,7 +5,7 @@ use lu_value::Value;
 use crate::{Evaluable, Interpreter};
 
 impl Evaluable for StatementNode {
-    fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
         match self {
             StatementNode::LetStmt(n) => n.evaluate(state),
             StatementNode::FnStmt(n) => n.evaluate(state),
@@ -15,13 +15,13 @@ impl Evaluable for StatementNode {
 }
 
 impl Evaluable for LetStmtNode {
-    fn evaluate(&self, _state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _state: &mut Interpreter) -> LuResult<Value> {
         todo!()
     }
 }
 
 impl Evaluable for FnStmtNode {
-    fn evaluate(&self, _state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _state: &mut Interpreter) -> LuResult<Value> {
         todo!()
     }
 }

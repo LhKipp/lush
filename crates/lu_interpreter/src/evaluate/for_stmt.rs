@@ -7,7 +7,7 @@ use crate::{Evaluable, Interpreter};
 
 impl Evaluable for ForStmtNode {
     #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
-    fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
         let stmts: Vec<_> = self.statements().collect();
         if stmts.is_empty() {
             // Empty for statement. This is a noop. Should have been a warning (at least).

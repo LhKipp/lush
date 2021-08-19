@@ -2,23 +2,13 @@
 
 use crate::{
     Rule,
-    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule},
+    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
     SyntaxKind::{self, *},
     SyntaxNode, SyntaxToken, SyntaxElement
 };
 
 {% for syn_elem in syntax_elements -%}
 {% set syntax_kind_name = syn_elem.name %}
-
-{% if syn_elem.has_rule -%}
-{% set rule_name = syn_elem.name ~ "Rule" %}
-use lu_parser::grammar::{{rule_name}};
-impl HasRule for {{syn_elem.struct_name}}{
-    fn get_belonging_rule() -> Box<dyn Rule>{
-        Box::new({{rule_name}}{})
-    }
-}
-{% endif -%}
 
 {% if syn_elem.is_token -%}
 {% set token_name = syn_elem.name ~ "Token"  %}
@@ -27,8 +17,12 @@ pub struct {{ token_name }} {
     pub(crate) syntax: SyntaxToken,
 }
 
-impl {{ token_name }} {
+impl HasSyntaxKind for {{ token_name }}{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
 }
+
 impl AstToken for {{ token_name }} {
     fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::{{syntax_kind_name}} }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
@@ -47,8 +41,6 @@ pub struct {{ node_name }} {
     pub(crate) syntax: SyntaxNode,
 }
 
-impl {{ node_name }} {
-}
 impl AstNode for {{ node_name }} {
     fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::{{syntax_kind_name}} }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -61,7 +53,25 @@ impl AstNode for {{ node_name }} {
 
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+
+impl HasSyntaxKind for {{ node_name }}{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
 {% endif -%}
+
+{% if syn_elem.has_rule -%}
+{% set rule_name = syn_elem.name ~ "Rule" %}
+use lu_parser::grammar::{{rule_name}};
+impl HasRule for {{syn_elem.struct_name}}{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new({{rule_name}}{})
+    }
+}
+{% endif -%}
+
 {% endfor -%}
 
 {% for gen_elem in generic_elements -%}
@@ -132,4 +142,14 @@ impl AstNode for {{ gen_elem.enum_name }} {
     }
 }
 {% endif -%}
+
+impl HasSyntaxKind for {{ gen_elem.enum_name }}{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            {% for represented in gen_elem.represents -%}
+            {{gen_elem.enum_name}}::{{represented.name}}(it) => it.get_syntax_kind(),
+            {% endfor -%}
+        }
+    }
+}
 {% endfor -%}

@@ -5,7 +5,7 @@ use lu_value::Value;
 use crate::{Evaluable, Interpreter};
 
 impl Evaluable for CmdStmtNode {
-    fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let possibl_longest_name = self.possible_longest_cmd_call_name();
