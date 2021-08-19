@@ -174,6 +174,7 @@ fn top_level_stmt() -> OrRule {
     OrRule {
         kind: None,
         rules: vec![
+            Box::new(ForStmtRule {}),
             Box::new(LetStmtRule {}),
             Box::new(FnStmtRule {}),
             Box::new(CmdStmtRule {}),
