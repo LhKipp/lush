@@ -10,4 +10,4 @@ mod scope;
 pub use crate::evaluate::Evaluable;
 pub use crate::interpreter::{CommandStorage, Interpreter};
 pub use command::Command;
-pub use scope::{Scope, ScopeFrame, SimpleScopeFrame};
+pub use scope::{Scope, ScopeFrame, ScopeFrameTag, SimpleScopeFrame};

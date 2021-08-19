@@ -1,5 +1,7 @@
 use indextree::{Arena, NodeId};
+use log::debug;
 use std::collections::HashMap;
+use tap::prelude::*;
 
 use lu_value::Value;
 
@@ -10,10 +12,12 @@ pub trait ScopeFrame {
     fn insert_var(&mut self, name: String, val: Value);
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
+    None,
     GlobalFrame,
     FnFrame,
+    ForStmtFrame,
 }
 
 /// The default scope frame being put on the scope stack, when entering a new scope
@@ -52,68 +56,102 @@ impl ScopeFrame for SimpleScopeFrame {
 pub struct Scope {
     pub arena: Arena<Box<dyn ScopeFrame>>,
     /// Always a valid id
-    cur_frame_id: NodeId,
+    cur_frame_id: Option<NodeId>,
 }
 
 impl Scope {
     pub fn new() -> Self {
-        // We create one global frame, so that current_id is valid from ctor on.
-        let mut arena = Arena::<Box<dyn ScopeFrame>>::new();
-        let global_frame =
-            arena.new_node(Box::new(SimpleScopeFrame::new(ScopeFrameTag::GlobalFrame)));
         Scope {
-            arena,
-            cur_frame_id: global_frame,
+            arena: Arena::<Box<dyn ScopeFrame>>::new(),
+            cur_frame_id: None,
         }
     }
 
     pub fn cur_frame(&self) -> &dyn ScopeFrame {
-        self.arena.get(self.cur_frame_id).unwrap().get().as_ref()
+        self.arena
+            .get(self.cur_frame_id.expect("Scope is empty"))
+            .unwrap()
+            .get()
+            .as_ref()
     }
 
     pub fn cur_mut_frame(&mut self) -> &mut dyn ScopeFrame {
         self.arena
-            .get_mut(self.cur_frame_id)
+            .get_mut(self.cur_frame_id.expect("Scope is empty"))
             .unwrap()
             .get_mut()
             .as_mut()
     }
 
     pub fn global_mut_frame(&mut self) -> &mut dyn ScopeFrame {
-        let ancestors: Vec<NodeId> = self.cur_frame_id.ancestors(&self.arena).collect();
+        let ancestors: Vec<NodeId> = self
+            .cur_frame_id
+            .expect("Scope is empty")
+            .ancestors(&self.arena)
+            .collect();
         let global_id = ancestors.last().unwrap();
-        self.arena.get_mut(*global_id).unwrap().get_mut().as_mut()
+        let global_frame = self.arena.get_mut(*global_id).unwrap();
+        assert_eq!(global_frame.get().get_tag(), ScopeFrameTag::GlobalFrame);
+        global_frame.get_mut().as_mut()
     }
 
     pub fn get_var(&self, name: &str) -> Option<&Value> {
-        self.cur_frame_id
-            .ancestors(&self.arena)
-            .map(|n_id| {
-                self.arena
-                    .get(n_id)
-                    .expect("Current_id should always have at least 1 ancestor")
-                    .get()
-            })
-            .flat_map(|frame| frame.get_var(name))
-            .next()
+        debug!("Finding var {} from {:?} on", name, self.get_cur_tag());
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            cur_frame_id
+                .ancestors(&self.arena)
+                .map(|n_id| {
+                    self.arena
+                        .get(n_id)
+                        .expect("Current_id should always have at least 1 ancestor")
+                        .get()
+                })
+                .flat_map(|frame| frame.get_var(name))
+                .next()
+                .tap(|result| debug!("Found var: {:?}", result))
+        } else {
+            debug!("Tried to get_var, but scope is empty");
+            None
+        }
     }
 
-    pub fn push_frame(&mut self) {
-        self.cur_frame_id = self
-            .arena
-            .new_node(Box::new(SimpleScopeFrame::new(ScopeFrameTag::GlobalFrame)));
+    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> &mut dyn ScopeFrame {
+        debug!("Pushing frame: {:?}", tag);
+        let prev_frame_id = self.cur_frame_id;
+        let new_frame_id = self.arena.new_node(Box::new(SimpleScopeFrame::new(tag)));
+        if let Some(prev_frame_id) = prev_frame_id {
+            prev_frame_id.append(new_frame_id, &mut self.arena);
+        }
+        self.cur_frame_id = Some(new_frame_id);
+
+        self.cur_mut_frame()
     }
 
-    pub fn pop_frame(&mut self) {
-        let parent = self.cur_parent_frame();
-        self.cur_frame_id.remove(&mut self.arena);
-        self.cur_frame_id = parent;
+    pub fn pop_frame(&mut self, expected: ScopeFrameTag) {
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            let cur_frame = &self.arena[cur_frame_id];
+            let cur_frame_tag = cur_frame.get().get_tag();
+
+            debug!(
+                "Popping frame: {:?}, Expected: {:?}",
+                cur_frame_tag, expected
+            );
+            assert_eq!(cur_frame_tag, expected);
+
+            let parent_id = cur_frame.parent();
+            cur_frame_id.remove(&mut self.arena);
+            self.cur_frame_id = parent_id;
+        } else {
+            debug!("Tried to pop_frame, but scope is empty")
+        }
     }
 
-    /// Returns the parent frame of the current frame
-    fn cur_parent_frame(&self) -> NodeId {
-        self.arena[self.cur_frame_id]
-            .parent()
-            .expect("The global frame should never be deallocated")
+    fn get_cur_tag(&self) -> ScopeFrameTag {
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            let cur_frame = &self.arena[cur_frame_id];
+            cur_frame.get().get_tag()
+        } else {
+            ScopeFrameTag::None
+        }
     }
 }
