@@ -40,7 +40,7 @@ syntax_elements = [
 
     # various tokens
     ["Error"                    , ""         , ""                                    , true     , false   , false]    ,
-    ["BareWord"                 , ""         , "[a-zA-Z]+"                           , true     , false   , false]    ,
+    ["BareWord"                 , ""         , "[_a-zA-Z]+"                           , true     , false   , false]    ,
     ["Whitespace"               , ""         , "[ ]+"                                , true     , false   , false]    ,
     ["Comment"                  , ""         , "#.*\\n"                              , true     , false   , false]    ,
     ["Newline"                  , ""         , "\\n"                                 , true     , false   , false]    ,
@@ -71,5 +71,5 @@ generic_elements = [
     # Element name, can represent, has_rule
 
     ["ValueExpr", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"], true],
-    ["Statement" , ["LetStmt" , "FnStmt", "CmdStmt"], true],
+    ["Statement" , ["ForStmt", "LetStmt" , "FnStmt", "CmdStmt"], true],
 ]

@@ -74,7 +74,7 @@ pub enum SyntaxKind {
     SingleQuote,
     #[error]
     Error,
-    #[regex("[a-zA-Z]+", priority = 0)]
+    #[regex("[_a-zA-Z]+", priority = 0)]
     BareWord,
     #[regex("[ ]+")]
     Whitespace,

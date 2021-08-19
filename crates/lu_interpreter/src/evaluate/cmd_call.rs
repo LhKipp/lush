@@ -1,3 +1,4 @@
+use log::debug;
 use lu_error::LuResult;
 use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
@@ -16,10 +17,11 @@ impl Evaluable for CmdStmtNode {
             .lock()
             .find_cmd_with_longest_match(&possibl_longest_name)
         {
+            let cmd_name = possibl_longest_name[0..cmd_parts_count].join(" ");
+            debug!("Calling cmd: {}", cmd_name);
+
             // Push cmd name as $args.0
-            args.push(Value::String(
-                possibl_longest_name[0..cmd_parts_count].join(" "),
-            ));
+            args.push(Value::String(cmd_name));
             // Push all other arguments
             for arg in self.args().skip(cmd_parts_count) {
                 // TODO remove partial result from eval call
@@ -45,6 +47,7 @@ impl Evaluable for CmdStmtNode {
 #[cfg(test)]
 mod test {
     use lu_error::LuResult;
+    use lu_syntax::ast::CmdStmtNode;
     use lu_test_support::{init_logger, make_test_interpreter};
     use lu_text_util::SourceCode;
     use lu_value::Value;
@@ -55,6 +58,6 @@ mod test {
         init_logger();
         let mut itprt = make_test_interpreter();
 
-        itprt.evaluate(SourceCode::Text(s.to_string()))
+        itprt.evaluate_as::<CmdStmtNode>(SourceCode::Text(s.to_string()))
     }
 }

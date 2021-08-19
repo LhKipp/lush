@@ -1581,6 +1581,7 @@ impl HasSyntaxKind for ValueExprNode{
     }
 }
 pub enum StatementNode {
+    ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
     CmdStmt(CmdStmtNode),
@@ -1592,12 +1593,13 @@ impl StatementNode {
 impl AstNode for StatementNode {
     fn can_cast(kind: SyntaxKind) -> bool { 
         match kind{
-            LetStmt | FnStmt | CmdStmt => true,
+            ForStmt | LetStmt | FnStmt | CmdStmt => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
+            ForStmt => StatementNode::ForStmt(ForStmtNode { syntax }),
             LetStmt => StatementNode::LetStmt(LetStmtNode { syntax }),
             FnStmt => StatementNode::FnStmt(FnStmtNode { syntax }),
             CmdStmt => StatementNode::CmdStmt(CmdStmtNode { syntax }),
@@ -1608,6 +1610,7 @@ impl AstNode for StatementNode {
 
     fn syntax(&self) -> &SyntaxNode {
         match self {
+            StatementNode::ForStmt(it) => &it.syntax,
             StatementNode::LetStmt(it) => &it.syntax,
             StatementNode::FnStmt(it) => &it.syntax,
             StatementNode::CmdStmt(it) => &it.syntax,
@@ -1617,6 +1620,7 @@ impl AstNode for StatementNode {
 impl HasSyntaxKind for StatementNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
+            StatementNode::ForStmt(it) => it.get_syntax_kind(),
             StatementNode::LetStmt(it) => it.get_syntax_kind(),
             StatementNode::FnStmt(it) => it.get_syntax_kind(),
             StatementNode::CmdStmt(it) => it.get_syntax_kind(),

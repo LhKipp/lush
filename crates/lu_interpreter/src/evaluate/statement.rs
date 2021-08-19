@@ -10,6 +10,7 @@ impl Evaluable for StatementNode {
             StatementNode::LetStmt(n) => n.evaluate(state),
             StatementNode::FnStmt(n) => n.evaluate(state),
             StatementNode::CmdStmt(n) => n.evaluate(state),
+            StatementNode::ForStmt(n) => n.evaluate(state),
         }
     }
 }

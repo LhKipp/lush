@@ -58,7 +58,7 @@ impl Parser {
         assert!(n <= 3);
 
         let steps = self.steps.get();
-        if steps > 1500 {
+        if steps > 300 {
             panic!("the parser seems stuck")
         }
         self.steps.set(steps + 1);

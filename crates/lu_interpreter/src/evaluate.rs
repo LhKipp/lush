@@ -17,7 +17,7 @@ pub trait Evaluable: HasSyntaxKind {
 
     fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
         debug!("Evaluating: {:?}", self.get_syntax_kind());
-        let result = self.evaluate(state);
+        let result = self.do_evaluate(state);
         debug!(
             "Result of Evaluating: {:?}: {:?}",
             self.get_syntax_kind(),

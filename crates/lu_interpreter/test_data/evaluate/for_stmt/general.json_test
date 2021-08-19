@@ -3,12 +3,23 @@
 for x in "123"
     tprint $x
 end
+print $t_printed
 ---
 {
-  "Fxk": {
+  "Ok": {
     "Array": [
       {
-        "String": "hi"
+        "Array": [
+          {
+            "String": "1"
+          },
+          {
+            "String": "2"
+          },
+          {
+            "String": "3"
+          }
+        ]
       }
     ]
   }

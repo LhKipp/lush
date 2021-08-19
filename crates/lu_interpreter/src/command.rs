@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use log::debug;
 use lu_error::LuResult;
 use lu_value::Value;
 
@@ -24,5 +25,11 @@ use crate::Interpreter;
 
 pub trait Command: Send + Sync + Debug {
     fn name(&self) -> &str;
-    fn run(&self, state: &mut Interpreter) -> LuResult<Value>;
+    fn do_run(&self, state: &mut Interpreter) -> LuResult<Value>;
+    fn run(&self, state: &mut Interpreter) -> LuResult<Value> {
+        debug!("Running cmd: {}", self.name());
+        let result = self.do_run(state);
+        debug!("Result of cmd {}: {:?}", self.name(), result);
+        result
+    }
 }

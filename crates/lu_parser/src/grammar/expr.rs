@@ -227,7 +227,7 @@ impl Rule for ValuePathExprRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
-        p.eat(Dollar);
+        p.expect(Dollar);
         loop {
             if !p.expect(BareWord) {
                 break;
