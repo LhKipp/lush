@@ -5,6 +5,7 @@ use crate::Interpreter;
 
 mod cmd_call;
 mod expr;
+mod for_stmt;
 mod source_file;
 mod statement;
 
