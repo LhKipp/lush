@@ -1,0 +1,16 @@
+1
+===
+for x in "123"
+    tprint $x
+end
+---
+{
+  "Fxk": {
+    "Array": [
+      {
+        "String": "hi"
+      }
+    ]
+  }
+}
+...

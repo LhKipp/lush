@@ -1,10 +1,10 @@
-use lu_error::LuResult;
+use lu_error::{EvalErr, LuResult, SourceCodeItem};
 use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, MathExprNode, NumberToken, StringExprNode, TableExprNode,
         ValueExprNode, ValuePathExprNode,
     },
-    AstToken,
+    AstNode, AstToken,
 };
 use lu_value::Value;
 
@@ -49,8 +49,18 @@ impl Evaluable for StringExprNode {
 }
 
 impl Evaluable for ValuePathExprNode {
-    fn evaluate(&self, _state: &mut crate::Interpreter) -> LuResult<Value> {
-        todo!()
+    fn evaluate(&self, state: &mut crate::Interpreter) -> LuResult<Value> {
+        let name_parts = self.var_name_parts();
+        assert_eq!(name_parts.len(), 1); // TODO handle indexing into table
+        if let Some(var) = state.scope.lock().get_var(&name_parts[0]) {
+            Ok(var.clone())
+        } else {
+            EvalErr::VarNotFound(SourceCodeItem::new(
+                self.syntax().text_range().into(),
+                self.syntax().text().to_string(),
+            ))
+            .into()
+        }
     }
 }
 

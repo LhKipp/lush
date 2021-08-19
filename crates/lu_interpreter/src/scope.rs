@@ -79,6 +79,12 @@ impl Scope {
             .as_mut()
     }
 
+    pub fn global_mut_frame(&mut self) -> &mut dyn ScopeFrame {
+        let ancestors: Vec<NodeId> = self.cur_frame_id.ancestors(&self.arena).collect();
+        let global_id = ancestors.last().unwrap();
+        self.arena.get_mut(*global_id).unwrap().get_mut().as_mut()
+    }
+
     pub fn get_var(&self, name: &str) -> Option<&Value> {
         self.cur_frame_id
             .ancestors(&self.arena)

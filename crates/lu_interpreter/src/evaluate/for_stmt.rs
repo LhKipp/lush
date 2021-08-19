@@ -53,3 +53,21 @@ impl Evaluable for ForStmtNode {
         Ok(Value::Nil)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use lu_error::LuResult;
+    use lu_syntax::ast::ForStmtNode;
+    use lu_test_support::{init_logger, make_test_interpreter};
+    use lu_text_util::SourceCode;
+    use lu_value::Value;
+    use {conformance, serde_json};
+
+    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/for_stmt/general.json_test")]
+    fn general_interpreter_tests(s: &str) -> LuResult<Value> {
+        init_logger();
+        let mut itprt = make_test_interpreter();
+
+        itprt.evaluate_as::<ForStmtNode>(SourceCode::Text(s.to_string()))
+    }
+}
