@@ -7,7 +7,9 @@ use crate::Interpreter;
 
 mod cmd_stmt;
 mod expr;
+mod fn_stmt;
 mod for_stmt;
+mod let_stmt;
 mod source_file;
 mod statement;
 
