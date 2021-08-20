@@ -39,8 +39,8 @@ echo 1 + 1
 - Token: "Whitespace (len: 1)"
 - Start: MathExpr
 - Token: "PlusSign (len: 1)"
-- Start: Number
 - Token: "Whitespace (len: 1)"
+- Start: Number
 - Token: "Number (len: 1)"
 - Finish: ""
 - Finish: ""
@@ -59,15 +59,15 @@ echo 1 + 2 * 3
 - Token: "Whitespace (len: 1)"
 - Start: MathExpr
 - Token: "PlusSign (len: 1)"
-- Start: "Number (parent: 5)"
 - Token: "Whitespace (len: 1)"
+- Start: "Number (parent: 4)"
 - Token: "Number (len: 1)"
 - Finish: ""
 - Token: "Whitespace (len: 1)"
 - Start: MathExpr
 - Token: "MultSign (len: 1)"
-- Start: Number
 - Token: "Whitespace (len: 1)"
+- Start: Number
 - Token: "Number (len: 1)"
 - Finish: ""
 - Finish: ""

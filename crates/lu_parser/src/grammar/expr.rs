@@ -168,8 +168,8 @@ impl Rule for NumberRule {
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        let m = p.start();
         p.eat_while(CMT_NL_WS);
+        let m = p.start();
         p.expect(Number);
         Some(m.complete(p, Number))
     }
