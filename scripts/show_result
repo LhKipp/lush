@@ -28,9 +28,20 @@ function print_json
     echo $argv | jq
 end
 
+argparse --ignore-unknown 'input' -- $argv
+or exit
+
 set val (run_test $argv)
+if set --query _flag_input
+    set copy_to_clip true
+else
+    set copy_to_clip false
+end
+
 if string match --quiet --regex "^{" -- $val
     print_json $val
+    $copy_to_clip && print_json $val | xsel --input -b
 else if string match --quiet --regex "^-" -- $val
     print_yaml $val
+    $copy_to_clip && print_yaml $val | xsel --input -b
 end
