@@ -97,7 +97,7 @@ pub(crate) fn value_expr_rule() -> OrRule {
     OrRule {
         kind: Some("value expr".into()),
         rules: vec![
-            Box::new(NumberRule {}),
+            Box::new(NumberExprRule {}),
             Box::new(ValuePathExprRule {}),
             Box::new(StringExprRule {}),
             Box::new(BareWord),
@@ -157,8 +157,8 @@ impl Rule for TableExprRule {
     }
 }
 
-pub struct NumberRule;
-impl Rule for NumberRule {
+pub struct NumberExprRule;
+impl Rule for NumberExprRule {
     fn name(&self) -> String {
         "Number".into()
     }
@@ -171,7 +171,7 @@ impl Rule for NumberRule {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
         p.expect(Number);
-        Some(m.complete(p, Number))
+        Some(m.complete(p, NumberExpr))
     }
 }
 

@@ -47,7 +47,7 @@ use crate::{
 pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;
 pub use expr::{
-    ArrayExprRule, NumberRule, StringExprRule, TableExprRule, ValueExprRule, ValuePathExprRule,
+    ArrayExprRule, NumberExprRule, StringExprRule, TableExprRule, ValueExprRule, ValuePathExprRule,
 };
 pub use fn_stmt::FnStmtRule;
 pub use for_stmt::ForStmtRule;

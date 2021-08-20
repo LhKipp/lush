@@ -45,7 +45,7 @@ syntax_elements = [
     ["Whitespace"               , ""         , "[ ]+"                                , true     , false   , false]    ,
     ["Comment"                  , ""         , "#.*\\n"                              , true     , false   , false]    ,
     ["Newline"                  , ""         , "\\n"                                 , true     , false   , false]    ,
-    ["Number"                   , ""         , "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , true     , false   , true]    ,
+    ["Number"                   , ""         , "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , true     , false   , false]    ,
     ["VarDeclName"                      , ""         , ""                                    , true    , false    , false]    ,
 
     #meta rules
@@ -60,6 +60,7 @@ syntax_elements = [
     ["Signature"                , ""         , ""                                    , false    , true    , true]    ,
     ["MathExpr"                 , ""         , ""                                    , false    , true    , false]    , # TODO MathExprRule is not yet taken out of pratt parsing.. But could be
     ["StringExpr"               , ""         , ""                                    , false    , true    , true]    ,
+    ["NumberExpr"               , ""         , ""                                    , false    , true    , true]    ,
     ["StringContent"            , ""         , ""                                    , true     , false   , false]    ,
     ["ValuePathExpr"            , ""         , ""                                    , false    , true    , true]    ,
     ["ArrayExpr"                , ""         , ""                                    , false    , true    , true]    ,
@@ -71,6 +72,6 @@ syntax_elements = [
 generic_elements = [
     # Element name, can represent, has_rule
 
-    ["ValueExpr", ["BareWord", "Number", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"], true],
+    ["ValueExpr", ["BareWord", "NumberExpr", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"], true],
     ["Statement" , ["ForStmt", "LetStmt" , "FnStmt", "CmdStmt"], true],
 ]

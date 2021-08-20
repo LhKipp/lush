@@ -1,7 +1,7 @@
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, MathExprNode, NumberToken, StringExprNode, TableExprNode,
+        ArrayExprNode, BareWordToken, MathExprNode, NumberExprNode, StringExprNode, TableExprNode,
         ValueExprNode, ValuePathExprNode,
     },
     AstNode, AstToken,
@@ -14,7 +14,7 @@ impl Evaluable for ValueExprNode {
     fn do_evaluate(&self, state: &mut crate::Interpreter) -> LuResult<Value> {
         match self {
             ValueExprNode::BareWord(n) => n.evaluate(state),
-            ValueExprNode::Number(n) => n.evaluate(state),
+            ValueExprNode::NumberExpr(n) => n.evaluate(state),
             ValueExprNode::MathExpr(n) => n.evaluate(state),
             ValueExprNode::StringExpr(n) => n.evaluate(state),
             ValueExprNode::ValuePathExpr(n) => n.evaluate(state),
@@ -30,7 +30,7 @@ impl Evaluable for BareWordToken {
     }
 }
 
-impl Evaluable for NumberToken {
+impl Evaluable for NumberExprNode {
     fn do_evaluate(&self, _state: &mut crate::Interpreter) -> LuResult<Value> {
         Ok(self.value())
     }

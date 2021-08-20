@@ -1048,13 +1048,6 @@ impl AstToken for NumberToken {
 }
 
 
-use lu_parser::grammar::NumberRule;
-impl HasRule for NumberToken{
-    fn get_belonging_rule() -> Box<dyn Rule>{
-        Box::new(NumberRule{})
-    }
-}
-
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1425,6 +1418,39 @@ impl HasRule for StringExprNode{
 
 
 
+pub struct NumberExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for NumberExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::NumberExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+impl HasSyntaxKind for NumberExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+use lu_parser::grammar::NumberExprRule;
+impl HasRule for NumberExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(NumberExprRule{})
+    }
+}
+
+
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StringContentToken {
     pub(crate) syntax: SyntaxToken,
@@ -1549,7 +1575,7 @@ impl HasRule for TableExprNode{
 }
 pub enum ValueExprNode {
     BareWord(BareWordToken),
-    Number(NumberToken),
+    NumberExpr(NumberExprNode),
     MathExpr(MathExprNode),
     StringExpr(StringExprNode),
     ValuePathExpr(ValuePathExprNode),
@@ -1563,14 +1589,14 @@ impl ValueExprNode {
 impl AstElement for ValueExprNode {
     fn can_cast(kind: SyntaxKind) -> bool { 
         match kind{
-            BareWord | Number | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
+            BareWord | NumberExpr | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
         let res = match syntax.kind() {
             BareWord => ValueExprNode::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
-            Number => ValueExprNode::Number(NumberToken { syntax: syntax.into_token().unwrap() }),
+            NumberExpr => ValueExprNode::NumberExpr(NumberExprNode { syntax: syntax.into_node().unwrap() }),
             MathExpr => ValueExprNode::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
             StringExpr => ValueExprNode::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
             ValuePathExpr => ValueExprNode::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
@@ -1584,7 +1610,7 @@ impl AstElement for ValueExprNode {
     fn syntax(&self) -> SyntaxElement {
         match self {
             ValueExprNode::BareWord(it) => it.syntax.clone().into(),
-            ValueExprNode::Number(it) => it.syntax.clone().into(),
+            ValueExprNode::NumberExpr(it) => it.syntax.clone().into(),
             ValueExprNode::MathExpr(it) => it.syntax.clone().into(),
             ValueExprNode::StringExpr(it) => it.syntax.clone().into(),
             ValueExprNode::ValuePathExpr(it) => it.syntax.clone().into(),
@@ -1597,7 +1623,7 @@ impl HasSyntaxKind for ValueExprNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             ValueExprNode::BareWord(it) => it.get_syntax_kind(),
-            ValueExprNode::Number(it) => it.get_syntax_kind(),
+            ValueExprNode::NumberExpr(it) => it.get_syntax_kind(),
             ValueExprNode::MathExpr(it) => it.get_syntax_kind(),
             ValueExprNode::StringExpr(it) => it.get_syntax_kind(),
             ValueExprNode::ValuePathExpr(it) => it.get_syntax_kind(),

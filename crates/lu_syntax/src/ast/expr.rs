@@ -1,8 +1,8 @@
 use crate::{AstElementChildren, AstNode, AstToken};
 
 use super::{
-    support, ArrayExprNode, BareWordToken, MathExprNode, NumberToken, StringContentToken,
-    StringExprNode, TableExprNode, ValueExprNode, ValuePathExprNode,
+    support, ArrayExprNode, BareWordToken, MathExprNode, NumberExprNode, NumberToken,
+    StringContentToken, StringExprNode, TableExprNode, ValueExprNode, ValuePathExprNode,
 };
 use lu_value::Value;
 
@@ -10,7 +10,7 @@ impl ValueExprNode {
     pub fn value(&self) -> Value {
         match self {
             ValueExprNode::BareWord(n) => n.value(),
-            ValueExprNode::Number(n) => n.value(),
+            ValueExprNode::NumberExpr(n) => n.value(),
             ValueExprNode::MathExpr(n) => n.value(),
             ValueExprNode::StringExpr(n) => n.value(),
             ValueExprNode::ValuePathExpr(n) => n.value(),
@@ -23,6 +23,14 @@ impl ValueExprNode {
 impl MathExprNode {
     pub fn value(&self) -> Value {
         todo!()
+    }
+}
+
+impl NumberExprNode {
+    pub fn value(&self) -> Value {
+        support::token_child::<NumberToken>(self.syntax())
+            .unwrap()
+            .value()
     }
 }
 
