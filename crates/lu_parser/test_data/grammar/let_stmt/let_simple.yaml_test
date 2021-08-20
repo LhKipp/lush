@@ -5,11 +5,11 @@ let x = 1
 - Start: LetStmt
 - Token: "LetKeyword (len: 3)"
 - Token: "Whitespace (len: 1)"
-- Token: "BareWord (len: 1)"
+- Token: "VarDeclName (len: 1)"
 - Token: "Whitespace (len: 1)"
 - Token: "AssignSign (len: 1)"
 - Token: "Whitespace (len: 1)"
-- Start: Number
+- Start: NumberExpr
 - Token: "Number (len: 1)"
 - Finish: ""
 - Finish: ""

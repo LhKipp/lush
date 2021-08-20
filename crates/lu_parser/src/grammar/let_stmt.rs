@@ -25,7 +25,7 @@ impl Rule for LetStmtRule {
             return None;
         }
         p.eat_while(CMT_NL_WS);
-        p.expect(BareWord);
+        p.expect_as(BareWord, VarDeclName);
         p.eat_while(CMT_NL_WS);
         p.expect(T![=]);
         ValueExprRule {}.parse(p);
