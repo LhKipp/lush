@@ -8,8 +8,8 @@ use lu_value::Value;
 use crate::{Evaluable, Interpreter, ScopeFrameTag};
 
 impl Evaluable for IfStmtNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
-        
+    fn do_evaluate(&self, _state: &mut Interpreter) -> LuResult<Value> {
+        todo!()
     }
 }
 

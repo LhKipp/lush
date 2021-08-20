@@ -1,0 +1,332 @@
+Config(
+    syntax_elements: [
+    (
+        name: "LetKeyword",
+        token_text: "let",
+        is_token: true,
+    ),// [0]
+    (
+        name: "FnKeyword",
+        token_text: "fn",
+        is_token: true,
+    ),// [1]
+    (
+        name: "ForKeyword",
+        token_text: "for",
+        is_token: true,
+    ),// [2]
+    (
+        name: "ElifKeyword",
+        token_text: "elif",
+        is_token: true,
+    ),// [3]
+    (
+        name: "ElseKeyword",
+        token_text: "else",
+        is_token: true,
+    ),// [4]
+    (
+        name: "IfKeyword",
+        token_text: "if",
+        is_token: true,
+    ),// [5]
+    (
+        name: "WhileKeyword",
+        token_text: "while",
+        is_token: true,
+    ),// [6]
+    (
+        name: "EndKeyword",
+        token_text: "end",
+        is_token: true,
+    ),// [7]
+    (
+        name: "BeginKeyword",
+        token_text: "begin",
+        is_token: true,
+    ),// [8]
+    (
+        name: "InKeyword",
+        token_text: "in",
+        is_token: true,
+    ),// [9]
+    (
+        name: "LeftParenthesis",
+        token_text: "(",
+        is_token: true,
+    ),// [10]
+    (
+        name: "RightParenthesis",
+        token_text: ")",
+        is_token: true,
+    ),// [11]
+    (
+        name: "LeftCurlyBrackets",
+        token_text: "{",
+        is_token: true,
+    ),// [12]
+    (
+        name: "RightCurlyBrackets",
+        token_text: "}",
+        is_token: true,
+    ),// [13]
+    (
+        name: "LeftRectangularBrackets",
+        token_text: "[",
+        is_token: true,
+    ),// [14]
+    (
+        name: "RightRectangularBrackets",
+        token_text: "]",
+        is_token: true,
+    ),// [15]
+    (
+        name: "PlusSign",
+        token_text: "+",
+        is_token: true,
+    ),// [16]
+    (
+        name: "MinusSign",
+        token_text: "-",
+        is_token: true,
+    ),// [17]
+    (
+        name: "MultSign",
+        token_text: "*",
+        is_token: true,
+    ),// [18]
+    (
+        name: "DivSign",
+        token_text: "/",
+        is_token: true,
+    ),// [19]
+    (
+        name: "LessThanSign",
+        token_text: "<",
+        is_token: true,
+    ),// [20]
+    (
+        name: "LessOrEqualSign",
+        token_text: "<=",
+        is_token: true,
+    ),// [21]
+    (
+        name: "EqualitySign",
+        token_text: "==",
+        is_token: true,
+    ),// [22]
+    (
+        name: "InequalitySign",
+        token_text: "!=",
+        is_token: true,
+    ),// [23]
+    (
+        name: "BiggerThanSign",
+        token_text: ">",
+        is_token: true,
+    ),// [24]
+    (
+        name: "BiggerOrEqualSign",
+        token_text: ">=",
+        is_token: true,
+    ),// [25]
+    (
+        name: "AssignSign",
+        token_text: "=",
+        is_token: true,
+    ),// [26]
+    (
+        name: "RightStream",
+        token_text: ">>",
+        is_token: true,
+    ),// [27]
+    (
+        name: "Pipe",
+        token_text: "|",
+        is_token: true,
+    ),// [28]
+    (
+        name: "Dollar",
+        token_text: "$",
+        is_token: true,
+    ),// [29]
+    (
+        name: "Point",
+        token_text: ".",
+        is_token: true,
+    ),// [30]
+    (
+        name: "DoubleQuote",
+        token_text: "\\\"",
+        is_token: true,
+    ),// [31]
+    (
+        name: "SingleQuote",
+        token_text: "\'",
+        is_token: true,
+    ),// [32]
+    (
+        name: "Error",
+        is_token: true,
+    ),// [33]
+    (
+        name: "ParserInternal",
+        is_token: true,
+    ),// [34]
+    (
+        name: "BareWord",
+        regex: "[_a-zA-Z]+",
+        is_token: true,
+    ),// [35]
+    (
+        name: "Whitespace",
+        regex: "[ ]+",
+        is_token: true,
+    ),// [36]
+    (
+        name: "Comment",
+        regex: "#.*\\n",
+        is_token: true,
+    ),// [37]
+    (
+        name: "Newline",
+        regex: "\\n",
+        is_token: true,
+    ),// [38]
+    (
+        name: "Number",
+        regex: "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)",
+        is_token: true,
+    ),// [39]
+    (
+        name: "VarDeclName",
+        is_token: true,
+    ),// [40]
+    (
+        name: "Eof",
+        is_node: true,
+    ),// [41]
+    (
+        name: "SourceFile",
+        is_node: true,
+        has_rule: true,
+    ),// [42]
+    (
+        name: "Tombstone",
+        is_node: true,
+    ),// [43]
+    (
+        name: "LetStmt",
+        is_node: true,
+        has_rule: true,
+    ),// [44]
+    (
+        name: "FnStmt",
+        is_node: true,
+        has_rule: true,
+    ),// [45]
+    (
+        name: "IfStmt",
+        is_node: true,
+        has_rule: true,
+    ),// [46]
+    (
+        name: "IfBlock",
+        is_node: true,
+    ),// [47]
+    (
+        name: "ElifBlock",
+        is_node: true,
+    ),// [48]
+    (
+        name: "ElseBlock",
+        is_node: true,
+    ),// [49]
+    (
+        name: "ForStmt",
+        is_node: true,
+        has_rule: true,
+    ),// [50]
+    (
+        name: "CmdStmt",
+        is_node: true,
+        has_rule: true,
+    ),// [51]
+    (
+        name: "BlockStmt",
+        is_node: true,
+        has_rule: true,
+    ),// [52]
+    (
+        name: "Signature",
+        is_node: true,
+        has_rule: true,
+    ),// [53]
+    (
+        name: "MathExpr",
+        is_node: true,
+    ),// [54]
+    (
+        name: "StringExpr",
+        is_node: true,
+        has_rule: true,
+    ),// [55]
+    (
+        name: "NumberExpr",
+        is_node: true,
+        has_rule: true,
+    ),// [56]
+    (
+        name: "StringContent",
+        is_token: true,
+    ),// [57]
+    (
+        name: "ValuePathExpr",
+        is_node: true,
+        has_rule: true,
+    ),// [58]
+    (
+        name: "ArrayExpr",
+        is_node: true,
+        has_rule: true,
+    ),// [59]
+    (
+        name: "TableExpr",
+        is_node: true,
+        has_rule: true,
+    ),
+    (
+        name: "ValueExpr",
+        represents_element_names: [
+        "BareWord",// [0]
+        "NumberExpr",// [1]
+        "MathExpr",// [2]
+        "StringExpr",// [3]
+        "ValuePathExpr",// [4]
+        "ArrayExpr",// [5]
+        "TableExpr",
+        ],
+        is_generic: true,
+        has_rule: true,
+    ),// [0]
+    (
+        name: "Statement",
+        represents_element_names: [
+        "ForStmt",// [0]
+        "LetStmt",// [1]
+        "FnStmt",// [2]
+        "IfStmt",// [3]
+        "CmdStmt",
+        ],
+        is_generic: true,
+    ),// [1]
+    (
+        name: "Condition",
+        represents_element_names: [
+        "CmdStmt",// [0]
+        "ValueExpr",
+        ],
+        is_generic: true,
+    )
+    ]
+)

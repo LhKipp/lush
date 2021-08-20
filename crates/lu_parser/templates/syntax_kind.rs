@@ -18,9 +18,6 @@ pub enum SyntaxKind {
     {% endif -%}
     {{ syn_elem.name }},
     {% endfor -%}
-    {% for gen_elem in generic_elements -%}
-    {{ gen_elem.name }},
-    {% endfor -%}
     __LAST,
 }
 

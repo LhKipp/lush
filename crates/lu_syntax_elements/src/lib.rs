@@ -1,29 +1,12 @@
 use std::{error::Error, fs};
 
+use ron::from_str;
 use serde::{Deserialize, Serialize};
 use tera::{self, Context};
-use toml;
 
-/// The structured syntax metadata.
-#[derive(Serialize, Deserialize, Clone)]
-pub struct SyntaxConfig {
-    syntax_elements: Vec<SyntaxElement>,
-    generic_elements: Vec<GenericElement>,
-}
-
-impl SyntaxConfig {
-    pub fn finish(&mut self) {
-        for syn_elem in &mut self.syntax_elements {
-            syn_elem.finish()
-        }
-        for generic_elem in &mut self.generic_elements {
-            generic_elem.before_linking();
-        }
-        let gen_elems = self.generic_elements.clone();
-        for generic_elem in &mut self.generic_elements {
-            generic_elem.link(&self.syntax_elements, &gen_elems);
-        }
-    }
+#[derive(Deserialize, Serialize, Debug, Clone)]
+struct Config {
+    pub syntax_elements: Vec<SyntaxElement>,
 }
 
 /// We derive Serialize so the Tera config object has named members,
@@ -32,135 +15,104 @@ impl SyntaxConfig {
 /// Note that this means `de::from_str(ser::to_string(punctuation_config))`
 /// does not work, as the two formats do not line up. This is only ok to do
 /// here because these are the _only_ de/serialization tasks we care about.
-#[derive(Serialize, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SyntaxElement {
     name: String,
+    #[serde(default)]
     struct_name: String,
+    #[serde(default)]
     token_text: String,
+    #[serde(default)]
     regex: String,
+    #[serde(default)]
     is_token: bool,
+    #[serde(default)]
     is_node: bool,
+    #[serde(default)]
+    is_generic: bool,
+    #[serde(default)]
     has_rule: bool,
+
+    #[serde(default)]
+    represents_element_names: Vec<String>,
+    #[serde(default)]
+    represents: Vec<SyntaxElement>,
+    #[serde(default)]
+    impl_trait: String,
 }
 
 impl SyntaxElement {
-    pub fn finish(&mut self) {
-        if self.is_token {
-            self.struct_name = self.name.clone() + "Token"
-        } else if self.is_node {
-            self.struct_name = self.name.clone() + "Node"
-        }
-    }
-}
-
-impl<'de> Deserialize<'de> for SyntaxElement {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::de::Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(rename = "SyntaxElement")]
-        struct Helper(String, String, String, bool, bool, bool);
-        // We implement deserialize by just delegating to a helper tuple struct type.
-        Helper::deserialize(deserializer).map(|helper| SyntaxElement {
-            name: helper.0,
-            token_text: helper.1,
-            regex: helper.2,
-            is_token: helper.3,
-            is_node: helper.4,
-            has_rule: helper.5,
-            struct_name: String::new(),
-        })
-    }
-}
-
-#[derive(Serialize, Clone)]
-pub struct GenericElement {
-    name: String,
-    enum_name: String,
-    represents_element_names: Vec<String>,
-    represents: Vec<SyntaxElement>,
-    impl_trait: String,
-    has_rule: bool,
-}
-
-impl<'de> Deserialize<'de> for GenericElement {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::de::Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(rename = "GenericElement")]
-        struct Helper(String, Vec<String>, bool);
-        // We implement deserialize by just delegating to a helper tuple struct type.
-        Helper::deserialize(deserializer).map(|helper| GenericElement {
-            name: helper.0,
-            represents_element_names: helper.1,
-            has_rule: helper.2,
-            enum_name: String::new(),
-            represents: Vec::new(),
-            impl_trait: "Set in Finish".to_string(),
-        })
-    }
-}
-
-impl GenericElement {
-    pub fn to_syntax_element(&self) -> SyntaxElement {
-        SyntaxElement {
-            name: self.name.clone(),
-            struct_name: self.enum_name.clone(),
-            token_text: "".into(),
-            regex: "".into(),
-            is_token: false,
-            is_node: true,
-            has_rule: self.has_rule,
-        }
-    }
-
     pub fn before_linking(&mut self) {
-        self.enum_name = self.name.clone() + "Node";
+        if self.is_token {
+            self.struct_name = self.name.clone() + "Token";
+        } else if self.is_node || self.is_generic {
+            self.struct_name = self.name.clone() + "Node";
+        }
+    }
+    pub fn link(&mut self, elems: &[SyntaxElement]) {
+        for represents in &self.represents_element_names {
+            let elem = elems
+                .iter()
+                .find(|e| e.name == *represents)
+                .expect(&format!("No such elem: {}", represents));
+            if elem.is_finished() {
+                self.represents.push(elem.clone());
+            }
+        }
+
+        let found = self.represents.clone();
+        self.represents_element_names
+            // retain if not yet found
+            .retain(|name| !found.iter().any(|e| e.name == *name));
     }
 
-    pub fn link(&mut self, syn_elems: &[SyntaxElement], gen_elems: &[GenericElement]) {
-        self.represents = self
-            .represents_element_names
-            .iter()
-            .map(|name| {
-                syn_elems
-                    .iter()
-                    .find(|syn_elem| syn_elem.name == *name)
-                    .cloned()
-                    .or_else(|| {
-                        gen_elems
-                            .iter()
-                            .find(|gen_elem| gen_elem.name == *name)
-                            .map(GenericElement::to_syntax_element)
-                    })
-                    .expect(&format!("Element {} is not present", name))
-            })
-            .collect();
-
-        // If every child is a node, we can impl AstNode, otherwise more generic AstElement
-        self.impl_trait = if self.represents.iter().all(|e| e.is_node) {
-            "AstNode"
-        } else {
-            "AstElement"
+    pub fn after_linkage(&mut self) {
+        if self.is_generic {
+            self.impl_trait = if self.represents.iter().all(|e| e.is_node) {
+                "AstNode".to_string()
+            } else {
+                "AstElement".to_string()
+            }
         }
-        .to_string();
+    }
+
+    pub fn is_finished(&self) -> bool {
+        self.represents_element_names.is_empty()
     }
 }
 
 /// Project-relative path to the syntax metadata.
-const SYNTAX_CONFIG: &str = "src/syntax.toml";
+const SYNTAX_CONFIG: &str = "src/syntax.ron";
 /// The manifest directory.
 const MANIFEST: &str = env!("CARGO_MANIFEST_DIR");
 
 pub fn syntax_elements_as_tera_context() -> Result<Context, Box<dyn Error>> {
     let syntax_config = format!("{}/{}", MANIFEST, SYNTAX_CONFIG);
     println!("cargo:rerun-if-changed={}", syntax_config);
-    // Read in the context file.
-    let mut config: SyntaxConfig = toml::from_str(&fs::read_to_string(syntax_config)?)?;
-    config.finish();
-    // And convert it into the Tera-compatible form.
+    let mut config: Config = from_str(&fs::read_to_string(syntax_config)?)?;
+
+    config
+        .syntax_elements
+        .iter_mut()
+        .for_each(SyntaxElement::before_linking);
+    // Deepest level of referencing is yet 2
+    for _ in 0..2 {
+        let clnd = config.syntax_elements.clone();
+        config
+            .syntax_elements
+            .iter_mut()
+            .for_each(|elem| elem.link(&clnd))
+    }
+
+    config
+        .syntax_elements
+        .iter_mut()
+        .for_each(SyntaxElement::after_linkage);
+
+    assert!(config
+        .syntax_elements
+        .iter()
+        .all(SyntaxElement::is_finished));
+
     Ok(Context::from_serialize(config)?)
 }

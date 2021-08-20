@@ -176,6 +176,9 @@ impl SyntaxKind{
             SyntaxKind::ValuePathExpr => "ValuePathExpr",
             SyntaxKind::ArrayExpr => "ArrayExpr",
             SyntaxKind::TableExpr => "TableExpr",
+            SyntaxKind::ValueExpr => "ValueExpr",
+            SyntaxKind::Statement => "Statement",
+            SyntaxKind::Condition => "Condition",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }

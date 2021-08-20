@@ -30,13 +30,13 @@
 
 mod block_stmt;
 mod cmd_stmt;
+mod condition;
 mod expr;
 mod fn_stmt;
 mod for_stmt;
 mod if_stmt;
 mod let_stmt;
 mod signature;
-mod condition;
 
 use itertools::Itertools;
 use log::debug;
@@ -50,6 +50,7 @@ use crate::{
 
 pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;
+pub use condition::ConditionRule;
 pub use expr::{
     ArrayExprRule, NumberExprRule, StringExprRule, TableExprRule, ValueExprRule, ValuePathExprRule,
 };
