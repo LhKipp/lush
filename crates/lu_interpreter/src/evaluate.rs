@@ -12,6 +12,7 @@ mod for_stmt;
 mod let_stmt;
 mod source_file;
 mod statement;
+mod if_stmt;
 
 pub trait Evaluable: HasSyntaxKind {
     /// Evaluate the AST-Node/Token given the state.

@@ -1,0 +1,35 @@
+1
+===
+if 1 == 1
+    tprint 1
+end
+---
+- Start: IfStmt 
+- Token: "IfKeyword (len: 2)" 
+- Token: "Whitespace (len: 1)" 
+- Start: "NumberExpr (parent: 4)" 
+- Token: "Number (len: 1)" 
+- Finish: "" 
+- Token: "Whitespace (len: 1)" 
+- Start: MathExpr 
+- Token: "EqualitySign (len: 2)" 
+- Token: "Whitespace (len: 1)" 
+- Start: NumberExpr 
+- Token: "Number (len: 1)" 
+- Finish: "" 
+- Finish: "" 
+- Token: "Newline (len: 1)" 
+- Start: IfBlock 
+- Token: "Whitespace (len: 4)" 
+- Start: CmdStmt 
+- Token: "BareWord (len: 6)" 
+- Token: "Whitespace (len: 1)" 
+- Start: NumberExpr 
+- Token: "Number (len: 1)" 
+- Finish: "" 
+- Finish: "" 
+- Finish: "" 
+- Token: "Newline (len: 1)" 
+- Token: "EndKeyword (len: 3)" 
+- Finish: "" 
+...

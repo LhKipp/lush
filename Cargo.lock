@@ -496,6 +496,7 @@ dependencies = [
  "tera",
  "text-size",
  "toml",
+ "vec_box",
 ]
 
 [[package]]

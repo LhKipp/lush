@@ -17,7 +17,11 @@ impl SyntaxConfig {
             syn_elem.finish()
         }
         for generic_elem in &mut self.generic_elements {
-            generic_elem.finish(&self.syntax_elements)
+            generic_elem.before_linking();
+        }
+        let gen_elems = self.generic_elements.clone();
+        for generic_elem in &mut self.generic_elements {
+            generic_elem.link(&self.syntax_elements, &gen_elems);
         }
     }
 }
@@ -101,9 +105,23 @@ impl<'de> Deserialize<'de> for GenericElement {
 }
 
 impl GenericElement {
-    pub fn finish(&mut self, syn_elems: &[SyntaxElement]) {
-        self.enum_name = self.name.clone() + "Node";
+    pub fn to_syntax_element(&self) -> SyntaxElement {
+        SyntaxElement {
+            name: self.name.clone(),
+            struct_name: self.enum_name.clone(),
+            token_text: "".into(),
+            regex: "".into(),
+            is_token: false,
+            is_node: true,
+            has_rule: self.has_rule,
+        }
+    }
 
+    pub fn before_linking(&mut self) {
+        self.enum_name = self.name.clone() + "Node";
+    }
+
+    pub fn link(&mut self, syn_elems: &[SyntaxElement], gen_elems: &[GenericElement]) {
         self.represents = self
             .represents_element_names
             .iter()
@@ -111,12 +129,15 @@ impl GenericElement {
                 syn_elems
                     .iter()
                     .find(|syn_elem| syn_elem.name == *name)
-                    .expect(&format!(
-                        "Generic element links to {:?} which is not present",
-                        name
-                    ))
+                    .cloned()
+                    .or_else(|| {
+                        gen_elems
+                            .iter()
+                            .find(|gen_elem| gen_elem.name == *name)
+                            .map(GenericElement::to_syntax_element)
+                    })
+                    .expect(&format!("Element {} is not present", name))
             })
-            .cloned()
             .collect();
 
         // If every child is a node, we can impl AstNode, otherwise more generic AstElement
@@ -125,7 +146,7 @@ impl GenericElement {
         } else {
             "AstElement"
         }
-        .to_string()
+        .to_string();
     }
 }
 

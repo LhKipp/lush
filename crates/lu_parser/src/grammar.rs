@@ -33,14 +33,18 @@ mod cmd_stmt;
 mod expr;
 mod fn_stmt;
 mod for_stmt;
+mod if_stmt;
 mod let_stmt;
 mod signature;
+mod condition;
 
 use itertools::Itertools;
 use log::debug;
+use vec_box::vec_box;
 
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
+    token_set::TokenSet,
     SyntaxKind::{self, *},
 };
 
@@ -51,6 +55,7 @@ pub use expr::{
 };
 pub use fn_stmt::FnStmtRule;
 pub use for_stmt::ForStmtRule;
+pub use if_stmt::IfStmtRule;
 pub use let_stmt::LetStmtRule;
 pub use signature::SignatureRule;
 
@@ -159,8 +164,9 @@ impl Rule for SourceFileRule {
 }
 
 // TODO make proper StatementRule
-fn statements_until(p: &mut Parser, end: SyntaxKind) {
-    while p.next_non(CMT_NL_WS) != end {
+fn statements_until<TS: Into<TokenSet>>(p: &mut Parser, end: TS) {
+    let end = end.into();
+    while !end.contains(p.next_non(CMT_NL_WS)) {
         top_level_stmt().parse(p);
     }
 }
@@ -174,11 +180,12 @@ fn statements(p: &mut Parser) {
 fn top_level_stmt() -> OrRule {
     OrRule {
         kind: None,
-        rules: vec![
-            Box::new(ForStmtRule {}),
-            Box::new(LetStmtRule {}),
-            Box::new(FnStmtRule {}),
-            Box::new(CmdStmtRule {}),
+        rules: vec_box![
+            ForStmtRule {},
+            LetStmtRule {},
+            FnStmtRule {},
+            CmdStmtRule {},
+            IfStmtRule {},
         ],
     }
 }

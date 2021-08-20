@@ -1227,6 +1227,117 @@ impl HasRule for FnStmtNode{
 
 
 
+pub struct IfStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for IfStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+impl HasSyntaxKind for IfStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+use lu_parser::grammar::IfStmtRule;
+impl HasRule for IfStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(IfStmtRule{})
+    }
+}
+
+
+
+pub struct IfBlockNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for IfBlockNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfBlock }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+impl HasSyntaxKind for IfBlockNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+
+
+pub struct ElifBlockNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for ElifBlockNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElifBlock }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+impl HasSyntaxKind for ElifBlockNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+
+
+pub struct ElseBlockNode {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for ElseBlockNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElseBlock }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+
+impl HasSyntaxKind for ElseBlockNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+
+
 pub struct ForStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1636,6 +1747,7 @@ pub enum StatementNode {
     ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
+    IfStmt(IfStmtNode),
     CmdStmt(CmdStmtNode),
     }
 
@@ -1645,7 +1757,7 @@ impl StatementNode {
 impl AstNode for StatementNode {
     fn can_cast(kind: SyntaxKind) -> bool { 
         match kind{
-            ForStmt | LetStmt | FnStmt | CmdStmt => true,
+            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt => true,
             _ => false,
         }
     }
@@ -1654,6 +1766,7 @@ impl AstNode for StatementNode {
             ForStmt => StatementNode::ForStmt(ForStmtNode { syntax }),
             LetStmt => StatementNode::LetStmt(LetStmtNode { syntax }),
             FnStmt => StatementNode::FnStmt(FnStmtNode { syntax }),
+            IfStmt => StatementNode::IfStmt(IfStmtNode { syntax }),
             CmdStmt => StatementNode::CmdStmt(CmdStmtNode { syntax }),
             _ => return None,
         };
@@ -1665,6 +1778,7 @@ impl AstNode for StatementNode {
             StatementNode::ForStmt(it) => &it.syntax,
             StatementNode::LetStmt(it) => &it.syntax,
             StatementNode::FnStmt(it) => &it.syntax,
+            StatementNode::IfStmt(it) => &it.syntax,
             StatementNode::CmdStmt(it) => &it.syntax,
             }
     }
@@ -1675,7 +1789,47 @@ impl HasSyntaxKind for StatementNode{
             StatementNode::ForStmt(it) => it.get_syntax_kind(),
             StatementNode::LetStmt(it) => it.get_syntax_kind(),
             StatementNode::FnStmt(it) => it.get_syntax_kind(),
+            StatementNode::IfStmt(it) => it.get_syntax_kind(),
             StatementNode::CmdStmt(it) => it.get_syntax_kind(),
+            }
+    }
+}
+pub enum ConditionNode {
+    CmdStmt(CmdStmtNode),
+    ValueExpr(ValueExprNode),
+    }
+
+impl ConditionNode {
+}
+
+impl AstNode for ConditionNode {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        match kind{
+            CmdStmt | ValueExpr => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            CmdStmt => ConditionNode::CmdStmt(CmdStmtNode { syntax }),
+            ValueExpr => ConditionNode::ValueExpr(ValueExprNode { syntax }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ConditionNode::CmdStmt(it) => &it.syntax,
+            ConditionNode::ValueExpr(it) => &it.syntax,
+            }
+    }
+}
+impl HasSyntaxKind for ConditionNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            ConditionNode::CmdStmt(it) => it.get_syntax_kind(),
+            ConditionNode::ValueExpr(it) => it.get_syntax_kind(),
             }
     }
 }

@@ -17,6 +17,7 @@ use crate::{
 };
 
 pub const CMT_NL_WS: [SyntaxKind; 3] = [Comment, Newline, Whitespace];
+pub const CMT_WS: [SyntaxKind; 2] = [Comment, Whitespace];
 
 pub struct Parser {
     token_source: TokenSource,
@@ -228,6 +229,17 @@ impl Parser {
         let err: ParseErr = format!("expected {:?}", kinds).into();
         self.error(err);
         false
+    }
+
+    /// Expect `and_then` after `before`
+    /// Example: p.expect_after(CMT_WS, Newline) // Expect a nl (with optional ws before)
+    pub(crate) fn expect_after<TS: Into<TokenSet>>(
+        &mut self,
+        before: TS,
+        and_then: SyntaxKind,
+    ) -> bool {
+        self.eat_while(before.into());
+        self.expect(and_then)
     }
 
     /// Create an error node and consume the next token.

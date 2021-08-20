@@ -54,6 +54,10 @@ syntax_elements = [
     ["Tombstone"                , ""         , ""                                    , false    , true    , false]    ,
     ["LetStmt"                  , ""         , ""                                    , false    , true    , true]    ,
     ["FnStmt"                   , ""         , ""                                    , false    , true    , true]    ,
+    ["IfStmt"                   , ""         , ""                                    , false    , true    , true]    ,
+    ["IfBlock"                   , ""         , ""                                    , false    , true    , false]    ,
+    ["ElifBlock"                   , ""         , ""                                    , false    , true    , false]    ,
+    ["ElseBlock"                   , ""         , ""                                    , false    , true    , false]    ,
     ["ForStmt"                   , ""         , ""                                    , false    , true    , true]    ,
     ["CmdStmt"                  , ""         , ""                                    , false    , true    , true]    ,
     ["BlockStmt"                  , ""         , ""                                    , false    , true    , true]    ,
@@ -73,5 +77,6 @@ generic_elements = [
     # Element name, can represent, has_rule
 
     ["ValueExpr", ["BareWord", "NumberExpr", "MathExpr", "StringExpr", "ValuePathExpr", "ArrayExpr", "TableExpr"], true],
-    ["Statement" , ["ForStmt", "LetStmt" , "FnStmt", "CmdStmt"], true],
+    ["Statement" , ["ForStmt", "LetStmt" , "FnStmt", "IfStmt", "CmdStmt"], true],
+    ["Condition" , ["CmdStmt", "ValueExpr"], true],
 ]
