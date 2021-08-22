@@ -1,9 +1,8 @@
 use super::{condition::ConditionRule, BlockStmtRule, Rule};
 
 use crate::{
-    self,
     parser::{CompletedMarker, Parser, CMT_NL_WS, CMT_WS},
-    *,
+    SyntaxKind::{self, *},
 };
 
 /// helper for parsing if / elif stmts
@@ -46,10 +45,7 @@ impl Rule for IfStmtRule {
             BlockStmtRule::else_block().parse(p);
         }
 
-        // if / elif does not eat end keyword. Do so here
-        if p.eat(EndKeyword) {
-            Some(if_stmt_marker.complete(p, IfStmt))
-        }
+        p.eat(EndKeyword); // if / elif does not eat end keyword. Do so here
 
         Some(if_stmt_marker.complete(p, IfStmt))
     }

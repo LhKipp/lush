@@ -66,12 +66,24 @@ impl {{ syn_elem.struct_name }} {
 {% if syn_elem.impl_trait == "AstElement" -%}
 impl AstElement for {{ syn_elem.struct_name }} {
     fn can_cast(kind: SyntaxKind) -> bool { 
+        {% for represented in syn_elem.represents -%}
+        {% if represented.is_generic %}
+        {{represented.struct_name}}::can_cast(kind) ||
+        {% endif %}
+        {% endfor %}
         match kind{
             {{ syn_elem.represents | map(attribute="name") | join(sep=" | ") }} => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        {% for represented in syn_elem.represents -%}
+        {% if represented.is_generic  -%}
+            if let Some(casted) = {{represented.struct_name}}::cast(syntax.clone()){
+                return Some(Self::{{represented.name}}(casted));
+            }
+        {% endif %}
+        {% endfor %}
         let res = match syntax.kind() {
             {% for represented in syn_elem.represents -%}
             {% if represented.is_token  -%}
@@ -100,6 +112,11 @@ impl AstElement for {{ syn_elem.struct_name }} {
 {% elif syn_elem.impl_trait == "AstNode" -%}
 impl AstNode for {{ syn_elem.struct_name }} {
     fn can_cast(kind: SyntaxKind) -> bool { 
+        {% for represented in syn_elem.represents -%}
+        {% if represented.is_generic %}
+        {{represented.struct_name}}::can_cast(kind) ||
+        {% endif %}
+        {% endfor %}
         match kind{
             {{ syn_elem.represents | map(attribute="name") | join(sep=" | ") }} => true,
             _ => false,

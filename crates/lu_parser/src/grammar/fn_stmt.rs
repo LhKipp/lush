@@ -16,20 +16,16 @@ impl Rule for FnStmtRule {
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        p.eat_while(CMT_NL_WS);
         let m = p.start();
+        p.eat_while(CMT_NL_WS);
+
         p.eat(FnKeyword);
         //consume all ws delimited bare words
         p.eat_while(&[BareWord, Whitespace]);
         p.eat_while(CMT_NL_WS);
         SignatureRule {}.opt(p);
         p.expect_after(CMT_WS, Newline);
-        BlockStmtRule {
-            parse_begin: false,
-            end_kinds: EndKeyword.into(),
-            statement_rule: Box::new(second_level_stmt()),
-        }
-        .parse(p);
+        BlockStmtRule::fn_for_block().parse(p);
         Some(m.complete(p, FnStmt))
     }
 }

@@ -1367,12 +1367,28 @@ impl ValueExprElement {
 
 impl AstElement for ValueExprElement {
     fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        
         match kind{
             BareWord | NumberExpr | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        
         let res = match syntax.kind() {
             BareWord => ValueExprElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
             NumberExpr => ValueExprElement::NumberExpr(NumberExprNode { syntax: syntax.into_node().unwrap() }),
@@ -1446,12 +1462,24 @@ impl StatementElement {
 
 impl AstElement for StatementElement {
     fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
         match kind{
             ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
         let res = match syntax.kind() {
             ForStmt => StatementElement::ForStmt(ForStmtNode { syntax: syntax.into_node().unwrap() }),
             LetStmt => StatementElement::LetStmt(LetStmtNode { syntax: syntax.into_node().unwrap() }),
@@ -1505,12 +1533,23 @@ impl ConditionElement {
 
 impl AstElement for ConditionElement {
     fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
         match kind{
             CmdStmt | ValueExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
         let res = match syntax.kind() {
             CmdStmt => ConditionElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,

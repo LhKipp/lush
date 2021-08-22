@@ -55,6 +55,15 @@ impl BlockStmtRule {
             statement_rule: Box::new(second_level_stmt()),
         }
     }
+
+    pub fn fn_for_block() -> Self {
+        Self {
+            parse_begin: false,
+            end_kinds: EndKeyword.into(),
+            eat_end: true,
+            statement_rule: Box::new(second_level_stmt()),
+        }
+    }
 }
 
 impl Rule for BlockStmtRule {
@@ -91,7 +100,7 @@ impl Rule for BlockStmtRule {
 mod tests {
     use lu_test_support::init_logger;
 
-    use crate::{grammar::second_level_stmt, parse_as, Event, SyntaxKind::*};
+    use crate::{parse_as, Event};
 
     use super::BlockStmtRule;
 
@@ -100,13 +109,6 @@ mod tests {
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/block_stmt/block_simple.yaml_test")]
     fn parse_cmds(s: &str) -> Vec<Event> {
         init_logger();
-        parse_as(
-            s,
-            &BlockStmtRule {
-                parse_begin: true,
-                end_kinds: EndKeyword.into(),
-                statement_rule: Box::new(second_level_stmt()),
-            },
-        )
+        parse_as(s, &BlockStmtRule::new())
     }
 }
