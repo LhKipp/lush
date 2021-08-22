@@ -45,3 +45,15 @@ impl Value {
         }
     }
 }
+
+impl From<bool> for Value {
+    fn from(v: bool) -> Self {
+        Value::Bool(v)
+    }
+}
+
+impl From<OrderedFloat<f64>> for Value {
+    fn from(v: OrderedFloat<f64>) -> Self {
+        Value::Number(v)
+    }
+}

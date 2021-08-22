@@ -1,4 +1,3 @@
-use log::debug;
 use lu_error::LuResult;
 use lu_interpreter::{Command, Interpreter};
 use lu_value::Value;
@@ -16,7 +15,6 @@ impl Command for PrintCmd {
             Value::Array(vals) => vals[1..].to_vec(), // Always erase $arg.0 (cmd name)
             _ => unreachable!(),
         };
-        debug!("{:?} returning {:?}", self.name(), args);
         Ok(Value::new_array(args))
     }
 }

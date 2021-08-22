@@ -15,6 +15,7 @@ mod if_stmt;
 mod let_stmt;
 mod source_file;
 mod statement;
+mod math_expr;
 
 pub trait Evaluable: HasSyntaxKind {
     /// Evaluate the AST-Node/Token given the state.

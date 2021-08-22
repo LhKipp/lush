@@ -1,7 +1,7 @@
 1
 ===
 if 1 == 1
-    tprint $x
+    tprint 1
 end
 print $t_printed
 ---
@@ -11,13 +11,7 @@ print $t_printed
       {
         "Array": [
           {
-            "String": "1"
-          },
-          {
-            "String": "2"
-          },
-          {
-            "String": "3"
+            "Number": 1.0
           }
         ]
       }

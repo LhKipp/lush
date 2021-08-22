@@ -14,6 +14,7 @@ end
 - Token: "RightParenthesis (len: 1)"
 - Finish: ""
 - Token: "Newline (len: 1)"
+- Start: BlockStmt
 - Token: "Whitespace (len: 2)"
 - Start: CmdStmt
 - Token: "BareWord (len: 4)"
@@ -26,5 +27,6 @@ end
 - Finish: ""
 - Token: "Newline (len: 1)"
 - Token: "EndKeyword (len: 3)"
+- Finish: ""
 - Finish: ""
 ...

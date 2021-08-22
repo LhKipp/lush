@@ -5,6 +5,7 @@ mod generated;
 mod if_stmt;
 mod let_stmt;
 mod value_path_expr;
+mod math_expr;
 use std::marker::PhantomData;
 
 use lu_parser::grammar::Rule;

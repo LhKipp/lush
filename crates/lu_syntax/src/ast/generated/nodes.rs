@@ -1577,3 +1577,133 @@ impl HasSyntaxKind for ConditionElement{
     }
 }
 
+pub enum OperatorExprElement {
+    PlusSign(PlusSignToken),
+    MinusSign(MinusSignToken),
+    MultSign(MultSignToken),
+    DivSign(DivSignToken),
+    LessThanSign(LessThanSignToken),
+    LessOrEqualSign(LessOrEqualSignToken),
+    EqualitySign(EqualitySignToken),
+    InequalitySign(InequalitySignToken),
+    BiggerThanSign(BiggerThanSignToken),
+    BiggerOrEqualSign(BiggerOrEqualSignToken),
+    AssignSign(AssignSignToken),
+    RightStream(RightStreamToken),
+    }
+
+impl OperatorExprElement {
+}
+
+impl AstElement for OperatorExprElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        match kind{
+            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | AssignSign | RightStream => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        let res = match syntax.kind() {
+            PlusSign => OperatorExprElement::PlusSign(PlusSignToken { syntax: syntax.into_token().unwrap() }),
+            MinusSign => OperatorExprElement::MinusSign(MinusSignToken { syntax: syntax.into_token().unwrap() }),
+            MultSign => OperatorExprElement::MultSign(MultSignToken { syntax: syntax.into_token().unwrap() }),
+            DivSign => OperatorExprElement::DivSign(DivSignToken { syntax: syntax.into_token().unwrap() }),
+            LessThanSign => OperatorExprElement::LessThanSign(LessThanSignToken { syntax: syntax.into_token().unwrap() }),
+            LessOrEqualSign => OperatorExprElement::LessOrEqualSign(LessOrEqualSignToken { syntax: syntax.into_token().unwrap() }),
+            EqualitySign => OperatorExprElement::EqualitySign(EqualitySignToken { syntax: syntax.into_token().unwrap() }),
+            InequalitySign => OperatorExprElement::InequalitySign(InequalitySignToken { syntax: syntax.into_token().unwrap() }),
+            BiggerThanSign => OperatorExprElement::BiggerThanSign(BiggerThanSignToken { syntax: syntax.into_token().unwrap() }),
+            BiggerOrEqualSign => OperatorExprElement::BiggerOrEqualSign(BiggerOrEqualSignToken { syntax: syntax.into_token().unwrap() }),
+            AssignSign => OperatorExprElement::AssignSign(AssignSignToken { syntax: syntax.into_token().unwrap() }),
+            RightStream => OperatorExprElement::RightStream(RightStreamToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            OperatorExprElement::PlusSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::MinusSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::MultSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::DivSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::LessThanSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::LessOrEqualSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::EqualitySign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::InequalitySign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::BiggerThanSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::BiggerOrEqualSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::AssignSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::RightStream(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for OperatorExprElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            OperatorExprElement::PlusSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::MinusSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::MultSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::DivSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::LessThanSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::LessOrEqualSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::EqualitySign(it) => it.get_syntax_kind(),
+            OperatorExprElement::InequalitySign(it) => it.get_syntax_kind(),
+            OperatorExprElement::BiggerThanSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::BiggerOrEqualSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::AssignSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::RightStream(it) => it.get_syntax_kind(),
+            }
+    }
+}
+

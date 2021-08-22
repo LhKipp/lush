@@ -327,6 +327,24 @@ Config(
         "ValueExpr",
         ],
         is_generic: true,
+    ),
+    (
+        name: "OperatorExpr",
+        represents_element_names: [
+            "PlusSign",
+            "MinusSign",
+            "MultSign",
+            "DivSign",
+            "LessThanSign",
+            "LessOrEqualSign",
+            "EqualitySign",
+            "InequalitySign",
+            "BiggerThanSign",
+            "BiggerOrEqualSign",
+            "AssignSign",
+            "RightStream",
+        ],
+        is_generic: true,
     )
     ]
 )

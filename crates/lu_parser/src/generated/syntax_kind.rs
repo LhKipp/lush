@@ -109,6 +109,7 @@ pub enum SyntaxKind {
     ValueExpr,
     Statement,
     Condition,
+    OperatorExpr,
     __LAST,
 }
 
@@ -179,6 +180,7 @@ impl SyntaxKind{
             SyntaxKind::ValueExpr => "ValueExpr",
             SyntaxKind::Statement => "Statement",
             SyntaxKind::Condition => "Condition",
+            SyntaxKind::OperatorExpr => "OperatorExpr",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }
