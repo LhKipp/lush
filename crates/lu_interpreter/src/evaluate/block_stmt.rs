@@ -17,7 +17,13 @@ impl Evaluable for BlockStmtNode {
 
         state.scope.lock().push_frame(ScopeFrameTag::BlockFrame);
         for stmt in self.statements() {
-            result = stmt.evaluate(state)?
+            match stmt.evaluate(state) {
+                Ok(v) => result = v,
+                Err(e) => {
+                    state.scope.lock().pop_frame(ScopeFrameTag::BlockFrame);
+                    return Err(e);
+                }
+            }
         }
         state.scope.lock().pop_frame(ScopeFrameTag::BlockFrame);
         Ok(result)
