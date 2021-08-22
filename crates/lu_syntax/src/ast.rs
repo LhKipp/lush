@@ -1,4 +1,5 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
+mod block_stmt;
 mod expr;
 mod generated;
 mod if_stmt;

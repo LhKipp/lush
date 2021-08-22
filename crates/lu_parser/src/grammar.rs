@@ -154,13 +154,7 @@ impl Rule for SourceFileRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        //SourceFile => statement % newline
-        BlockStmtRule {
-            parse_begin: false,
-            end_kinds: [Eof].into(),
-            statement_rule: Box::new(top_level_stmt()),
-        }
-        .parse(p);
+        BlockStmtRule::source_file_block().parse(p);
         Some(m.complete(p, SourceFile))
     }
 

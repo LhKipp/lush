@@ -15,9 +15,11 @@ pub trait ScopeFrame {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
     None,
+    BlockFrame,
     GlobalFrame,
     FnFrame,
     ForStmtFrame,
+    IfStmtFrame,
 }
 
 /// The default scope frame being put on the scope stack, when entering a new scope
@@ -91,7 +93,6 @@ impl Scope {
             .collect();
         let global_id = ancestors.last().unwrap();
         let global_frame = self.arena.get_mut(*global_id).unwrap();
-        assert_eq!(global_frame.get().get_tag(), ScopeFrameTag::GlobalFrame);
         global_frame.get_mut().as_mut()
     }
 

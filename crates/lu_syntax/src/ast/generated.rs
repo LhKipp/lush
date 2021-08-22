@@ -26,8 +26,8 @@ impl CmdStmtNode {
 }
 
 impl SourceFileNode {
-    pub fn statements(&self) -> AstElementChildren<StatementElement> {
-        support::element_children(self.syntax())
+    pub fn statements(&self) -> Option<BlockStmtNode> {
+        support::node_child(self.syntax())
     }
 }
 
@@ -43,7 +43,7 @@ impl ForStmtNode {
     pub fn iterated_value(&self) -> Option<ValueExprElement> {
         support::element_child(self.syntax())
     }
-    pub fn statements(&self) -> AstElementChildren<StatementElement> {
-        support::element_children(self.syntax())
+    pub fn block(&self) -> Option<BlockStmtNode> {
+        support::node_child(self.syntax())
     }
 }

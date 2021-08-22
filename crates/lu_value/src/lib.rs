@@ -11,6 +11,7 @@ pub enum Value {
     //
     // The following types are lu-copy
     Nil,
+    Bool(bool),
     Number(OrderedFloat<f64>),
     String(String),
     BareWord(String),
@@ -28,6 +29,19 @@ impl Value {
         match self {
             Value::Array(vals) => Rc::make_mut(vals),
             _ => unreachable!(),
+        }
+    }
+
+    /// Returns Some(true|false) if self represents a true or false value
+    /// Returns None if self is not convertible to bool
+    pub fn convert_to_bool(&self) -> Option<bool> {
+        // TODO check what else should be false / true
+        match self {
+            Value::Nil => Some(false),
+            Value::Bool(v) => Some(*v),
+            Value::Number(n) => Some(*n != OrderedFloat::from(0f64)),
+            Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
+            Value::Array(arr) => Some(!arr.is_empty()),
         }
     }
 }

@@ -7,7 +7,9 @@ use crate::{
 
 pub struct BlockStmtRule {
     pub parse_begin: bool,
+    pub eat_end: bool,
     pub end_kinds: TokenSet,
+
     pub statement_rule: Box<dyn Rule>,
 }
 
@@ -19,6 +21,36 @@ impl BlockStmtRule {
     pub fn new() -> BlockStmtRule {
         BlockStmtRule {
             parse_begin: true,
+            eat_end: true,
+            end_kinds: [EndKeyword].into(),
+            statement_rule: Box::new(second_level_stmt()),
+        }
+    }
+
+    /// Source file block
+    pub fn source_file_block() -> Self {
+        Self {
+            parse_begin: false,
+            eat_end: false,
+            end_kinds: [Eof].into(),
+            statement_rule: Box::new(top_level_stmt()),
+        }
+    }
+
+    /// BlockRule for if or elif blocks
+    pub fn if_elif_block() -> Self {
+        BlockStmtRule {
+            parse_begin: false,
+            eat_end: false,
+            end_kinds: [ElseKeyword, ElifKeyword, EndKeyword].into(),
+            statement_rule: Box::new(second_level_stmt()),
+        }
+    }
+
+    pub fn else_block() -> Self {
+        Self {
+            parse_begin: false,
+            eat_end: true,
             end_kinds: [EndKeyword].into(),
             statement_rule: Box::new(second_level_stmt()),
         }
@@ -47,7 +79,9 @@ impl Rule for BlockStmtRule {
         }
 
         p.eat_while(CMT_NL_WS);
-        p.expect(self.end_kinds);
+        if self.eat_end {
+            p.expect(self.end_kinds);
+        }
 
         Some(m.complete(p, BlockStmt))
     }
@@ -57,7 +91,7 @@ impl Rule for BlockStmtRule {
 mod tests {
     use lu_test_support::init_logger;
 
-    use crate::{parse_as, Event};
+    use crate::{grammar::second_level_stmt, parse_as, Event, SyntaxKind::*};
 
     use super::BlockStmtRule;
 
@@ -66,6 +100,13 @@ mod tests {
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/block_stmt/block_simple.yaml_test")]
     fn parse_cmds(s: &str) -> Vec<Event> {
         init_logger();
-        parse_as(s, &BlockStmtRule {})
+        parse_as(
+            s,
+            &BlockStmtRule {
+                parse_begin: true,
+                end_kinds: EndKeyword.into(),
+                statement_rule: Box::new(second_level_stmt()),
+            },
+        )
     }
 }

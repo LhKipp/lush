@@ -1,7 +1,10 @@
 use contracts::ensures;
 use log::debug;
 use lu_error::LuResult;
-use lu_syntax::{ast::ForStmtNode, AstToken};
+use lu_syntax::{
+    ast::{ForStmtNode, HasSyntaxKind},
+    AstToken,
+};
 use lu_value::Value;
 
 use crate::{Evaluable, Interpreter, ScopeFrameTag};
@@ -9,8 +12,8 @@ use crate::{Evaluable, Interpreter, ScopeFrameTag};
 impl Evaluable for ForStmtNode {
     #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
     fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
-        let stmts: Vec<_> = self.statements().collect();
-        if stmts.is_empty() {
+        let block = self.block().unwrap();
+        if block.is_empty() {
             debug!("Empty for stmt");
             // Empty for statement. This is a noop. Should have been a warning (at least).
             return Ok(Value::Nil);
@@ -41,9 +44,7 @@ impl Evaluable for ForStmtNode {
                             .push_frame(ScopeFrameTag::ForStmtFrame)
                             .insert_var(var_names[0].clone(), Value::String(char.to_string()));
                     }
-                    for stmt in &stmts {
-                        stmt.evaluate(state)?;
-                    }
+                    block.evaluate(state)?;
                     {
                         let mut scope = state.scope.lock();
                         scope.pop_frame(ScopeFrameTag::ForStmtFrame);
@@ -51,9 +52,21 @@ impl Evaluable for ForStmtNode {
                 }
             }
             Value::Array(_arr) => todo!(),
+            Value::Bool(_) => todo!(),
         }
 
         Ok(Value::Nil)
+    }
+
+    fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+        debug!("Evaluating: {:?}", self.get_syntax_kind());
+        let result = self.do_evaluate(state);
+        debug!(
+            "Result of Evaluating: {:?}: {:?}",
+            self.get_syntax_kind(),
+            result
+        );
+        result
     }
 }
 

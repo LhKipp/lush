@@ -1,9 +1,23 @@
-use super::{condition::ConditionRule, statements_until, Rule};
+use super::{condition::ConditionRule, BlockStmtRule, Rule};
 
 use crate::{
+    self,
     parser::{CompletedMarker, Parser, CMT_NL_WS, CMT_WS},
-    SyntaxKind::*,
+    *,
 };
+
+/// helper for parsing if / elif stmts
+fn parse_with_cond(kind: SyntaxKind, p: &mut Parser) {
+    assert!(kind == SyntaxKind::IfKeyword || kind == SyntaxKind::ElifKeyword);
+    let if_elif_block_rule = BlockStmtRule::if_elif_block();
+
+    p.expect(kind);
+    p.eat_while(CMT_NL_WS);
+    ConditionRule::new().parse(p);
+    p.expect_after(CMT_WS, Newline);
+
+    if_elif_block_rule.parse(p);
+}
 
 pub struct IfStmtRule;
 impl Rule for IfStmtRule {
@@ -18,37 +32,24 @@ impl Rule for IfStmtRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let if_stmt_marker = p.start();
         p.eat_while(CMT_NL_WS);
-        p.expect(IfKeyword);
-        p.eat_while(CMT_NL_WS);
-        ConditionRule::new().parse(p);
-        p.expect_after(CMT_WS, Newline);
 
-        let m = p.start();
-        statements_until(p, [ElseKeyword, ElifKeyword, EndKeyword]);
-        m.complete(p, IfBlock);
+        parse_with_cond(IfKeyword, p);
 
-        while p.eat(ElifKeyword) {
-            p.eat_while(CMT_NL_WS);
-            ConditionRule::new().parse(p);
-            p.expect_after(CMT_WS, Newline);
-
-            let m = p.start();
-            statements_until(p, [ElseKeyword, ElifKeyword, EndKeyword]);
-            m.complete(p, ElifBlock);
+        while p.at(ElifKeyword) {
+            parse_with_cond(ElifKeyword, p);
         }
-
-        p.eat_while(CMT_NL_WS);
 
         if p.eat(ElseKeyword) {
             p.eat_while(CMT_WS);
             p.expect_after(CMT_WS, Newline);
 
-            let m = p.start();
-            statements_until(p, EndKeyword);
-            m.complete(p, ElseBlock);
+            BlockStmtRule::else_block().parse(p);
         }
 
-        p.expect(EndKeyword);
+        // if / elif does not eat end keyword. Do so here
+        if p.eat(EndKeyword) {
+            Some(if_stmt_marker.complete(p, IfStmt))
+        }
 
         Some(if_stmt_marker.complete(p, IfStmt))
     }

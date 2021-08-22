@@ -3,33 +3,35 @@
 for x in [ 1 2 3 ]
 end
 ---
-- Start: ForStmt 
-- Token: "ForKeyword (len: 3)" 
-- Token: "Whitespace (len: 1)" 
-- Token: "VarDeclName (len: 1)" 
-- Token: "Whitespace (len: 1)" 
-- Token: "InKeyword (len: 2)" 
-- Token: "Whitespace (len: 1)" 
-- Start: ArrayExpr 
-- Token: "LeftRectangularBrackets (len: 1)" 
-- Token: "Whitespace (len: 1)" 
-- Start: NumberExpr 
-- Token: "Number (len: 1)" 
-- Finish: "" 
-- Token: "Whitespace (len: 1)" 
-- Start: NumberExpr 
-- Token: "Number (len: 1)" 
-- Finish: "" 
-- Token: "Whitespace (len: 1)" 
-- Start: NumberExpr 
-- Token: "Number (len: 1)" 
-- Finish: "" 
-- Token: "Whitespace (len: 1)" 
-- Token: "RightRectangularBrackets (len: 1)" 
-- Finish: "" 
-- Token: "Newline (len: 1)" 
-- Token: "EndKeyword (len: 3)" 
-- Finish: "" 
+- Start: ForStmt
+- Token: "ForKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Token: "VarDeclName (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Token: "InKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Start: ArrayExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Start: BlockStmt
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
 ...
 2
 ===
@@ -50,6 +52,7 @@ end
 - Token: "DoubleQuote (len: 1)"
 - Finish: ""
 - Token: "Newline (len: 1)"
+- Start: BlockStmt
 - Token: "Whitespace (len: 4)"
 - Start: CmdStmt
 - Token: "BareWord (len: 6)"
@@ -61,5 +64,6 @@ end
 - Finish: ""
 - Token: "Newline (len: 1)"
 - Token: "EndKeyword (len: 3)"
+- Finish: ""
 - Finish: ""
 ...

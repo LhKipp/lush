@@ -16,6 +16,7 @@ use crate::{LuErr, LuResult, SourceCodeItem};
 pub enum EvalErr {
     Message(String),
     VarNotFound(SourceCodeItem),
+    NotConvertibleToBool(SourceCodeItem),
 }
 
 impl EvalErr {
@@ -44,6 +45,9 @@ impl EvalErr {
             EvalErr::VarNotFound(var) => Diagnostic::error()
                 .with_code("E00002")
                 .with_message(format!("Variable {} not found", var.content)),
+            EvalErr::NotConvertibleToBool(cond) => Diagnostic::error()
+                .with_code("E00003")
+                .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
         }
     }
 }
