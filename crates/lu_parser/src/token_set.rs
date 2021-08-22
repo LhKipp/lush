@@ -2,7 +2,7 @@ use crate::SyntaxKind::{self, ParserInternal};
 
 /// A bit-set of `SyntaxKind`s
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct TokenSet(u128, [SyntaxKind; 4]);
+pub struct TokenSet(u128, [SyntaxKind; 4]);
 
 #[allow(unused)]
 impl TokenSet {

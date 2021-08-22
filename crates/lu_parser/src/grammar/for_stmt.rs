@@ -32,9 +32,12 @@ impl Rule for ForStmtRule {
         ValueExprRule {}.parse(p);
         p.eat_until(Newline);
         p.expect(Newline);
-        statements_until(p, EndKeyword);
-        p.eat_while(CMT_NL_WS);
-        p.expect(EndKeyword);
+        BlockStmtRule {
+            parse_begin: false,
+            end_kinds: EndKeyword.into(),
+            statement_rule: Box::new(second_level_stmt()),
+        }
+        .parse(p);
         Some(m.complete(p, ForStmt))
     }
 }

@@ -2,20 +2,20 @@ use crate::{AstElementChildren, AstNode, AstToken};
 
 use super::{
     support, ArrayExprNode, BareWordToken, MathExprNode, NumberExprNode, NumberToken,
-    StringContentToken, StringExprNode, TableExprNode, ValueExprNode, ValuePathExprNode,
+    StringContentToken, StringExprNode, TableExprNode, ValueExprElement, ValuePathExprNode,
 };
 use lu_value::Value;
 
-impl ValueExprNode {
+impl ValueExprElement {
     pub fn value(&self) -> Value {
         match self {
-            ValueExprNode::BareWord(n) => n.value(),
-            ValueExprNode::NumberExpr(n) => n.value(),
-            ValueExprNode::MathExpr(n) => n.value(),
-            ValueExprNode::StringExpr(n) => n.value(),
-            ValueExprNode::ValuePathExpr(n) => n.value(),
-            ValueExprNode::ArrayExpr(n) => n.value(),
-            ValueExprNode::TableExpr(n) => n.value(),
+            ValueExprElement::BareWord(n) => n.value(),
+            ValueExprElement::NumberExpr(n) => n.value(),
+            ValueExprElement::MathExpr(n) => n.value(),
+            ValueExprElement::StringExpr(n) => n.value(),
+            ValueExprElement::ValuePathExpr(n) => n.value(),
+            ValueExprElement::ArrayExpr(n) => n.value(),
+            ValueExprElement::TableExpr(n) => n.value(),
         }
     }
 }
@@ -67,7 +67,7 @@ impl ArrayExprNode {
     pub fn value(&self) -> Value {
         Value::new_array(self.values().map(|n| n.value()).collect())
     }
-    pub fn values(&self) -> AstElementChildren<ValueExprNode> {
+    pub fn values(&self) -> AstElementChildren<ValueExprElement> {
         support::element_children(self.syntax())
     }
 }

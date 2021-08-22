@@ -5,16 +5,29 @@ use crate::{
     SyntaxKind::*,
 };
 
-fn block_stmt() -> OrRule {
-    OrRule {
-        kind: None,
-        rules: vec![Box::new(LetStmtRule {}), Box::new(CmdStmtRule {})],
+pub struct BlockStmtRule {
+    pub parse_begin: bool,
+    pub end_kinds: TokenSet,
+    pub statement_rule: Box<dyn Rule>,
+}
+
+impl BlockStmtRule {
+    /// Returns default block rule
+    /// begin
+    ///     <stmts>
+    /// end
+    pub fn new() -> BlockStmtRule {
+        BlockStmtRule {
+            parse_begin: true,
+            end_kinds: [EndKeyword].into(),
+            statement_rule: Box::new(second_level_stmt()),
+        }
     }
 }
 
-pub struct BlockStmtRule;
 impl Rule for BlockStmtRule {
     fn matches(&self, p: &mut Parser) -> bool {
+        assert!(self.parse_begin);
         p.next_non(CMT_NL_WS) == BeginKeyword
     }
 
@@ -24,12 +37,18 @@ impl Rule for BlockStmtRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        p.expect(BeginKeyword);
-        while p.next_non(CMT_NL_WS) != EndKeyword {
-            block_stmt().parse(p);
+
+        if self.parse_begin {
+            p.expect(BeginKeyword);
         }
+
+        while !self.end_kinds.contains(p.next_non(CMT_NL_WS)) {
+            self.statement_rule.parse(p);
+        }
+
         p.eat_while(CMT_NL_WS);
-        p.expect(EndKeyword);
+        p.expect(self.end_kinds);
+
         Some(m.complete(p, BlockStmt))
     }
 }

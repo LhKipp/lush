@@ -2,7 +2,7 @@
 pub(crate) mod nodes;
 pub use nodes::*;
 
-use crate::{AstElementChildren, AstNode, AstNodeChildren, AstToken};
+use crate::{AstElementChildren, AstNode, AstToken};
 
 use super::support;
 
@@ -20,14 +20,14 @@ impl CmdStmtNode {
     }
 
     /// All arguments of this command. This does include the command name parts.
-    pub fn args(&self) -> AstElementChildren<ValueExprNode> {
-        support::element_children::<ValueExprNode>(self.syntax())
+    pub fn args(&self) -> AstElementChildren<ValueExprElement> {
+        support::element_children::<ValueExprElement>(self.syntax())
     }
 }
 
 impl SourceFileNode {
-    pub fn statements(&self) -> AstNodeChildren<StatementNode> {
-        support::node_children(self.syntax())
+    pub fn statements(&self) -> AstElementChildren<StatementElement> {
+        support::element_children(self.syntax())
     }
 }
 
@@ -40,10 +40,10 @@ impl ForStmtNode {
         support::token_children(self.syntax())
     }
     /// The value over which is iterated
-    pub fn iterated_value(&self) -> Option<ValueExprNode> {
+    pub fn iterated_value(&self) -> Option<ValueExprElement> {
         support::element_child(self.syntax())
     }
-    pub fn statements(&self) -> AstNodeChildren<StatementNode> {
-        support::node_children(self.syntax())
+    pub fn statements(&self) -> AstElementChildren<StatementElement> {
+        support::element_children(self.syntax())
     }
 }

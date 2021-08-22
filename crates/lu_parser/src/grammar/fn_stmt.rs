@@ -1,7 +1,7 @@
 use super::*;
 
 use crate::{
-    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    parser::{CompletedMarker, Parser, CMT_NL_WS, CMT_WS},
     SyntaxKind::*,
 };
 
@@ -23,11 +23,13 @@ impl Rule for FnStmtRule {
         p.eat_while(&[BareWord, Whitespace]);
         p.eat_while(CMT_NL_WS);
         SignatureRule {}.opt(p);
-        p.eat_while(CMT_NL_WS);
-        statements_until(p, EndKeyword);
-        p.eat_while(CMT_NL_WS);
-        p.expect(EndKeyword);
-
+        p.expect_after(CMT_WS, Newline);
+        BlockStmtRule {
+            parse_begin: false,
+            end_kinds: EndKeyword.into(),
+            statement_rule: Box::new(second_level_stmt()),
+        }
+        .parse(p);
         Some(m.complete(p, FnStmt))
     }
 }

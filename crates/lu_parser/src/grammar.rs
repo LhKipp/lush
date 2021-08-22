@@ -43,7 +43,7 @@ use log::debug;
 use vec_box::vec_box;
 
 use crate::{
-    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    parser::{CompletedMarker, Parser},
     token_set::TokenSet,
     SyntaxKind::{self, *},
 };
@@ -155,38 +155,36 @@ impl Rule for SourceFileRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
         //SourceFile => statement % newline
-        statements(p);
+        BlockStmtRule {
+            parse_begin: false,
+            end_kinds: [Eof].into(),
+            statement_rule: Box::new(top_level_stmt()),
+        }
+        .parse(p);
         Some(m.complete(p, SourceFile))
     }
 
     fn matches(&self, _: &mut Parser) -> bool {
-        true
+        unreachable!("Should never be requested")
     }
 }
 
-// TODO make proper StatementRule
-fn statements_until<TS: Into<TokenSet>>(p: &mut Parser, end: TS) {
-    let end = end.into();
-    while !end.contains(p.next_non(CMT_NL_WS)) {
-        top_level_stmt().parse(p);
-    }
-}
-
-fn statements(p: &mut Parser) {
-    while p.next_non(CMT_NL_WS) != Eof {
-        top_level_stmt().parse(p);
+fn second_level_stmt() -> OrRule {
+    OrRule {
+        kind: Some("Second level stmt".into()),
+        rules: vec_box![
+            LetStmtRule {},
+            CmdStmtRule {},
+            ForStmtRule {},
+            IfStmtRule {}
+        ],
     }
 }
 
 fn top_level_stmt() -> OrRule {
-    OrRule {
-        kind: None,
-        rules: vec_box![
-            ForStmtRule {},
-            LetStmtRule {},
-            FnStmtRule {},
-            CmdStmtRule {},
-            IfStmtRule {},
-        ],
-    }
+    let mut second_level_stmt = second_level_stmt();
+    second_level_stmt.rules.push(Box::new(FnStmtRule {}));
+    second_level_stmt.kind = Some("Top level stmt".into());
+
+    second_level_stmt
 }

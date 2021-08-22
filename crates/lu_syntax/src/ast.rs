@@ -1,6 +1,7 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
 mod expr;
 mod generated;
+mod if_stmt;
 mod let_stmt;
 mod value_path_expr;
 use std::marker::PhantomData;
@@ -34,6 +35,13 @@ pub trait AstNode {
     fn cast(syntax: SyntaxNode) -> Option<Self>
     where
         Self: Sized;
+
+    fn cast_element(syntax: SyntaxElement) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        syntax.into_node().map(Self::cast).flatten()
+    }
 
     fn syntax(&self) -> &SyntaxNode;
     //TODO check whether these methods are needed.
@@ -76,6 +84,13 @@ pub trait AstElement {
         Self: Sized;
 
     fn syntax(&self) -> SyntaxElement;
+
+    fn text(&self) -> String {
+        match self.syntax() {
+            rowan::NodeOrToken::Node(n) => n.text().to_string(),
+            rowan::NodeOrToken::Token(t) => t.text().to_string(),
+        }
+    }
 }
 
 /// An iterator over `SyntaxNode` children of a particular AST type.
@@ -85,6 +100,7 @@ pub struct AstNodeChildren<N> {
     ph: PhantomData<N>,
 }
 
+#[allow(dead_code)]
 impl<N> AstNodeChildren<N> {
     fn new(parent: &SyntaxNode) -> Self {
         AstNodeChildren {
@@ -153,6 +169,7 @@ mod support {
             .collect()
     }
 
+    #[allow(dead_code)]
     pub(super) fn node_children<N: AstNode>(parent: &SyntaxNode) -> AstNodeChildren<N> {
         AstNodeChildren::new(parent)
     }

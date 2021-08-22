@@ -45,8 +45,11 @@ impl SyntaxElement {
     pub fn before_linking(&mut self) {
         if self.is_token {
             self.struct_name = self.name.clone() + "Token";
-        } else if self.is_node || self.is_generic {
+        } else if self.is_node {
             self.struct_name = self.name.clone() + "Node";
+        } else if self.is_generic {
+            self.struct_name = self.name.clone() + "Element";
+            self.impl_trait = "AstElement".into();
         }
     }
     pub fn link(&mut self, elems: &[SyntaxElement]) {
@@ -66,15 +69,7 @@ impl SyntaxElement {
             .retain(|name| !found.iter().any(|e| e.name == *name));
     }
 
-    pub fn after_linkage(&mut self) {
-        if self.is_generic {
-            self.impl_trait = if self.represents.iter().all(|e| e.is_node) {
-                "AstNode".to_string()
-            } else {
-                "AstElement".to_string()
-            }
-        }
-    }
+    pub fn after_linkage(&mut self) {}
 
     pub fn is_finished(&self) -> bool {
         self.represents_element_names.is_empty()
