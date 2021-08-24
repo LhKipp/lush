@@ -8,7 +8,6 @@ edition = "2018"
 [dependencies]
 lu_interpreter = { version = "0.1.0", path = "../lu_interpreter" }
 lu_cmds = { version = "0.1.0", path = "../lu_cmds" }
-lu_value = { version = "0.1.0", path = "../lu_value" }
 
 vec_box = "1.0.0"
 log = "0.4.14"
