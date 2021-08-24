@@ -14,7 +14,11 @@ pub enum ValueType {
     Function,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+// Empty Trait to mark something as a function
+#[typetag::serde(tag = "type")]
+pub trait Func: std::fmt::Debug {}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about
     // pure functions with inputs. However, copying large structs (Array, Table, ...)
@@ -29,7 +33,24 @@ pub enum Value {
 
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
+    Function(Rc<dyn Func>),
 }
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (other, self) {
+            (Value::Nil, Value::Nil) => true,
+            (Value::Bool(lhs), Value::Bool(rhs)) => lhs == rhs,
+            (Value::Number(lhs), Value::Number(rhs)) => lhs == rhs,
+            (Value::String(lhs), Value::String(rhs)) => lhs == rhs,
+            (Value::BareWord(lhs), Value::BareWord(rhs)) => lhs == rhs,
+            (Value::Array(lhs), Value::Array(rhs)) => lhs == rhs,
+            (Value::Function(lhs), Value::Function(rhs)) => Rc::ptr_eq(lhs, rhs),
+            _ => false,
+        }
+    }
+}
+impl Eq for Value {}
 
 impl Value {
     pub fn new_array(vals: Vec<Value>) -> Self {
