@@ -3,6 +3,17 @@ use std::rc::Rc;
 
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub enum ValueType {
+    Nil,
+    Bool,
+    Number,
+    String,
+    BareWord,
+    Array,
+    Function,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about
