@@ -1,0 +1,46 @@
+if_executed
+===
+if 1 == 1
+    tprint if_
+else
+    tprint else_
+end
+print $t_printed
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Array": [
+          {
+            "BareWord": "if_"
+          }
+        ]
+      }
+    ]
+  }
+}
+...
+else_executed
+===
+if 1 == 2
+    tprint if_
+else
+    tprint else_
+end
+print $t_printed
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Array": [
+          {
+            "BareWord": "else_"
+          }
+        ]
+      }
+    ]
+  }
+}
+...

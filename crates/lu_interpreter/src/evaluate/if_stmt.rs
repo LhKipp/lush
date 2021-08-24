@@ -90,7 +90,22 @@ mod test {
     use {conformance, serde_json};
 
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/single_if.json_test")]
-    fn general_interpreter_tests(s: &str) -> LuResult<Value> {
+    fn single_if_test(s: &str) -> LuResult<Value> {
+        init_logger();
+        let mut itprt = make_test_interpreter();
+
+        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+    }
+
+    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/if_else.json_test")]
+    fn if_else_test(s: &str) -> LuResult<Value> {
+        init_logger();
+        let mut itprt = make_test_interpreter();
+
+        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+    }
+    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/elif.json_test")]
+    fn elif_test(s: &str) -> LuResult<Value> {
         init_logger();
         let mut itprt = make_test_interpreter();
 
