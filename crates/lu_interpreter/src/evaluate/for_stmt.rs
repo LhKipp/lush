@@ -24,10 +24,8 @@ impl Evaluable for ForStmtNode {
             .map(|decl| decl.text().to_string())
             .collect();
         assert!(var_names.len() > 0);
-        let iterated_val = self.iterated_value().unwrap().value();
-
         // TODO iterate special over table
-        match iterated_val {
+        match self.iterated_value().unwrap().value() {
             Value::Nil => todo!(),
             Value::Number(_) => todo!(),
             Value::BareWord(_) => todo!(),
@@ -53,6 +51,7 @@ impl Evaluable for ForStmtNode {
             }
             Value::Array(_arr) => todo!(),
             Value::Bool(_) => todo!(),
+            Value::Function(_) => todo!(),
         }
 
         Ok(Value::Nil)

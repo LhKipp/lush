@@ -74,6 +74,7 @@ impl Value {
             Value::Number(n) => Some(*n != OrderedFloat::from(0f64)),
             Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
             Value::Array(arr) => Some(!arr.is_empty()),
+            Value::Function(_) => None,
         }
     }
 }

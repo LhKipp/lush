@@ -1,9 +1,13 @@
 use indextree::{Arena, NodeId};
 use log::debug;
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 use tap::prelude::*;
 
 use lu_value::Value;
+
+pub use indextree::NodeId as ScopeFrameId;
+
+use crate::Function;
 
 pub trait ScopeFrame {
     fn get_tag(&self) -> ScopeFrameTag;
@@ -26,6 +30,7 @@ pub enum ScopeFrameTag {
 pub struct SimpleScopeFrame {
     pub tag: ScopeFrameTag,
     pub vars: HashMap<String, Value>,
+    pub funcs: HashMap<String, Rc<Function>>,
 }
 
 impl SimpleScopeFrame {
@@ -33,6 +38,7 @@ impl SimpleScopeFrame {
         Self {
             tag,
             vars: HashMap::new(),
+            funcs: HashMap::new(),
         }
     }
 }
