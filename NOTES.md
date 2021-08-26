@@ -35,3 +35,22 @@ get_x >$cmd_out 2>log.txt
 This should work fine in praxis, as most functions will be either user facing functions or internal non printing funcs.
 
 IDEA: Maybe have a tag `verbose` for functions who use stdout? So that they could be silenced alltogether?
+
+
+## Dry run
+- Functions error out when they try to do an unpure operation in an pure context
+    - This is necessary as e.G. `git branch --list` is pure, but `git branch <arg>` is not. Whether a function is pure or not depends on the args/flags
+ 
+- Example editing of lu-program
+```lu
+fn filter[pred: fn]
+    assert ($in | type) == "table"
+    let result: table
+    for row in $in
+        if pred $row
+            result = result + row
+        end
+    end
+    return result
+end
+```
