@@ -1,3 +1,16 @@
+## DataTypes
+Typical ones: Nil, Bool, Number, String, BareWord, Array, Function,
+
+TableRow: like lua table.
+{
+    name = "hello"
+    origin = "world"
+}
+
+Table: Array of TableRow
+All TableRows within a table must be of the same type
+## Pipeline
+lexer | parser | func_call_resolution | math_expr_to_fn_transformation | evaluation
 ## Closures
 When returning a function (closure), the closure captures its environment by value (!) on the return statement!
 
@@ -41,9 +54,25 @@ IDEA: Maybe have a tag `verbose` for functions who use stdout? So that they coul
 - Functions error out when they try to do an unpure operation in an pure context
     - This is necessary as e.G. `git branch --list` is pure, but `git branch <arg>` is not. Whether a function is pure or not depends on the args/flags
  
-- Example editing of lu-program
+## HOF Funcs
 ```lu
-fn filter[pred: fn]
+fn filter[pred: fn] # type of fn is deduced
+    assert ($in | type) == "table"
+    let result: table
+    for row in $in
+        if pred $row # must return something convertible to bool and take an argument of $arg
+            result = result + row
+        end
+    end
+    return result
+end
+```
+While this syntax should in principle work, it would be simpler to have the bounds being declared in the signature
+
+
+```lu
+fn filter[pred: fn<($in._elem_type) -> bool>]
+    # fn<in_type -> (args, flags) -> bool>
     assert ($in | type) == "table"
     let result: table
     for row in $in
@@ -54,3 +83,25 @@ fn filter[pred: fn]
     return result
 end
 ```
+```lu
+fn filter[pred: fn<($in._elem_type) -> bool>]
+    assert ($in | type) == "table"
+    let result: table
+    for row in $in
+        if pred $row
+            result = result + row
+        end
+    end
+    return result
+end
+```
+
+echo [[name, size]; [file1, 1kb]] | filter $size > 1kb
+
+transformed into:
+
+echo [[name, size]; [file1, 1kb]] | filter fn[arg: {name, size}] $arg.size > 1kb end
+
+
+
+## Evaluation of partial programs
