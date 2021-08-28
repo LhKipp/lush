@@ -75,6 +75,16 @@ impl Scope {
         }
     }
 
+    pub fn get_cur_frame_id(&self) -> ScopeFrameId {
+        self.cur_frame_id.unwrap()
+    }
+
+    /// Id must be valid. Panic otherwise!
+    pub fn set_cur_frame_id(&mut self, id: ScopeFrameId) {
+        assert!(self.arena.get(id).is_some());
+        self.cur_frame_id = Some(id);
+    }
+
     pub fn cur_frame(&self) -> &dyn ScopeFrame {
         self.arena
             .get(self.cur_frame_id.expect("Scope is empty"))
@@ -122,7 +132,7 @@ impl Scope {
         }
     }
 
-    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> &mut dyn ScopeFrame {
+    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut dyn ScopeFrame) {
         debug!("Pushing frame: {:?}", tag);
         let prev_frame_id = self.cur_frame_id;
         let new_frame_id = self.arena.new_node(Box::new(SimpleScopeFrame::new(tag)));
@@ -131,7 +141,7 @@ impl Scope {
         }
         self.cur_frame_id = Some(new_frame_id);
 
-        self.cur_mut_frame()
+        (new_frame_id, self.cur_mut_frame())
     }
 
     pub fn pop_frame(&mut self, expected: ScopeFrameTag) {

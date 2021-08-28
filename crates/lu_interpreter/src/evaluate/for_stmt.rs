@@ -40,6 +40,7 @@ impl Evaluable for ForStmtNode {
                         let mut scope = state.scope.lock();
                         scope
                             .push_frame(ScopeFrameTag::ForStmtFrame)
+                            .1
                             .insert_var(var_names[0].clone(), Value::String(char.to_string()));
                     }
                     block.evaluate(state)?;
