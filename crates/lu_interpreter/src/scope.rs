@@ -1,19 +1,18 @@
 use indextree::{Arena, NodeId};
 use log::debug;
-use std::{collections::HashMap, rc::Rc};
-use tap::prelude::*;
-
 use lu_value::Value;
+use std::collections::HashMap;
+use tap::prelude::*;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::Function;
+use crate::{function::Callable, Variable};
 
 pub trait ScopeFrame {
     fn get_tag(&self) -> ScopeFrameTag;
-    fn get_var(&self, name: &str) -> Option<&Value>;
-    fn get_mut_var(&mut self, name: &str) -> Option<&mut Value>;
-    fn insert_var(&mut self, name: String, val: Value);
+    fn get_var(&self, name: &str) -> Option<&Variable>;
+    fn get_mut_var(&mut self, name: &str) -> Option<&mut Variable>;
+    fn insert_var(&mut self, var: Variable);
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -29,8 +28,7 @@ pub enum ScopeFrameTag {
 /// The default scope frame being put on the scope stack, when entering a new scope
 pub struct SimpleScopeFrame {
     pub tag: ScopeFrameTag,
-    pub vars: HashMap<String, Value>,
-    pub funcs: HashMap<String, Rc<Function>>,
+    pub vars: HashMap<String, Variable>,
 }
 
 impl SimpleScopeFrame {
@@ -38,7 +36,6 @@ impl SimpleScopeFrame {
         Self {
             tag,
             vars: HashMap::new(),
-            funcs: HashMap::new(),
         }
     }
 }
@@ -48,16 +45,16 @@ impl ScopeFrame for SimpleScopeFrame {
         self.tag
     }
 
-    fn get_var(&self, name: &str) -> Option<&Value> {
+    fn get_var(&self, name: &str) -> Option<&Variable> {
         self.vars.get(name)
     }
 
-    fn get_mut_var(&mut self, name: &str) -> Option<&mut Value> {
+    fn get_mut_var(&mut self, name: &str) -> Option<&mut Variable> {
         self.vars.get_mut(name)
     }
 
-    fn insert_var(&mut self, name: String, val: Value) {
-        self.vars.insert(name, val);
+    fn insert_var(&mut self, var: Variable) {
+        self.vars.insert(var.name.clone(), var);
     }
 }
 
@@ -112,7 +109,7 @@ impl Scope {
         global_frame.get_mut().as_mut()
     }
 
-    pub fn get_var(&self, name: &str) -> Option<&Value> {
+    pub fn find_var(&self, name: &str) -> Option<&Variable> {
         debug!("Finding var {} from {:?} on", name, self.get_cur_tag());
         if let Some(cur_frame_id) = self.cur_frame_id {
             cur_frame_id
@@ -170,5 +167,47 @@ impl Scope {
         } else {
             ScopeFrameTag::None
         }
+    }
+
+    fn find_func(&self, name: &str) -> Option<&Callable> {
+        debug!("Finding cmd {} from {:?} on", name, self.get_cur_tag());
+        if let Some(var) = self.find_var(name) {
+            match &var.val {
+                Value::Function(func) => Some(
+                    func.downcast_ref::<Callable>()
+                        .expect("Func is always castable to Callable"),
+                ),
+                _ => todo!("TODO found variable must not be func"),
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Find the command, having the longest match with name_parts (where not every part of
+    /// name_parts has to be matched)
+    /// Example:
+    /// Stored cmd name: git add
+    /// name_parts:      git add my_file
+    /// will return (2, <git-add-cmd>)
+    // The call side can not necessarily distinguish between cmd name parts and arguments.
+    // Therefore we need to do some search here
+    pub fn find_cmd_with_longest_match(&self, name_parts: &[String]) -> Option<(usize, &Callable)> {
+        assert!(name_parts.len() > 0);
+        // We try to find the longest matching subcommand here ...  Maybe we should use a trie as
+        // the internal datastructure
+        let mut result = None;
+        for i in 0..name_parts.len() {
+            let cmd_name = name_parts[0..i + 1].join(" ");
+            if let Some(func) = self.find_func(&cmd_name) {
+                result = Some((i + 1, func))
+            }
+        }
+        debug!(
+            "Match found for cmd_name_parts {:?}: {:?}",
+            name_parts,
+            result.map_or("None", |(_, func)| &func.name())
+        );
+        result
     }
 }

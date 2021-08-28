@@ -123,6 +123,28 @@ impl Parser {
         true
     }
 
+    /// Eat `orig` as `as_` delimited by `del`. If there can be multiple `del` between `orig`,
+    /// multiple_del should be set to true, false otherwise
+    pub(crate) fn eat_delimited_as<TS: Into<TokenSet> + Copy>(
+        &mut self,
+        orig: TS,
+        as_: SyntaxKind,
+        del: TS,
+        multiple_del: bool,
+    ) {
+        let del: TokenSet = del.into();
+        let orig: TokenSet = orig.into();
+
+        debug!("eat_delimited_as {:?} {:?}, del: {:?}", orig, as_, del);
+        while self.eat_as(orig, as_) {
+            if multiple_del {
+                while self.eat(del) {}
+            } else {
+                self.eat(del);
+            }
+        }
+    }
+
     /// Consume the next token if `kind` matches.
     pub(crate) fn eat_while<TS: Into<TokenSet> + Copy>(&mut self, ts: TS) {
         let kinds: TokenSet = ts.into();

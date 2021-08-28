@@ -46,8 +46,8 @@ impl Evaluable for ValuePathExprNode {
     fn do_evaluate(&self, state: &mut crate::Interpreter) -> LuResult<Value> {
         let name_parts = self.var_name_parts();
         assert_eq!(name_parts.len(), 1); // TODO handle indexing into table
-        if let Some(var) = state.scope.lock().get_var(&name_parts[0]) {
-            Ok(var.clone())
+        if let Some(var) = state.scope.lock().find_var(&name_parts[0]) {
+            Ok(var.val.clone())
         } else {
             EvalErr::VarNotFound(SourceCodeItem::new(
                 self.syntax().text_range().into(),

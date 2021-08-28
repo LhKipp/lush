@@ -14,11 +14,12 @@ lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 lu_value = { version = "0.1.0", path = "../lu_value" }
 
 derive-new = "0.5"
-indextree = "4.3.1"
+indextree = {version = "4.3.1", features = ["deser"]}
 parking_lot = "0.11"
 log = "0.4.14"
 contracts = "0.6.2"
 tap = "1.0.1"
+serde = "1.0.129"
 
 [dev-dependencies]
 lu_test_support = { version = "0.1.0", path = "../lu_test_support" }

@@ -867,6 +867,28 @@ impl HasSyntaxKind for VarDeclNameToken{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FnDeclNameToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for FnDeclNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FnDeclName }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for FnDeclNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EofNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -887,6 +909,7 @@ impl HasSyntaxKind for EofNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -914,6 +937,7 @@ impl HasRule for SourceFileNode{
         Box::new(SourceFileRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TombstoneNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -934,6 +958,7 @@ impl HasSyntaxKind for TombstoneNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -961,6 +986,7 @@ impl HasRule for LetStmtNode{
         Box::new(LetStmtRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -988,6 +1014,7 @@ impl HasRule for FnStmtNode{
         Box::new(FnStmtRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IfStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1015,6 +1042,7 @@ impl HasRule for IfStmtNode{
         Box::new(IfStmtRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IfBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1035,6 +1063,7 @@ impl HasSyntaxKind for IfBlockNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ElifBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1055,6 +1084,7 @@ impl HasSyntaxKind for ElifBlockNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ElseBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1075,6 +1105,7 @@ impl HasSyntaxKind for ElseBlockNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1102,6 +1133,7 @@ impl HasRule for ForStmtNode{
         Box::new(ForStmtRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CmdStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1129,6 +1161,7 @@ impl HasRule for CmdStmtNode{
         Box::new(CmdStmtRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BlockStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1149,6 +1182,7 @@ impl HasSyntaxKind for BlockStmtNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1176,6 +1210,7 @@ impl HasRule for SignatureNode{
         Box::new(SignatureRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1196,6 +1231,7 @@ impl HasSyntaxKind for MathExprNode{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StringExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1223,6 +1259,7 @@ impl HasRule for StringExprNode{
         Box::new(StringExprRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NumberExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1271,6 +1308,7 @@ impl HasSyntaxKind for StringContentToken{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ValuePathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1298,6 +1336,7 @@ impl HasRule for ValuePathExprNode{
         Box::new(ValuePathExprRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1325,6 +1364,7 @@ impl HasRule for ArrayExprNode{
         Box::new(ArrayExprRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1352,6 +1392,7 @@ impl HasRule for TableExprNode{
         Box::new(TableExprRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ValueExprElement {
     BareWord(BareWordToken),
     NumberExpr(NumberExprNode),
@@ -1449,6 +1490,7 @@ impl HasRule for ValueExprElement{
         Box::new(ValueExprRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StatementElement {
     ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
@@ -1523,6 +1565,7 @@ impl HasSyntaxKind for StatementElement{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConditionElement {
     CmdStmt(CmdStmtNode),
     ValueExpr(ValueExprElement),
@@ -1577,6 +1620,7 @@ impl HasSyntaxKind for ConditionElement{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum OperatorExprElement {
     PlusSign(PlusSignToken),
     MinusSign(MinusSignToken),

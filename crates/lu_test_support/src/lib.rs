@@ -3,10 +3,9 @@ extern crate vec_box;
 
 use pretty_env_logger::env_logger;
 
-use std::collections::HashMap;
-
 use lu_cmds::{PrintCmd, TestPrintCmd};
-use lu_interpreter::{Command, Interpreter};
+use lu_interpreter::{Callable, Command, Interpreter, ScopeFrameTag, Variable};
+use lu_value::Value;
 
 pub fn init_logger() {
     let _ = env_logger::builder()
@@ -17,11 +16,15 @@ pub fn init_logger() {
 
 pub fn make_test_interpreter() -> Interpreter {
     let cmds: Vec<Box<dyn Command>> = vec_box![PrintCmd {}, TestPrintCmd {}];
-    let cmd_strg = cmds
-        .into_iter()
-        .map(|cmd| (cmd.name().to_string(), cmd))
-        .collect::<HashMap<_, _>>()
-        .into();
+    let state = Interpreter::new();
+    {
+        let mut l_scope = state.scope.lock();
+        let (_, frame) = l_scope.push_frame(ScopeFrameTag::GlobalFrame);
+        for cmd in cmds {
+            let cmd: Callable = cmd.into();
+            frame.insert_var(Variable::new(cmd.name().to_string(), Value::new_func(cmd)))
+        }
+    }
 
-    Interpreter::new(cmd_strg)
+    state
 }

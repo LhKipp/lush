@@ -86,6 +86,7 @@ pub enum SyntaxKind {
     #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
     Number,
     VarDeclName,
+    FnDeclName,
     Eof,
     SourceFile,
     Tombstone,
@@ -157,6 +158,7 @@ impl SyntaxKind{
             SyntaxKind::Newline => "Newline",
             SyntaxKind::Number => "Number",
             SyntaxKind::VarDeclName => "VarDeclName",
+            SyntaxKind::FnDeclName => "FnDeclName",
             SyntaxKind::Eof => "Eof",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::Tombstone => "Tombstone",

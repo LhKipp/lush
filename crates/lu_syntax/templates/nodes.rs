@@ -32,6 +32,7 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
 
 {% elif syn_elem.is_node -%}
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct {{ syn_elem.struct_name }} {
     pub(crate) syntax: SyntaxNode,
 }
@@ -54,6 +55,7 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
 
 {% elif syn_elem.is_generic -%}
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum {{ syn_elem.struct_name }} {
     {% for represented in syn_elem.represents -%}
     {{represented.name}}({{represented.struct_name}}),

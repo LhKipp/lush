@@ -19,10 +19,13 @@ impl Rule for FnStmtRule {
         let m = p.start();
         p.eat_while(CMT_NL_WS);
 
-        p.eat(FnKeyword);
-        //consume all ws delimited bare words
-        p.eat_while(&[BareWord, Whitespace]);
+        p.expect(FnKeyword);
         p.eat_while(CMT_NL_WS);
+
+        // eat the name
+        p.eat_delimited_as(BareWord, FnDeclName, Whitespace, true);
+        p.eat_while(CMT_NL_WS);
+
         SignatureRule {}.opt(p);
         p.expect_after(CMT_WS, Newline);
         BlockStmtRule::fn_for_block().parse(p);

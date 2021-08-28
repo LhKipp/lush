@@ -175,7 +175,7 @@ Config(
     ),// [34]
     (
         name: "BareWord",
-        regex: "[_a-zA-Z]+",
+        regex: "[_a-zA-Z]+[_a-zA-Z0-9]*",
         is_token: true,
     ),// [35]
     (
@@ -200,6 +200,10 @@ Config(
     ),// [39]
     (
         name: "VarDeclName",
+        is_token: true,
+    ),// [40]
+    (
+        name: "FnDeclName",
         is_token: true,
     ),// [40]
     (

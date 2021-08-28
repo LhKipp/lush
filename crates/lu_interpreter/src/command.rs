@@ -1,10 +1,4 @@
-use std::fmt::Debug;
-
-use log::debug;
-use lu_error::LuResult;
-use lu_value::Value;
-
-use crate::Interpreter;
+use crate::Evaluable;
 
 // pub struct CommandArgs {
 //     /// The name by which the command has been called
@@ -23,13 +17,27 @@ use crate::Interpreter;
 //     }
 // }
 
-pub trait Command: Send + Sync + Debug {
+pub trait Command: Evaluable + CommandClone {
     fn name(&self) -> &str;
-    fn do_run(&self, state: &mut Interpreter) -> LuResult<Value>;
-    fn run(&self, state: &mut Interpreter) -> LuResult<Value> {
-        debug!("Running cmd: {}", self.name());
-        let result = self.do_run(state);
-        debug!("Result of cmd {}: {:?}", self.name(), result);
-        result
+}
+
+// https://stackoverflow.com/questions/30353462/how-to-clone-a-struct-storing-a-boxed-trait-object
+pub trait CommandClone {
+    fn clone_box(&self) -> Box<dyn Command>;
+}
+
+impl<T> CommandClone for T
+where
+    T: 'static + Command + Clone,
+{
+    fn clone_box(&self) -> Box<dyn Command> {
+        Box::new(self.clone())
+    }
+}
+
+// We can now implement Clone manually by forwarding to clone_box.
+impl Clone for Box<dyn Command> {
+    fn clone(&self) -> Box<dyn Command> {
+        self.clone_box()
     }
 }

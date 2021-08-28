@@ -7,7 +7,7 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{Evaluable, Interpreter, ScopeFrameTag};
+use crate::{Evaluable, Interpreter, ScopeFrameTag, Variable};
 
 impl Evaluable for ForStmtNode {
     #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
@@ -41,7 +41,10 @@ impl Evaluable for ForStmtNode {
                         scope
                             .push_frame(ScopeFrameTag::ForStmtFrame)
                             .1
-                            .insert_var(var_names[0].clone(), Value::String(char.to_string()));
+                            .insert_var(Variable::new(
+                                var_names[0].clone(),
+                                Value::String(char.to_string()),
+                            ));
                     }
                     block.evaluate(state)?;
                     {

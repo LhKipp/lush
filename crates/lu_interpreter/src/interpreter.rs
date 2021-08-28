@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
-mod command_storage;
 
 use lu_error::{LuErr, LuResult, ParseErr};
 use lu_syntax::{
@@ -14,19 +13,16 @@ use parking_lot::Mutex;
 use std::{path::PathBuf, sync::Arc};
 
 use crate::{Evaluable, Scope};
-pub use command_storage::CommandStorage;
 
 /// The interpreter holds data, getting transformed while interpreting the ast.
 /// The interpreter struct is merely here for having a nice frontend to the interpreter crate
 pub struct Interpreter {
-    pub cmds: Arc<Mutex<CommandStorage>>,
     pub scope: Arc<Mutex<Scope>>,
 }
 
 impl Interpreter {
-    pub fn new(cmds: CommandStorage) -> Self {
+    pub fn new() -> Self {
         Interpreter {
-            cmds: Arc::new(Mutex::new(cmds)),
             scope: Arc::new(Mutex::new(Scope::new())),
         }
     }

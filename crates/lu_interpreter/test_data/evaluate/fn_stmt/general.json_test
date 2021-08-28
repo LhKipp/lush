@@ -1,0 +1,23 @@
+1
+===
+fn func_1()
+    tprint "func_1"
+end
+
+func_1
+print $t_printed
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Array": [
+          {
+            "String": "func_1"
+          }
+        ]
+      }
+    ]
+  }
+}
+...

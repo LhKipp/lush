@@ -1,5 +1,5 @@
 use ordered_float::OrderedFloat;
-use std::rc::Rc;
+use std::{any::Any, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
@@ -14,10 +14,6 @@ pub enum ValueType {
     Array,
     Function,
 }
-
-// Empty Trait to mark something as a function
-#[typetag::serde(tag = "type")]
-pub trait Func: std::fmt::Debug {}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Value {
@@ -34,7 +30,8 @@ pub enum Value {
 
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
-    Function(Rc<dyn Func>),
+    #[serde(skip)]
+    Function(Rc<dyn Any>),
 }
 
 impl PartialEq for Value {
@@ -54,6 +51,10 @@ impl PartialEq for Value {
 impl Eq for Value {}
 
 impl Value {
+    pub fn new_func<F: Any + Sized>(func: F) -> Self {
+        Value::Function(Rc::new(func))
+    }
+
     pub fn new_array(vals: Vec<Value>) -> Self {
         Value::Array(Rc::new(vals))
     }
