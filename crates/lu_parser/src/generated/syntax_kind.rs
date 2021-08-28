@@ -75,7 +75,7 @@ pub enum SyntaxKind {
     #[error]
     Error,
     ParserInternal,
-    #[regex("[_a-zA-Z]+", priority = 0)]
+    #[regex("[_a-zA-Z]+[_a-zA-Z0-9]*", priority = 0)]
     BareWord,
     #[regex("[ ]+")]
     Whitespace,
