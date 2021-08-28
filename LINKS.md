@@ -15,3 +15,4 @@ https://github.com/oilshell/oil/wiki/Alternative-Shells
 https://github.com/liljencrantz/crush
 
 https://www.reddit.com/r/ProgrammingLanguages/comments/nlbzrp/announcing_slash_a_modern_shell_scripting_language/
+https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjuqou4kNHyAhXO2qQKHe6lBRUQFnoECCMQAQ&url=https%3A%2F%2Fsigops.org%2Fs%2Fconferences%2Fhotos%2F2021%2Fpapers%2Fhotos21-s06-greenberg.pdf&usg=AOvVaw3TMp5kJUREm1PuvSxVJ30Q
