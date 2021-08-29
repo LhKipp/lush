@@ -8,3 +8,13 @@ print hi | xargs
   }
 }
 ...
+External takes arguments
+===
+print hi | xargs echo "-n"
+---
+{
+  "Ok": {
+    "BareWord": "[BareWord(hi)]"
+  }
+}
+...

@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use crate::command::RunExternalCmd;
 use crate::{scope::ScopeFrameId, Command};
 use crate::{EvalArg, Evaluable, Variable};
 use lu_parser::grammar::FnStmtRule;
@@ -99,26 +100,29 @@ impl Function {
 pub enum Callable {
     Func(Function),
     InternalCmd(Box<dyn Command>),
+    ExternalCmd(RunExternalCmd),
 }
 
-impl Callable {
-    pub fn name(&self) -> &str {
-        match self {
-            Callable::Func(f) => &f.name,
-            Callable::InternalCmd(cmd) => cmd.name(),
-        }
-    }
-}
+impl Callable {}
 
-impl Evaluable for Callable {
-    fn do_evaluate(
+impl Command for Callable {
+    fn do_run(
         &self,
         _: &[EvalArg],
         state: &mut crate::Interpreter,
     ) -> lu_error::LuResult<lu_value::Value> {
         match self {
             Callable::Func(f) => f.evaluate(state),
-            Callable::InternalCmd(cmd) => cmd.evaluate(state),
+            Callable::InternalCmd(cmd) => cmd.run(state),
+            Callable::ExternalCmd(cmd) => cmd.run(state),
+        }
+    }
+
+    fn name(&self) -> &str {
+        match self {
+            Callable::Func(f) => &f.name,
+            Callable::InternalCmd(cmd) => cmd.name(),
+            Callable::ExternalCmd(cmd) => cmd.name(),
         }
     }
 }
@@ -126,12 +130,6 @@ impl Evaluable for Callable {
 impl From<Box<dyn Command>> for Callable {
     fn from(cmd: Box<dyn Command>) -> Self {
         Callable::InternalCmd(cmd)
-    }
-}
-
-impl<Cmd: Command + Sized + 'static> From<Cmd> for Callable {
-    fn from(cmd: Cmd) -> Self {
-        Callable::InternalCmd(Box::new(cmd))
     }
 }
 

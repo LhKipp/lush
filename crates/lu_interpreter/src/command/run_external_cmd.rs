@@ -9,13 +9,13 @@ use lu_value::Value;
 pub struct RunExternalCmd {
     /// The node in the AST which is evaluated by this Command
     pub cmd_node: CmdStmtNode,
+    pub cmd_name: String,
 }
 
 impl Command for RunExternalCmd {
     fn name(&self) -> &str {
-        "RunExternalCmd"
+        &self.cmd_name
     }
-}
 
     fn do_run(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let l_scope = state.scope.lock();
@@ -24,9 +24,8 @@ impl Command for RunExternalCmd {
         let args: Vec<String> = args.iter().map(Value::to_string).collect();
         let stdin = self.expect_in(&l_scope);
 
-        assert!(!args.is_empty()); // Args can never be empty, args[0] == CmdName
-
-        let mut child = std::process::Command::new(args[0].clone())
+        let mut child = std::process::Command::new(self.cmd_name.clone())
+            .args(args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()

@@ -22,20 +22,18 @@ impl Evaluable for CmdStmtNode {
         } else {
             (
                 1,
-                RunExternalCmd {
+                Callable::ExternalCmd(RunExternalCmd {
                     cmd_node: self.clone(),
-                }
-                .into(),
+                    cmd_name: possibl_longest_name[0].clone(),
+                }),
             )
         };
 
         let cmd_name = possibl_longest_name[0..cmd_parts_count].join(" ");
         debug!("Calling cmd: {}", cmd_name);
 
-        // Push cmd name as $args.0
+        // Push real cmd arguments (excluding cmd name, as $args)
         let mut args = Vec::new();
-        args.push(Value::String(cmd_name));
-        // Push all other arguments
         for arg in self.args().skip(cmd_parts_count) {
             // TODO remove partial result from eval call
             args.push(arg.evaluate(state)?);

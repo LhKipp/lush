@@ -6,7 +6,7 @@ use tap::prelude::*;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{function::Callable, Variable};
+use crate::{function::Callable, Command, Variable};
 
 pub trait ScopeFrame {
     fn get_tag(&self) -> ScopeFrameTag;
@@ -204,9 +204,10 @@ impl Scope {
             }
         }
         debug!(
-            "Match found for cmd_name_parts {:?}: {:?}",
+            "Match found for cmd_name_parts {:?}: ({:?}, {:?})",
             name_parts,
-            result.map_or("None", |(_, func)| &func.name())
+            result.map_or("None", |(_, func)| &func.name()),
+            result.map_or(999, |(idx, _)| idx)
         );
         result
     }
