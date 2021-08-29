@@ -8,7 +8,7 @@ mod interpreter;
 mod scope;
 mod variable;
 
-pub use crate::evaluate::Evaluable;
+pub use crate::evaluate::{EvalArg, Evaluable};
 pub use crate::function::{Callable, Function};
 pub use crate::interpreter::Interpreter;
 pub use crate::variable::Variable;

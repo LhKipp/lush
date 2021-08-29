@@ -2,10 +2,10 @@ use lu_error::LuResult;
 use lu_syntax::ast::LetStmtNode;
 use lu_value::Value;
 
-use crate::{Evaluable, Interpreter, Variable};
+use crate::{EvalArg, Evaluable, Interpreter, Variable};
 
 impl Evaluable for LetStmtNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let var_name = self.var_name().unwrap();
         let val = self.value().unwrap();
 

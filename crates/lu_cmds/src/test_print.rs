@@ -1,7 +1,7 @@
 use log::debug;
 // use log::debug;
 use lu_error::LuResult;
-use lu_interpreter::{Command, Evaluable, Interpreter, Variable};
+use lu_interpreter::{Command, EvalArg, Evaluable, Interpreter, Variable};
 use lu_value::Value;
 
 #[derive(Debug, Clone)]
@@ -14,7 +14,7 @@ impl Command for TestPrintCmd {
 }
 
 impl Evaluable for TestPrintCmd {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let args = match &state.scope.lock().cur_frame().get_var("args").unwrap().val {
             Value::Array(vals) => vals[1..].to_vec(), // Always erase $arg.0 (cmd name)
             _ => unreachable!(),

@@ -2,10 +2,10 @@ use lu_error::LuResult;
 use lu_syntax::ast::PipedCmdsStmtNode;
 use lu_value::Value;
 
-use crate::{Evaluable, Interpreter, Variable};
+use crate::{EvalArg, Evaluable, Interpreter, Variable};
 
 impl Evaluable for PipedCmdsStmtNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let mut previous_val = Value::Nil;
         for cmd in self.cmds() {
             state

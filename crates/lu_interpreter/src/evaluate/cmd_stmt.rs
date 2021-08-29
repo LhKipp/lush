@@ -3,10 +3,12 @@ use lu_error::LuResult;
 use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
-use crate::{command::RunExternalCmd, function::Callable, Evaluable, Interpreter, Variable};
+use crate::{
+    command::RunExternalCmd, function::Callable, EvalArg, Evaluable, Interpreter, Variable,
+};
 
 impl Evaluable for CmdStmtNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let possibl_longest_name = self.possible_longest_cmd_call_name();

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use crate::{scope::ScopeFrameId, Command};
-use crate::{Evaluable, Variable};
+use crate::{EvalArg, Evaluable, Variable};
 use lu_parser::grammar::FnStmtRule;
 use lu_syntax::{ast::FnStmtNode, Parse};
 use lu_value::ValueType;
@@ -111,7 +111,11 @@ impl Callable {
 }
 
 impl Evaluable for Callable {
-    fn do_evaluate(&self, state: &mut crate::Interpreter) -> lu_error::LuResult<lu_value::Value> {
+    fn do_evaluate(
+        &self,
+        _: &[EvalArg],
+        state: &mut crate::Interpreter,
+    ) -> lu_error::LuResult<lu_value::Value> {
         match self {
             Callable::Func(f) => f.evaluate(state),
             Callable::InternalCmd(cmd) => cmd.evaluate(state),

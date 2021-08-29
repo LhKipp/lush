@@ -1,17 +1,14 @@
 use contracts::ensures;
 use log::debug;
 use lu_error::LuResult;
-use lu_syntax::{
-    ast::{ForStmtNode, HasSyntaxKind},
-    AstToken,
-};
+use lu_syntax::{ast::ForStmtNode, AstToken};
 use lu_value::Value;
 
-use crate::{Evaluable, Interpreter, ScopeFrameTag, Variable};
+use crate::{EvalArg, Evaluable, Interpreter, ScopeFrameTag, Variable};
 
 impl Evaluable for ForStmtNode {
     #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let block = self.block().unwrap();
         if block.is_empty() {
             debug!("Empty for stmt");
@@ -59,17 +56,6 @@ impl Evaluable for ForStmtNode {
         }
 
         Ok(Value::Nil)
-    }
-
-    fn evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
-        debug!("Evaluating: {:?}", self.get_syntax_kind());
-        let result = self.do_evaluate(state);
-        debug!(
-            "Result of Evaluating: {:?}: {:?}",
-            self.get_syntax_kind(),
-            result
-        );
-        result
     }
 }
 

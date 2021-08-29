@@ -3,10 +3,10 @@ use lu_parser::SyntaxKind;
 use lu_syntax::ast::{FnStmtNode, HasSyntaxKind};
 use lu_value::Value;
 
-use crate::{function::Signature, Callable, Evaluable, Function, Interpreter, Variable};
+use crate::{function::Signature, Callable, EvalArg, Evaluable, Function, Interpreter, Variable};
 
 impl Evaluable for FnStmtNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let mut l_scope = state.scope.lock();
 
         let name = self.name().unwrap_or("".to_string());
@@ -35,7 +35,7 @@ impl HasSyntaxKind for Function {
 }
 
 impl Evaluable for Function {
-    fn do_evaluate(&self, state: &mut crate::Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut crate::Interpreter) -> LuResult<Value> {
         if let Some(block) = self.fn_node.block_stmt() {
             block.evaluate(state)
         } else {

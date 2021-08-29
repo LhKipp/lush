@@ -10,10 +10,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{Evaluable, Interpreter, ScopeFrameTag};
+use crate::{EvalArg, Evaluable, Interpreter, ScopeFrameTag};
 
 impl Evaluable for MathExprNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let lhs = self.lhs().unwrap();
         let rhs = self.rhs().unwrap();
         let op = self.operator().unwrap();

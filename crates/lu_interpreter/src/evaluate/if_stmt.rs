@@ -9,10 +9,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{Evaluable, Interpreter, ScopeFrameTag};
+use crate::{EvalArg, Evaluable, Interpreter, ScopeFrameTag};
 
 impl Evaluable for IfStmtNode {
-    fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
         let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, state);
