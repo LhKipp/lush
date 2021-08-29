@@ -326,6 +326,7 @@ Config(
         "FnStmt",// [2]
         "IfStmt",// [3]
         "CmdStmt",
+        "PipedCmdsStmt"
         ],
         is_generic: true,
     ),// [1]

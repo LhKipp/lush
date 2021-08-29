@@ -1,0 +1,18 @@
+1
+===
+print "hi" | print $in
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Array": [
+          {
+            "String": "hi"
+          }
+        ]
+      }
+    ]
+  }
+}
+...

@@ -1,12 +1,13 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
 mod block_stmt;
 mod expr;
+mod fn_stmt;
 mod generated;
 mod if_stmt;
 mod let_stmt;
 mod math_expr;
+mod piped_cmds_stmt;
 mod value_path_expr;
-mod fn_stmt;
 use std::marker::PhantomData;
 
 use lu_parser::grammar::Rule;

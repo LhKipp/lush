@@ -15,6 +15,7 @@ mod for_stmt;
 mod if_stmt;
 mod let_stmt;
 mod math_expr;
+mod piped_cmds_stmt;
 mod source_file;
 mod statement;
 

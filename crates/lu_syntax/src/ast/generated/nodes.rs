@@ -1525,6 +1525,7 @@ pub enum StatementElement {
     FnStmt(FnStmtNode),
     IfStmt(IfStmtNode),
     CmdStmt(CmdStmtNode),
+    PipedCmdsStmt(PipedCmdsStmtNode),
     }
 
 impl StatementElement {
@@ -1538,12 +1539,14 @@ impl AstElement for StatementElement {
         
         
         
+        
         match kind{
-            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt => true,
+            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -1556,6 +1559,7 @@ impl AstElement for StatementElement {
             FnStmt => StatementElement::FnStmt(FnStmtNode { syntax: syntax.into_node().unwrap() }),
             IfStmt => StatementElement::IfStmt(IfStmtNode { syntax: syntax.into_node().unwrap() }),
             CmdStmt => StatementElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
+            PipedCmdsStmt => StatementElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -1578,6 +1582,9 @@ impl AstElement for StatementElement {
             
             StatementElement::CmdStmt(it) => it.syntax.clone().into(),
             
+            
+            StatementElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
+            
             }
     }
 }
@@ -1589,6 +1596,7 @@ impl HasSyntaxKind for StatementElement{
             StatementElement::FnStmt(it) => it.get_syntax_kind(),
             StatementElement::IfStmt(it) => it.get_syntax_kind(),
             StatementElement::CmdStmt(it) => it.get_syntax_kind(),
+            StatementElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
             }
     }
 }
