@@ -17,6 +17,9 @@ use crate::Evaluable;
 //     }
 // }
 
+pub const IN_VAR_NAME: &str = "in";
+pub const ARGS_VAR_NAME: &str = "args";
+
 pub trait Command: Evaluable + CommandClone {
     fn name(&self) -> &str;
 }
