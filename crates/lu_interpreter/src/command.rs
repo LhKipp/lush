@@ -1,9 +1,12 @@
+use std::fmt::Debug;
 use std::rc::Rc;
 
-use crate::{Evaluable, Scope};
+use crate::{EvalArg, Interpreter, Scope};
 
 mod run_external_cmd;
 
+use log::debug;
+use lu_error::LuResult;
 use lu_value::{Value, NIL_VAL};
 pub use run_external_cmd::RunExternalCmd;
 
@@ -27,7 +30,7 @@ pub use run_external_cmd::RunExternalCmd;
 pub const IN_VAR_NAME: &str = "in";
 pub const ARGS_VAR_NAME: &str = "args";
 
-pub trait Command: Evaluable + CommandClone {
+pub trait Command: CommandClone + Debug {
     fn name(&self) -> &str;
 
     /// Returns $args
@@ -44,6 +47,31 @@ pub trait Command: Evaluable + CommandClone {
             .find_var(IN_VAR_NAME)
             .map(|var| &var.val)
             .unwrap_or(&NIL_VAL)
+    }
+
+    fn do_run(&self, args: &[EvalArg], state: &mut Interpreter) -> LuResult<Value>;
+
+    fn run(&self, state: &mut Interpreter) -> LuResult<Value> {
+        self.run_with_args(&[], state)
+    }
+
+    fn run_with_args(&self, args: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+        {
+            let l_scope = state.scope.lock();
+            debug!(
+                "Running command {:?} with args ({:?})\n$in: {:?}, $args {:?}",
+                self.name(),
+                args,
+                self.expect_in(&l_scope),
+                self.expect_args(&l_scope)
+            )
+        }
+        let result = self.do_run(args, state);
+        {
+            debug!("Result of running command {}: {:?}", self.name(), result);
+        }
+
+        result
     }
 }
 

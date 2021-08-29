@@ -4,7 +4,7 @@ use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
 use crate::{
-    command::RunExternalCmd, function::Callable, EvalArg, Evaluable, Interpreter, Variable,
+    command::RunExternalCmd, function::Callable, Command, EvalArg, Evaluable, Interpreter, Variable,
 };
 
 impl Evaluable for CmdStmtNode {
@@ -47,7 +47,7 @@ impl Evaluable for CmdStmtNode {
             .cur_mut_frame()
             .insert_var(Variable::new("args".to_string(), Value::new_array(args)));
 
-        cmd.evaluate(state)
+        cmd.run(state)
     }
 }
 
