@@ -95,12 +95,16 @@ impl<'a> TreeBuilder<'a> {
             match mem::replace(&mut events[i], Event::tombstone()) {
                 Event::Start {
                     kind: Tombstone, ..
-                } => (),
+                } => {
+                    debug!("BuildTree: Tombstone, skipping");
+                }
 
                 Event::Start {
                     kind,
                     forward_parent,
                 } => {
+                    assert!(kind != Tombstone);
+                    debug!("BuildTree: Start({:?})", kind);
                     // For events[A, B, C], B is A's forward_parent, C is B's forward_parent,
                     // in the normal control flow, the parent-child relation: `A -> B -> C`,
                     // while with the magic forward_parent, it writes: `C <- B <- A`.
