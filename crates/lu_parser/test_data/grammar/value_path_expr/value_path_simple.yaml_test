@@ -1,0 +1,10 @@
+1
+===
+$in
+---
+- Start: ValuePathExpr
+- Token: "Dollar (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+...
+

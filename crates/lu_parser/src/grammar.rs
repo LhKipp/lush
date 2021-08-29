@@ -38,6 +38,7 @@ mod if_stmt;
 mod let_stmt;
 mod piped_cmds_stmt;
 mod signature;
+mod value_path_expr;
 
 use itertools::Itertools;
 use log::debug;
@@ -52,15 +53,14 @@ use crate::{
 pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;
 pub use condition::ConditionRule;
-pub use expr::{
-    ArrayExprRule, NumberExprRule, StringExprRule, TableExprRule, ValueExprRule, ValuePathExprRule,
-};
+pub use expr::{ArrayExprRule, NumberExprRule, StringExprRule, TableExprRule, ValueExprRule};
 pub use fn_stmt::FnStmtRule;
 pub use for_stmt::ForStmtRule;
 pub use if_stmt::IfStmtRule;
 pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use signature::SignatureRule;
+pub use value_path_expr::ValuePathExprRule;
 
 pub trait Rule {
     /// Returns the name of the rule

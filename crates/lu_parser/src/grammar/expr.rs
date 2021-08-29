@@ -213,29 +213,3 @@ impl Rule for StringExprRule {
         Some(m.complete(p, StringExpr))
     }
 }
-
-pub struct ValuePathExprRule;
-impl Rule for ValuePathExprRule {
-    fn name(&self) -> String {
-        "ValuePath".into()
-    }
-
-    fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == T![$]
-    }
-
-    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        p.eat_while(CMT_NL_WS);
-        let m = p.start();
-        p.expect(Dollar);
-        loop {
-            if !p.expect(BareWord) {
-                break;
-            }
-            if !p.at(Point) {
-                break;
-            }
-        }
-        Some(m.complete(p, ValuePathExpr))
-    }
-}
