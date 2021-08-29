@@ -170,7 +170,7 @@ fn second_level_stmt() -> OrRule {
         kind: Some("Second level stmt".into()),
         rules: vec_box![
             LetStmtRule {},
-            CmdStmtRule {},
+            PipedCmdsStmtRule {},
             ForStmtRule {},
             IfStmtRule {}
         ],

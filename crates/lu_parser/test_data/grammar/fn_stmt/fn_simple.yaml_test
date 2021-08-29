@@ -16,6 +16,7 @@ end
 - Token: "Newline (len: 1)"
 - Start: BlockStmt
 - Token: "Whitespace (len: 2)"
+- Start: Tombstone
 - Start: CmdStmt
 - Token: "BareWord (len: 4)"
 - Token: "Whitespace (len: 1)"

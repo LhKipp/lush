@@ -12,7 +12,7 @@ impl ConditionRule {
         Self {
             inner: OrRule {
                 kind: Some("Condition".into()),
-                rules: vec_box![CmdStmtRule {}, ValueExprRule {}],
+                rules: vec_box![PipedCmdsStmtRule {}, ValueExprRule {}],
             },
         }
     }

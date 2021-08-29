@@ -8,6 +8,7 @@ end
 - Token: "BeginKeyword (len: 5)"
 - Token: "Newline (len: 1)"
 - Token: "Whitespace (len: 4)"
+- Start: Tombstone
 - Start: CmdStmt
 - Token: "BareWord (len: 5)"
 - Token: "Whitespace (len: 1)"
