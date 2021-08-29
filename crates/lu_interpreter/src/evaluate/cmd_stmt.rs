@@ -3,9 +3,7 @@ use lu_error::LuResult;
 use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
-use crate::{
-    command::RunExternalCmd, function::Callable, Command, EvalArg, Evaluable, Interpreter, Variable,
-};
+use crate::{Callable, Command, EvalArg, Evaluable, Interpreter, RunExternalCmd, Variable};
 
 impl Evaluable for CmdStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {

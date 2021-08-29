@@ -3,12 +3,9 @@ use std::rc::Rc;
 
 use crate::{EvalArg, Interpreter, Scope};
 
-mod run_external_cmd;
-
 use log::debug;
 use lu_error::LuResult;
 use lu_value::{Value, NIL_VAL};
-pub use run_external_cmd::RunExternalCmd;
 
 // pub struct CommandArgs {
 //     /// The name by which the command has been called

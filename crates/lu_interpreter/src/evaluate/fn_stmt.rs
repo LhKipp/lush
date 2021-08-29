@@ -1,9 +1,8 @@
 use lu_error::LuResult;
-use lu_parser::SyntaxKind;
-use lu_syntax::ast::{FnStmtNode, HasSyntaxKind};
+use lu_syntax::ast::FnStmtNode;
 use lu_value::Value;
 
-use crate::{function::Signature, Callable, EvalArg, Evaluable, Function, Interpreter, Variable};
+use crate::{Callable, EvalArg, Evaluable, Function, Interpreter, Signature, Variable};
 
 impl Evaluable for FnStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
@@ -25,22 +24,6 @@ impl Evaluable for FnStmtNode {
             .insert_var(Variable::new(name, Value::new_func(func)));
 
         Ok(Value::Nil)
-    }
-}
-
-impl HasSyntaxKind for Function {
-    fn get_syntax_kind(&self) -> lu_parser::SyntaxKind {
-        SyntaxKind::FnStmt
-    }
-}
-
-impl Evaluable for Function {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut crate::Interpreter) -> LuResult<Value> {
-        if let Some(block) = self.fn_node.block_stmt() {
-            block.evaluate(state)
-        } else {
-            Ok(Value::Nil)
-        }
     }
 }
 

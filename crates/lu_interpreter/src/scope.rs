@@ -6,7 +6,7 @@ use tap::prelude::*;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{function::Callable, Command, Variable};
+use crate::{Callable, Command, Variable};
 
 pub trait ScopeFrame {
     fn get_tag(&self) -> ScopeFrameTag;
