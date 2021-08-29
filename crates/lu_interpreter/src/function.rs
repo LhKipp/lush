@@ -125,6 +125,12 @@ impl From<Box<dyn Command>> for Callable {
     }
 }
 
+impl<Cmd: Command + Sized + 'static> From<Cmd> for Callable {
+    fn from(cmd: Cmd) -> Self {
+        Callable::InternalCmd(Box::new(cmd))
+    }
+}
+
 impl From<Function> for Callable {
     fn from(func: Function) -> Self {
         Callable::Func(func)
