@@ -1162,6 +1162,34 @@ impl HasRule for CmdStmtNode{
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PipedCmdsStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for PipedCmdsStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::PipedCmdsStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for PipedCmdsStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+use lu_parser::grammar::PipedCmdsStmtRule;
+impl HasRule for PipedCmdsStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(PipedCmdsStmtRule{})
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BlockStmtNode {
     pub(crate) syntax: SyntaxNode,
 }

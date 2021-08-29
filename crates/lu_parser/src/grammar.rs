@@ -36,6 +36,7 @@ mod fn_stmt;
 mod for_stmt;
 mod if_stmt;
 mod let_stmt;
+mod piped_cmds_stmt;
 mod signature;
 
 use itertools::Itertools;
@@ -58,6 +59,7 @@ pub use fn_stmt::FnStmtRule;
 pub use for_stmt::ForStmtRule;
 pub use if_stmt::IfStmtRule;
 pub use let_stmt::LetStmtRule;
+pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use signature::SignatureRule;
 
 pub trait Rule {

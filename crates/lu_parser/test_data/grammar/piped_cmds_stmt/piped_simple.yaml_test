@@ -1,0 +1,27 @@
+1
+===
+echo "hi" | echo 123
+---
+- Start: PipedCmdsStmt
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 2)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Finish: ""
+- Token: "Pipe (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 3)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...
+

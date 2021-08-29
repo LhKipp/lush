@@ -257,6 +257,11 @@ Config(
         has_rule: true,
     ),// [51]
     (
+        name: "PipedCmdsStmt",
+        is_node: true,
+        has_rule: true,
+    ),
+    (
         name: "BlockStmt",
         is_node: true,
         has_rule: false, // TODO block stmt can have rule, but is not ctorable by {}
