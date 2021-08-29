@@ -1,4 +1,11 @@
-use crate::Evaluable;
+use std::rc::Rc;
+
+use crate::{Evaluable, Scope};
+
+mod run_external_cmd;
+
+use lu_value::{Value, NIL_VAL};
+pub use run_external_cmd::RunExternalCmd;
 
 // pub struct CommandArgs {
 //     /// The name by which the command has been called
@@ -22,6 +29,22 @@ pub const ARGS_VAR_NAME: &str = "args";
 
 pub trait Command: Evaluable + CommandClone {
     fn name(&self) -> &str;
+
+    /// Returns $args
+    fn expect_args<'a>(&self, scope: &'a Scope) -> &'a Rc<Vec<Value>> {
+        match &scope.find_var(ARGS_VAR_NAME).expect("Always present").val {
+            Value::Array(v) => &v,
+            _ => unreachable!("Args are always an array"),
+        }
+    }
+
+    /// Returns $in
+    fn expect_in<'a>(&self, scope: &'a Scope) -> &'a Value {
+        &scope
+            .find_var(IN_VAR_NAME)
+            .map(|var| &var.val)
+            .unwrap_or(&NIL_VAL)
+    }
 }
 
 // https://stackoverflow.com/questions/30353462/how-to-clone-a-struct-storing-a-boxed-trait-object

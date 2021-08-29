@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::ops::Range;
+use std::{error::Error, ops::Range};
 
 mod eval_err;
 mod fs_err;
@@ -26,9 +26,9 @@ pub enum LuErr {
     Internal(String),
 }
 
-impl<S: Into<String>> From<S> for LuErr {
-    fn from(s: S) -> Self {
-        LuErr::Internal(s.into())
+impl<E: Error> From<E> for LuErr {
+    fn from(e: E) -> Self {
+        LuErr::Internal(e.to_string())
     }
 }
 
@@ -44,11 +44,11 @@ impl From<EvalErr> for LuErr {
     }
 }
 
-impl From<FsErr> for LuErr {
-    fn from(e: FsErr) -> Self {
-        LuErr::FS(e)
-    }
-}
+// impl From<FsErr> for LuErr {
+//     fn from(e: FsErr) -> Self {
+//         LuErr::FS(e)
+//     }
+// }
 
 /// An item in the source code to be used in the `Error` enum.
 #[derive(PartialEq, Eq, Debug, Serialize, Deserialize)]

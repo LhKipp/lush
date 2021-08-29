@@ -3,7 +3,7 @@ use lu_error::LuResult;
 use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
-use crate::{function::Callable, Evaluable, Interpreter, Variable};
+use crate::{command::RunExternalCmd, function::Callable, Evaluable, Interpreter, Variable};
 
 impl Evaluable for CmdStmtNode {
     fn do_evaluate(&self, state: &mut Interpreter) -> LuResult<Value> {
@@ -18,8 +18,13 @@ impl Evaluable for CmdStmtNode {
         {
             (cmd_parts_count, callable.clone())
         } else {
-            // Cmd not found. Shell out
-            todo!("Todo")
+            (
+                1,
+                RunExternalCmd {
+                    cmd_node: self.clone(),
+                }
+                .into(),
+            )
         };
 
         let cmd_name = possibl_longest_name[0..cmd_parts_count].join(" ");
@@ -54,7 +59,15 @@ mod test {
     use {conformance, serde_json};
 
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/cmd_stmt/general.json_test")]
-    fn general_interpreter_tests(s: &str) -> LuResult<Value> {
+    fn general_cmd_tests(s: &str) -> LuResult<Value> {
+        init_logger();
+        let mut itprt = make_test_interpreter();
+
+        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+    }
+
+    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/cmd_stmt/external.json_test")]
+    fn external_cmd_tests(s: &str) -> LuResult<Value> {
         init_logger();
         let mut itprt = make_test_interpreter();
 

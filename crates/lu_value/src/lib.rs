@@ -1,5 +1,5 @@
 use ordered_float::OrderedFloat;
-use std::{any::Any, rc::Rc};
+use std::{any::Any, fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
@@ -14,6 +14,8 @@ pub enum ValueType {
     Array,
     Function,
 }
+
+pub const NIL_VAL: Value = Value::Nil;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Value {
@@ -66,6 +68,10 @@ impl Value {
         }
     }
 
+    pub fn is_nil(&self) -> bool {
+        return self == &Value::Nil;
+    }
+
     /// Returns Some(true|false) if self represents a true or false value
     /// Returns None if self is not convertible to bool
     pub fn convert_to_bool(&self) -> Option<bool> {
@@ -77,6 +83,20 @@ impl Value {
             Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
             Value::Array(arr) => Some(!arr.is_empty()),
             Value::Function(_) => None,
+        }
+    }
+}
+
+impl Display for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Value::Nil => write!(f, "Nil"),
+            Value::Bool(v) => v.fmt(f),
+            Value::Number(v) => v.fmt(f),
+            Value::String(v) => v.fmt(f),
+            Value::BareWord(v) => v.fmt(f),
+            Value::Function(v) => write!(f, "{:p}", Rc::as_ptr(v)),
+            Value::Array(arr) => write!(f, "{:?}", arr),
         }
     }
 }

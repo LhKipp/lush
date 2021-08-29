@@ -12,5 +12,5 @@ pub use crate::evaluate::Evaluable;
 pub use crate::function::{Callable, Function};
 pub use crate::interpreter::Interpreter;
 pub use crate::variable::Variable;
-pub use command::{Command, CMD_VAR_ARGS_NAME, CMD_VAR_IN_NAME};
+pub use command::{Command, ARGS_VAR_NAME, IN_VAR_NAME};
 pub use scope::{Scope, ScopeFrame, ScopeFrameTag, SimpleScopeFrame};

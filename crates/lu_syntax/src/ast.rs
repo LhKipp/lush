@@ -10,6 +10,7 @@ mod piped_cmds_stmt;
 mod value_path_expr;
 use std::marker::PhantomData;
 
+use lu_error::SourceCodeItem;
 use lu_parser::grammar::Rule;
 
 use crate::{
@@ -60,6 +61,10 @@ pub trait AstNode {
         Self: Sized,
     {
         Self::cast(self.syntax().clone()).unwrap()
+    }
+
+    fn into_item(&self) -> SourceCodeItem {
+        SourceCodeItem::new(self.syntax().text_range().into(), self.syntax().text())
     }
 }
 

@@ -17,6 +17,11 @@ pub enum EvalErr {
     Message(String),
     VarNotFound(SourceCodeItem),
     NotConvertibleToBool(SourceCodeItem),
+
+    SpawningExternalProcessFailed(SourceCodeItem, String),
+    ExternalCmdStdinWriteErr(SourceCodeItem, String),
+    ReadingStdoutFromCmdFailed(SourceCodeItem, String),
+    ExternalCmdFailed(SourceCodeItem),
 }
 
 impl EvalErr {
@@ -47,6 +52,18 @@ impl EvalErr {
                 .with_message(format!("Variable {} not found", var.content)),
             EvalErr::NotConvertibleToBool(cond) => Diagnostic::error()
                 .with_code("E00003")
+                .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
+            EvalErr::SpawningExternalProcessFailed(cond, _) => Diagnostic::error()
+                .with_code("E00004")
+                .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
+            EvalErr::ExternalCmdStdinWriteErr(cond, _) => Diagnostic::error()
+                .with_code("E00006")
+                .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
+            EvalErr::ReadingStdoutFromCmdFailed(cond, _) => Diagnostic::error()
+                .with_code("E00007")
+                .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
+            EvalErr::ExternalCmdFailed(cond) => Diagnostic::error()
+                .with_code("E00008")
                 .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
         }
     }

@@ -1,0 +1,10 @@
+External takes stdin
+===
+print hi | xargs
+---
+{
+  "Ok": {
+    "BareWord": "[BareWord(hi)]\n"
+  }
+}
+...
