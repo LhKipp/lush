@@ -58,11 +58,9 @@ impl Rule for LuTypeRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
 
-        lu_type_specifier().expect(p);
-        if p.next_non(CMT_NL_WS) == T![?] {
-            p.eat_while(CMT_NL_WS);
-            p.expect_as(T![?], OptTypeMarker);
-        }
+        p.eat_while(CMT_NL_WS);
+        lu_type_specifier().parse(p);
+        p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
         Some(m.complete(p, LuType))
     }
 }
