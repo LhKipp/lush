@@ -163,6 +163,39 @@ impl Parser {
         }
     }
 
+    /// Eats `kinds` only if it comes after `after`. Leaves the token stream untouched otherwise
+    pub(crate) fn eat_after<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet>>(
+        &mut self,
+        kinds: TS1,
+        after: TS2,
+    ) -> bool {
+        let kinds = kinds.into();
+        let after = after.into();
+        if kinds.contains(self.next_non(after)) {
+            self.eat_while(after);
+            self.expect(kinds)
+        } else {
+            false
+        }
+    }
+
+    /// Eats `kinds` only if it comes after `after`. Leaves the token stream untouched otherwise
+    pub(crate) fn eat_after_as<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet> + Copy>(
+        &mut self,
+        kinds: TS1,
+        as_: SyntaxKind,
+        after: TS2,
+    ) -> bool {
+        let kinds = kinds.into();
+        let after = after.into();
+        if kinds.contains(self.next_non(after)) {
+            self.eat_while(after);
+            self.expect_as(kinds, as_)
+        } else {
+            false
+        }
+    }
+
     /// Discards all token until `kinds`. Returns all discarded tokens
     pub(crate) fn discard_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) -> Vec<Token> {
         let mut discarded = Vec::new();
@@ -255,13 +288,40 @@ impl Parser {
 
     /// Expect `and_then` after `before`
     /// Example: p.expect_after(CMT_WS, Newline) // Expect a nl (with optional ws before)
-    pub(crate) fn expect_after<TS: Into<TokenSet>>(
+    pub(crate) fn expect_after<TS1: Into<TokenSet>, TS2: Into<TokenSet>>(
         &mut self,
-        before: TS,
-        and_then: SyntaxKind,
+        before: TS1,
+        kinds: TS2,
     ) -> bool {
-        self.eat_while(before.into());
-        self.expect(and_then)
+        let kinds = kinds.into();
+        let before = before.into();
+        if kinds.contains(self.next_non(before)) {
+            self.eat_while(before);
+            self.expect(kinds)
+        } else {
+            let err: ParseErr = format!("expected {:?}", kinds).into();
+            self.error(err);
+            false
+        }
+    }
+
+    /// Eats `kinds` only if it comes after `after`. Leaves the token stream untouched otherwise
+    pub(crate) fn expect_after_as<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet> + Copy>(
+        &mut self,
+        kinds: TS1,
+        as_: SyntaxKind,
+        after: TS2,
+    ) -> bool {
+        let kinds = kinds.into();
+        let after = after.into();
+        if kinds.contains(self.next_non(after)) {
+            self.eat_while(after);
+            self.expect_as(kinds, as_)
+        } else {
+            let err: ParseErr = format!("expected {:?}", kinds).into();
+            self.error(err);
+            false
+        }
     }
 
     /// Create an error node and consume the next token.

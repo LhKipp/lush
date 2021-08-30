@@ -37,7 +37,7 @@ pub enum SyntaxKind {
     #[token("str")]
     StringKeyword,
     ArrayType,
-    OptTypeMarker,
+    OptModifier,
     #[token("(")]
     LeftParenthesis,
     #[token(")")]
@@ -82,6 +82,8 @@ pub enum SyntaxKind {
     QuestionMark,
     #[token(".")]
     Point,
+    #[token(":")]
+    DoublePoint,
     #[token("\"")]
     DoubleQuote,
     #[token("'")]
@@ -99,15 +101,18 @@ pub enum SyntaxKind {
     Newline,
     #[regex("[_a-zA-Z]+[_a-zA-Z0-9]*", priority = 0)]
     BareWord,
+    StringContent,
     VarDeclName,
     FnDeclName,
-    StringContent,
-    #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
-    Number,
+    ParamName,
+    #[token("...[_a-zA-Z]+[_a-zA-Z0-9]*")]
+    VarArgName,
     #[regex("--[_a-zA-Z]+[_a-zA-Z0-9]*")]
     LongFlag,
     #[regex("-[_a-zA-Z]+[_a-zA-Z0-9]*")]
     ShortFlag,
+    #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
+    Number,
     SourceFile,
     LetStmt,
     FnStmt,
@@ -120,6 +125,9 @@ pub enum SyntaxKind {
     PipedCmdsStmt,
     BlockStmt,
     Signature,
+    FlagSignature,
+    ParamSignature,
+    VarArgParamSignatureRule,
     LuType,
     MathExpr,
     StringExpr,
@@ -153,7 +161,7 @@ impl SyntaxKind{
             SyntaxKind::NumberKeyword => "NumberKeyword",
             SyntaxKind::StringKeyword => "StringKeyword",
             SyntaxKind::ArrayType => "ArrayType",
-            SyntaxKind::OptTypeMarker => "OptTypeMarker",
+            SyntaxKind::OptModifier => "OptModifier",
             SyntaxKind::LeftParenthesis => "LeftParenthesis",
             SyntaxKind::RightParenthesis => "RightParenthesis",
             SyntaxKind::LeftCurlyBrackets => "LeftCurlyBrackets",
@@ -176,6 +184,7 @@ impl SyntaxKind{
             SyntaxKind::Dollar => "Dollar",
             SyntaxKind::QuestionMark => "QuestionMark",
             SyntaxKind::Point => "Point",
+            SyntaxKind::DoublePoint => "DoublePoint",
             SyntaxKind::DoubleQuote => "DoubleQuote",
             SyntaxKind::SingleQuote => "SingleQuote",
             SyntaxKind::Error => "Error",
@@ -186,12 +195,14 @@ impl SyntaxKind{
             SyntaxKind::Comment => "Comment",
             SyntaxKind::Newline => "Newline",
             SyntaxKind::BareWord => "BareWord",
+            SyntaxKind::StringContent => "StringContent",
             SyntaxKind::VarDeclName => "VarDeclName",
             SyntaxKind::FnDeclName => "FnDeclName",
-            SyntaxKind::StringContent => "StringContent",
-            SyntaxKind::Number => "Number",
+            SyntaxKind::ParamName => "ParamName",
+            SyntaxKind::VarArgName => "VarArgName",
             SyntaxKind::LongFlag => "LongFlag",
             SyntaxKind::ShortFlag => "ShortFlag",
+            SyntaxKind::Number => "Number",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::LetStmt => "LetStmt",
             SyntaxKind::FnStmt => "FnStmt",
@@ -204,6 +215,9 @@ impl SyntaxKind{
             SyntaxKind::PipedCmdsStmt => "PipedCmdsStmt",
             SyntaxKind::BlockStmt => "BlockStmt",
             SyntaxKind::Signature => "Signature",
+            SyntaxKind::FlagSignature => "FlagSignature",
+            SyntaxKind::ParamSignature => "ParamSignature",
+            SyntaxKind::VarArgParamSignatureRule => "VarArgParamSignatureRule",
             SyntaxKind::LuType => "LuType",
             SyntaxKind::MathExpr => "MathExpr",
             SyntaxKind::StringExpr => "StringExpr",
@@ -260,6 +274,8 @@ macro_rules! T {
     [$] => {$crate::SyntaxKind::Dollar };
     [?] => {$crate::SyntaxKind::QuestionMark };
     [.] => {$crate::SyntaxKind::Point };
+    [:] => {$crate::SyntaxKind::DoublePoint };
     [DoubleQuote] => {$crate::SyntaxKind::DoubleQuote };
     [SingleQuote] => {$crate::SyntaxKind::SingleQuote };
+    [...[_a-zA-Z]+[_a-zA-Z0-9]*] => {$crate::SyntaxKind::VarArgName };
     }

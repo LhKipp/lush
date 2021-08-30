@@ -350,11 +350,11 @@ impl HasRule for ArrayTypeNode{
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct OptTypeMarkerToken {
+pub struct OptModifierToken {
     pub(crate) syntax: SyntaxToken,
 }
-impl AstToken for OptTypeMarkerToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptTypeMarker }
+impl AstToken for OptModifierToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptModifier }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -364,7 +364,7 @@ impl AstToken for OptTypeMarkerToken {
     }
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for OptTypeMarkerToken{
+impl HasSyntaxKind for OptModifierToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
@@ -833,6 +833,27 @@ impl HasSyntaxKind for PointToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DoublePointToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for DoublePointToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::DoublePoint }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for DoublePointToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DoubleQuoteToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1043,6 +1064,27 @@ impl HasSyntaxKind for BareWordToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct StringContentToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for StringContentToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StringContent }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for StringContentToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VarDeclNameToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1085,11 +1127,11 @@ impl HasSyntaxKind for FnDeclNameToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct StringContentToken {
+pub struct ParamNameToken {
     pub(crate) syntax: SyntaxToken,
 }
-impl AstToken for StringContentToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StringContent }
+impl AstToken for ParamNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParamName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1099,18 +1141,18 @@ impl AstToken for StringContentToken {
     }
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for StringContentToken{
+impl HasSyntaxKind for ParamNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct NumberToken {
+pub struct VarArgNameToken {
     pub(crate) syntax: SyntaxToken,
 }
-impl AstToken for NumberToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Number }
+impl AstToken for VarArgNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::VarArgName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1120,7 +1162,7 @@ impl AstToken for NumberToken {
     }
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for NumberToken{
+impl HasSyntaxKind for VarArgNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
@@ -1163,6 +1205,27 @@ impl AstToken for ShortFlagToken {
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
 impl HasSyntaxKind for ShortFlagToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NumberToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for NumberToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Number }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for NumberToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
@@ -1476,6 +1539,69 @@ impl HasRule for SignatureNode{
         Box::new(SignatureRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FlagSignatureNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for FlagSignatureNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FlagSignature }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for FlagSignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ParamSignatureNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for ParamSignatureNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParamSignature }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for ParamSignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VarArgParamSignatureRuleNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for VarArgParamSignatureRuleNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::VarArgParamSignatureRule }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for VarArgParamSignatureRuleNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LuTypeNode {
     pub(crate) syntax: SyntaxNode,
