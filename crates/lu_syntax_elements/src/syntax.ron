@@ -11,6 +11,15 @@ Config(
     ( name: "EndKeyword"               , token_text: "end"                            , is_token: true  , ), 
     ( name: "BeginKeyword"             , token_text: "begin"                          , is_token: true  , ), 
     ( name: "InKeyword"                , token_text: "in"                             , is_token: true  , ), 
+    ( name: "AnyKeyword"           , token_text: "any"  , is_token: true , ) ,
+    ( name: "NilKeyword"           , token_text: "nil"  , is_token: true , ) ,
+    ( name: "BoolKeyword"          , token_text: "bool" , is_token: true , ) ,
+    ( name: "NumberKeyword"        , token_text: "num"  , is_token: true , ) ,
+    ( name: "StringKeyword"        , token_text: "str"  , is_token: true , ) ,
+
+    // === TYPES ===
+    ( name: "ArrayType"                , is_node: true                                , has_rule: true )               , 
+    ( name: "OptTypeMarker"            , is_token: true                                , )               , 
     // === PUNCTUATION === 
     ( name: "LeftParenthesis"          , token_text: "("                              , is_token: true  , ), 
     ( name: "RightParenthesis"         , token_text: ")"                              , is_token: true  , ), 
@@ -32,6 +41,7 @@ Config(
     ( name: "RightStream"              , token_text: ">>"                             , is_token: true  , ), 
     ( name: "Pipe"                     , token_text: "|"                              , is_token: true  , ), 
     ( name: "Dollar"                   , token_text: "$"                              , is_token: true  , ), 
+    ( name: "QuestionMark"                   , token_text: "?"                              , is_token: true  , ), 
     ( name: "Point"                    , token_text: "."                              , is_token: true  , ), 
     ( name: "DoubleQuote"              , token_text: "\\\""                           , is_token: true  , ), 
     ( name: "SingleQuote"              , token_text: "\'"                             , is_token: true  , ), 
@@ -52,6 +62,8 @@ Config(
 
     ( name: "StringContent"            , is_token: true                               , )               , 
     ( name: "Number"                   , regex: "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , is_token: true  , ), 
+    ( name: "LongFlag"                 , regex: "--[_a-zA-Z]+[_a-zA-Z0-9]*"           , is_token: true  , ), 
+    ( name: "ShortFlag"                , regex: "-[_a-zA-Z]+[_a-zA-Z0-9]*"           , is_token: true  , ), 
 
     // === RULES ===
     ( name: "SourceFile"               , is_node: true                                , has_rule: true  , ), 
@@ -67,6 +79,7 @@ Config(
     // TODO block stmt can have rule , but is not ctorable by {}) , 
     ( name: "BlockStmt"                , is_node: true                                , has_rule: false , ),
     ( name: "Signature"                , is_node: true                                , has_rule: true  , ), 
+    ( name: "LuType"                   , is_node: true                                , has_rule: true  , ), 
     // === EXPRESSION RULES ===
     ( name: "MathExpr"                 , is_node: true                                , )               , 
     ( name: "StringExpr"               , is_node: true                                , has_rule: true  , ), 

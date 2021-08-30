@@ -26,6 +26,18 @@ pub enum SyntaxKind {
     BeginKeyword,
     #[token("in")]
     InKeyword,
+    #[token("any")]
+    AnyKeyword,
+    #[token("nil")]
+    NilKeyword,
+    #[token("bool")]
+    BoolKeyword,
+    #[token("num")]
+    NumberKeyword,
+    #[token("str")]
+    StringKeyword,
+    ArrayType,
+    OptTypeMarker,
     #[token("(")]
     LeftParenthesis,
     #[token(")")]
@@ -66,6 +78,8 @@ pub enum SyntaxKind {
     Pipe,
     #[token("$")]
     Dollar,
+    #[token("?")]
+    QuestionMark,
     #[token(".")]
     Point,
     #[token("\"")]
@@ -75,21 +89,26 @@ pub enum SyntaxKind {
     #[error]
     Error,
     ParserInternal,
-    #[regex("[_a-zA-Z]+[_a-zA-Z0-9]*", priority = 0)]
-    BareWord,
+    Eof,
+    Tombstone,
     #[regex("[ ]+")]
     Whitespace,
     #[regex("#.*\n")]
     Comment,
     #[regex("\n")]
     Newline,
-    #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
-    Number,
+    #[regex("[_a-zA-Z]+[_a-zA-Z0-9]*", priority = 0)]
+    BareWord,
     VarDeclName,
     FnDeclName,
-    Eof,
+    StringContent,
+    #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
+    Number,
+    #[regex("--[_a-zA-Z]+[_a-zA-Z0-9]*")]
+    LongFlag,
+    #[regex("-[_a-zA-Z]+[_a-zA-Z0-9]*")]
+    ShortFlag,
     SourceFile,
-    Tombstone,
     LetStmt,
     FnStmt,
     IfStmt,
@@ -101,10 +120,10 @@ pub enum SyntaxKind {
     PipedCmdsStmt,
     BlockStmt,
     Signature,
+    LuType,
     MathExpr,
     StringExpr,
     NumberExpr,
-    StringContent,
     ValuePathExpr,
     ArrayExpr,
     TableExpr,
@@ -128,6 +147,13 @@ impl SyntaxKind{
             SyntaxKind::EndKeyword => "EndKeyword",
             SyntaxKind::BeginKeyword => "BeginKeyword",
             SyntaxKind::InKeyword => "InKeyword",
+            SyntaxKind::AnyKeyword => "AnyKeyword",
+            SyntaxKind::NilKeyword => "NilKeyword",
+            SyntaxKind::BoolKeyword => "BoolKeyword",
+            SyntaxKind::NumberKeyword => "NumberKeyword",
+            SyntaxKind::StringKeyword => "StringKeyword",
+            SyntaxKind::ArrayType => "ArrayType",
+            SyntaxKind::OptTypeMarker => "OptTypeMarker",
             SyntaxKind::LeftParenthesis => "LeftParenthesis",
             SyntaxKind::RightParenthesis => "RightParenthesis",
             SyntaxKind::LeftCurlyBrackets => "LeftCurlyBrackets",
@@ -148,21 +174,25 @@ impl SyntaxKind{
             SyntaxKind::RightStream => "RightStream",
             SyntaxKind::Pipe => "Pipe",
             SyntaxKind::Dollar => "Dollar",
+            SyntaxKind::QuestionMark => "QuestionMark",
             SyntaxKind::Point => "Point",
             SyntaxKind::DoubleQuote => "DoubleQuote",
             SyntaxKind::SingleQuote => "SingleQuote",
             SyntaxKind::Error => "Error",
             SyntaxKind::ParserInternal => "ParserInternal",
-            SyntaxKind::BareWord => "BareWord",
+            SyntaxKind::Eof => "Eof",
+            SyntaxKind::Tombstone => "Tombstone",
             SyntaxKind::Whitespace => "Whitespace",
             SyntaxKind::Comment => "Comment",
             SyntaxKind::Newline => "Newline",
-            SyntaxKind::Number => "Number",
+            SyntaxKind::BareWord => "BareWord",
             SyntaxKind::VarDeclName => "VarDeclName",
             SyntaxKind::FnDeclName => "FnDeclName",
-            SyntaxKind::Eof => "Eof",
+            SyntaxKind::StringContent => "StringContent",
+            SyntaxKind::Number => "Number",
+            SyntaxKind::LongFlag => "LongFlag",
+            SyntaxKind::ShortFlag => "ShortFlag",
             SyntaxKind::SourceFile => "SourceFile",
-            SyntaxKind::Tombstone => "Tombstone",
             SyntaxKind::LetStmt => "LetStmt",
             SyntaxKind::FnStmt => "FnStmt",
             SyntaxKind::IfStmt => "IfStmt",
@@ -174,10 +204,10 @@ impl SyntaxKind{
             SyntaxKind::PipedCmdsStmt => "PipedCmdsStmt",
             SyntaxKind::BlockStmt => "BlockStmt",
             SyntaxKind::Signature => "Signature",
+            SyntaxKind::LuType => "LuType",
             SyntaxKind::MathExpr => "MathExpr",
             SyntaxKind::StringExpr => "StringExpr",
             SyntaxKind::NumberExpr => "NumberExpr",
-            SyntaxKind::StringContent => "StringContent",
             SyntaxKind::ValuePathExpr => "ValuePathExpr",
             SyntaxKind::ArrayExpr => "ArrayExpr",
             SyntaxKind::TableExpr => "TableExpr",
@@ -203,6 +233,11 @@ macro_rules! T {
     [end] => {$crate::SyntaxKind::EndKeyword };
     [begin] => {$crate::SyntaxKind::BeginKeyword };
     [in] => {$crate::SyntaxKind::InKeyword };
+    [any] => {$crate::SyntaxKind::AnyKeyword };
+    [nil] => {$crate::SyntaxKind::NilKeyword };
+    [bool] => {$crate::SyntaxKind::BoolKeyword };
+    [num] => {$crate::SyntaxKind::NumberKeyword };
+    [str] => {$crate::SyntaxKind::StringKeyword };
     ["("] => {$crate::SyntaxKind::LeftParenthesis };
     [")"] => {$crate::SyntaxKind::RightParenthesis };
     ["{"] => {$crate::SyntaxKind::LeftCurlyBrackets };
@@ -223,6 +258,7 @@ macro_rules! T {
     [>>] => {$crate::SyntaxKind::RightStream };
     [|] => {$crate::SyntaxKind::Pipe };
     [$] => {$crate::SyntaxKind::Dollar };
+    [?] => {$crate::SyntaxKind::QuestionMark };
     [.] => {$crate::SyntaxKind::Point };
     [DoubleQuote] => {$crate::SyntaxKind::DoubleQuote };
     [SingleQuote] => {$crate::SyntaxKind::SingleQuote };

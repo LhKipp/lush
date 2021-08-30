@@ -38,6 +38,7 @@ mod if_stmt;
 mod let_stmt;
 mod piped_cmds_stmt;
 mod signature;
+mod type_;
 mod value_path_expr;
 
 use itertools::Itertools;
@@ -60,6 +61,7 @@ pub use if_stmt::IfStmtRule;
 pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use signature::SignatureRule;
+pub use type_::{ArrayTypeRule, LuTypeRule};
 pub use value_path_expr::ValuePathExprRule;
 
 pub trait Rule {
@@ -106,9 +108,8 @@ impl Rule for SyntaxKind {
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        let m = p.start();
         p.expect(*self);
-        Some(m.complete(p, *self))
+        None
     }
 }
 
