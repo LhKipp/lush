@@ -20,7 +20,7 @@ pub enum EvalErr {
 
     SpawningExternalProcessFailed(SourceCodeItem, String),
     ExternalCmdStdinWriteErr(SourceCodeItem, String),
-    ReadingStdoutFromCmdFailed(SourceCodeItem, String),
+    ExternalCmdStdoutReadErr(SourceCodeItem, String),
     ExternalCmdFailed(SourceCodeItem),
 }
 
@@ -59,7 +59,7 @@ impl EvalErr {
             EvalErr::ExternalCmdStdinWriteErr(cond, _) => Diagnostic::error()
                 .with_code("E00006")
                 .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
-            EvalErr::ReadingStdoutFromCmdFailed(cond, _) => Diagnostic::error()
+            EvalErr::ExternalCmdStdoutReadErr(cond, _) => Diagnostic::error()
                 .with_code("E00007")
                 .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
             EvalErr::ExternalCmdFailed(cond) => Diagnostic::error()

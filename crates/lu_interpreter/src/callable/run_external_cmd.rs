@@ -48,7 +48,7 @@ impl Command for RunExternalCmd {
         }
 
         let output = child.wait_with_output().map_err(|e| {
-            EvalErr::ReadingStdoutFromCmdFailed(self.cmd_node.into_item(), format!("{:?}", e))
+            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.into_item(), format!("{:?}", e))
         })?;
 
         if output.status.success() {
