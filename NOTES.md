@@ -7,8 +7,72 @@ TableRow: like lua table.
     origin = "world"
 }
 
-Table: Array of TableRow
-All TableRows within a table must be of the same type
+Table: Array of Object
+
+## Typing
+let x : <Type> = val
+<Type> can be ommited and will be infered in that case
+
+let x : [str] = ["hello" "world"]
+fn <modifiers> name '<' generics '>' <InType> -> Signature -> <RetType>
+
+fn decl: fn'<' <InType> -> Signature -> <RetType> '>'
+
+end
+
+fn map<T,U> [T] -> (fn<(T)->U>) -> [U]
+end
+
+fn map [T] -> (mapper) -> [mapper T]
+fn accumulate [T] -> (acc_fn) -> acc_fn T T
+
+
+fn map [] -> (mapper) -> []
+
+end
+
+
+fn can_fail (line: num) -> str | nil
+    let file_content = read /home/user/.my_config.txt | split "\n"
+    if $file_content.len < $line
+        return nil
+    else
+        return file_content[$line]
+end
+
+1 + $size ==> 
+fn (arg) -> num
+    1 + $arg.size
+
+
+Select is to havy to type with generics. Instead we will fallback to a custom type func
+fn select<T> [{$args : any, ..}] -> (...args: string) -> [{$args}]
+
+
+fn git branch (arg: string
+    --list: [string] -> [string] # list will list all branches
+    --delete: string -> nil # deletes the branch with name $arg
+on --list
+
+signature git_branch_generic_opts = (
+    --verbose
+    --help
+    --track -t
+)
+
+fn git branch --list -l (
+    ...patterns: string
+) -> [string]
+
+fn git branch --delete -D (
+    ...branches: string
+    $git_branch_generic_opts
+) -> nil
+
+end
+
+
+
 ## Pipeline
 lexer | parser | func_call_resolution | math_expr_to_fn_transformation | evaluation
 ## Closures
