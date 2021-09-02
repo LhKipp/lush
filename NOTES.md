@@ -1,7 +1,7 @@
 ## DataTypes
 Typical ones: Nil, Bool, Number, String, BareWord, Array, Function,
 
-TableRow: like lua table.
+Object: like lua table.
 {
     name = "hello"
     origin = "world"
