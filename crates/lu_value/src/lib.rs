@@ -3,9 +3,6 @@ use std::{any::Any, fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
-mod value_type;
-pub use value_type::ValueType;
-
 pub const NIL_VAL: Value = Value::Nil;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

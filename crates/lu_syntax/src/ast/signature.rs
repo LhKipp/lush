@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
-use lu_value::ValueType;
-
 use crate::{ArgSignature, AstNode, AstToken, FlagSignature, Signature, VarArgSignature};
 
 use super::{

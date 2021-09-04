@@ -4,6 +4,9 @@ use std::fmt::Debug;
 
 mod block_stmt;
 mod source_file;
+mod value_type;
+
+pub use value_type::ValueType;
 
 pub struct TypeChecker {
     pub errors: Vec<LuErr>,
