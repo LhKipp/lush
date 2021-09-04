@@ -35,13 +35,10 @@ impl Evaluable for ForStmtNode {
                     // We entered the for loop. We need to push a new scope and set the vars
                     {
                         let mut scope = state.scope.lock();
-                        scope
-                            .push_frame(ScopeFrameTag::ForStmtFrame)
-                            .1
-                            .insert_var(Variable::new(
-                                var_names[0].clone(),
-                                Value::String(char.to_string()),
-                            ));
+                        scope.push_frame(ScopeFrameTag::ForStmtFrame).1.insert(
+                            var_names[0].clone(),
+                            Variable::new(var_names[0].clone(), Value::String(char.to_string())),
+                        );
                     }
                     block.evaluate(state)?;
                     {

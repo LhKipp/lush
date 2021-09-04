@@ -131,6 +131,17 @@ Config(
             "BiggerOrEqualSign",
             "AssignSign",
             "RightStream",
-        ],)
+        ],),
+    (name: "LuTypeSpecifier", is_generic: true,
+        represents_element_names: [
+            "NumberKeyword",
+            "AnyKeyword",
+            "NilKeyword",
+            "BoolKeyword",
+            "StringKeyword",
+            "FnKeyword",
+            "ArrayType",
+            "BareWord"
+        ],),
     ]
 )

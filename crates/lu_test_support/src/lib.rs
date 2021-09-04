@@ -22,7 +22,10 @@ pub fn make_test_interpreter() -> Interpreter {
         let (_, frame) = l_scope.push_frame(ScopeFrameTag::GlobalFrame);
         for cmd in cmds {
             let cmd: Callable = cmd.into();
-            frame.insert_var(Variable::new(cmd.name().to_string(), Value::new_func(cmd)))
+            frame.insert(
+                cmd.name().to_string(),
+                Variable::new(cmd.name().to_string(), Value::new_func(cmd)),
+            )
         }
     }
 

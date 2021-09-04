@@ -37,10 +37,10 @@ fn lu_type_specifier() -> OrRule {
             AnyKeyword,
             NilKeyword,
             BoolKeyword,
-            NumberKeyword,
             StringKeyword,
             FnKeyword,
             ArrayTypeRule {},
+            BareWord,
         ],
     }
 }
@@ -59,8 +59,10 @@ impl Rule for LuTypeRule {
         let m = p.start();
 
         p.eat_while(CMT_NL_WS);
+        // p.expect_after_as(BareWord, LuTypeName, CMT_NL_WS);
         lu_type_specifier().parse(p);
-        p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
+        // TODO make option type special in the language?
+        // p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
         Some(m.complete(p, LuType))
     }
 }

@@ -1,12 +1,10 @@
 mod command;
 mod function;
 mod run_external_cmd;
-mod signature;
 
 pub use command::{Command, ARGS_VAR_NAME, IN_VAR_NAME};
 pub use function::Function;
 pub use run_external_cmd::RunExternalCmd;
-pub use signature::{ArgModifier, ArgSignature, FlagModifier, FlagSignature, Signature};
 
 use crate::EvalArg;
 

@@ -12,12 +12,12 @@ use lu_value::Value;
 use parking_lot::Mutex;
 use std::{path::PathBuf, sync::Arc};
 
-use crate::{Evaluable, Scope};
+use crate::{Evaluable, Scope, Variable};
 
 /// The interpreter holds data, getting transformed while interpreting the ast.
 /// The interpreter struct is merely here for having a nice frontend to the interpreter crate
 pub struct Interpreter {
-    pub scope: Arc<Mutex<Scope>>,
+    pub scope: Arc<Mutex<Scope<Variable>>>,
 }
 
 impl Interpreter {

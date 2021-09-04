@@ -17,16 +17,17 @@ impl Command for TestPrintCmd {
         let args = self.expect_args(&l_scope).clone();
         let global_f = l_scope.global_mut_frame();
 
-        if let Some(test_print_vars) = global_f.get_mut_var("t_printed") {
+        let var = "t_printed".to_string();
+        if let Some(test_print_vars) = global_f.get_mut(&var) {
             let vals = test_print_vars.val.expect_array();
             let len = args.len();
             vals.extend((0..len).map(move |i| args[i].clone()))
         } else {
             debug!("Inserted t_printed");
-            global_f.insert_var(Variable::new(
-                "t_printed".to_string(),
-                Value::Array(args.clone()),
-            ));
+            global_f.insert(
+                var.clone(),
+                Variable::new(var.clone(), Value::Array(args.clone())),
+            );
         }
         Ok(Value::Nil)
     }

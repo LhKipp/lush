@@ -2,7 +2,7 @@ use lu_error::LuResult;
 use lu_syntax::ast::FnStmtNode;
 use lu_value::Value;
 
-use crate::{Callable, EvalArg, Evaluable, Function, Interpreter, Signature, Variable};
+use crate::{Callable, EvalArg, Evaluable, Function, Interpreter, Variable};
 
 impl Evaluable for FnStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
@@ -14,14 +14,14 @@ impl Evaluable for FnStmtNode {
         //     .map(|sig_n| sig_n.into())
         //     .or(Signature::new());
         // TODO create right signature from function
-        let sign = Signature::default();
+        // let sign = Signature::default();
         let frame_id = l_scope.get_cur_frame_id();
 
-        let func = Function::new(name.clone(), sign, self.clone(), frame_id);
+        let func = Function::new(name.clone(), self.clone(), frame_id);
         let func: Callable = func.into();
         l_scope
             .cur_mut_frame()
-            .insert_var(Variable::new(name, Value::new_func(func)));
+            .insert(name.clone(), Variable::new(name, Value::new_func(func)));
 
         Ok(Value::Nil)
     }

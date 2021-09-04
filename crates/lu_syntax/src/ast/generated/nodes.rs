@@ -2158,3 +2158,102 @@ impl HasSyntaxKind for OperatorExprElement{
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LuTypeSpecifierElement {
+    NumberKeyword(NumberKeywordToken),
+    AnyKeyword(AnyKeywordToken),
+    NilKeyword(NilKeywordToken),
+    BoolKeyword(BoolKeywordToken),
+    StringKeyword(StringKeywordToken),
+    FnKeyword(FnKeywordToken),
+    ArrayType(ArrayTypeNode),
+    BareWord(BareWordToken),
+    }
+
+impl LuTypeSpecifierElement {
+}
+
+impl AstElement for LuTypeSpecifierElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        match kind{
+            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | FnKeyword | ArrayType | BareWord => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        let res = match syntax.kind() {
+            NumberKeyword => LuTypeSpecifierElement::NumberKeyword(NumberKeywordToken { syntax: syntax.into_token().unwrap() }),
+            AnyKeyword => LuTypeSpecifierElement::AnyKeyword(AnyKeywordToken { syntax: syntax.into_token().unwrap() }),
+            NilKeyword => LuTypeSpecifierElement::NilKeyword(NilKeywordToken { syntax: syntax.into_token().unwrap() }),
+            BoolKeyword => LuTypeSpecifierElement::BoolKeyword(BoolKeywordToken { syntax: syntax.into_token().unwrap() }),
+            StringKeyword => LuTypeSpecifierElement::StringKeyword(StringKeywordToken { syntax: syntax.into_token().unwrap() }),
+            FnKeyword => LuTypeSpecifierElement::FnKeyword(FnKeywordToken { syntax: syntax.into_token().unwrap() }),
+            ArrayType => LuTypeSpecifierElement::ArrayType(ArrayTypeNode { syntax: syntax.into_node().unwrap() }),
+            BareWord => LuTypeSpecifierElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            LuTypeSpecifierElement::NumberKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::AnyKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::NilKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::BoolKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::StringKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::FnKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::ArrayType(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::BareWord(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for LuTypeSpecifierElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            LuTypeSpecifierElement::NumberKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::AnyKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::NilKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::BoolKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::StringKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::FnKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::ArrayType(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::BareWord(it) => it.get_syntax_kind(),
+            }
+    }
+}
+

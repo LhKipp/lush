@@ -12,7 +12,7 @@ impl Evaluable for PipedCmdsStmtNode {
                 .scope
                 .lock()
                 .cur_mut_frame()
-                .insert_var(Variable::new_in(previous_val));
+                .insert("in".to_string(), Variable::new_in(previous_val));
             previous_val = cmd.evaluate(state)?
         }
 

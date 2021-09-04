@@ -1,5 +1,9 @@
+#[macro_use]
+extern crate derive_new;
+
 pub mod ast;
 mod build_tree;
+mod signature;
 mod syntax_node;
 
 use build_tree::TreeBuilder;
@@ -7,6 +11,9 @@ use lu_error::{LuErr, LuResult, ParseErr, ParseErrs};
 
 use lu_parser::grammar::{Rule, SourceFileRule};
 
+pub use signature::{
+    ArgModifier, ArgSignature, FlagModifier, FlagSignature, Signature, VarArgSignature,
+};
 pub use syntax_node::{
     SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
 };

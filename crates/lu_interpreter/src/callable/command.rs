@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::rc::Rc;
 
-use crate::{EvalArg, Interpreter, Scope};
+use crate::{EvalArg, Interpreter, Scope, Variable};
 
 use log::debug;
 use lu_error::LuResult;
@@ -31,7 +31,7 @@ pub trait Command: CommandClone + Debug {
     fn name(&self) -> &str;
 
     /// Returns $args
-    fn expect_args<'a>(&self, scope: &'a Scope) -> &'a Rc<Vec<Value>> {
+    fn expect_args<'a>(&self, scope: &'a Scope<Variable>) -> &'a Rc<Vec<Value>> {
         match &scope.find_var(ARGS_VAR_NAME).expect("Always present").val {
             Value::Array(v) => &v,
             _ => unreachable!("Args are always an array"),
@@ -39,7 +39,7 @@ pub trait Command: CommandClone + Debug {
     }
 
     /// Returns $in
-    fn expect_in<'a>(&self, scope: &'a Scope) -> &'a Value {
+    fn expect_in<'a>(&self, scope: &'a Scope<Variable>) -> &'a Value {
         &scope
             .find_var(IN_VAR_NAME)
             .map(|var| &var.val)

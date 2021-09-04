@@ -1,0 +1,66 @@
+Single arg
+===
+( arg1 )
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ParamSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ParamName (len: 4)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Multiple Args
+===
+(arg1 arg2 arg3)
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ParamSignature
+- Token: "ParamName (len: 4)"
+- Finish: ""
+- Start: ParamSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ParamName (len: 4)"
+- Finish: ""
+- Start: ParamSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ParamName (len: 4)"
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Long and shortflag
+===
+( --long_flag -l)
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "Whitespace (len: 1)"
+- Token: "LongFlag (len: 11)"
+- Token: "Whitespace (len: 1)"
+- Token: "ShortFlag (len: 2)"
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Arg with type
+===
+(arg1: num)
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ParamSignature
+- Token: "ParamName (len: 4)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "NumberKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...

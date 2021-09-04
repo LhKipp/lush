@@ -1,13 +1,14 @@
 #![allow(dead_code)]
 use crate::scope::ScopeFrameId;
-use crate::{Command, Evaluable, Signature, Variable};
+use crate::{Command, Evaluable, Variable};
 use lu_syntax::ast::FnStmtNode;
 use lu_value::Value;
 
 #[derive(Clone, Debug)]
 pub struct Function {
     pub name: String,
-    pub signature: Signature,
+    // TODO check whether signature here, or ptr to type checkers resolved t
+    // pub signature: Signature,
     pub fn_node: FnStmtNode,
     pub parent_frame_id: ScopeFrameId,
     // For closures only
@@ -17,13 +18,13 @@ pub struct Function {
 impl Function {
     pub fn new(
         name: String,
-        signature: Signature,
+        // signature: Signature,
         fn_node: FnStmtNode,
         parent_frame_id: ScopeFrameId,
     ) -> Self {
         Self {
             name,
-            signature,
+            // signature,
             parent_frame_id,
             fn_node,
             captured_vars: Vec::new(),

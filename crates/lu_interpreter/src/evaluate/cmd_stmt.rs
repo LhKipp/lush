@@ -37,11 +37,10 @@ impl Evaluable for CmdStmtNode {
             args.push(arg.evaluate(state)?);
         }
 
-        state
-            .scope
-            .lock()
-            .cur_mut_frame()
-            .insert_var(Variable::new("args".to_string(), Value::new_array(args)));
+        state.scope.lock().cur_mut_frame().insert(
+            "args".to_string(),
+            Variable::new("args".to_string(), Value::new_array(args)),
+        );
 
         cmd.run(state)
     }

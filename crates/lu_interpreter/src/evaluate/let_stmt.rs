@@ -15,7 +15,7 @@ impl Evaluable for LetStmtNode {
             .scope
             .lock()
             .cur_mut_frame()
-            .insert_var(Variable::new(var_name, val));
+            .insert(var_name.to_string(), Variable::new(var_name, val));
 
         Ok(Value::Nil)
     }

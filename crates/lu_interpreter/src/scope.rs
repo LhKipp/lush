@@ -9,10 +9,11 @@ pub use indextree::NodeId as ScopeFrameId;
 use crate::{Callable, Command, Variable};
 
 pub trait ScopeFrame {
+    type Elem;
     fn get_tag(&self) -> ScopeFrameTag;
-    fn get_var(&self, name: &str) -> Option<&Variable>;
-    fn get_mut_var(&mut self, name: &str) -> Option<&mut Variable>;
-    fn insert_var(&mut self, var: Variable);
+    fn get(&self, name: &str) -> Option<&Self::Elem>;
+    fn get_mut(&mut self, name: &str) -> Option<&mut Self::Elem>;
+    fn insert(&mut self, key: String, var: Self::Elem);
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -26,12 +27,12 @@ pub enum ScopeFrameTag {
 }
 
 /// The default scope frame being put on the scope stack, when entering a new scope
-pub struct SimpleScopeFrame {
+pub struct SimpleScopeFrame<Elem> {
     pub tag: ScopeFrameTag,
-    pub vars: HashMap<String, Variable>,
+    pub vars: HashMap<String, Elem>,
 }
 
-impl SimpleScopeFrame {
+impl<Elem> SimpleScopeFrame<Elem> {
     pub fn new(tag: ScopeFrameTag) -> Self {
         Self {
             tag,
@@ -40,34 +41,35 @@ impl SimpleScopeFrame {
     }
 }
 
-impl ScopeFrame for SimpleScopeFrame {
+impl<Elem> ScopeFrame for SimpleScopeFrame<Elem> {
+    type Elem = Elem;
     fn get_tag(&self) -> ScopeFrameTag {
         self.tag
     }
 
-    fn get_var(&self, name: &str) -> Option<&Variable> {
+    fn get(&self, name: &str) -> Option<&Elem> {
         self.vars.get(name)
     }
 
-    fn get_mut_var(&mut self, name: &str) -> Option<&mut Variable> {
+    fn get_mut(&mut self, name: &str) -> Option<&mut Elem> {
         self.vars.get_mut(name)
     }
 
-    fn insert_var(&mut self, var: Variable) {
-        self.vars.insert(var.name.clone(), var);
+    fn insert(&mut self, key: String, var: Elem) {
+        self.vars.insert(key, var);
     }
 }
 
-pub struct Scope {
-    pub arena: Arena<Box<dyn ScopeFrame>>,
+pub struct Scope<OfT> {
+    pub arena: Arena<Box<dyn ScopeFrame<Elem = OfT>>>,
     /// Always a valid id
     cur_frame_id: Option<NodeId>,
 }
 
-impl Scope {
+impl<OfT: 'static> Scope<OfT> {
     pub fn new() -> Self {
         Scope {
-            arena: Arena::<Box<dyn ScopeFrame>>::new(),
+            arena: Arena::<Box<dyn ScopeFrame<Elem = OfT>>>::new(),
             cur_frame_id: None,
         }
     }
@@ -82,7 +84,7 @@ impl Scope {
         self.cur_frame_id = Some(id);
     }
 
-    pub fn cur_frame(&self) -> &dyn ScopeFrame {
+    pub fn cur_frame(&self) -> &dyn ScopeFrame<Elem = OfT> {
         self.arena
             .get(self.cur_frame_id.expect("Scope is empty"))
             .unwrap()
@@ -90,7 +92,7 @@ impl Scope {
             .as_ref()
     }
 
-    pub fn cur_mut_frame(&mut self) -> &mut dyn ScopeFrame {
+    pub fn cur_mut_frame(&mut self) -> &mut dyn ScopeFrame<Elem = OfT> {
         self.arena
             .get_mut(self.cur_frame_id.expect("Scope is empty"))
             .unwrap()
@@ -98,7 +100,7 @@ impl Scope {
             .as_mut()
     }
 
-    pub fn global_mut_frame(&mut self) -> &mut dyn ScopeFrame {
+    pub fn global_mut_frame(&mut self) -> &mut dyn ScopeFrame<Elem = OfT> {
         let ancestors: Vec<NodeId> = self
             .cur_frame_id
             .expect("Scope is empty")
@@ -109,27 +111,10 @@ impl Scope {
         global_frame.get_mut().as_mut()
     }
 
-    pub fn find_var(&self, name: &str) -> Option<&Variable> {
-        debug!("Finding var {} from {:?} on", name, self.get_cur_tag());
-        if let Some(cur_frame_id) = self.cur_frame_id {
-            cur_frame_id
-                .ancestors(&self.arena)
-                .map(|n_id| {
-                    self.arena
-                        .get(n_id)
-                        .expect("Current_id should always have at least 1 ancestor")
-                        .get()
-                })
-                .flat_map(|frame| frame.get_var(name))
-                .next()
-                .tap(|result| debug!("Found var: {:?}", result))
-        } else {
-            debug!("Tried to get_var, but scope is empty");
-            None
-        }
-    }
-
-    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut dyn ScopeFrame) {
+    pub fn push_frame(
+        &mut self,
+        tag: ScopeFrameTag,
+    ) -> (ScopeFrameId, &mut dyn ScopeFrame<Elem = OfT>) {
         debug!("Pushing frame: {:?}", tag);
         let prev_frame_id = self.cur_frame_id;
         let new_frame_id = self.arena.new_node(Box::new(SimpleScopeFrame::new(tag)));
@@ -166,6 +151,28 @@ impl Scope {
             cur_frame.get().get_tag()
         } else {
             ScopeFrameTag::None
+        }
+    }
+}
+
+impl Scope<Variable> {
+    pub fn find_var(&self, name: &str) -> Option<&Variable> {
+        debug!("Finding var {} from {:?} on", name, self.get_cur_tag());
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            cur_frame_id
+                .ancestors(&self.arena)
+                .map(|n_id| {
+                    self.arena
+                        .get(n_id)
+                        .expect("Current_id should always have at least 1 ancestor")
+                        .get()
+                })
+                .flat_map(|frame| frame.get(name))
+                .next()
+                .tap(|result| debug!("Found var: {:?}", result))
+        } else {
+            debug!("Tried to get_var, but scope is empty");
+            None
         }
     }
 

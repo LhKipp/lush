@@ -20,3 +20,4 @@ https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjuqou4
 
 
 https://github.com/Heliozoa/impl-enum
+https://crates.io/crates/goldentests
