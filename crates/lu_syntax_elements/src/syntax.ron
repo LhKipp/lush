@@ -16,6 +16,7 @@ Config(
     ( name: "BoolKeyword"                , token_text: "bool"                           , is_token: true   , ) ,
     ( name: "NumberKeyword"              , token_text: "num"                            , is_token: true   , ) ,
     ( name: "StringKeyword"              , token_text: "str"                            , is_token: true   , ) ,
+    ( name: "RetKeyword"              , token_text: "ret"                            , is_token: true   , ) ,
 
     // === TYPES ===
     ( name: "ArrayType"                  , is_node: true                                , has_rule: true ) ,
@@ -86,6 +87,8 @@ Config(
     ( name: "Signature"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "FlagSignature"              , is_node: true                                , has_rule: false  , ) ,
     ( name: "ParamSignature"             , is_node: true                                , has_rule: false  , ) ,
+    ( name: "InSignature"             , is_node: true                                , has_rule: false  , ) ,
+    ( name: "RetSignature"             , is_node: true                                , has_rule: false  , ) ,
     ( name: "VarArgParamSignatureRule"   , is_node: true                                , has_rule: false  , ) ,
     ( name: "LuType"                     , is_node: true                                , has_rule: true   , ) ,
     // === EXPRESSION RULES ===

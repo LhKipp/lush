@@ -26,7 +26,7 @@ impl Command for TestPrintCmd {
             debug!("Inserted t_printed");
             global_f.insert(
                 var.clone(),
-                Variable::new(var.clone(), Value::Array(args.clone())),
+                Variable::new(var.clone(), Value::Array(args.clone()), None),
             );
         }
         Ok(Value::Nil)

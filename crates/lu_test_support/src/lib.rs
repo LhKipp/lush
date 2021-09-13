@@ -24,7 +24,7 @@ pub fn make_test_interpreter() -> Interpreter {
             let cmd: Callable = cmd.into();
             frame.insert(
                 cmd.name().to_string(),
-                Variable::new(cmd.name().to_string(), Value::new_func(cmd)),
+                Variable::new(cmd.name().to_string(), Value::new_func(cmd), None),
             )
         }
     }

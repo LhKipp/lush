@@ -26,6 +26,8 @@ use lu_value::{Value, NIL_VAL};
 
 pub const IN_VAR_NAME: &str = "in";
 pub const ARGS_VAR_NAME: &str = "args";
+/// Default arg names are arg0 arg1 ...
+pub const ARG_VAR_NAME: &str = "arg";
 
 pub trait Command: CommandClone + Debug {
     fn name(&self) -> &str;

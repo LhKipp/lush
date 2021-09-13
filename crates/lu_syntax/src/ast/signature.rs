@@ -1,74 +1,88 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
-use crate::{ArgSignature, AstNode, AstToken, FlagSignature, Signature, VarArgSignature};
+use crate::{AstNode, AstNodeChildren, AstToken};
 
 use super::{
-    support, FlagSignatureNode, LongFlagToken, LuTypeNode, OptModifierToken, ParamNameToken,
-    ParamSignatureNode, ShortFlagToken, SignatureNode, VarArgParamSignatureRuleNode,
+    support, FlagSignatureNode, InSignatureNode, LongFlagToken, LuTypeNode, OptModifierToken,
+    ParamNameToken, ParamSignatureNode, RetSignatureNode, ShortFlagToken, SignatureNode,
+    VarArgParamSignatureRuleNode,
 };
 
 impl SignatureNode {
-    // pub fn to_signature(&self) -> Option<Signature> {
-    // Signature::new()
-    // }
+    pub fn in_type(&self) -> Option<LuTypeNode> {
+        support::node_child::<InSignatureNode>(self.syntax())
+            .map(|n| n.type_())
+            .flatten()
+    }
+    pub fn ret_type(&self) -> Option<LuTypeNode> {
+        support::node_child::<RetSignatureNode>(self.syntax())
+            .map(|n| n.type_())
+            .flatten()
+    }
+    pub fn args(&self) -> AstNodeChildren<ParamSignatureNode> {
+        support::node_children(self.syntax())
+    }
 
-    // pub fn args(&self) -> Vec<ArgSignature> {
-    //     support::node_children::<ParamSignatureNode>(self.syntax())
-    //         .map(|n| n.to_arg_signature())
-    //         .collect()
-    // }
+    pub fn var_arg(&self) -> Option<VarArgParamSignatureRuleNode> {
+        support::node_child(self.syntax())
+    }
 
-    // pub fn var_arg(&self) -> Option<VarArgSignature> {
-    //     support::node_child::<VarArgParamSignatureRuleNode>(self.syntax())
-    //         .map(|n| n.to_var_arg_signature())
-    // }
-
-    // pub fn flags(&self) -> Vec<FlagSignature> {
-    //     support::node_children::<FlagSignatureNode>(self.syntax())
-    //         .map(|n| n.to_flag_signature())
-    //         .collect()
-    // }
+    pub fn flags(&self) -> AstNodeChildren<FlagSignatureNode> {
+        support::node_children::<FlagSignatureNode>(self.syntax())
+    }
 }
 
-// impl ParamSignatureNode {
-//     pub fn to_arg_signature(&self) -> ArgSignature {
-//         let name = support::token_child::<ParamNameToken>(self.syntax())
-//             .unwrap()
-//             .text()
-//             .to_string();
-//         let is_opt = support::token_child::<OptModifierToken>(self.syntax()).is_some();
-//         let type_ = support::node_child::<LuTypeNode>(self.syntax())
-//             .map(|n| n.to_type())
-//             .unwrap(ValueType::Unspecified);
+impl ParamSignatureNode {
+    pub fn name(&self) -> String {
+        let name = support::token_child::<ParamNameToken>(self.syntax());
+        name.map(|t| t.text().to_string()).unwrap()
+    }
 
-//         ArgSignature::new(name, type_, is_opt)
-//     }
-// }
+    pub fn type_(&self) -> Option<LuTypeNode> {
+        support::node_child::<LuTypeNode>(self.syntax())
+    }
+}
 
-// impl VarArgParamSignatureRuleNode {
-//     pub fn to_var_arg_signature(&self) -> VarArgSignature {
-//         let name = support::token_child::<ParamNameToken>(self.syntax())
-//             .unwrap()
-//             .text()
-//             .to_string();
-//         let type_ = support::token_child::<LuTypeNode>(self.syntax())
-//             .map(LuTypeNode::to_type)
-//             .unwrap(ValueType::Unspecified);
+impl VarArgParamSignatureRuleNode {
+    pub fn name(&self) -> String {
+        support::token_child::<ParamNameToken>(self.syntax())
+            .unwrap()
+            .text()
+            .to_string()
+    }
 
-//         VarArgSignature::new(name, type_)
-//     }
-// }
+    pub fn type_(&self) -> Option<LuTypeNode> {
+        support::node_child(self.syntax())
+    }
+}
 
-// impl FlagSignatureNode {
-//     pub fn to_flag_signature(&self) -> FlagSignature {
-//         let long_name = support::token_child::<LongFlagToken>(self.syntax())
-//             .map(|flag| flag.text().to_string());
-//         let short_name = support::token_child::<ShortFlagToken>(self.syntax())
-//             .map(|flag| flag.text().to_string());
-//         let type_ = support::token_child::<LuTypeNode>(self.syntax())
-//             .map(LuTypeNode::to_type)
-//             .unwrap(ValueType::Unspecified);
+impl FlagSignatureNode {
+    pub fn long_name(&self) -> Option<String> {
+        support::token_child::<LongFlagToken>(self.syntax()).map(|flag| flag.text().to_string())
+    }
+    pub fn short_name(&self) -> Option<char> {
+        let short_name = support::token_child::<ShortFlagToken>(self.syntax())
+            .map(|flag| flag.text().to_string());
+        if let Some(mut name) = short_name {
+            assert!(name.chars().count() == 1);
+            name.pop()
+        } else {
+            None
+        }
+    }
+    pub fn type_(&self) -> Option<LuTypeNode> {
+        support::node_child(self.syntax())
+    }
+}
 
-//         FlagSignature::new(long_name, short_name, type_)
-//     }
-// }
+impl RetSignatureNode {
+    pub fn type_(&self) -> Option<LuTypeNode> {
+        support::node_child(self.syntax())
+    }
+}
+
+impl InSignatureNode {
+    pub fn type_(&self) -> Option<LuTypeNode> {
+        support::node_child(self.syntax())
+    }
+}

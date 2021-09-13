@@ -2,7 +2,7 @@ use lu_error::LuResult;
 use lu_syntax::ast::LetStmtNode;
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Interpreter, Variable};
+use crate::{variable::VarDeclNode, EvalArg, Evaluable, Interpreter, Variable};
 
 impl Evaluable for LetStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
@@ -11,11 +11,10 @@ impl Evaluable for LetStmtNode {
 
         let val = val.evaluate(state)?;
 
-        state
-            .scope
-            .lock()
-            .cur_mut_frame()
-            .insert(var_name.to_string(), Variable::new(var_name, val));
+        state.scope.lock().cur_mut_frame().insert(
+            var_name.to_string(),
+            Variable::new(var_name, val, Some(VarDeclNode::LetStmt(self.clone()))),
+        );
 
         Ok(Value::Nil)
     }

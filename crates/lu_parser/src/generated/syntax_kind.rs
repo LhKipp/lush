@@ -36,6 +36,8 @@ pub enum SyntaxKind {
     NumberKeyword,
     #[token("str")]
     StringKeyword,
+    #[token("ret")]
+    RetKeyword,
     ArrayType,
     OptModifier,
     #[token("(")]
@@ -127,6 +129,8 @@ pub enum SyntaxKind {
     Signature,
     FlagSignature,
     ParamSignature,
+    InSignature,
+    RetSignature,
     VarArgParamSignatureRule,
     LuType,
     MathExpr,
@@ -161,6 +165,7 @@ impl SyntaxKind{
             SyntaxKind::BoolKeyword => "BoolKeyword",
             SyntaxKind::NumberKeyword => "NumberKeyword",
             SyntaxKind::StringKeyword => "StringKeyword",
+            SyntaxKind::RetKeyword => "RetKeyword",
             SyntaxKind::ArrayType => "ArrayType",
             SyntaxKind::OptModifier => "OptModifier",
             SyntaxKind::LeftParenthesis => "LeftParenthesis",
@@ -218,6 +223,8 @@ impl SyntaxKind{
             SyntaxKind::Signature => "Signature",
             SyntaxKind::FlagSignature => "FlagSignature",
             SyntaxKind::ParamSignature => "ParamSignature",
+            SyntaxKind::InSignature => "InSignature",
+            SyntaxKind::RetSignature => "RetSignature",
             SyntaxKind::VarArgParamSignatureRule => "VarArgParamSignatureRule",
             SyntaxKind::LuType => "LuType",
             SyntaxKind::MathExpr => "MathExpr",
@@ -254,6 +261,7 @@ macro_rules! T {
     [bool] => {$crate::SyntaxKind::BoolKeyword };
     [num] => {$crate::SyntaxKind::NumberKeyword };
     [str] => {$crate::SyntaxKind::StringKeyword };
+    [ret] => {$crate::SyntaxKind::RetKeyword };
     ["("] => {$crate::SyntaxKind::LeftParenthesis };
     [")"] => {$crate::SyntaxKind::RightParenthesis };
     ["{"] => {$crate::SyntaxKind::LeftCurlyBrackets };

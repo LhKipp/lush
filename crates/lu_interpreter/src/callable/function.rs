@@ -1,14 +1,54 @@
 #![allow(dead_code)]
 use crate::scope::ScopeFrameId;
+use crate::typecheck::ValueType;
 use crate::{Command, Evaluable, Variable};
 use lu_syntax::ast::FnStmtNode;
 use lu_value::Value;
 
+#[derive(Clone, Debug, new)]
+pub struct ArgSignature {
+    pub name: String,
+    pub type_: Option<ValueType>,
+    pub is_opt: bool,
+}
+
+impl ArgSignature {
+    pub fn is_in_arg(&self) -> bool {
+        self.name == "in"
+    }
+    pub fn is_ret_arg(&self) -> bool {
+        self.name == "ret"
+    }
+}
+
+#[derive(Clone, Debug, new)]
+pub struct VarArgSignature {
+    pub name: String,
+    pub type_: Option<ValueType>,
+}
+
+#[derive(Clone, Debug, new, Hash, Eq, PartialEq)]
+pub struct FlagSignature {
+    pub long_name: Option<String>,
+    pub short_name: Option<char>,
+    pub type_: Option<ValueType>,
+    #[new(default)]
+    pub is_opt: bool,
+}
+
+#[derive(Clone, Debug, new)]
+pub struct Signature {
+    pub args: Vec<ArgSignature>,
+    pub var_arg: Option<VarArgSignature>,
+    pub flags: Vec<FlagSignature>,
+    pub in_type: Option<ValueType>,
+    pub ret_type: Option<ValueType>,
+}
+
 #[derive(Clone, Debug)]
 pub struct Function {
     pub name: String,
-    // TODO check whether signature here, or ptr to type checkers resolved t
-    // pub signature: Signature,
+    pub signature: Signature,
     pub fn_node: FnStmtNode,
     pub parent_frame_id: ScopeFrameId,
     // For closures only
@@ -18,13 +58,13 @@ pub struct Function {
 impl Function {
     pub fn new(
         name: String,
-        // signature: Signature,
+        signature: Signature,
         fn_node: FnStmtNode,
         parent_frame_id: ScopeFrameId,
     ) -> Self {
         Self {
             name,
-            // signature,
+            signature,
             parent_frame_id,
             fn_node,
             captured_vars: Vec::new(),

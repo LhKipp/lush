@@ -4,6 +4,7 @@ use std::{error::Error, ops::Range};
 mod eval_err;
 mod fs_err;
 mod parse_err;
+mod ty_err;
 
 #[macro_use]
 extern crate derive_new;
@@ -12,6 +13,7 @@ extern crate strum_macros;
 pub use eval_err::EvalErr;
 pub use fs_err::FsErr;
 pub use parse_err::{ParseErr, ParseErrs};
+pub use ty_err::TyErr;
 
 use std::result;
 
@@ -22,6 +24,7 @@ pub enum LuErr {
     Parse(ParseErr),
     ParseErrs(ParseErrs),
     Eval(EvalErr),
+    Ty(TyErr),
     FS(FsErr),
     Internal(String),
 }

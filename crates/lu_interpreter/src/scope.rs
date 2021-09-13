@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use tap::prelude::*;
 
 pub use indextree::NodeId as ScopeFrameId;
+use lu_syntax_elements::BlockType;
 
 use crate::{Callable, Command, Variable};
 
@@ -19,11 +20,22 @@ pub trait ScopeFrame {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
     None,
+    SourceFileFrame,
     BlockFrame,
     GlobalFrame,
     FnFrame,
     ForStmtFrame,
     IfStmtFrame,
+}
+
+impl From<BlockType> for ScopeFrameTag {
+    fn from(b_type: BlockType) -> Self {
+        match b_type {
+            BlockType::SourceFileBlock => Self::SourceFileFrame,
+            BlockType::FnBlock => Self::FnFrame,
+            BlockType::ForBlock => Self::ForStmtFrame,
+        }
+    }
 }
 
 /// The default scope frame being put on the scope stack, when entering a new scope

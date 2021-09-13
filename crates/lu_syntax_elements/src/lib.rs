@@ -1,3 +1,7 @@
+mod block_type;
+
+pub use block_type::BlockType;
+
 use std::{error::Error, fs};
 
 use ron::from_str;

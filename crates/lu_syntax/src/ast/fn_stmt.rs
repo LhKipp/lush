@@ -1,6 +1,6 @@
 use crate::{ast::FnDeclNameToken, AstNode, AstToken};
 
-use super::{support, BlockStmtNode, FnStmtNode};
+use super::{support, BlockStmtNode, FnStmtNode, SignatureNode};
 
 impl FnStmtNode {
     pub fn name(&self) -> Option<String> {
@@ -17,6 +17,11 @@ impl FnStmtNode {
             )
         }
     }
+
+    pub fn signature(&self) -> Option<SignatureNode> {
+        support::node_child(self.syntax())
+    }
+
     pub fn block_stmt(&self) -> Option<BlockStmtNode> {
         support::node_child(self.syntax())
     }

@@ -4,24 +4,13 @@ use crate::{AstNode, AstToken};
 use super::{support, ArrayTypeNode, LuTypeNode, LuTypeSpecifierElement};
 
 impl LuTypeNode {
-    // pub fn into_type(&self) -> ValueType {
-    //     match support::element_child::<LuTypeSpecifierElement>(self.syntax()).unwrap() {
-    //         LuTypeSpecifierElement::NumberKeyword(_) => ValueType::Number,
-    //         LuTypeSpecifierElement::AnyKeyword(_) => ValueType::Any,
-    //         LuTypeSpecifierElement::NilKeyword(_) => ValueType::Nil,
-    //         LuTypeSpecifierElement::BoolKeyword(_) => ValueType::Bool,
-    //         LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
-    //         LuTypeSpecifierElement::FnKeyword(_) => ValueType::Function,
-    //         LuTypeSpecifierElement::ArrayType(n) => n.into_type(),
-    //         LuTypeSpecifierElement::BareWord(n) => ValueType::Unresolved(n.text().to_string()),
-    //     }
-    // }
+    pub fn into_type(&self) -> LuTypeSpecifierElement {
+        support::element_child(self.syntax()).unwrap()
+    }
 }
 
 impl ArrayTypeNode {
-    // pub fn into_type(&self) -> ValueType {
-    //     let inner_t = support::node_child::<LuTypeNode>(self.syntax())
-    //         .map_or(ValueType::Unspecified, |n| n.into_type());
-    //     ValueType::Array(Box::new(inner_t))
-    // }
+    pub fn inner_type(&self) -> Option<LuTypeNode> {
+        support::node_child(self.syntax())
+    }
 }

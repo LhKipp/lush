@@ -3,10 +3,13 @@ use lu_error::LuErr;
 use std::fmt::Debug;
 
 mod block_stmt;
+mod resolve;
 mod source_file;
+mod ty_var;
 mod value_type;
 
-pub use value_type::ValueType;
+pub use resolve::*;
+pub use value_type::{CustomType, ValueType};
 
 pub struct TypeChecker {
     pub errors: Vec<LuErr>,

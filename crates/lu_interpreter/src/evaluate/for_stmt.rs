@@ -4,7 +4,7 @@ use lu_error::LuResult;
 use lu_syntax::{ast::ForStmtNode, AstToken};
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Interpreter, ScopeFrameTag, Variable};
+use crate::{variable::VarDeclNode, EvalArg, Evaluable, Interpreter, ScopeFrameTag, Variable};
 
 impl Evaluable for ForStmtNode {
     #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
@@ -37,7 +37,11 @@ impl Evaluable for ForStmtNode {
                         let mut scope = state.scope.lock();
                         scope.push_frame(ScopeFrameTag::ForStmtFrame).1.insert(
                             var_names[0].clone(),
-                            Variable::new(var_names[0].clone(), Value::String(char.to_string())),
+                            Variable::new(
+                                var_names[0].clone(),
+                                Value::String(char.to_string()),
+                                Some(VarDeclNode::ForStmt(self.clone(), 0)),
+                            ),
                         );
                     }
                     block.evaluate(state)?;

@@ -322,6 +322,27 @@ impl HasSyntaxKind for StringKeywordToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RetKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for RetKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RetKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for RetKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1576,6 +1597,48 @@ impl AstNode for ParamSignatureNode {
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
 impl HasSyntaxKind for ParamSignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InSignatureNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for InSignatureNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::InSignature }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for InSignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RetSignatureNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for RetSignatureNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RetSignature }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for RetSignatureNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
