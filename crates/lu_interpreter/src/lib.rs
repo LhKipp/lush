@@ -11,6 +11,7 @@ mod scope;
 mod typecheck;
 mod value_type;
 mod variable;
+mod visit_arg;
 
 pub use crate::evaluate::{EvalArg, Evaluable};
 pub use crate::interpreter::Interpreter;

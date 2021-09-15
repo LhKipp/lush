@@ -15,8 +15,7 @@ use std::{path::PathBuf, sync::Arc};
 
 use crate::{typecheck::TypeChecker, Evaluable, Evaluator, Resolver, Scope, Variable};
 
-/// The interpreter holds data, getting transformed while interpreting the ast.
-/// The interpreter struct is merely here for having a nice frontend to the interpreter crate
+/// The interpreter holds data (scope), getting transformed while interpreting the ast.
 pub struct Interpreter {
     pub scope: Arc<Mutex<Scope<Variable>>>,
 }
@@ -30,17 +29,21 @@ impl Interpreter {
 
     pub fn run(&mut self, code: SourceCode) -> Result<Value, Vec<LuErr>> {
         let mut errs = Vec::new();
-        let code = match code.to_string() {
-            Ok(s) => s,
+        let (code, source_name) = match code.unpack() {
+            Ok(c) => c,
             Err(e) => return Err(vec![e]),
         };
+        let source_name = source_name.unwrap_or("tmp_text".into());
 
         let parse_result = Parse::rule(&code, &SourceFileRule {});
         let source_file = parse_result.cast::<SourceFileNode>().unwrap();
         errs.extend(parse_result.errors.into_iter().map(|e| LuErr::from(e)));
 
         let mut resolver = Resolver::new(self.scope.clone());
-        resolver.resolve(&source_file);
+        resolver.resolve(
+            &source_file,
+            source_name.into_os_string().into_string().unwrap(),
+        );
         errs.extend(resolver.errors);
 
         let mut ty_checker = TypeChecker::new(resolver.scope);

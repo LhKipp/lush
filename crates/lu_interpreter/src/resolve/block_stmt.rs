@@ -13,15 +13,15 @@ use lu_value::Value;
 
 use crate::{
     resolve::{Resolve, ResolveArg, Resolver},
+    visit_arg::VisitArg,
     ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
     Signature, ValueType, VarArgSignature, Variable, ARG_VAR_NAME,
 };
 
 impl Resolve for BlockStmtNode {
     fn do_resolve_dependant_names(&self, args: &[ResolveArg], resolver: &mut Resolver) {
-        assert!(!args.is_empty(), "Passing of BlockType is required");
-        let b_type = match &args[0] {
-            ResolveArg::BlockTypeArg(t) => t,
+        let b_type = match args.get(0) {
+            Some(ResolveArg::Arg(VisitArg::BlockTypeArg(t))) => t,
             _ => unreachable!("Passing of BlockType as first arg is required"),
         };
         {
@@ -46,7 +46,6 @@ impl Resolve for BlockStmtNode {
                 source_fn_stmt(&fn_stmt, resolver);
             }
         }
-        // TODO only resolving top level stmts should be
     }
 }
 

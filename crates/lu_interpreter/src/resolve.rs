@@ -7,6 +7,7 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use std::{collections::HashMap, rc::Rc};
 
+use crate::visit_arg::VisitArg;
 use crate::{ScopeFrameTag, ValueType};
 use log::debug;
 use lu_error::{LuErr, TyErr};
@@ -40,15 +41,7 @@ pub trait Resolve: Debug {
 
 #[derive(Educe)]
 #[educe(Debug)]
-/// TypeChecking runs in 2 steps:
-/// 1. Resolve elements
-/// 2. Actual typecheck
-///
-/// Step 1 includes:
 ///     Bringing all custom types, funcs into scope ==> Returns: Scope<ResoElem>
-/// Step 2 includes:
-///     actual typechecking
-/// TODO better docs
 pub struct Resolver {
     #[educe(Debug(ignore))]
     pub scope: Arc<Mutex<Scope<Variable>>>,
@@ -57,8 +50,7 @@ pub struct Resolver {
 
 #[derive(Clone, Debug)]
 pub enum ResolveArg {
-    Dummy,
-    BlockTypeArg(BlockType),
+    Arg(VisitArg),
 }
 
 impl Resolver {
@@ -68,8 +60,11 @@ impl Resolver {
             errors: Vec::new(),
         }
     }
-    pub(crate) fn resolve(&mut self, source_file: &SourceFileNode) {
-        source_file.resolve_dependant_names(self);
+    pub(crate) fn resolve(&mut self, source_file: &SourceFileNode, source_file_name: String) {
+        source_file.resolve_dependant_names_with_args(
+            &[ResolveArg::Arg(VisitArg::SourceFileName(source_file_name))],
+            self,
+        );
     }
 
     pub(crate) fn ok_or_record_err(&mut self, ty: Result<ValueType, LuErr>) -> ValueType {
