@@ -50,14 +50,6 @@ impl Resolve for BlockStmtNode {
 }
 
 fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
-    let parent_frame_id = {
-        let mut l_scope = resolver.scope.lock();
-
-        let parent_frame_id = l_scope.get_cur_frame_id();
-        l_scope.push_frame(ScopeFrameTag::FnFrame);
-        parent_frame_id
-    };
-
     let name = fn_stmt.name().unwrap_or("".to_string());
 
     // Source the signature (either user provided or default)
@@ -71,6 +63,7 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
         Signature::new(args, None, vec![], None, None)
     };
 
+    let parent_frame_id = resolver.scope.lock().get_cur_frame_id();
     let func = Function::new(name, sign, fn_stmt.clone(), parent_frame_id);
 
     resolver
