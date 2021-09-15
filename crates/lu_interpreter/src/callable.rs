@@ -6,7 +6,7 @@ pub use command::{Command, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME};
 pub use function::*;
 pub use run_external_cmd::RunExternalCmd;
 
-use crate::EvalArg;
+use crate::{EvalArg, Evaluator};
 
 #[derive(Clone, Debug)]
 pub enum Callable {
@@ -18,11 +18,7 @@ pub enum Callable {
 impl Callable {}
 
 impl Command for Callable {
-    fn do_run(
-        &self,
-        _: &[EvalArg],
-        state: &mut crate::Interpreter,
-    ) -> lu_error::LuResult<lu_value::Value> {
+    fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> lu_error::LuResult<lu_value::Value> {
         match self {
             Callable::Func(f) => f.run(state),
             Callable::InternalCmd(cmd) => cmd.run(state),

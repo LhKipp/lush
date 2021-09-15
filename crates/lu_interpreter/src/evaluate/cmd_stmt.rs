@@ -3,10 +3,10 @@ use lu_error::LuResult;
 use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
-use crate::{Callable, Command, EvalArg, Evaluable, Interpreter, RunExternalCmd, Variable};
+use crate::{Callable, Command, EvalArg, Evaluable, Evaluator, RunExternalCmd, Variable};
 
 impl Evaluable for CmdStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let possibl_longest_name = self.possible_longest_cmd_call_name();
@@ -50,7 +50,7 @@ impl Evaluable for CmdStmtNode {
 mod test {
     use lu_error::LuResult;
     use lu_syntax::ast::SourceFileNode;
-    use lu_test_support::{init_logger, make_test_interpreter};
+    use lu_test_support::{init_logger, make_test_evaluator};
     use lu_text_util::SourceCode;
     use lu_value::Value;
     use {conformance, serde_json};
@@ -58,16 +58,16 @@ mod test {
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/cmd_stmt/general.json_test")]
     fn general_cmd_tests(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut itprt = make_test_interpreter();
+        let mut evaluator = make_test_evaluator();
 
-        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
     }
 
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/cmd_stmt/external.json_test")]
     fn external_cmd_tests(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut itprt = make_test_interpreter();
+        let mut evaluator = make_test_evaluator();
 
-        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
     }
 }

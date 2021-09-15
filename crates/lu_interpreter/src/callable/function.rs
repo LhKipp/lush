@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use crate::scope::ScopeFrameId;
-use crate::typecheck::ValueType;
 use crate::{Command, Evaluable, Variable};
+use crate::{Evaluator, ValueType};
 use lu_syntax::ast::FnStmtNode;
 use lu_value::Value;
 
@@ -80,7 +80,7 @@ impl Command for Function {
     fn do_run(
         &self,
         _: &[crate::EvalArg],
-        state: &mut crate::Interpreter,
+        state: &mut Evaluator,
     ) -> lu_error::LuResult<lu_value::Value> {
         // TODO typecheck and put vars into scope
         if let Some(block) = self.fn_node.block_stmt() {

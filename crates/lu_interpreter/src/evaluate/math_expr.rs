@@ -10,10 +10,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Interpreter, ScopeFrameTag};
+use crate::{EvalArg, Evaluable, Evaluator, Interpreter, ScopeFrameTag};
 
 impl Evaluable for MathExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         let lhs = self.lhs().unwrap();
         let rhs = self.rhs().unwrap();
         let op = self.operator().unwrap();
@@ -92,8 +92,8 @@ fn eval_right_stream(_lhs: Value, _rhs: Value) -> LuResult<Value> {
 //     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/single_if.json_test")]
 //     fn general_interpreter_tests(s: &str) -> LuResult<Value> {
 //         init_logger();
-//         let mut itprt = make_test_interpreter();
+//         let mut evaluator = make_test_interpreter();
 
-//         itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+//         evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
 //     }
 // }

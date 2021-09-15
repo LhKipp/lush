@@ -12,12 +12,10 @@ use lu_syntax_elements::BlockType;
 use lu_value::Value;
 
 use crate::{
-    typecheck::{ResoElem, Resolve, ResolveArg, Resolver, ValueType},
+    resolve::{Resolve, ResolveArg, Resolver},
     ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
-    Signature, VarArgSignature, Variable, ARG_VAR_NAME,
+    Signature, ValueType, VarArgSignature, Variable, ARG_VAR_NAME,
 };
-
-use super::TyFunction;
 
 impl Resolve for BlockStmtNode {
     fn do_resolve_dependant_names(&self, args: &[ResolveArg], resolver: &mut Resolver) {
@@ -26,7 +24,10 @@ impl Resolve for BlockStmtNode {
             ResolveArg::BlockTypeArg(t) => t,
             _ => unreachable!("Passing of BlockType as first arg is required"),
         };
-        resolver.scope.push_frame(b_type.clone().into());
+        {
+            let mut l_scope = resolver.scope.lock();
+            l_scope.push_frame(b_type.clone().into());
+        }
 
         if b_type == &BlockType::SourceFileBlock {
             // For each fn_stmt we have to do:
@@ -45,19 +46,26 @@ impl Resolve for BlockStmtNode {
                 source_fn_stmt(&fn_stmt, resolver);
             }
         }
+        // TODO only resolving top level stmts should be
     }
 }
 
 fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
-    let parent_frame_id = resolver.scope.get_cur_frame_id();
+    let parent_frame_id = {
+        let mut l_scope = resolver.scope.lock();
 
-    resolver.scope.push_frame(ScopeFrameTag::FnFrame);
+        let parent_frame_id = l_scope.get_cur_frame_id();
+        l_scope.push_frame(ScopeFrameTag::FnFrame);
+        parent_frame_id
+    };
+
     let name = fn_stmt.name().unwrap_or("".to_string());
 
     // Source the signature (either user provided or default)
     let sign = if let Some(sign_node) = fn_stmt.signature() {
         source_signature(&sign_node, resolver)
     } else {
+        //TODO shouldnt this be empty and var_arg == Any
         let args = (0..10)
             .map(|i| ArgSignature::new(ARG_VAR_NAME.to_string() + &i.to_string(), None, true))
             .collect();
@@ -65,12 +73,12 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
     };
 
     let func = Function::new(name, sign, fn_stmt.clone(), parent_frame_id);
-    let ty_func = TyFunction::from_func(func, resolver);
 
     resolver
         .scope
+        .lock()
         .cur_mut_frame()
-        .insert(ty_func.func.name.clone(), ResoElem::Func(Rc::new(ty_func)));
+        .insert(func.name.clone(), Variable::new_func(func, fn_stmt.clone()));
 }
 
 fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signature {
@@ -112,6 +120,6 @@ fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signa
 }
 
 fn get_ty_of_node(ty_node: &LuTypeNode, resolver: &mut Resolver) -> ValueType {
-    let ty = ValueType::from_node(&ty_node.into_type(), &resolver.custom_types);
+    let ty = ValueType::from_node(&ty_node.into_type(), &resolver);
     resolver.ok_or_record_err(ty)
 }

@@ -1,6 +1,6 @@
 use std::{io::Write, process::Stdio};
 
-use crate::{Command, EvalArg, Interpreter};
+use crate::{Command, EvalArg, Evaluator};
 use lu_error::{EvalErr, LuResult};
 use lu_syntax::{ast::CmdStmtNode, AstNode};
 use lu_value::Value;
@@ -17,7 +17,7 @@ impl Command for RunExternalCmd {
         &self.cmd_name
     }
 
-    fn do_run(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         let l_scope = state.scope.lock();
 
         let args = self.expect_args(&l_scope);

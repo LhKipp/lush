@@ -18,6 +18,7 @@ pub use ty_err::TyErr;
 use std::result;
 
 pub type LuResult<T> = result::Result<T, LuErr>;
+pub type LuResults<T> = result::Result<T, Vec<LuErr>>;
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum LuErr {
@@ -27,6 +28,7 @@ pub enum LuErr {
     Ty(TyErr),
     FS(FsErr),
     Internal(String),
+    Errors(),
 }
 
 impl<E: Error> From<E> for LuErr {

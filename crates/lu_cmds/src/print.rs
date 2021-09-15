@@ -1,5 +1,5 @@
 use lu_error::LuResult;
-use lu_interpreter::{Command, EvalArg, Interpreter};
+use lu_interpreter::{Command, EvalArg, Evaluator};
 use lu_value::Value;
 
 #[derive(Debug, Clone)]
@@ -10,7 +10,7 @@ impl Command for PrintCmd {
         "print"
     }
 
-    fn do_run(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         let l_scope = state.scope.lock();
         let args = self.expect_args(&l_scope);
         Ok(Value::Array(args.clone()))

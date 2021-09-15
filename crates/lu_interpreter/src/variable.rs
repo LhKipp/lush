@@ -1,10 +1,13 @@
-use lu_syntax::ast::{ForStmtNode, LetStmtNode, ParamSignatureNode};
+use lu_syntax::ast::{FnStmtNode, ForStmtNode, LetStmtNode, ParamSignatureNode};
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
+
+use crate::{Callable, Command, Function};
 
 #[derive(Clone, Debug, Eq, PartialEq, new)]
 pub enum VarDeclNode {
     LetStmt(LetStmtNode),
+    FnStmt(FnStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
     ArgSignature(ParamSignatureNode),
@@ -19,6 +22,15 @@ pub struct Variable {
 }
 
 impl Variable {
+    pub fn new_func(func: Function, decl: FnStmtNode) -> Variable {
+        let func: Callable = func.into();
+        Variable::new(
+            func.name().to_string(),
+            Value::new_func(func),
+            Some(VarDeclNode::FnStmt(decl)),
+        )
+    }
+
     pub fn new_in(val: Value) -> Self {
         Self {
             name: "in".into(),

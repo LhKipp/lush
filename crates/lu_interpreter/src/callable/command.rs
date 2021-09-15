@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::rc::Rc;
 
-use crate::{EvalArg, Interpreter, Scope, Variable};
+use crate::{EvalArg, Evaluator, Scope, Variable};
 
 use log::debug;
 use lu_error::LuResult;
@@ -48,13 +48,13 @@ pub trait Command: CommandClone + Debug {
             .unwrap_or(&NIL_VAL)
     }
 
-    fn do_run(&self, args: &[EvalArg], state: &mut Interpreter) -> LuResult<Value>;
+    fn do_run(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value>;
 
-    fn run(&self, state: &mut Interpreter) -> LuResult<Value> {
+    fn run(&self, state: &mut Evaluator) -> LuResult<Value> {
         self.run_with_args(&[], state)
     }
 
-    fn run_with_args(&self, args: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn run_with_args(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         {
             let l_scope = state.scope.lock();
             debug!(

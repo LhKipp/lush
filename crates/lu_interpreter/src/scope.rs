@@ -20,9 +20,11 @@ pub trait ScopeFrame {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
     None,
-    SourceFileFrame,
-    BlockFrame,
+
     GlobalFrame,
+    SourceFileFrame,
+
+    BlockFrame,
     FnFrame,
     ForStmtFrame,
     IfStmtFrame,

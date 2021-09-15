@@ -2,10 +2,10 @@ use lu_error::LuResult;
 use lu_syntax::ast::StatementElement;
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Interpreter};
+use crate::{EvalArg, Evaluable, Evaluator};
 
 impl Evaluable for StatementElement {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         match self {
             StatementElement::IfStmt(n) => n.evaluate(state),
             StatementElement::LetStmt(n) => n.evaluate(state),

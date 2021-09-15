@@ -28,7 +28,7 @@ pub use ast::{AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken
 #[derive(Debug)]
 pub struct Parse {
     green: GreenNode,
-    errors: Vec<ParseErr>,
+    pub errors: Vec<ParseErr>,
 }
 
 impl Parse {
@@ -55,10 +55,6 @@ impl Parse {
 
     pub fn cast<T: AstNode>(&self) -> Option<T> {
         T::cast(self.syntax_node())
-    }
-
-    pub fn errors(&self) -> &[ParseErr] {
-        &*self.errors
     }
 
     pub fn ok<T: AstNode>(self) -> LuResult<T> {

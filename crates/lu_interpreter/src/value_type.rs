@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-
 use lu_error::LuErr;
 use lu_syntax::ast::LuTypeSpecifierElement;
 use rusttyc::{types::Arity, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
+
+use super::Resolver;
 
 // enum ParamType{
 //     GenericT(i32),
@@ -18,11 +18,6 @@ use serde::{Deserialize, Serialize};
 //     args: Vec<ParamType>,
 //     ret_t: ParamType
 // }
-
-#[derive(Debug, Clone)]
-pub struct CustomType {
-    // TODO
-}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum ValueType {
@@ -43,7 +38,7 @@ pub enum ValueType {
 impl ValueType {
     pub fn from_node(
         node: &LuTypeSpecifierElement,
-        custom_ty_map: &HashMap<String, CustomType>,
+        resolver: &Resolver,
     ) -> Result<ValueType, LuErr> {
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => ValueType::Any,
@@ -54,7 +49,7 @@ impl ValueType {
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
             LuTypeSpecifierElement::ArrayType(arr) => {
                 if let Some(inner) = arr.inner_type() {
-                    ValueType::from_node(&inner.into_type(), custom_ty_map)?
+                    ValueType::from_node(&inner.into_type(), resolver)?
                 } else {
                     ValueType::Unspecified
                 }

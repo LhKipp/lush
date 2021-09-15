@@ -4,11 +4,11 @@ use lu_error::LuResult;
 use lu_syntax::{ast::ForStmtNode, AstToken};
 use lu_value::Value;
 
-use crate::{variable::VarDeclNode, EvalArg, Evaluable, Interpreter, ScopeFrameTag, Variable};
+use crate::{variable::VarDeclNode, EvalArg, Evaluable, Evaluator, ScopeFrameTag, Variable};
 
 impl Evaluable for ForStmtNode {
     #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Interpreter) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
         let block = self.block().unwrap();
         if block.is_empty() {
             debug!("Empty for stmt");
@@ -64,7 +64,7 @@ impl Evaluable for ForStmtNode {
 mod test {
     use lu_error::LuResult;
     use lu_syntax::ast::SourceFileNode;
-    use lu_test_support::{init_logger, make_test_interpreter};
+    use lu_test_support::{init_logger, make_test_evaluator};
     use lu_text_util::SourceCode;
     use lu_value::Value;
     use {conformance, serde_json};
@@ -72,8 +72,8 @@ mod test {
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/for_stmt/general.json_test")]
     fn general_interpreter_tests(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut itprt = make_test_interpreter();
+        let mut evaluator = make_test_evaluator();
 
-        itprt.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
     }
 }
