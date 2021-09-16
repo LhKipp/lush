@@ -40,12 +40,12 @@ impl Evaluable for BlockStmtNode {
             match stmt.evaluate(state) {
                 Ok(v) => result = v,
                 Err(e) => {
-                    state.scope.lock().pop_frame(ScopeFrameTag::BlockFrame);
+                    state.scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
                     return Err(e);
                 }
             }
         }
-        state.scope.lock().pop_frame(ScopeFrameTag::BlockFrame);
+        state.scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
         Ok(result)
     }
 }
@@ -64,6 +64,6 @@ impl Evaluable for BlockStmtNode {
 //         init_logger();
 //         let mut evaluator = make_test_interpreter();
 
-//         evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+//         evaluator.eval(SourceCode::Text(s.to_string()))
 //     }
 // }

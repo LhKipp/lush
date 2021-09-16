@@ -76,7 +76,7 @@ fn eval_block_if_true(
 fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> LuResult<Value> {
     state.scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
     let result = block.evaluate(state);
-    state.scope.lock().pop_frame(ScopeFrameTag::IfStmtFrame);
+    state.scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);
     result
 }
 
@@ -84,7 +84,7 @@ fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> LuResult<Value> {
 mod test {
     use lu_error::LuResult;
     use lu_syntax::ast::SourceFileNode;
-    use lu_test_support::{init_logger, make_test_evaluator};
+    use lu_test_support::{init_logger, make_test_interpreter};
     use lu_text_util::SourceCode;
     use lu_value::Value;
     use {conformance, serde_json};
@@ -92,23 +92,29 @@ mod test {
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/single_if.json_test")]
     fn single_if_test(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut evaluator = make_test_evaluator();
+        let mut evaluator = make_test_interpreter();
 
-        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator
+            .eval(s.to_string().into())
+            .map_err(|errs| errs[0].clone())
     }
 
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/if_else.json_test")]
     fn if_else_test(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut evaluator = make_test_evaluator();
+        let mut evaluator = make_test_interpreter();
 
-        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator
+            .eval(s.to_string().into())
+            .map_err(|errs| errs[0].clone())
     }
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/elif.json_test")]
     fn elif_test(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut evaluator = make_test_evaluator();
+        let mut evaluator = make_test_interpreter();
 
-        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator
+            .eval(s.to_string().into())
+            .map_err(|errs| errs[0].clone())
     }
 }

@@ -16,7 +16,6 @@ impl Evaluable for FnStmtNode {
 mod test {
     use lu_error::LuResults;
     use lu_test_support::{init_logger, make_test_interpreter};
-    use lu_text_util::SourceCode;
     use lu_value::Value;
     use {conformance, serde_json};
 
@@ -25,6 +24,6 @@ mod test {
         init_logger();
         let mut itprtr = make_test_interpreter();
 
-        itprtr.run(SourceCode::Text(s.to_string()))
+        itprtr.eval(s.to_string().into())
     }
 }

@@ -9,15 +9,11 @@ use super::{
 };
 
 impl SignatureNode {
-    pub fn in_type(&self) -> Option<LuTypeNode> {
-        support::node_child::<InSignatureNode>(self.syntax())
-            .map(|n| n.type_())
-            .flatten()
+    pub fn in_arg(&self) -> Option<InSignatureNode> {
+        support::node_child(self.syntax())
     }
-    pub fn ret_type(&self) -> Option<LuTypeNode> {
-        support::node_child::<RetSignatureNode>(self.syntax())
-            .map(|n| n.type_())
-            .flatten()
+    pub fn ret_arg(&self) -> Option<RetSignatureNode> {
+        support::node_child(self.syntax())
     }
     pub fn args(&self) -> AstNodeChildren<ParamSignatureNode> {
         support::node_children(self.syntax())

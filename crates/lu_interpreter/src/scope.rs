@@ -1,7 +1,7 @@
 use indextree::{Arena, NodeId};
 use log::debug;
-use lu_value::Value;
-use std::collections::HashMap;
+use lu_error::{LuErr, LuResult};
+use std::{collections::HashMap, fmt, path::PathBuf};
 use tap::prelude::*;
 
 pub use indextree::NodeId as ScopeFrameId;
@@ -9,20 +9,12 @@ use lu_syntax_elements::BlockType;
 
 use crate::{Callable, Command, Variable};
 
-pub trait ScopeFrame {
-    type Elem;
-    fn get_tag(&self) -> ScopeFrameTag;
-    fn get(&self, name: &str) -> Option<&Self::Elem>;
-    fn get_mut(&mut self, name: &str) -> Option<&mut Self::Elem>;
-    fn insert(&mut self, key: String, var: Self::Elem);
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
     None,
 
     GlobalFrame,
-    SourceFileFrame,
+    SourceFileFrame(PathBuf),
 
     BlockFrame,
     FnFrame,
@@ -33,57 +25,69 @@ pub enum ScopeFrameTag {
 impl From<BlockType> for ScopeFrameTag {
     fn from(b_type: BlockType) -> Self {
         match b_type {
-            BlockType::SourceFileBlock => Self::SourceFileFrame,
             BlockType::FnBlock => Self::FnFrame,
             BlockType::ForBlock => Self::ForStmtFrame,
+            _ => unreachable!("TODO"),
         }
     }
 }
 
 /// The default scope frame being put on the scope stack, when entering a new scope
-pub struct SimpleScopeFrame<Elem> {
+#[derive(Clone, Debug)]
+pub struct ScopeFrame<Elem>
+where
+    Elem: fmt::Debug,
+{
     pub tag: ScopeFrameTag,
-    pub vars: HashMap<String, Elem>,
+    pub elems: HashMap<String, Elem>,
 }
 
-impl<Elem> SimpleScopeFrame<Elem> {
+impl<Elem: fmt::Debug> ScopeFrame<Elem> {
     pub fn new(tag: ScopeFrameTag) -> Self {
         Self {
             tag,
-            vars: HashMap::new(),
+            elems: HashMap::new(),
         }
     }
-}
 
-impl<Elem> ScopeFrame for SimpleScopeFrame<Elem> {
-    type Elem = Elem;
-    fn get_tag(&self) -> ScopeFrameTag {
-        self.tag
+    pub fn get_tag(&self) -> &ScopeFrameTag {
+        &self.tag
     }
 
-    fn get(&self, name: &str) -> Option<&Elem> {
-        self.vars.get(name)
+    pub fn get(&self, name: &str) -> Option<&Elem> {
+        self.elems.get(name)
     }
 
-    fn get_mut(&mut self, name: &str) -> Option<&mut Elem> {
-        self.vars.get_mut(name)
+    pub fn get_mut(&mut self, name: &str) -> Option<&mut Elem> {
+        self.elems.get_mut(name)
     }
 
-    fn insert(&mut self, key: String, var: Elem) {
-        self.vars.insert(key, var);
+    pub fn insert(&mut self, key: String, var: Elem) {
+        debug!("Inserting into Scope {:?} with name {}", var, key);
+        self.elems.insert(key, var);
     }
 }
 
-pub struct Scope<OfT> {
-    pub arena: Arena<Box<dyn ScopeFrame<Elem = OfT>>>,
+impl ScopeFrame<Variable> {
+    pub fn insert_var(&mut self, var: Variable) -> Option<Variable> {
+        self.elems.insert(var.name.clone(), var)
+    }
+}
+
+#[derive(Clone)]
+pub struct Scope<T>
+where
+    T: fmt::Debug,
+{
+    pub arena: Arena<ScopeFrame<T>>,
     /// Always a valid id
     cur_frame_id: Option<NodeId>,
 }
 
-impl<OfT: 'static> Scope<OfT> {
+impl<T: fmt::Debug + 'static> Scope<T> {
     pub fn new() -> Self {
         Scope {
-            arena: Arena::<Box<dyn ScopeFrame<Elem = OfT>>>::new(),
+            arena: Arena::new(),
             cur_frame_id: None,
         }
     }
@@ -98,40 +102,30 @@ impl<OfT: 'static> Scope<OfT> {
         self.cur_frame_id = Some(id);
     }
 
-    pub fn cur_frame(&self) -> &dyn ScopeFrame<Elem = OfT> {
+    pub fn cur_frame(&self) -> &ScopeFrame<T> {
         self.arena
             .get(self.cur_frame_id.expect("Scope is empty"))
             .unwrap()
             .get()
-            .as_ref()
     }
 
-    pub fn cur_mut_frame(&mut self) -> &mut dyn ScopeFrame<Elem = OfT> {
+    pub fn cur_mut_frame(&mut self) -> &mut ScopeFrame<T> {
         self.arena
-            .get_mut(self.cur_frame_id.expect("Scope is empty"))
+            .get_mut(self.get_cur_frame_id())
             .unwrap()
             .get_mut()
-            .as_mut()
     }
 
-    pub fn global_mut_frame(&mut self) -> &mut dyn ScopeFrame<Elem = OfT> {
-        let ancestors: Vec<NodeId> = self
-            .cur_frame_id
-            .expect("Scope is empty")
-            .ancestors(&self.arena)
-            .collect();
+    pub fn global_mut_frame(&mut self) -> &mut ScopeFrame<T> {
+        let ancestors: Vec<NodeId> = self.get_cur_frame_id().ancestors(&self.arena).collect();
         let global_id = ancestors.last().unwrap();
-        let global_frame = self.arena.get_mut(*global_id).unwrap();
-        global_frame.get_mut().as_mut()
+        self.arena[*global_id].get_mut()
     }
 
-    pub fn push_frame(
-        &mut self,
-        tag: ScopeFrameTag,
-    ) -> (ScopeFrameId, &mut dyn ScopeFrame<Elem = OfT>) {
+    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut ScopeFrame<T>) {
         debug!("Pushing frame: {:?}", tag);
         let prev_frame_id = self.cur_frame_id;
-        let new_frame_id = self.arena.new_node(Box::new(SimpleScopeFrame::new(tag)));
+        let new_frame_id = self.arena.new_node(ScopeFrame::new(tag));
         if let Some(prev_frame_id) = prev_frame_id {
             prev_frame_id.append(new_frame_id, &mut self.arena);
         }
@@ -140,7 +134,7 @@ impl<OfT: 'static> Scope<OfT> {
         (new_frame_id, self.cur_mut_frame())
     }
 
-    pub fn pop_frame(&mut self, expected: ScopeFrameTag) {
+    pub fn pop_frame(&mut self, expected: &ScopeFrameTag) {
         if let Some(cur_frame_id) = self.cur_frame_id {
             let cur_frame = &self.arena[cur_frame_id];
             let cur_frame_tag = cur_frame.get().get_tag();
@@ -162,10 +156,56 @@ impl<OfT: 'static> Scope<OfT> {
     fn get_cur_tag(&self) -> ScopeFrameTag {
         if let Some(cur_frame_id) = self.cur_frame_id {
             let cur_frame = &self.arena[cur_frame_id];
-            cur_frame.get().get_tag()
+            cur_frame.get().get_tag().clone()
         } else {
             ScopeFrameTag::None
         }
+    }
+
+    fn root_id(&self) -> Option<NodeId> {
+        self.cur_frame_id
+            .map(|id| id.ancestors(&self.arena).last())
+            .flatten()
+    }
+
+    fn tag_of(&self, id: NodeId) -> &ScopeFrameTag {
+        self.arena[id].get().get_tag()
+    }
+
+    fn fmt_as_string(&self) -> String {
+        if self.is_empty() {
+            return "Empty Scope".to_string();
+        }
+
+        let mut indent = 0;
+        let mut result = "\n".to_string();
+        for elem in self.root_id().unwrap().traverse(&self.arena) {
+            match elem {
+                indextree::NodeEdge::Start(id) => {
+                    let is_selected = if id == self.cur_frame_id.unwrap() {
+                        "*"
+                    } else {
+                        ""
+                    };
+                    result = result
+                        + &format!(
+                            "{:indent$}{}{:?}\n",
+                            "",
+                            is_selected,
+                            self.tag_of(id),
+                            indent = indent
+                        );
+                    indent = indent + 4;
+                }
+                indextree::NodeEdge::End(_) => indent = indent - 4,
+            }
+        }
+
+        result
+    }
+
+    pub(crate) fn is_empty(&self) -> bool {
+        self.cur_frame_id.is_none()
     }
 }
 
@@ -192,17 +232,10 @@ impl Scope<Variable> {
 
     fn find_func(&self, name: &str) -> Option<&Callable> {
         debug!("Finding cmd {} from {:?} on", name, self.get_cur_tag());
-        if let Some(var) = self.find_var(name) {
-            match &var.val {
-                Value::Function(func) => Some(
-                    func.downcast_ref::<Callable>()
-                        .expect("Func is always castable to Callable"),
-                ),
-                _ => todo!("TODO found variable must not be func"),
-            }
-        } else {
-            None
-        }
+        // TODO write check that no variable shadows a func name
+        self.find_var(name)
+            .map(|var| var.val_as_callable())
+            .flatten()
     }
 
     /// Find the command, having the longest match with name_parts (where not every part of
@@ -231,5 +264,51 @@ impl Scope<Variable> {
             result.map_or(999, |(idx, _)| idx)
         );
         result
+    }
+
+    pub fn set_cur_source_frame(&mut self, f_to_set: &PathBuf) -> LuResult<()> {
+        debug!("set_cur_source_frame");
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            let stages = cur_frame_id
+                .ancestors(&self.arena)
+                .chain(cur_frame_id.descendants(&self.arena));
+            for id in stages {
+                match self.arena.get(id).unwrap().get().get_tag() {
+                    ScopeFrameTag::SourceFileFrame(_) => {
+                        // Source file frame stage reached
+                        // Now iterate over left and right to find matching frame
+                        debug!("Found source file frame stage");
+                        for sipling in id
+                            .preceding_siblings(&self.arena)
+                            .chain(id.following_siblings(&self.arena))
+                        {
+                            match self.arena.get(sipling).unwrap().get().get_tag() {
+                                ScopeFrameTag::SourceFileFrame(f_name) => {
+                                    debug!("{:?} == {:?} ???", f_name, f_to_set);
+                                    if f_name == f_to_set {
+                                        debug!("set_cur_frame_id found matching source file frame {:?}", f_name);
+                                        self.set_cur_frame_id(sipling);
+                                        return Ok(());
+                                    }
+                                }
+                                _ => unreachable!(""),
+                            }
+                        }
+                    }
+                    _ => {}
+                };
+            }
+        }
+
+        debug!("set_cur_source_frame returning error");
+        Err(LuErr::Internal(
+            "Expected the scope to have at least 1 element".to_string(),
+        ))
+    }
+}
+
+impl<T: fmt::Debug + 'static> fmt::Debug for Scope<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.fmt_as_string())
     }
 }

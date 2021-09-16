@@ -15,15 +15,15 @@ mod visit_arg;
 
 pub use crate::evaluate::{EvalArg, Evaluable};
 pub use crate::interpreter::Interpreter;
-pub use crate::variable::Variable;
+pub use crate::variable::{VarDeclNode, Variable};
 pub use callable::{
-    ArgSignature, Callable, Command, FlagSignature, Function, RunExternalCmd, Signature,
-    VarArgSignature, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
+    ArgSignature, Callable, Command, FlagSignature, Function, InArgSignature, RetArgSignature,
+    RunExternalCmd, Signature, VarArgSignature, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
 };
 
 pub use evaluate::*;
 pub use resolve::*;
 pub use typecheck::*;
 
-pub use scope::{Scope, ScopeFrame, ScopeFrameTag, SimpleScopeFrame};
-pub use value_type::ValueType;
+pub use scope::{Scope, ScopeFrame, ScopeFrameTag};
+pub use value_type::{ValueType, ValueTypeErr};

@@ -1,23 +1,29 @@
 #![allow(dead_code)]
 use crate::scope::ScopeFrameId;
-use crate::{Command, Evaluable, Variable};
+use crate::{Command, Evaluable, VarDeclNode, Variable};
 use crate::{Evaluator, ValueType};
-use lu_syntax::ast::FnStmtNode;
+use lu_syntax::ast::{
+    FlagSignatureNode, FnStmtNode, InSignatureNode, ParamSignatureNode, RetSignatureNode,
+    VarArgParamSignatureRuleNode,
+};
 use lu_value::Value;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, new)]
 pub struct ArgSignature {
     pub name: String,
     pub type_: Option<ValueType>,
     pub is_opt: bool,
+    pub decl: Option<ParamSignatureNode>,
 }
 
-impl ArgSignature {
-    pub fn is_in_arg(&self) -> bool {
-        self.name == "in"
-    }
-    pub fn is_ret_arg(&self) -> bool {
-        self.name == "ret"
+impl Into<Variable> for ArgSignature {
+    fn into(self) -> Variable {
+        Variable::new(
+            self.name,
+            Value::Nil,
+            self.decl.map(|n| VarDeclNode::ArgSignature(n)),
+        )
     }
 }
 
@@ -25,15 +31,60 @@ impl ArgSignature {
 pub struct VarArgSignature {
     pub name: String,
     pub type_: Option<ValueType>,
+    pub decl: Option<VarArgParamSignatureRuleNode>,
 }
 
-#[derive(Clone, Debug, new, Hash, Eq, PartialEq)]
+impl Into<Variable> for VarArgSignature {
+    fn into(self) -> Variable {
+        Variable::new(
+            self.name,
+            Value::Nil,
+            self.decl.map(|n| VarDeclNode::VarArgSignature(n)),
+        )
+    }
+}
+
+#[derive(Clone, Debug, new)]
+pub struct InArgSignature {
+    pub type_: Option<ValueType>,
+    pub decl: Option<InSignatureNode>,
+}
+
+impl Into<Variable> for InArgSignature {
+    fn into(self) -> Variable {
+        Variable::new(
+            "in".into(),
+            Value::Nil,
+            self.decl.map(|n| VarDeclNode::InArgSignature(n)),
+        )
+    }
+}
+
+#[derive(Clone, Debug, new)]
+pub struct RetArgSignature {
+    pub type_: Option<ValueType>,
+    pub decl: Option<RetSignatureNode>,
+}
+
+impl Into<Variable> for RetArgSignature {
+    fn into(self) -> Variable {
+        Variable::new(
+            "ret".into(),
+            Value::Nil,
+            self.decl.map(|n| VarDeclNode::RetArgSignature(n)),
+        )
+    }
+}
+
+#[derive(Clone, Debug, new, Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub struct FlagSignature {
     pub long_name: Option<String>,
     pub short_name: Option<char>,
     pub type_: Option<ValueType>,
-    #[new(default)]
+    #[new(default)] // TODO this default should be false, making every flag necessary
     pub is_opt: bool,
+    #[serde(skip)]
+    pub decl: Option<FlagSignatureNode>,
 }
 
 #[derive(Clone, Debug, new)]
@@ -41,8 +92,8 @@ pub struct Signature {
     pub args: Vec<ArgSignature>,
     pub var_arg: Option<VarArgSignature>,
     pub flags: Vec<FlagSignature>,
-    pub in_type: Option<ValueType>,
-    pub ret_type: Option<ValueType>,
+    pub in_type: Option<InArgSignature>,
+    pub ret_type: Option<RetArgSignature>,
 }
 
 #[derive(Clone, Debug)]

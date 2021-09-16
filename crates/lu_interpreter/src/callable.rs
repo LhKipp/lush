@@ -3,12 +3,13 @@ mod function;
 mod run_external_cmd;
 
 pub use command::{Command, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME};
+use enum_as_inner::EnumAsInner;
 pub use function::*;
 pub use run_external_cmd::RunExternalCmd;
 
 use crate::{EvalArg, Evaluator};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, EnumAsInner)]
 pub enum Callable {
     Func(Function),
     InternalCmd(Box<dyn Command>),

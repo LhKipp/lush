@@ -1,21 +1,47 @@
-use lu_syntax::ast::{FnStmtNode, ForStmtNode, LetStmtNode, ParamSignatureNode};
+use lu_error::SourceCodeItem;
+use lu_syntax::{
+    ast::{
+        FnStmtNode, ForStmtNode, InSignatureNode, LetStmtNode, ParamSignatureNode,
+        RetSignatureNode, VarArgParamSignatureRuleNode,
+    },
+    AstNode, AstToken,
+};
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
 use crate::{Callable, Command, Function};
 
-#[derive(Clone, Debug, Eq, PartialEq, new)]
+#[derive(Clone, Debug, Eq, PartialEq, new, Hash)]
 pub enum VarDeclNode {
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
     ArgSignature(ParamSignatureNode),
+    VarArgSignature(VarArgParamSignatureRuleNode),
+    InArgSignature(InSignatureNode),
+    RetArgSignature(RetSignatureNode),
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, new, Serialize, Deserialize)]
+impl VarDeclNode {
+    pub fn into_item(&self) -> SourceCodeItem {
+        match self {
+            VarDeclNode::LetStmt(n) => n.into_item(),
+            VarDeclNode::FnStmt(n) => n.into_item(),
+            VarDeclNode::ArgSignature(n) => n.into_item(),
+            VarDeclNode::VarArgSignature(n) => n.into_item(),
+            VarDeclNode::InArgSignature(n) => n.into_item(),
+            VarDeclNode::RetArgSignature(n) => n.into_item(),
+            VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].into_item(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, new, Serialize, Deserialize, Hash)]
 pub struct Variable {
+    /// The name of the variable
     pub name: String,
+    /// The evaluation value of this variable, Value::Nil in other stages of interpretation
     pub val: Value,
     #[serde(skip)]
     pub decl: Option<VarDeclNode>,
@@ -44,5 +70,12 @@ impl Variable {
             val,
             decl: None,
         }
+    }
+
+    pub fn val_as_callable(&self) -> Option<&Callable> {
+        self.val.as_function().map(|func| {
+            func.downcast_ref::<Callable>()
+                .expect("Func is always castable to Callable")
+        })
     }
 }

@@ -2,15 +2,11 @@ use std::{fmt::Debug, sync::Arc};
 
 use log::debug;
 use lu_error::{LuErr, LuResult};
-use lu_syntax::{
-    ast::{HasRule, SourceFileNode},
-    AstNode, Parse,
-};
-use lu_text_util::SourceCode;
+use lu_syntax::ast::SourceFileNode;
 use lu_value::Value;
 use parking_lot::Mutex;
 
-use crate::{Scope, Variable};
+use crate::{Scope, TypeChecker, Variable};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -47,6 +43,8 @@ pub trait Evaluable: Debug {
 }
 
 pub struct Evaluator {
+    pub ty_checker: TypeChecker,
+
     pub scope: Arc<Mutex<Scope<Variable>>>,
     pub errors: Vec<LuErr>,
     /// The final result of this evaluator
@@ -54,38 +52,55 @@ pub struct Evaluator {
 }
 
 impl Evaluator {
-    pub fn new(scope: Arc<Mutex<Scope<Variable>>>) -> Self {
+    pub fn new(ty_checker: TypeChecker) -> Self {
+        let scope = ty_checker.resolve.scope.clone();
         Self {
+            ty_checker,
             scope,
             errors: Vec::new(),
             result: None,
         }
     }
 
-    pub fn evaluate(&mut self, node: &SourceFileNode) {
+    pub fn evaluate(&mut self) {
+        let node = self
+            .ty_checker
+            .resolve
+            .parse
+            .cast::<SourceFileNode>()
+            .unwrap();
         match node.evaluate(self) {
             Ok(v) => self.result = Some(v),
             Err(e) => self.errors.push(e),
         }
     }
 
-    /// Evaluate code as T
-    pub fn evaluate_as<T: Evaluable + HasRule + AstNode>(
-        &mut self,
-        code: SourceCode,
-    ) -> LuResult<Value> {
-        let parse_result = Parse::rule(&code.to_string()?, &*T::get_belonging_rule());
-        // We don't allow evaluation if errors happend.
-        let source_file = parse_result.ok::<T>()?;
-        source_file.evaluate(self)
+    // /// Evaluate code as T
+    // pub fn evaluate_as<T: Evaluable + HasRule + AstNode>(
+    //     &mut self,
+    //     code: SourceCode,
+    // ) -> LuResult<Value> {
+    //     let parse_result = Parse::rule(&code.to_string()?, &*T::get_belonging_rule());
+    //     // We don't allow evaluation if errors happend.
+    //     let source_file = parse_result.ok::<T>()?;
+    //     source_file.evaluate(self)
+    // }
+
+    pub fn failed(&self) -> bool {
+        !self.errors.is_empty()
     }
 
-    pub(crate) fn succeeded(&self) -> bool {
-        if self.errors.is_empty() {
-            assert!(self.result.is_some());
-            true
+    pub(crate) fn all_errors(&self) -> Vec<LuErr> {
+        let mut errs = self.ty_checker.all_errors();
+        errs.extend(self.errors.clone());
+        errs
+    }
+
+    pub(crate) fn as_result(self) -> Result<Value, Vec<LuErr>> {
+        if self.failed() {
+            Err(self.all_errors())
         } else {
-            false
+            Ok(self.result.unwrap())
         }
     }
 }

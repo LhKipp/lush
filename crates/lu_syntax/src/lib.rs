@@ -1,11 +1,13 @@
 pub mod ast;
+use lu_text_util::SourceCode;
 mod build_tree;
 mod syntax_node;
+use lu_pipeline_stage::PipelineStage;
 
 use build_tree::TreeBuilder;
-use lu_error::{LuErr, LuResult, ParseErr, ParseErrs};
+use lu_error::{LuErr, LuResults};
 
-use lu_parser::grammar::{Rule, SourceFileRule};
+use lu_parser::grammar::Rule;
 
 pub use syntax_node::{
     SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
@@ -27,26 +29,36 @@ pub use ast::{AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken
 /// Currently the green node will always be a SourceFileNode
 #[derive(Debug)]
 pub struct Parse {
+    pub source: SourceCode,
+    pub errors: Vec<LuErr>,
     green: GreenNode,
-    pub errors: Vec<ParseErr>,
 }
 
 impl Parse {
-    pub fn rule(text: &str, rule: &dyn Rule) -> Self {
-        let (green, errors) = TreeBuilder::build(text, rule);
+    pub fn rule(code: SourceCode, rule: &dyn Rule) -> Self {
+        let (green, errors) = TreeBuilder::build(&code.text, rule);
+        let errors: Vec<LuErr> = errors.into_iter().map(|e| e.into()).collect();
 
         // TODO add validation here
         // errors.extend(validation::validate(&root));
 
-        Parse::new(green, errors)
+        Parse::new(code, green, errors)
     }
 
-    pub fn source_file(text: &str) -> Parse {
-        Self::rule(text, &SourceFileRule {})
+    fn new(source: SourceCode, green: GreenNode, errors: Vec<LuErr>) -> Parse {
+        Parse {
+            source,
+            green,
+            errors,
+        }
     }
 
-    fn new(green: GreenNode, errors: Vec<ParseErr>) -> Parse {
-        Parse { green, errors }
+    pub fn all_errors(&self) -> Vec<LuErr> {
+        self.errors.clone()
+    }
+
+    pub fn any_failed(&self) -> bool {
+        !self.errors.is_empty()
     }
 
     pub fn syntax_node(&self) -> SyntaxNode {
@@ -57,17 +69,22 @@ impl Parse {
         T::cast(self.syntax_node())
     }
 
-    pub fn ok<T: AstNode>(self) -> LuResult<T> {
+    pub fn ok<T: AstNode>(self) -> LuResults<T> {
         if self.errors.is_empty() {
             Ok(self.cast::<T>().unwrap())
         } else {
-            Err(LuErr::ParseErrs(ParseErrs::new(self.errors)))
+            Err(self.errors)
         }
+    }
+
+    pub fn errors(self) -> Vec<LuErr> {
+        // TODO make internal errors from ParseErr to LuErr
+        self.errors.into_iter().map(|e| LuErr::from(e)).collect()
     }
 }
 
-#[test]
-fn comp() {
-    assert_eq!(1 + 1, 2);
-    // Parse::source_file("echo hi");
+impl PipelineStage for Parse {
+    fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
+        None
+    }
 }

@@ -83,6 +83,10 @@ pub trait AstToken {
     fn text(&self) -> &str {
         self.syntax().text()
     }
+
+    fn into_item(&self) -> SourceCodeItem {
+        SourceCodeItem::new(self.syntax().text_range().into(), self.text().to_string())
+    }
 }
 
 pub trait AstElement {
@@ -101,6 +105,10 @@ pub trait AstElement {
             rowan::NodeOrToken::Node(n) => n.text().to_string(),
             rowan::NodeOrToken::Token(t) => t.text().to_string(),
         }
+    }
+
+    fn into_item(&self) -> SourceCodeItem {
+        SourceCodeItem::new(self.syntax().text_range().into(), self.text())
     }
 }
 

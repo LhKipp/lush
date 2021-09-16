@@ -1,0 +1,31 @@
+1
+===
+let x:num = "Hello World"
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "let x:num",
+            "range": [
+              0,
+              9
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "\"Hello World\"",
+            "range": [
+              12,
+              25
+            ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...

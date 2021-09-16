@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::{error::Error, ops::Range};
+use std::{convert::TryInto, error::Error, ops::Range};
+use text_size::TextRange;
 
 mod eval_err;
 mod fs_err;
@@ -13,20 +14,19 @@ extern crate strum_macros;
 pub use eval_err::EvalErr;
 pub use fs_err::FsErr;
 pub use parse_err::{ParseErr, ParseErrs};
-pub use ty_err::TyErr;
+pub use ty_err::*;
 
 use std::result;
 
 pub type LuResult<T> = result::Result<T, LuErr>;
 pub type LuResults<T> = result::Result<T, Vec<LuErr>>;
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum LuErr {
     Parse(ParseErr),
-    ParseErrs(ParseErrs),
-    Eval(EvalErr),
     Ty(TyErr),
     FS(FsErr),
+    Eval(EvalErr),
     Internal(String),
     Errors(),
 }
@@ -49,6 +49,12 @@ impl From<EvalErr> for LuErr {
     }
 }
 
+impl From<TyErr> for LuErr {
+    fn from(e: TyErr) -> Self {
+        LuErr::Ty(e)
+    }
+}
+
 // impl From<FsErr> for LuErr {
 //     fn from(e: FsErr) -> Self {
 //         LuErr::FS(e)
@@ -56,15 +62,22 @@ impl From<EvalErr> for LuErr {
 // }
 
 /// An item in the source code to be used in the `Error` enum.
-#[derive(PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct SourceCodeItem {
-    range: Range<usize>,
     content: String,
+    range: TextRange,
 }
 
 impl SourceCodeItem {
+    // TODO adapt ctor and users
     pub fn new(range: Range<usize>, content: impl Into<String>) -> SourceCodeItem {
         let content = content.into();
-        SourceCodeItem { range, content }
+        SourceCodeItem {
+            range: TextRange::new(
+                range.start.try_into().unwrap(),
+                range.end.try_into().unwrap(),
+            ),
+            content,
+        }
     }
 }

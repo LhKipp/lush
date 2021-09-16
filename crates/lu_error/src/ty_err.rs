@@ -12,15 +12,30 @@ use thiserror::Error;
 
 use crate::{LuErr, LuResult, SourceCodeItem};
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum TyErr {
     Message(String),
+    TermDoesNotReturnType(SourceCodeItem),
+    TypesNotEqual {
+        lhs_decl: Option<SourceCodeItem>,
+        lhs_ty: String,
+        rhs_decl: Option<SourceCodeItem>,
+        rhs_ty: String,
+    },
 }
 
 impl TyErr {
     pub fn report(&self) -> Diagnostic<()> {
         match self {
             TyErr::Message(_) => todo!(),
+            TyErr::TermDoesNotReturnType(_) => todo!(),
+            #[allow(unused_variables)]
+            TyErr::TypesNotEqual {
+                lhs_decl,
+                lhs_ty,
+                rhs_decl,
+                rhs_ty,
+            } => todo!(),
         }
     }
 }

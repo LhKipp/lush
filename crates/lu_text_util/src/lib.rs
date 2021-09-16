@@ -1,25 +1,30 @@
 use lu_error::LuResult;
-use lu_fs::read_to_string;
 use std::path::PathBuf;
 
-pub enum SourceCode {
-    Text(String),
-    File(PathBuf),
+#[derive(Debug, Clone)]
+pub struct SourceCode {
+    pub text: String,
+    pub path: PathBuf,
 }
 
 impl SourceCode {
-    /// Returns (Text, SourceName)
-    pub fn unpack(self) -> LuResult<(String, Option<PathBuf>)> {
-        match self {
-            SourceCode::Text(s) => Ok((s, None)),
-            SourceCode::File(p) => Ok((read_to_string(p.clone())?, Some(p))),
+    pub fn new_text(text: String) -> SourceCode {
+        SourceCode {
+            text,
+            path: "tmp_text".into(),
         }
     }
 
-    pub fn to_string(self) -> LuResult<String> {
-        match self {
-            SourceCode::Text(t) => Ok(t),
-            SourceCode::File(f) => read_to_string(f),
-        }
+    pub fn new_file(f: PathBuf) -> LuResult<SourceCode> {
+        Ok(SourceCode {
+            text: lu_fs::read_to_string(f.as_path())?,
+            path: f,
+        })
+    }
+}
+
+impl From<String> for SourceCode {
+    fn from(s: String) -> Self {
+        SourceCode::new_text(s)
     }
 }

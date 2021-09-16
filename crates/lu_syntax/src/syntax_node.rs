@@ -9,7 +9,7 @@
 use lu_error::ParseErr;
 use rowan::{GreenNodeBuilder, Language, SmolStr};
 
-use crate::{Parse, SyntaxKind};
+use crate::SyntaxKind;
 
 pub(crate) use rowan::GreenNode;
 
@@ -43,12 +43,6 @@ impl SyntaxTreeBuilder {
     pub(crate) fn finish_raw(self) -> (GreenNode, Vec<ParseErr>) {
         let green = self.inner.finish();
         (green, self.errors)
-    }
-
-    #[allow(unused)]
-    pub fn finish(self) -> Parse {
-        let (green, errors) = self.finish_raw();
-        Parse::new(green, errors)
     }
 
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {

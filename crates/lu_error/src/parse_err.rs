@@ -7,7 +7,7 @@ pub struct ParseErrs {
     pub errs: Vec<ParseErr>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum ParseErr {
     /// Catch-all
     Message(String),

@@ -3,6 +3,7 @@ use std::rc::Rc;
 
 use log::debug;
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
+use lu_pipeline_stage::ErrorContainer;
 use lu_syntax::{
     ast::{BlockStmtNode, FnStmtNode, IfStmtNode, LuTypeNode, SignatureNode, StatementElement},
     ast::{ConditionElement, IfBlockNode},
@@ -12,6 +13,7 @@ use lu_syntax_elements::BlockType;
 use lu_value::Value;
 
 use crate::{
+    callable::{InArgSignature, RetArgSignature},
     resolve::{Resolve, ResolveArg, Resolver},
     visit_arg::VisitArg,
     ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
@@ -20,32 +22,34 @@ use crate::{
 
 impl Resolve for BlockStmtNode {
     fn do_resolve_dependant_names(&self, args: &[ResolveArg], resolver: &mut Resolver) {
-        let b_type = match args.get(0) {
-            Some(ResolveArg::Arg(VisitArg::BlockTypeArg(t))) => t,
+        let source_f_path = match args.get(0) {
+            Some(ResolveArg::Arg(VisitArg::SourceFileBlock(f))) => f,
             _ => unreachable!("Passing of BlockType as first arg is required"),
         };
         {
             let mut l_scope = resolver.scope.lock();
-            l_scope.push_frame(b_type.clone().into());
+            l_scope.push_frame(ScopeFrameTag::SourceFileFrame(source_f_path.clone()));
         }
 
-        if b_type == &BlockType::SourceFileBlock {
-            // For each fn_stmt we have to do:
-            // 1. Put the fn with signature into the current scope
-            // 2. resolve all dependant names within the fn_stmt
-            // Step 2 is done in sequence with resolution of the source file block, so as to have
-            // global vars in scope
-            // ```lu
-            // let x = 1
-            // mut_x # Call can happen before sourcing fn stmt. Therefore source fn stmts before
-            // fn mut_x
-            //      $x = 3 # $x refers to global x
-            // end
-            // ```
-            for fn_stmt in self.fn_stmts() {
-                source_fn_stmt(&fn_stmt, resolver);
-            }
+        // For each fn_stmt we have to do:
+        // 1. Put the fn with signature into the current scope
+        // 2. resolve all dependant names within the fn_stmt
+        // Step 2 is done in sequence with resolution of the source file block, so as to have
+        // global vars in scope
+        // ```lu
+        // let x = 1
+        // mut_x # Call can happen before sourcing fn stmt. Therefore source fn stmts before
+        // fn mut_x
+        //      $x = 3 # $x refers to global x
+        // end
+        // ```
+        for fn_stmt in self.fn_stmts() {
+            source_fn_stmt(&fn_stmt, resolver);
         }
+
+        // TODO source variables
+
+        // No deletion of the source file frame, so following steps can use it
     }
 }
 
@@ -56,9 +60,10 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
     let sign = if let Some(sign_node) = fn_stmt.signature() {
         source_signature(&sign_node, resolver)
     } else {
-        //TODO shouldnt this be empty and var_arg == Any
+        // TODO shouldnt this be empty and var_arg == Any
+        // let var_arg = VarArgSignature::new("args".into(), None, None);
         let args = (0..10)
-            .map(|i| ArgSignature::new(ARG_VAR_NAME.to_string() + &i.to_string(), None, true))
+            .map(|i| ArgSignature::new(ARG_VAR_NAME.to_string() + &i.to_string(), None, true, None))
             .collect();
         Signature::new(args, None, vec![], None, None)
     };
@@ -74,12 +79,18 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
 }
 
 fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signature {
-    let in_ty = sign_node
-        .in_type()
-        .map(|in_node| get_ty_of_node(&in_node, resolver));
-    let ret_ty = sign_node
-        .ret_type()
-        .map(|ret_node| get_ty_of_node(&ret_node, resolver));
+    let in_ty = sign_node.in_arg().map(|in_node| {
+        InArgSignature::new(
+            in_node.type_().map(|ty| get_ty_of_node(&ty, resolver)),
+            Some(in_node.clone()),
+        )
+    });
+    let ret_ty = sign_node.ret_arg().map(|ret_node| {
+        RetArgSignature::new(
+            ret_node.type_().map(|ty| get_ty_of_node(&ty, resolver)),
+            Some(ret_node.clone()),
+        )
+    });
     let args: Vec<ArgSignature> = sign_node
         .args()
         .map(|arg_node| -> ArgSignature {
@@ -87,7 +98,7 @@ fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signa
             let ty = arg_node
                 .type_()
                 .map(|ty_node| get_ty_of_node(&ty_node, resolver));
-            ArgSignature::new(arg_name, ty, false)
+            ArgSignature::new(arg_name, ty, false, Some(arg_node))
         })
         .collect();
     let flags = sign_node
@@ -98,7 +109,7 @@ fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signa
             let ty = flag_node
                 .type_()
                 .map(|ty_node| get_ty_of_node(&ty_node, resolver));
-            FlagSignature::new(long_name, short_name, ty)
+            FlagSignature::new(long_name, short_name, ty, Some(flag_node))
         })
         .collect();
     let var_arg = sign_node.var_arg().map(|var_arg_node| {
@@ -106,12 +117,12 @@ fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signa
         let ty = var_arg_node
             .type_()
             .map(|ty_node| get_ty_of_node(&ty_node, resolver));
-        VarArgSignature::new(name, ty)
+        VarArgSignature::new(name, ty, Some(var_arg_node))
     });
     Signature::new(args, var_arg, flags, in_ty, ret_ty)
 }
 
 fn get_ty_of_node(ty_node: &LuTypeNode, resolver: &mut Resolver) -> ValueType {
-    let ty = ValueType::from_node(&ty_node.into_type(), &resolver);
-    resolver.ok_or_record_err(ty)
+    let ty = ValueType::from_node(&ty_node.into_type());
+    resolver.ok_or_record(ty).unwrap_or(ValueType::Error)
 }

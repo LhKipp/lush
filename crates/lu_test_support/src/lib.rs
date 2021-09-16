@@ -1,13 +1,10 @@
 #[macro_use]
 extern crate vec_box;
 
-use std::sync::Arc;
-
-use parking_lot::Mutex;
 use pretty_env_logger::env_logger;
 
 use lu_cmds::{PrintCmd, TestPrintCmd};
-use lu_interpreter::{Callable, Command, Evaluator, Interpreter, Scope, ScopeFrameTag, Variable};
+use lu_interpreter::{Callable, Command, Interpreter, Scope, ScopeFrameTag, Variable};
 use lu_value::Value;
 
 pub fn init_logger() {
@@ -30,11 +27,6 @@ fn make_test_scope() -> Scope<Variable> {
         )
     }
     scope
-}
-
-pub fn make_test_evaluator() -> Evaluator {
-    let state = Evaluator::new(Arc::new(Mutex::new(make_test_scope())));
-    state
 }
 
 pub fn make_test_interpreter() -> Interpreter {

@@ -23,17 +23,17 @@ impl Evaluable for PipedCmdsStmtNode {
 #[cfg(test)]
 mod test {
     use lu_error::LuResult;
-    use lu_syntax::ast::SourceFileNode;
-    use lu_test_support::{init_logger, make_test_evaluator};
-    use lu_text_util::SourceCode;
+    use lu_test_support::{init_logger, make_test_interpreter};
     use lu_value::Value;
     use {conformance, serde_json};
 
     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/piped_cmds_stmt/general.json_test")]
     fn general_interpreter_tests(s: &str) -> LuResult<Value> {
         init_logger();
-        let mut evaluator = make_test_evaluator();
+        let mut evaluator = make_test_interpreter();
 
-        evaluator.evaluate_as::<SourceFileNode>(SourceCode::Text(s.to_string()))
+        evaluator
+            .eval(s.to_string().into())
+            .map_err(|errs| errs[0].clone())
     }
 }

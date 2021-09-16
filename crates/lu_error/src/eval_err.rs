@@ -12,7 +12,7 @@ use thiserror::Error;
 
 use crate::{LuErr, LuResult, SourceCodeItem};
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum EvalErr {
     Message(String),
     VarNotFound(SourceCodeItem),

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use lu_error::{LuErr, LuResult, ParseErr};
+use lu_error::{LuErr, LuResult, LuResults, ParseErr};
 use lu_parser::grammar::SourceFileRule;
 use lu_syntax::{
     ast::{HasRule, SourceFileNode},
@@ -15,6 +15,11 @@ use std::{path::PathBuf, sync::Arc};
 
 use crate::{typecheck::TypeChecker, Evaluable, Evaluator, Resolver, Scope, Variable};
 
+struct NamedSourceFileNode {
+    node: SourceFileNode,
+    path: PathBuf,
+}
+
 /// The interpreter holds data (scope), getting transformed while interpreting the ast.
 pub struct Interpreter {
     pub scope: Arc<Mutex<Scope<Variable>>>,
@@ -27,46 +32,52 @@ impl Interpreter {
         }
     }
 
-    pub fn run(&mut self, code: SourceCode) -> Result<Value, Vec<LuErr>> {
-        let mut errs = Vec::new();
-        let (code, source_name) = match code.unpack() {
-            Ok(c) => c,
-            Err(e) => return Err(vec![e]),
-        };
-        let source_name = source_name.unwrap_or("tmp_text".into());
-
-        let parse_result = Parse::rule(&code, &SourceFileRule {});
-        let source_file = parse_result.cast::<SourceFileNode>().unwrap();
-        errs.extend(parse_result.errors.into_iter().map(|e| LuErr::from(e)));
-
-        let mut resolver = Resolver::new(self.scope.clone());
-        resolver.resolve(
-            &source_file,
-            source_name.into_os_string().into_string().unwrap(),
-        );
-        errs.extend(resolver.errors);
-
-        let mut ty_checker = TypeChecker::new(resolver.scope);
-        ty_checker.typecheck(&source_file);
-        errs.extend(ty_checker.errors);
-
-        // We don't allow evaluation if errors happend.
-        if !errs.is_empty() {
-            return Err(errs);
-        }
-
-        let mut evaluator = Evaluator::new(ty_checker.scope);
-        evaluator.evaluate(&source_file);
-
-        if evaluator.succeeded() {
-            Ok(evaluator.result.unwrap())
-        } else {
-            errs.extend(evaluator.errors);
-            Err(errs)
-        }
+    pub fn parse(&mut self, code: SourceCode) -> Parse {
+        Parse::rule(code, &SourceFileRule {})
     }
 
-    pub fn evaluate(&mut self, code: SourceCode) -> Result<Value, Vec<LuErr>> {
-        self.run(code)
+    pub fn resolve(&mut self, parse: Parse) -> Resolver {
+        let mut resolver = Resolver::new(parse, self.scope.clone());
+        resolver.resolve();
+
+        resolver
+    }
+
+    pub fn typecheck(&mut self, resolve: Resolver) -> TypeChecker {
+        let mut ty_checker = TypeChecker::new(resolve);
+        ty_checker.typecheck();
+        ty_checker
+    }
+
+    pub fn evaluate(&mut self, ty_checker: TypeChecker) -> Option<Evaluator> {
+        // We don't allow evaluation if errors happend.
+        if ty_checker.any_failed() {
+            return None;
+        }
+
+        let mut evaluator = Evaluator::new(ty_checker);
+        evaluator.evaluate();
+        Some(evaluator)
+
+        // if evaluator.succeeded() {
+        //     Ok(evaluator.result.unwrap())
+        // } else {
+        //     Err(evaluator.all_errors())
+        // }
+    }
+
+    pub fn eval(&mut self, code: SourceCode) -> LuResults<Value> {
+        let parse = self.parse(code);
+        let resolve = self.resolve(parse);
+        let ty_check = self.typecheck(resolve);
+        let ty_check = ty_check.as_result()?;
+        self.evaluate(ty_check).unwrap().as_result()
+    }
+
+    pub fn ty_check(&mut self, code: SourceCode) -> LuResults<TypeChecker> {
+        let parse = self.parse(code);
+        let resolve = self.resolve(parse);
+        let ty_check = self.typecheck(resolve);
+        ty_check.as_result()
     }
 }

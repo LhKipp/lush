@@ -1,23 +1,23 @@
+use std::{collections::HashMap, fmt::Display};
+
 use lu_error::LuErr;
 use lu_syntax::ast::LuTypeSpecifierElement;
-use rusttyc::{types::Arity, Partial, Variant as TcVariant};
+use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
 
-use super::Resolver;
+use crate::FlagSignature;
 
-// enum ParamType{
-//     GenericT(i32),
-//     Concrete(ValueType),
-// }
-
-// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-// struct FuncType{
-//     name: String,
-//     req_flags: Vec<String>,
-
-//     args: Vec<ParamType>,
-//     ret_t: ParamType
-// }
+#[derive(Educe)]
+#[educe(Hash)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct FuncType {
+    in_ty: Option<ValueType>,
+    ret_ty: Option<ValueType>,
+    args_ty: Vec<ValueType>,
+    var_arg_ty: Option<ValueType>,
+    #[educe(Hash(ignore))]
+    flags_ty: HashMap<FlagSignature, ValueType>,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum ValueType {
@@ -32,14 +32,11 @@ pub enum ValueType {
     String,
     BareWord,
     Array(Box<ValueType>),
-    // Function(FuncType),
+    Func(Box<FuncType>),
 }
 
 impl ValueType {
-    pub fn from_node(
-        node: &LuTypeSpecifierElement,
-        resolver: &Resolver,
-    ) -> Result<ValueType, LuErr> {
+    pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => ValueType::Any,
             LuTypeSpecifierElement::NumberKeyword(_) => ValueType::Number,
@@ -49,7 +46,7 @@ impl ValueType {
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
             LuTypeSpecifierElement::ArrayType(arr) => {
                 if let Some(inner) = arr.inner_type() {
-                    ValueType::from_node(&inner.into_type(), resolver)?
+                    ValueType::from_node(&inner.into_type())?
                 } else {
                     ValueType::Unspecified
                 }
@@ -61,8 +58,18 @@ impl ValueType {
     }
 }
 
+#[derive(Clone, Debug)]
+pub enum ValueTypeErr {
+    Dummy,
+    /// Lhs not meetable with rhs
+    NotMeetAble {
+        lhs_ty: ValueType,
+        rhs_ty: ValueType,
+    },
+}
+
 impl TcVariant for ValueType {
-    type Err = String;
+    type Err = ValueTypeErr;
 
     fn top() -> Self {
         ValueType::Any
@@ -96,12 +103,9 @@ impl TcVariant for ValueType {
                 }
                 _ => None,
             };
-            coercable_ty.ok_or_else(|| {
-                format!(
-                    "{:?} can not be combined with {:?}",
-                    lhs.variant, rhs.variant
-                )
-                .to_string()
+            coercable_ty.ok_or_else(|| ValueTypeErr::NotMeetAble {
+                lhs_ty: lhs.variant,
+                rhs_ty: rhs.variant,
             })?
         };
 
@@ -126,8 +130,33 @@ impl TcVariant for ValueType {
             | ValueType::String
             | ValueType::BareWord => Arity::Fixed(0),
             ValueType::Array(_) => Arity::Fixed(1),
-
             ValueType::Error => Self::arity(&ValueType::Any),
+            ValueType::Func(_) => todo!(),
+        }
+    }
+}
+
+impl Constructable for ValueType {
+    type Type = ValueType;
+
+    fn construct(&self, _: &[Self::Type]) -> Result<Self::Type, <Self as TcVariant>::Err> {
+        Ok(self.clone())
+    }
+}
+
+impl Display for ValueType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ValueType::Error => write!(f, "ERROR"),
+            ValueType::Unspecified => write!(f, "UNSPECIFIED"),
+            ValueType::Any => write!(f, "any"),
+            ValueType::Nil => write!(f, "nil"),
+            ValueType::Bool => write!(f, "bool"),
+            ValueType::Number => write!(f, "num"),
+            ValueType::String => write!(f, "str"),
+            ValueType::BareWord => write!(f, "bare_word"),
+            ValueType::Array(t) => write!(f, "[{}]", t),
+            ValueType::Func(_) => todo!(),
         }
     }
 }

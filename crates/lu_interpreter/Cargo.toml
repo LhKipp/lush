@@ -13,6 +13,7 @@ lu_text_util = { version = "0.1.0", path = "../lu_text_util" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
+lu_pipeline_stage = { version = "0.1.0", path = "../lu_pipeline_stage" }
 
 derive-new = "0.5"
 indextree = {version = "4.3.1", features = ["deser"]}
@@ -24,6 +25,8 @@ serde = "1.0.129"
 rusttyc = "0.4.2"
 educe = "0.4.18"
 if_chain = "1.0.2"
+enum-as-inner = "0.3.3"
+bimap = "0.6.1"
 
 [dev-dependencies]
 lu_test_support = { version = "0.1.0", path = "../lu_test_support" }

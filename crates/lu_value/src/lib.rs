@@ -1,11 +1,13 @@
+use enum_as_inner::EnumAsInner;
 use ordered_float::OrderedFloat;
+use std::hash::{Hash, Hasher};
 use std::{any::Any, fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
 pub const NIL_VAL: Value = Value::Nil;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, EnumAsInner)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about
     // pure functions with inputs. However, copying large structs (Array, Table, ...)
@@ -40,6 +42,23 @@ impl PartialEq for Value {
 }
 impl Eq for Value {}
 
+impl Hash for Value {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            Value::Nil => {
+                state.write_i32(1);
+                state.finish();
+            }
+            Value::Bool(v) => v.hash(state),
+            Value::Number(v) => v.hash(state),
+            Value::String(v) => v.hash(state),
+            Value::BareWord(v) => v.hash(state),
+            Value::Array(v) => v.hash(state),
+            Value::Function(func) => Rc::as_ptr(func).hash(state),
+        }
+    }
+}
+
 impl Value {
     pub fn new_func<F: Any + Sized>(func: F) -> Self {
         Value::Function(Rc::new(func))
@@ -58,6 +77,10 @@ impl Value {
 
     pub fn is_nil(&self) -> bool {
         return self == &Value::Nil;
+    }
+
+    pub fn is_func(&self) -> bool {
+        matches!(self, Value::Function(_))
     }
 
     /// Returns Some(true|false) if self represents a true or false value
