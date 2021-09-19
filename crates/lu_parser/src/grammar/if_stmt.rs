@@ -13,7 +13,7 @@ fn parse_with_cond(kind: SyntaxKind, p: &mut Parser) {
     p.expect(kind);
     p.eat_while(CMT_NL_WS);
     ConditionRule::new().parse(p);
-    p.expect_after(CMT_WS, Newline);
+    p.expect_after(Newline, CMT_WS);
 
     if_elif_block_rule.parse(p);
 }
@@ -40,7 +40,7 @@ impl Rule for IfStmtRule {
 
         if p.eat(ElseKeyword) {
             p.eat_while(CMT_WS);
-            p.expect_after(CMT_WS, Newline);
+            p.expect_after(Newline, CMT_WS);
 
             BlockStmtRule::else_block().parse(p);
         }

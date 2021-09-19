@@ -221,20 +221,17 @@ impl Parser {
 
     /// Expect `and_then` after `before`
     /// Example: p.expect_after(CMT_WS, Newline) // Expect a nl (with optional ws before)
-    pub(crate) fn expect_after<TS1: Into<TokenSet>, TS2: Into<TokenSet>>(
+    pub(crate) fn expect_after<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet>>(
         &mut self,
-        before: TS1,
-        kinds: TS2,
+        kinds: TS1,
+        after: TS2,
     ) -> bool {
-        let kinds = kinds.into();
-        let before = before.into();
-        if kinds.contains(self.next_non(before)) {
-            self.eat_while(before);
-            self.expect(kinds)
-        } else {
-            let err: ParseErr = format!("expected {:?}", kinds).into();
+        if !self.eat_after(kinds, after) {
+            let err: ParseErr = format!("expected {:?}", kinds.into()).into();
             self.error(err);
             false
+        } else {
+            true
         }
     }
 

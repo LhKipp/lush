@@ -29,7 +29,7 @@ impl Rule for LetStmtRule {
         if p.eat_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);
         }
-        p.expect_after(CMT_NL_WS, T![=]);
+        p.expect_after(T![=], CMT_NL_WS);
         ValueExprRule {}.parse(p);
         Some(m.complete(p, LetStmt))
     }

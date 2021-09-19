@@ -27,7 +27,7 @@ impl Rule for FnStmtRule {
         p.eat_while(CMT_NL_WS);
 
         SignatureRule {}.opt(p);
-        p.expect_after(CMT_WS, Newline);
+        p.expect_after(Newline, CMT_WS);
         BlockStmtRule::fn_for_block().parse(p);
         Some(m.complete(p, FnStmt))
     }

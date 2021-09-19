@@ -30,7 +30,7 @@ impl Rule for FlagSignatureRule {
             p.eat_after(ShortFlag, CMT_WS); // shortflag belongs to longflag, must be on same line
         } else {
             // no long_flag, expect shortflag then (otherwise FlagSignatureRule wouldn't match)
-            if !p.expect_after(ShortFlag, CMT_NL_WS) {
+            if !p.expect_after(CMT_NL_WS, ShortFlag) {
                 m.abandon(p);
                 return None;
             }
@@ -78,8 +78,8 @@ impl Rule for KeywordArgRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         assert!(self.kw == RetKeyword || self.kw == InKeyword);
         let m = p.start();
-        p.expect_after(CMT_NL_WS, self.kw);
-        if p.expect_after(CMT_NL_WS, T![:]) {
+        p.expect_after(self.kw, CMT_NL_WS);
+        if p.expect_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);
         }
         Some(m.complete(p, self.marker_kind))
@@ -121,7 +121,7 @@ impl Rule for VarArgParamSignatureRule {
     /// ...rest (<:> type)?
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        p.expect_after(CMT_NL_WS, VarArgName);
+        p.expect_after(VarArgName, CMT_NL_WS);
         if p.eat_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);
         }
@@ -143,7 +143,7 @@ impl Rule for SignatureRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
 
-        p.expect_after(CMT_NL_WS, T!["("]);
+        p.expect_after(T!["("], CMT_NL_WS);
 
         let param_rule = OrRule {
             kind: None,
@@ -164,7 +164,7 @@ impl Rule for SignatureRule {
             flag_rule.parse(p);
         }
 
-        p.expect_after(CMT_NL_WS, T![")"]);
+        p.expect_after(T![")"], CMT_NL_WS);
         Some(m.complete(p, Signature))
     }
 }
