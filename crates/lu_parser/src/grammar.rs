@@ -176,7 +176,8 @@ fn second_level_stmt() -> OrRule {
             PipedCmdsStmtRule {},
             RetStmtRule {},
             ForStmtRule {},
-            IfStmtRule {}
+            IfStmtRule {},
+            ValueExprRule {},
         ],
     }
 }

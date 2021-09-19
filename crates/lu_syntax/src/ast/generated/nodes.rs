@@ -2051,6 +2051,7 @@ pub enum StatementElement {
     IfStmt(IfStmtNode),
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
+    ValueExpr(ValueExprElement),
     }
 
 impl StatementElement {
@@ -2065,8 +2066,11 @@ impl AstElement for StatementElement {
         
         
         
+        ValueExprElement::can_cast(kind) ||
+        
+        
         match kind{
-            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt => true,
+            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
             _ => false,
         }
     }
@@ -2076,6 +2080,10 @@ impl AstElement for StatementElement {
         
         
         
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
         
         
         let res = match syntax.kind() {
@@ -2110,6 +2118,9 @@ impl AstElement for StatementElement {
             
             StatementElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
             
+            
+            StatementElement::ValueExpr(it) => it.syntax().clone().into(),
+            
             }
     }
 }
@@ -2122,6 +2133,7 @@ impl HasSyntaxKind for StatementElement{
             StatementElement::IfStmt(it) => it.get_syntax_kind(),
             StatementElement::CmdStmt(it) => it.get_syntax_kind(),
             StatementElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
+            StatementElement::ValueExpr(it) => it.get_syntax_kind(),
             }
     }
 }

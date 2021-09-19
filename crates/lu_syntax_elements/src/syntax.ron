@@ -120,7 +120,8 @@ Config(
         "FnStmt",
         "IfStmt",
         "CmdStmt",
-        "PipedCmdsStmt"
+        "PipedCmdsStmt",
+        "ValueExpr",
         ],),
     (name: "Condition",is_generic: true, represents_element_names: [
         "CmdStmt",
