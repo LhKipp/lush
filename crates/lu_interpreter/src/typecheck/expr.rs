@@ -1,7 +1,7 @@
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, NumberExprNode, StringExprNode, TableExprNode,
-        ValueExprElement, ValuePathExprNode,
+        ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StringExprNode,
+        TableExprNode, ValueExprElement, ValuePathExprNode,
     },
     AstNode,
 };
@@ -19,6 +19,16 @@ impl TypeCheck for ValueExprElement {
             ValueExprElement::ValuePathExpr(n) => n.typecheck(state),
             ValueExprElement::ArrayExpr(n) => n.typecheck(state),
             ValueExprElement::TableExpr(n) => n.typecheck(state),
+        }
+    }
+}
+
+impl TypeCheck for CmdOrValueExprElement {
+    fn do_typecheck(&self, args: &[TypeCheckArg], state: &mut TypeChecker) -> Option<TcKey> {
+        match self {
+            CmdOrValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, state),
+            CmdOrValueExprElement::PipedCmdsStmt(n) => n.typecheck_with_args(args, state),
+            CmdOrValueExprElement::ValueExpr(n) => n.typecheck_with_args(args, state),
         }
     }
 }

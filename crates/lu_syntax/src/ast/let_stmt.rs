@@ -4,7 +4,7 @@ use rowan::TextRange;
 use crate::{AstElement, AstNode, AstToken};
 
 use super::{
-    support, LetKeywordToken, LetStmtNode, LuTypeNode, ValueExprElement, VarDeclNameToken,
+    support, CmdOrValueExprElement, LetKeywordToken, LetStmtNode, LuTypeNode, VarDeclNameToken,
 };
 
 impl LetStmtNode {
@@ -17,8 +17,8 @@ impl LetStmtNode {
     }
 
     /// Returns the rhs of the assignment
-    pub fn value(&self) -> Option<ValueExprElement> {
-        support::element_child::<ValueExprElement>(self.syntax())
+    pub fn value(&self) -> Option<CmdOrValueExprElement> {
+        support::element_child(self.syntax())
     }
 
     /// Returns the type of the declared variable

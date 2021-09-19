@@ -1883,6 +1883,69 @@ impl HasRule for TableExprNode{
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CmdOrValueExprElement {
+    CmdStmt(CmdStmtNode),
+    PipedCmdsStmt(PipedCmdsStmtNode),
+    ValueExpr(ValueExprElement),
+    }
+
+impl CmdOrValueExprElement {
+}
+
+impl AstElement for CmdOrValueExprElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
+        match kind{
+            CmdStmt | PipedCmdsStmt | ValueExpr => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
+        let res = match syntax.kind() {
+            CmdStmt => CmdOrValueExprElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
+            PipedCmdsStmt => CmdOrValueExprElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            CmdOrValueExprElement::CmdStmt(it) => it.syntax.clone().into(),
+            
+            
+            CmdOrValueExprElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
+            
+            
+            CmdOrValueExprElement::ValueExpr(it) => it.syntax().clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for CmdOrValueExprElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            CmdOrValueExprElement::CmdStmt(it) => it.get_syntax_kind(),
+            CmdOrValueExprElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
+            CmdOrValueExprElement::ValueExpr(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ValueExprElement {
     BareWord(BareWordToken),
     NumberExpr(NumberExprNode),

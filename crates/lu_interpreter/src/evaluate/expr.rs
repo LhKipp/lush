@@ -1,8 +1,8 @@
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, NumberExprNode, StringExprNode, TableExprNode,
-        ValueExprElement, ValuePathExprNode,
+        ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StringExprNode,
+        TableExprNode, ValueExprElement, ValuePathExprNode,
     },
     AstNode, AstToken,
 };
@@ -20,6 +20,16 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::ValuePathExpr(n) => n.evaluate(state),
             ValueExprElement::ArrayExpr(n) => n.evaluate(state),
             ValueExprElement::TableExpr(n) => n.evaluate(state),
+        }
+    }
+}
+
+impl Evaluable for CmdOrValueExprElement {
+    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+        match self {
+            CmdOrValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, state),
+            CmdOrValueExprElement::PipedCmdsStmt(n) => n.evaluate_with_args(args, state),
+            CmdOrValueExprElement::ValueExpr(n) => n.evaluate_with_args(args, state),
         }
     }
 }

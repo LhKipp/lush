@@ -188,3 +188,10 @@ fn top_level_stmt() -> OrRule {
 
     second_level_stmt
 }
+
+fn cmd_or_value_expr_rule() -> OrRule {
+    OrRule {
+        kind: Some("LetRhsRule".into()),
+        rules: vec_box![PipedCmdsStmtRule {}, ValueExprRule {}],
+    }
+}
