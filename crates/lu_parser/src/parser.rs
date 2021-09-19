@@ -86,11 +86,6 @@ impl Parser {
             .tap(|kind| debug!("Result: {:?}", kind))
     }
 
-    // /// Checks if all tokens until are kind are skippable. Expects kind to be present
-    // pub(crate) fn is_skippable_until(&self, kind: SyntaxKind) -> bool {
-    //     self.next_non_skippable() == kind
-    // }
-
     /// Consume the next token if `kind` matches.
     pub(crate) fn eat<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
         let kinds: TokenSet = kinds.into();
@@ -196,6 +191,69 @@ impl Parser {
         }
     }
 
+    /// Consume the next token if it is `kind` or emit an error
+    /// otherwise.
+    pub(crate) fn expect<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
+        let kinds: TokenSet = kinds.into();
+        if self.eat(kinds) {
+            debug!("Expected {:?} and found one of them", kinds);
+            return true;
+        }
+        debug!("Expected {:?}, but found none. Creating error.", kinds);
+        let err: ParseErr = format!("expected {:?}", kinds).into();
+        self.error(err);
+        false
+    }
+
+    /// Consume the next token if it is `kind` or emit an error
+    /// otherwise.
+    pub(crate) fn expect_as<TS: Into<TokenSet>>(&mut self, kinds: TS, as_: SyntaxKind) -> bool {
+        let kinds: TokenSet = kinds.into();
+        if self.eat_as(kinds, as_) {
+            debug!("Expected_as {:?} and found one of them", kinds);
+            return true;
+        }
+        debug!("Expected_as {:?}, but found none. Creating error.", kinds);
+        let err: ParseErr = format!("expected {:?}", kinds).into();
+        self.error(err);
+        false
+    }
+
+    /// Expect `and_then` after `before`
+    /// Example: p.expect_after(CMT_WS, Newline) // Expect a nl (with optional ws before)
+    pub(crate) fn expect_after<TS1: Into<TokenSet>, TS2: Into<TokenSet>>(
+        &mut self,
+        before: TS1,
+        kinds: TS2,
+    ) -> bool {
+        let kinds = kinds.into();
+        let before = before.into();
+        if kinds.contains(self.next_non(before)) {
+            self.eat_while(before);
+            self.expect(kinds)
+        } else {
+            let err: ParseErr = format!("expected {:?}", kinds).into();
+            self.error(err);
+            false
+        }
+    }
+
+    /// Eats `kinds` only if it comes after `after`. Leaves the token stream untouched otherwise
+    pub(crate) fn expect_after_as<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet> + Copy>(
+        &mut self,
+        kinds: TS1,
+        as_: SyntaxKind,
+        after: TS2,
+    ) -> bool {
+        if !self.eat_after_as(kinds.clone(), as_, after) {
+            let err: ParseErr = format!("expected {:?}", kinds.into()).into();
+            self.error(err);
+            false
+        } else {
+            true
+        }
+    }
+
     /// Discards all token until `kinds`. Returns all discarded tokens
     pub(crate) fn discard_until<TS: Into<TokenSet> + Copy>(&mut self, kinds: TS) -> Vec<Token> {
         let mut discarded = Vec::new();
@@ -257,73 +315,6 @@ impl Parser {
         debug!("Parser error: {:?}", err);
         self.push_event(Event::Error(err));
     }
-
-    /// Consume the next token if it is `kind` or emit an error
-    /// otherwise.
-    pub(crate) fn expect<TS: Into<TokenSet>>(&mut self, kinds: TS) -> bool {
-        let kinds: TokenSet = kinds.into();
-        if self.eat(kinds) {
-            debug!("Expected {:?} and found one of them", kinds);
-            return true;
-        }
-        debug!("Expected {:?}, but found none. Creating error.", kinds);
-        let err: ParseErr = format!("expected {:?}", kinds).into();
-        self.error(err);
-        false
-    }
-
-    /// Consume the next token if it is `kind` or emit an error
-    /// otherwise.
-    pub(crate) fn expect_as<TS: Into<TokenSet>>(&mut self, kinds: TS, as_: SyntaxKind) -> bool {
-        let kinds: TokenSet = kinds.into();
-        if self.eat_as(kinds, as_) {
-            debug!("Expected_as {:?} and found one of them", kinds);
-            return true;
-        }
-        debug!("Expected_as {:?}, but found none. Creating error.", kinds);
-        let err: ParseErr = format!("expected {:?}", kinds).into();
-        self.error(err);
-        false
-    }
-
-    /// Expect `and_then` after `before`
-    /// Example: p.expect_after(CMT_WS, Newline) // Expect a nl (with optional ws before)
-    pub(crate) fn expect_after<TS1: Into<TokenSet>, TS2: Into<TokenSet>>(
-        &mut self,
-        before: TS1,
-        kinds: TS2,
-    ) -> bool {
-        let kinds = kinds.into();
-        let before = before.into();
-        if kinds.contains(self.next_non(before)) {
-            self.eat_while(before);
-            self.expect(kinds)
-        } else {
-            let err: ParseErr = format!("expected {:?}", kinds).into();
-            self.error(err);
-            false
-        }
-    }
-
-    /// Eats `kinds` only if it comes after `after`. Leaves the token stream untouched otherwise
-    pub(crate) fn expect_after_as<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet> + Copy>(
-        &mut self,
-        kinds: TS1,
-        as_: SyntaxKind,
-        after: TS2,
-    ) -> bool {
-        let kinds = kinds.into();
-        let after = after.into();
-        if kinds.contains(self.next_non(after)) {
-            self.eat_while(after);
-            self.expect_as(kinds, as_)
-        } else {
-            let err: ParseErr = format!("expected {:?}", kinds).into();
-            self.error(err);
-            false
-        }
-    }
-
     /// Create an error node and consume the next token.
     pub(crate) fn err_recover(&mut self, message: &str, recovery: TokenSet) {
         match self.current() {
