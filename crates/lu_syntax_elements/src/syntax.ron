@@ -75,6 +75,7 @@ Config(
     ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "LetStmt"                    , is_node: true                                , has_rule: true   , ) ,
     ( name: "FnStmt"                     , is_node: true                                , has_rule: true   , ) ,
+    ( name: "RetStmt"                    , is_node: true                                , has_rule: true   , ) ,
     ( name: "IfStmt"                     , is_node: true                                , has_rule: true   , ) ,
     ( name: "IfBlock"                    , is_node: true                                , )                ,
     ( name: "ElifBlock"                  , is_node: true                                , )                ,

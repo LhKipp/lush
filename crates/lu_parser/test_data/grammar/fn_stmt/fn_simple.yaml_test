@@ -31,3 +31,40 @@ end
 - Finish: ""
 - Finish: ""
 ...
+ret_typed
+===
+fn ret_num(ret: num)
+    ret 1
+end
+---
+- Start: FnStmt
+- Token: "FnKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Token: "FnDeclName (len: 7)"
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: RetSignature
+- Token: "RetKeyword (len: 3)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "NumberKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Start: BlockStmt
+- Start: RetStmt
+- Token: "Whitespace (len: 4)"
+- Token: "RetKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+...

@@ -37,6 +37,7 @@ mod for_stmt;
 mod if_stmt;
 mod let_stmt;
 mod piped_cmds_stmt;
+mod ret_stmt;
 mod signature;
 mod type_;
 mod value_path_expr;
@@ -60,6 +61,7 @@ pub use for_stmt::ForStmtRule;
 pub use if_stmt::IfStmtRule;
 pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
+pub use ret_stmt::RetStmtRule;
 pub use signature::SignatureRule;
 pub use type_::{ArrayTypeRule, LuTypeRule};
 pub use value_path_expr::ValuePathExprRule;
@@ -172,6 +174,7 @@ fn second_level_stmt() -> OrRule {
         rules: vec_box![
             LetStmtRule {},
             PipedCmdsStmtRule {},
+            RetStmtRule {},
             ForStmtRule {},
             IfStmtRule {}
         ],

@@ -1337,6 +1337,34 @@ impl HasRule for FnStmtNode{
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RetStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for RetStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RetStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for RetStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+use lu_parser::grammar::RetStmtRule;
+impl HasRule for RetStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(RetStmtRule{})
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IfStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
