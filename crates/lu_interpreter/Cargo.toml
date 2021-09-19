@@ -30,6 +30,7 @@ bimap = "0.6.1"
 
 [dev-dependencies]
 lu_test_support = { version = "0.1.0", path = "../lu_test_support" }
+lu_interpreter = { version = "0.1.0", path = "../lu_interpreter" }
 conformance = "0.2.0"
 serde_json = "1.0.64"
 serde_yaml = "0.8.17"

@@ -14,7 +14,7 @@ impl TypeCheck for StatementElement {
             StatementElement::LetStmt(n) => n.typecheck(ty_state),
             // StatementElement::FnStmt(n) => n.typecheck(ty_state),
             // StatementElement::IfStmt(n) => n.typecheck(ty_state),
-            // StatementElement::CmdStmt(n) => n.typecheck(ty_state),
+            StatementElement::CmdStmt(n) => n.typecheck(ty_state),
             // StatementElement::PipedCmdsStmt(n) => n.typecheck(ty_state),
             _ => None,
         }

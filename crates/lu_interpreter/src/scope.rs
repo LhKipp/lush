@@ -7,7 +7,7 @@ use tap::prelude::*;
 pub use indextree::NodeId as ScopeFrameId;
 use lu_syntax_elements::BlockType;
 
-use crate::{Callable, Command, Variable};
+use crate::{Callable, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
@@ -230,6 +230,7 @@ impl Scope<Variable> {
         }
     }
 
+    #[allow(unused)]
     fn find_func(&self, name: &str) -> Option<&Callable> {
         debug!("Finding cmd {} from {:?} on", name, self.get_cur_tag());
         // TODO write check that no variable shadows a func name
@@ -247,22 +248,28 @@ impl Scope<Variable> {
     // The call side can not necessarily distinguish between cmd name parts and arguments.
     // Therefore we need to do some search here
     pub fn find_cmd_with_longest_match(&self, name_parts: &[String]) -> Option<(usize, &Callable)> {
+        let result = self
+            .find_var_with_longest_match(name_parts)
+            .map(|(i, var)| (i, var.val_as_callable()));
+        if let Some((i, Some(callable))) = result {
+            Some((i, callable))
+        } else {
+            None
+        }
+    }
+
+    /// See find_cmd_with_longest_match
+    pub fn find_var_with_longest_match(&self, name_parts: &[String]) -> Option<(usize, &Variable)> {
         assert!(name_parts.len() > 0);
         // We try to find the longest matching subcommand here ...  Maybe we should use a trie as
         // the internal datastructure
         let mut result = None;
         for i in 0..name_parts.len() {
             let cmd_name = name_parts[0..i + 1].join(" ");
-            if let Some(func) = self.find_func(&cmd_name) {
+            if let Some(func) = self.find_var(&cmd_name) {
                 result = Some((i + 1, func))
             }
         }
-        debug!(
-            "Match found for cmd_name_parts {:?}: ({:?}, {:?})",
-            name_parts,
-            result.map_or("None", |(_, func)| &func.name()),
-            result.map_or(999, |(idx, _)| idx)
-        );
         result
     }
 

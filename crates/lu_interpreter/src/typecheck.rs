@@ -11,8 +11,10 @@ use crate::ValueTypeErr;
 use crate::{visit_arg::VisitArg, FlagSignature, Function, Resolver, Scope, ValueType, Variable};
 
 mod block_stmt;
+mod cmd_stmt;
 mod expr;
 mod let_stmt;
+mod piped_cmds_stmt;
 mod source_file;
 mod statement;
 
@@ -29,10 +31,16 @@ pub struct TypeChecker {
     /// Variable to tcfunc (for func variables)
     pub tc_func_table: HashMap<Variable, TcFunc>,
 
+    /// To not spam the tables with error keys, we keep one
+    tc_error_key: Option<TcKey>,
+
     /// Final result of typechecking
     pub ty_table: HashMap<TcKey, ValueType>,
 
     pub errors: Vec<LuErr>,
+
+    /// The final result of this evaluator
+    pub result: Option<ValueType>,
 
     scope: Scope<Variable>,
     checker: VarlessTypeChecker<ValueType>,
@@ -50,6 +58,8 @@ impl TypeChecker {
             tc_expr_table: HashMap::new(),
             tc_func_table: HashMap::new(),
             ty_table: HashMap::new(),
+            tc_error_key: None,
+            result: None,
         }
     }
 
@@ -57,14 +67,19 @@ impl TypeChecker {
         let source_file = self.resolve.parse.cast::<SourceFileNode>().unwrap();
         let source_f_path = self.resolve.parse.source.path.clone();
 
-        source_file.typecheck_with_args(
+        let ret_key = source_file.typecheck_with_args(
             &[TypeCheckArg::Arg(VisitArg::SourceFilePath(source_f_path))],
             self,
         );
 
         match self.checker.clone().type_check() {
-            Ok(t) => self.ty_table = t,
-            Err(e) => self.handle_tc_err(e),
+            Ok(t) => {
+                self.ty_table = t;
+                self.result = ret_key.map(|k| self.ty_table.get(&k).unwrap().clone())
+            }
+            Err(e) => {
+                self.handle_tc_err(e);
+            }
         }
     }
 
@@ -72,6 +87,19 @@ impl TypeChecker {
         let key = self.checker.new_term_key();
         self.tc_expr_table.insert(key, term);
         key
+    }
+
+    pub(crate) fn get_tc_error_key(&mut self) -> TcKey {
+        if let Some(key) = self.tc_error_key {
+            key
+        } else {
+            let error_key = self.checker.new_term_key();
+            self.checker
+                .impose(error_key.concretizes_explicit(ValueType::Error))
+                .unwrap();
+            self.tc_error_key = Some(error_key);
+            error_key
+        }
     }
 
     /// TODO pass Constraint when Constraint is pub and do impose here instead on caller side

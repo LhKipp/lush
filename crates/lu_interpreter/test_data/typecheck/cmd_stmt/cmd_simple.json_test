@@ -1,0 +1,12 @@
+1
+===
+fn func_1(ret: num)
+    1
+end
+func_1
+---
+{
+  "Ok": "Number"
+}
+...
+
