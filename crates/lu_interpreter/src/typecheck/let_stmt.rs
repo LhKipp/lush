@@ -1,4 +1,3 @@
-use log::debug;
 use lu_error::TyErr;
 use lu_pipeline_stage::ErrorContainer;
 use lu_syntax::{ast::LetStmtNode, AstElement};

@@ -67,12 +67,6 @@ impl Resolver {
         }
     }
 
-    pub(crate) fn all_errors(&self) -> Vec<LuErr> {
-        let mut errs = self.parse.all_errors();
-        errs.extend(self.errors.clone());
-        errs
-    }
-
     pub(crate) fn resolve(&mut self) {
         let source_file = self.parse.cast::<SourceFileNode>().unwrap();
         let source_f_path = self.parse.source.path.clone();
@@ -82,19 +76,13 @@ impl Resolver {
             self,
         );
     }
-
-    pub(crate) fn any_failed(&self) -> bool {
-        self.parse.any_failed() || !self.errors.is_empty()
-    }
 }
 
 impl PipelineStage for Resolver {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
         Some(&self.parse)
     }
-}
 
-impl ErrorContainer for Resolver {
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {
         &mut self.errors
     }

@@ -2,16 +2,38 @@ use lu_error::LuErr;
 
 pub trait PipelineStage {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage>;
-}
 
-pub trait ErrorContainer: PipelineStage {
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr>;
     fn get_errors(&self) -> &Vec<LuErr>;
+
+    fn collect_all_errors(&self) -> Vec<LuErr> {
+        let mut prev_err = self
+            .get_prev_stage()
+            .map(PipelineStage::get_errors)
+            .cloned()
+            .unwrap_or_else(Vec::new);
+        prev_err.extend(self.get_errors().clone());
+        prev_err
+    }
 
     fn push_err(&mut self, e: LuErr) {
         self.get_mut_errors().push(e)
     }
 
+    fn succeeded(&self) -> bool {
+        self.get_errors().is_empty()
+            && self
+                .get_prev_stage()
+                .map(PipelineStage::succeeded)
+                .unwrap_or(true)
+    }
+
+    fn failed(&self) -> bool {
+        !self.succeeded()
+    }
+}
+
+pub trait ErrorContainer: PipelineStage {
     fn ok_or_record<T>(&mut self, res: Result<T, LuErr>) -> Option<T> {
         match res {
             Ok(t) => Some(t),
@@ -22,6 +44,8 @@ pub trait ErrorContainer: PipelineStage {
         }
     }
 }
+
+impl<Stage: PipelineStage> ErrorContainer for Stage {}
 
 // pub trait RecordResult {
 //     fn record<T>(self, container: &mut dyn ErrorContainer) -> Option<T>;

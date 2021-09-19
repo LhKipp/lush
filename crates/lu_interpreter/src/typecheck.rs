@@ -2,7 +2,6 @@ use bimap::BiHashMap;
 use log::debug;
 use lu_error::{LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
-use lu_pipeline_stage::ErrorContainer;
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::ast::SourceFileNode;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
@@ -22,6 +21,8 @@ pub struct TypeChecker {
     pub resolve: Resolver,
 
     /// A TcKey (TermCheckKey) always refers to a node in the ast
+    // We keep track of the node for error formatting reasons. Therefore a SourceCodeItem
+    // is enough
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
     /// Variable to tckey (for simple variables)
     pub tc_table: BiHashMap<Variable, TcKey>,
@@ -50,12 +51,6 @@ impl TypeChecker {
             tc_func_table: HashMap::new(),
             ty_table: HashMap::new(),
         }
-    }
-
-    pub fn all_errors(&self) -> Vec<LuErr> {
-        let mut errs = self.resolve.all_errors();
-        errs.extend(self.errors.clone());
-        errs
     }
 
     pub fn typecheck(&mut self) {
@@ -126,13 +121,9 @@ impl TypeChecker {
         }
     }
 
-    pub(crate) fn any_failed(&self) -> bool {
-        self.resolve.any_failed() || !self.errors.is_empty()
-    }
-
     pub(crate) fn as_result(self) -> LuResults<TypeChecker> {
-        if self.any_failed() {
-            Err(self.all_errors())
+        if self.failed() {
+            Err(self.collect_all_errors())
         } else {
             Ok(self)
         }
@@ -143,9 +134,7 @@ impl PipelineStage for TypeChecker {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
         Some(&self.resolve)
     }
-}
 
-impl ErrorContainer for TypeChecker {
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {
         &mut self.errors
     }

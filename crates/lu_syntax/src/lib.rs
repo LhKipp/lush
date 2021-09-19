@@ -53,14 +53,6 @@ impl Parse {
         }
     }
 
-    pub fn all_errors(&self) -> Vec<LuErr> {
-        self.errors.clone()
-    }
-
-    pub fn any_failed(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     pub fn syntax_node(&self) -> SyntaxNode {
         SyntaxNode::new_root(self.green.clone())
     }
@@ -76,15 +68,18 @@ impl Parse {
             Err(self.errors)
         }
     }
-
-    pub fn errors(self) -> Vec<LuErr> {
-        // TODO make internal errors from ParseErr to LuErr
-        self.errors.into_iter().map(|e| LuErr::from(e)).collect()
-    }
 }
 
 impl PipelineStage for Parse {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
         None
+    }
+
+    fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {
+        &mut self.errors
+    }
+
+    fn get_errors(&self) -> &Vec<LuErr> {
+        &self.errors
     }
 }

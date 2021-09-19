@@ -2,6 +2,7 @@ use std::{fmt::Debug, sync::Arc};
 
 use log::debug;
 use lu_error::{LuErr, LuResult};
+use lu_pipeline_stage::PipelineStage;
 use lu_syntax::ast::SourceFileNode;
 use lu_value::Value;
 use parking_lot::Mutex;
@@ -91,7 +92,7 @@ impl Evaluator {
     }
 
     pub(crate) fn all_errors(&self) -> Vec<LuErr> {
-        let mut errs = self.ty_checker.all_errors();
+        let mut errs = self.ty_checker.collect_all_errors();
         errs.extend(self.errors.clone());
         errs
     }

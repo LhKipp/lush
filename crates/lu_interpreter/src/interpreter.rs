@@ -3,6 +3,7 @@
 
 use lu_error::{LuErr, LuResult, LuResults, ParseErr};
 use lu_parser::grammar::SourceFileRule;
+use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{HasRule, SourceFileNode},
     AstNode, Parse,
@@ -51,7 +52,7 @@ impl Interpreter {
 
     pub fn evaluate(&mut self, ty_checker: TypeChecker) -> Option<Evaluator> {
         // We don't allow evaluation if errors happend.
-        if ty_checker.any_failed() {
+        if ty_checker.failed() {
             return None;
         }
 
