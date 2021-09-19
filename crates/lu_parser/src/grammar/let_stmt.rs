@@ -1,9 +1,10 @@
 use crate::{
-    grammar::{LuTypeRule, ValueExprRule},
+    grammar::{LuTypeRule, OrRule, PipedCmdsStmtRule, ValueExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::*,
     T,
 };
+use vec_box::vec_box;
 
 use super::Rule;
 
@@ -30,7 +31,11 @@ impl Rule for LetStmtRule {
             LuTypeRule {}.parse(p);
         }
         p.expect_after(T![=], CMT_NL_WS);
-        ValueExprRule {}.parse(p);
+        let let_rhs_rule = OrRule {
+            kind: Some("LetRhsRule".into()),
+            rules: vec_box![PipedCmdsStmtRule {}, ValueExprRule {}],
+        };
+        let_rhs_rule.parse(p);
         Some(m.complete(p, LetStmt))
     }
 }

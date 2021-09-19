@@ -14,3 +14,19 @@ let x = 1
 - Finish: ""
 - Finish: ""
 ...
+let with rhs func
+===
+let x = func_1
+---
+- Start: LetStmt
+- Token: "LetKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Token: "VarDeclName (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Token: "AssignSign (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: CmdStmt
+- Token: "BareWord (len: 6)"
+- Finish: ""
+- Finish: ""
+...
