@@ -27,6 +27,7 @@ impl LetStmtNode {
     }
 
     pub fn item_till_value(&self) -> SourceCodeItem {
+        // We want to capture "let var : type"
         let start = support::token_child::<LetKeywordToken>(self.syntax())
             .unwrap()
             .syntax()
@@ -40,6 +41,9 @@ impl LetStmtNode {
             .unwrap();
         let text_range = TextRange::new(start.start(), end.end());
         let idx_range = TextRange::up_to(end.end() - start.start());
+        let idx_range = idx_range
+            .checked_add(start.start() - self.syntax().text_range().start())
+            .unwrap();
         let text = self.syntax().text().slice(idx_range);
 
         SourceCodeItem::new(text_range.into(), text.to_string())
