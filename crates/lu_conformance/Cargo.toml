@@ -1,0 +1,17 @@
+[package]
+name = "lu_conformance"
+version = "0.1.0"
+edition = "2018"
+
+description = "Fork of conformance (at hash: 6804003c90dd111a618efe262ef405a41c09059c) for lu. Please see [https://github.com/CAD97/tinyc/tree/master/crates/conformance] for the original repo"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+proc-macro = true
+
+[dependencies]
+glob = "0.3.0"
+proc-macro2 = "1.0.6"
+quote = "1.0.2"
+syn = { version = "1.0.5", features = ["full"] }
+walkdir = "2.3.2"
