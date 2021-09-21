@@ -32,7 +32,7 @@ impl Evaluable for CmdStmtNode {
 
         // Push real cmd arguments (excluding cmd name, as $args)
         let mut args = Vec::new();
-        for arg in self.args().skip(cmd_parts_count) {
+        for arg in self.name_with_args().skip(cmd_parts_count) {
             // TODO remove partial result from eval call
             args.push(arg.evaluate(state)?);
         }

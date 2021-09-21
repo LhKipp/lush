@@ -21,7 +21,7 @@ impl VarDeclNode {
     pub fn into_item(&self) -> SourceCodeItem {
         match self {
             VarDeclNode::LetStmt(n) => n.into_item(),
-            VarDeclNode::FnStmt(n) => n.into_item(),
+            VarDeclNode::FnStmt(n) => n.decl_item(),
             VarDeclNode::ArgSignature(n) => n.into_item(),
             VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].into_item(),
         }

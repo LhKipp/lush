@@ -16,7 +16,7 @@ impl CmdStmtNode {
     }
 
     /// All arguments of this command. This does include the command name parts.
-    pub fn args(&self) -> AstElementChildren<ValueExprElement> {
+    pub fn name_with_args(&self) -> AstElementChildren<ValueExprElement> {
         support::element_children(self.syntax())
     }
 }

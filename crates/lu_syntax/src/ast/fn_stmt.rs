@@ -7,7 +7,7 @@ use super::{support, BlockStmtNode, FnKeywordToken, FnStmtNode, SignatureNode};
 
 impl FnStmtNode {
     pub fn name(&self) -> Option<String> {
-        let name_parts = support::token_children::<FnDeclNameToken>(self.syntax());
+        let name_parts = self.name_nodes();
         if name_parts.is_empty() {
             None
         } else {
@@ -21,21 +21,48 @@ impl FnStmtNode {
         }
     }
 
+    pub fn name_nodes(&self) -> Vec<FnDeclNameToken> {
+        support::token_children(self.syntax())
+    }
+
     pub fn fallback_in_ret_item(&self) -> SourceCodeItem {
-        let name_parts = support::token_children::<FnDeclNameToken>(self.syntax());
-        if let (Some(begin), Some(end)) = (name_parts.first(), name_parts.last()) {
-            let range = TextRange::new(
-                begin.syntax().text_range().start(),
-                end.syntax().text_range().end(),
-            );
-            let text = self.text_at(&range);
-            SourceCodeItem::new(range.into(), text)
+        self.decl_item()
+        // TODO evaluate whether below wouldnt be better
+        // from first_name till end of last_name
+        // let name_parts = support::token_children::<FnDeclNameToken>(self.syntax());
+        // if let (Some(begin), Some(end)) = (name_parts.first(), name_parts.last()) {
+        //     let range = TextRange::new(
+        //         begin.syntax().text_range().start(),
+        //         end.syntax().text_range().end(),
+        //     );
+        //     let text = self.text_at(&range);
+        //     SourceCodeItem::new(range.into(), text)
+        // } else {
+        //     // Thats odd ... func without name
+        //     support::token_child::<FnKeywordToken>(self.syntax())
+        //         .unwrap()
+        //         .into_item()
+        // }
+    }
+
+    pub fn decl_item(&self) -> SourceCodeItem {
+        // from fn till end of signature (or first item before)
+        let fn_kw_range = support::token_child::<FnKeywordToken>(self.syntax())
+            .unwrap()
+            .syntax()
+            .text_range();
+        let end = if let Some(sign) = self.signature() {
+            sign.syntax().text_range().end()
+        } else if let Some(last_name) = self.name_nodes().last() {
+            last_name.syntax().text_range().end()
         } else {
-            // Thats odd ... func without name
-            support::token_child::<FnKeywordToken>(self.syntax())
-                .unwrap()
-                .into_item()
-        }
+            fn_kw_range.end()
+        };
+
+        let text_range = TextRange::new(fn_kw_range.start(), end);
+        let text = self.text_at(&text_range);
+
+        SourceCodeItem::new(text_range.into(), text.to_string())
     }
 
     pub fn signature(&self) -> Option<SignatureNode> {

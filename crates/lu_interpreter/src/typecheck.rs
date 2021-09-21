@@ -32,6 +32,7 @@ pub struct TypeChecker {
     pub tc_func_table: HashMap<Variable, TcFunc>,
 
     /// To not spam the tables with error keys, we keep one
+    #[allow(dead_code)]
     tc_error_key: Option<TcKey>,
 
     /// Final result of typechecking
@@ -111,6 +112,8 @@ impl TypeChecker {
         key
     }
 
+    // This is prob a very bad idea
+    #[allow(dead_code)]
     pub(crate) fn get_tc_error_key(&mut self) -> TcKey {
         if let Some(key) = self.tc_error_key {
             key
@@ -177,6 +180,10 @@ impl TypeChecker {
         } else {
             Ok(self)
         }
+    }
+
+    pub fn get_item_of<'a>(&'a self, non_passed_arg: &TcKey) -> &'a SourceCodeItem {
+        self.tc_expr_table.get(non_passed_arg).unwrap()
     }
 }
 

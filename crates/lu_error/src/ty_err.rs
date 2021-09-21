@@ -22,20 +22,30 @@ pub enum TyErr {
         rhs_decl: Option<SourceCodeItem>,
         rhs_ty: String,
     },
+    UnexpectedArg {
+        arg: SourceCodeItem,
+        fn_decl: SourceCodeItem,
+    },
+    UnsatisfiedArg {
+        arg_decl: SourceCodeItem,
+        cmd_stmt: SourceCodeItem,
+    },
 }
 
 impl TyErr {
+    #![allow(unused_variables)]
     pub fn report(&self) -> Diagnostic<()> {
         match self {
             TyErr::Message(_) => todo!(),
             TyErr::TermDoesNotReturnType(_) => todo!(),
-            #[allow(unused_variables)]
             TyErr::TypesNotEqual {
                 lhs_decl,
                 lhs_ty,
                 rhs_decl,
                 rhs_ty,
             } => todo!(),
+            TyErr::UnexpectedArg { arg, fn_decl } => todo!(),
+            TyErr::UnsatisfiedArg { arg_decl, cmd_stmt } => todo!(),
         }
     }
 }

@@ -1,0 +1,62 @@
+Arg not passed
+===
+fn func(arg)
+end
+func
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "UnsatisfiedArg": {
+          "arg_decl": {
+            "content": "arg",
+            "range": [
+              8,
+              11
+            ]
+          },
+          "cmd_stmt": {
+            "content": "func",
+            "range": [
+              17,
+              21
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...
+To many args passed
+===
+fn func()
+end
+func unexpected_arg
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "UnexpectedArg": {
+          "arg": {
+            "content": "unexpected_arg",
+            "range": [
+              19,
+              33
+            ]
+          },
+          "fn_decl": {
+            "content": "fn func()",
+            "range": [
+              0,
+              9
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...
