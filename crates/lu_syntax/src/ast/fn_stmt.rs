@@ -1,6 +1,9 @@
+use lu_error::SourceCodeItem;
+use rowan::TextRange;
+
 use crate::{ast::FnDeclNameToken, AstNode, AstToken};
 
-use super::{support, BlockStmtNode, FnStmtNode, SignatureNode};
+use super::{support, BlockStmtNode, FnKeywordToken, FnStmtNode, SignatureNode};
 
 impl FnStmtNode {
     pub fn name(&self) -> Option<String> {
@@ -15,6 +18,23 @@ impl FnStmtNode {
                     .collect::<Vec<_>>()
                     .join(" "),
             )
+        }
+    }
+
+    pub fn fallback_in_ret_item(&self) -> SourceCodeItem {
+        let name_parts = support::token_children::<FnDeclNameToken>(self.syntax());
+        if let (Some(begin), Some(end)) = (name_parts.first(), name_parts.last()) {
+            let range = TextRange::new(
+                begin.syntax().text_range().start(),
+                end.syntax().text_range().end(),
+            );
+            let text = self.text_at(&range);
+            SourceCodeItem::new(range.into(), text)
+        } else {
+            // Thats odd ... func without name
+            support::token_child::<FnKeywordToken>(self.syntax())
+                .unwrap()
+                .into_item()
         }
     }
 

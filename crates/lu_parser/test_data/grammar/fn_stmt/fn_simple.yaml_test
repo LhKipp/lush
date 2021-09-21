@@ -43,8 +43,8 @@ end
 - Token: "FnDeclName (len: 7)"
 - Start: Signature
 - Token: "LeftParenthesis (len: 1)"
-- Start: RetSignature
-- Token: "RetKeyword (len: 3)"
+- Start: ArgSignature
+- Token: "ArgName (len: 3)"
 - Token: "DoublePoint (len: 1)"
 - Start: LuType
 - Token: "Whitespace (len: 1)"

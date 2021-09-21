@@ -15,6 +15,7 @@ use std::marker::PhantomData;
 
 use lu_error::SourceCodeItem;
 use lu_parser::grammar::Rule;
+use rowan::{SyntaxText, TextRange};
 
 use crate::{
     syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken},
@@ -68,6 +69,14 @@ pub trait AstNode {
 
     fn into_item(&self) -> SourceCodeItem {
         SourceCodeItem::new(self.syntax().text_range().into(), self.syntax().text())
+    }
+
+    fn text_at(&self, range: &TextRange) -> SyntaxText {
+        let idx_range = TextRange::up_to(range.end() - range.start());
+        let idx_range = idx_range
+            .checked_add(range.start() - self.syntax().text_range().start())
+            .unwrap();
+        self.syntax().text().slice(idx_range)
     }
 }
 

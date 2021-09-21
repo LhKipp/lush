@@ -64,7 +64,7 @@ Config(
     ( name: "VarDeclName"                , is_token: true                               , )                ,
     ( name: "FnDeclName"                 , is_token: true                               , )                ,
 
-    ( name: "ParamName"                  , is_token: true                               , )                ,
+    ( name: "ArgName"                  , is_token: true                               , )                ,
     ( name: "VarArgName"                 , token_text: "...[_a-zA-Z]+[_a-zA-Z0-9]*"     , is_token: true   , ) ,
     ( name: "LongFlag"                   , regex: "--[_a-zA-Z]+[_a-zA-Z0-9]*"           , is_token: true   , ) ,
     ( name: "ShortFlag"                  , regex: "-[_a-zA-Z]+[_a-zA-Z0-9]*"            , is_token: true   , ) ,
@@ -87,10 +87,7 @@ Config(
     ( name: "BlockStmt"                  , is_node: true                                , has_rule: false  , ) ,
     ( name: "Signature"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "FlagSignature"              , is_node: true                                , has_rule: false  , ) ,
-    ( name: "ParamSignature"             , is_node: true                                , has_rule: false  , ) ,
-    ( name: "InSignature"             , is_node: true                                , has_rule: false  , ) ,
-    ( name: "RetSignature"             , is_node: true                                , has_rule: false  , ) ,
-    ( name: "VarArgParamSignatureRule"   , is_node: true                                , has_rule: false  , ) ,
+    ( name: "ArgSignature"             , is_node: true                                , has_rule: false  , ) ,
     ( name: "LuType"                     , is_node: true                                , has_rule: true   , ) ,
     // === EXPRESSION RULES ===
     ( name: "MathExpr"                   , is_node: true                                , )                ,

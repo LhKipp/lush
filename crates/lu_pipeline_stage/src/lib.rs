@@ -43,6 +43,15 @@ pub trait ErrorContainer: PipelineStage {
             }
         }
     }
+
+    /// Records whether opt was Some (hand has therefore been recorded as an error)
+    fn record_option(&mut self, opt: Option<LuErr>) -> bool {
+        opt.map(|e| {
+            self.push_err(e);
+            true
+        })
+        .unwrap_or(false)
+    }
 }
 
 impl<Stage: PipelineStage> ErrorContainer for Stage {}

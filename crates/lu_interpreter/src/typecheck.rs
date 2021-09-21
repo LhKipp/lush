@@ -89,6 +89,28 @@ impl TypeChecker {
         key
     }
 
+    pub(crate) fn new_term_key_equated(
+        &mut self,
+        term: SourceCodeItem,
+        equate_with: TcKey,
+    ) -> TcKey {
+        let key = self.new_term_key(term);
+        let res = self.checker.impose(key.equate_with(equate_with));
+        self.handle_tc_result(res);
+        key
+    }
+
+    pub(crate) fn new_term_key_concretiziesd(
+        &mut self,
+        term: SourceCodeItem,
+        ty: ValueType,
+    ) -> TcKey {
+        let key = self.new_term_key(term);
+        let res = self.checker.impose(key.concretizes_explicit(ty));
+        self.handle_tc_result(res);
+        key
+    }
+
     pub(crate) fn get_tc_error_key(&mut self) -> TcKey {
         if let Some(key) = self.tc_error_key {
             key
@@ -180,8 +202,8 @@ pub enum TcEntry {
 
 #[derive(Debug, Clone)]
 pub struct TcFunc {
-    in_ty: Option<TcKey>,
-    ret_ty: Option<TcKey>,
+    in_ty: TcKey,
+    ret_ty: TcKey,
     args_ty: Vec<TcKey>,
     var_arg_ty: Option<TcKey>,
     flags_ty: HashMap<FlagSignature, TcKey>,
@@ -191,55 +213,28 @@ impl TcFunc {
     /// generate a TcFunc from func. Each arg / flag / in / ret type of the func
     /// will be inserted as a seperate pseudo variable
     pub fn from_func(func: Function, ty_checker: &mut TypeChecker) -> Self {
-        fn tc_key_with_opt_type(
-            var: Variable,
-            bound: &Option<ValueType>,
-            ty_checker: &mut TypeChecker,
-        ) -> TcKey {
-            let tc_key = ty_checker.checker.new_term_key();
-            if let Some(type_decl) = bound {
-                ty_checker
-                    .checker
-                    .impose(tc_key.concretizes_explicit(type_decl.clone()))
-                    .unwrap();
-            }
-            // TODO we insert the var into the tc_table but not into the scope
-            // therefore we shouldn't violate scoping rules here, about variable visibility
-            // The passed var is also more like a pseudo variable, so that we can later on
-            // refer to the declaration via a unified interface...
-            // I think, what is being done here is safe, but needs some more thought
-            ty_checker.tc_table.insert(var, tc_key.clone());
-            tc_key
-        }
+        // ret and in are always concretly infered.
+        // if there is no decl, it's infered as AnyOf<T>
 
-        macro_rules! gen_key_of {
-            ($t:ident) => {{
-                let ty = $t.type_.clone();
-                let var: Variable = $t.into();
-                tc_key_with_opt_type(var, &ty, ty_checker)
-            }};
-        }
-        // TODO write macro that does the transformation
+        let in_item = func.signature.in_type.decl.into_item();
+        let in_ty = ty_checker.new_term_key_concretiziesd(in_item, func.signature.in_type.type_);
+
+        let ret_item = func.signature.ret_type.decl.into_item();
+        let ret_ty = ty_checker.new_term_key_concretiziesd(ret_item, func.signature.ret_type.type_);
+
         let var_arg_ty = func
             .signature
             .var_arg
-            .clone()
-            .map(|var_arg_sign| gen_key_of!(var_arg_sign));
-        let in_ty = func
-            .signature
-            .in_type
-            .clone()
-            .map(|in_sign| gen_key_of!(in_sign));
-        let ret_ty = func
-            .signature
-            .ret_type
-            .clone()
-            .map(|ret_sign| gen_key_of!(ret_sign));
+            .map(|var_arg_sign| (var_arg_sign.decl.into_item(), var_arg_sign.type_))
+            .map(|(decl, ty)| ty_checker.new_term_key_concretiziesd(decl, ty));
+
         let args_ty = func
             .signature
             .args
             .into_iter()
-            .map(|arg_sign| gen_key_of!(arg_sign))
+            .map(|arg_sign| {
+                ty_checker.new_term_key_concretiziesd(arg_sign.decl.into_item(), arg_sign.type_)
+            })
             .collect();
 
         let ty_func = Self {
@@ -290,6 +285,7 @@ pub trait TypeCheck: Debug {
     }
 }
 
+// TODO remove this. Its broken. Sometimes this is an error sometimes its not
 impl<T: TypeCheck> TypeCheck for Option<T> {
     fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TypeChecker) -> Option<TcKey> {
         match self {

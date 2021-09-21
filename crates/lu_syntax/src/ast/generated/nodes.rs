@@ -1148,11 +1148,11 @@ impl HasSyntaxKind for FnDeclNameToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ParamNameToken {
+pub struct ArgNameToken {
     pub(crate) syntax: SyntaxToken,
 }
-impl AstToken for ParamNameToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParamName }
+impl AstToken for ArgNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArgName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1162,7 +1162,7 @@ impl AstToken for ParamNameToken {
     }
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ParamNameToken{
+impl HasSyntaxKind for ArgNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
@@ -1610,11 +1610,11 @@ impl HasSyntaxKind for FlagSignatureNode{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ParamSignatureNode {
+pub struct ArgSignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
-impl AstNode for ParamSignatureNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParamSignature }
+impl AstNode for ArgSignatureNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArgSignature }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1624,70 +1624,7 @@ impl AstNode for ParamSignatureNode {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ParamSignatureNode{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        self.syntax().kind()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct InSignatureNode {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AstNode for InSignatureNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::InSignature }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl HasSyntaxKind for InSignatureNode{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        self.syntax().kind()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RetSignatureNode {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AstNode for RetSignatureNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RetSignature }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl HasSyntaxKind for RetSignatureNode{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        self.syntax().kind()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct VarArgParamSignatureRuleNode {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AstNode for VarArgParamSignatureRuleNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::VarArgParamSignatureRule }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl HasSyntaxKind for VarArgParamSignatureRuleNode{
+impl HasSyntaxKind for ArgSignatureNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }

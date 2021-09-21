@@ -1,5 +1,6 @@
 use std::{collections::HashMap, fmt::Display};
 
+use log::warn;
 use lu_error::LuErr;
 use lu_syntax::ast::LuTypeSpecifierElement;
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
@@ -21,10 +22,11 @@ pub struct FuncType {
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum ValueType {
-    /// Variant to indicate an already occured error. Error acts like any does, but further
-    /// resolution should not generate further errors
+    /// Variant to indicate an already occured error. Error acts like any does, but
+    /// further ty_checking does not generate errors based on this ValueType::Error
     Error,
     Unspecified,
+    /// Any that can be only of one type
     Any,
     Nil,
     Bool,
@@ -38,7 +40,10 @@ pub enum ValueType {
 impl ValueType {
     pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
         let ty = match node {
-            LuTypeSpecifierElement::AnyKeyword(_) => ValueType::Any,
+            LuTypeSpecifierElement::AnyKeyword(_) => {
+                warn!("RETURNING WRONG VALUE_TYPE: Any INSTEAD OF AnyOf");
+                ValueType::Any // TODO this must be AnyOf!!!
+            }
             LuTypeSpecifierElement::NumberKeyword(_) => ValueType::Number,
             LuTypeSpecifierElement::NilKeyword(_) => ValueType::Nil,
             LuTypeSpecifierElement::BoolKeyword(_) => ValueType::Bool,

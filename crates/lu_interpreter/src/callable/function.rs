@@ -1,78 +1,66 @@
 #![allow(dead_code)]
 use crate::scope::ScopeFrameId;
-use crate::{Command, Evaluable, VarDeclNode, Variable};
+use crate::{Command, Evaluable, Variable};
 use crate::{Evaluator, ValueType};
-use lu_syntax::ast::{
-    FlagSignatureNode, FnStmtNode, InSignatureNode, ParamSignatureNode, RetSignatureNode,
-    VarArgParamSignatureRuleNode,
-};
+use derive_more::From;
+use lu_error::{LuErr, SourceCodeItem};
+use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode};
+use lu_syntax::AstNode;
+use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, From)]
+pub enum Decl {
+    Arg(ArgSignatureNode),
+    FnNodeFallback(FnStmtNode),
+}
+
+impl Decl {
+    pub fn into_item(&self) -> SourceCodeItem {
+        match self {
+            Decl::FnNodeFallback(fn_node) => fn_node.fallback_in_ret_item(),
+            Decl::Arg(arg) => arg.into_item(),
+        }
+    }
+}
 
 #[derive(Clone, Debug, new)]
 pub struct ArgSignature {
     pub name: String,
-    pub type_: Option<ValueType>,
-    pub is_opt: bool,
-    pub decl: Option<ParamSignatureNode>,
+    pub type_: ValueType,
+    #[new(default)] // TODO this default should be false, making every flag necessary
+    pub is_opt: bool, // TODO this is prob a bad idea???
+    pub decl: Decl,
 }
 
-impl Into<Variable> for ArgSignature {
-    fn into(self) -> Variable {
-        Variable::new(
-            self.name,
-            Value::Nil,
-            self.decl.map(|n| VarDeclNode::ArgSignature(n)),
-        )
-    }
-}
+impl ArgSignature {
+    pub fn from_node(
+        n: Option<ArgSignatureNode>,
+        fallback_name: &str,
+        fn_node: &FnStmtNode,
+    ) -> (Self, Option<LuErr>) {
+        let name = n.as_ref().map(|n| n.name()).unwrap_or(fallback_name.into());
+        let fallback_ty = (ValueType::Unspecified, None);
+        let decl: Decl = n
+            .as_ref()
+            .map(|n| n.clone().into())
+            .unwrap_or_else(|| fn_node.clone().into());
+        let ty = n
+            .as_ref()
+            .map(|in_node| {
+                in_node
+                    .type_()
+                    .map(|ty| {
+                        // Ty should always be some
+                        ValueType::from_node(&ty.into_type())
+                            .map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
+                    })
+                    .unwrap_or(fallback_ty.clone()) // But for incomplete input we fallback
+            })
+            .unwrap_or(fallback_ty); // or if in is not specified, use fallback
 
-#[derive(Clone, Debug, new)]
-pub struct VarArgSignature {
-    pub name: String,
-    pub type_: Option<ValueType>,
-    pub decl: Option<VarArgParamSignatureRuleNode>,
-}
-
-impl Into<Variable> for VarArgSignature {
-    fn into(self) -> Variable {
-        Variable::new(
-            self.name,
-            Value::Nil,
-            self.decl.map(|n| VarDeclNode::VarArgSignature(n)),
-        )
-    }
-}
-
-#[derive(Clone, Debug, new)]
-pub struct InArgSignature {
-    pub type_: Option<ValueType>,
-    pub decl: Option<InSignatureNode>,
-}
-
-impl Into<Variable> for InArgSignature {
-    fn into(self) -> Variable {
-        Variable::new(
-            "in".into(),
-            Value::Nil,
-            self.decl.map(|n| VarDeclNode::InArgSignature(n)),
-        )
-    }
-}
-
-#[derive(Clone, Debug, new)]
-pub struct RetArgSignature {
-    pub type_: Option<ValueType>,
-    pub decl: Option<RetSignatureNode>,
-}
-
-impl Into<Variable> for RetArgSignature {
-    fn into(self) -> Variable {
-        Variable::new(
-            "ret".into(),
-            Value::Nil,
-            self.decl.map(|n| VarDeclNode::RetArgSignature(n)),
-        )
+        (ArgSignature::new(name, ty.0, decl), ty.1)
     }
 }
 
@@ -80,7 +68,7 @@ impl Into<Variable> for RetArgSignature {
 pub struct FlagSignature {
     pub long_name: Option<String>,
     pub short_name: Option<char>,
-    pub type_: Option<ValueType>,
+    pub type_: ValueType,
     #[new(default)] // TODO this default should be false, making every flag necessary
     pub is_opt: bool,
     #[serde(skip)]
@@ -90,15 +78,42 @@ pub struct FlagSignature {
 #[derive(Clone, Debug, new)]
 pub struct Signature {
     pub args: Vec<ArgSignature>,
-    pub var_arg: Option<VarArgSignature>,
+    pub var_arg: Option<ArgSignature>,
     pub flags: Vec<FlagSignature>,
-    pub in_type: Option<InArgSignature>,
-    pub ret_type: Option<RetArgSignature>,
+    pub in_type: ArgSignature,
+    pub ret_type: ArgSignature,
 }
 
+impl Signature {
+    pub fn default_signature(fn_node: &FnStmtNode) -> Signature {
+        Signature::new(
+            Vec::new(),
+            Some(ArgSignature::new(
+                VAR_ARGS_DEF_NAME.into(),
+                ValueType::Any,
+                fn_node.clone().into(),
+            )),
+            Vec::new(),
+            ArgSignature::new(
+                IN_ARG_NAME.into(),
+                ValueType::Unspecified,
+                fn_node.clone().into(),
+            ),
+            ArgSignature::new(
+                RET_ARG_NAME.into(),
+                ValueType::Unspecified,
+                fn_node.clone().into(),
+            ),
+        )
+    }
+}
+
+/// Function is a struct containing all needed information for a function/closure
+/// This should allow for less lookup in the ast later on
 #[derive(Clone, Debug)]
 pub struct Function {
     pub name: String,
+    /// A signature is always present (if not user provided, defaulted.)
     pub signature: Signature,
     pub fn_node: FnStmtNode,
     pub parent_frame_id: ScopeFrameId,

@@ -1,12 +1,11 @@
-use crate::grammar::{LuTypeRule, OrRule};
+use crate::grammar::LuTypeRule;
 use crate::parser::CMT_WS;
 use crate::token_set::TokenSet;
+use crate::T;
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::*,
 };
-use crate::{SyntaxKind, T};
-use vec_box::vec_box;
 
 use super::Rule;
 
@@ -44,88 +43,33 @@ impl Rule for FlagSignatureRule {
     }
 }
 
-struct KeywordArgRule {
-    kw: SyntaxKind,
-    marker_kind: SyntaxKind,
-}
+/// Ret In VarArg NormalArg Rule
+struct ArgSignatureRule {}
 
-impl KeywordArgRule {
-    pub fn in_arg_rule() -> Self {
-        KeywordArgRule {
-            kw: InKeyword,
-            marker_kind: InSignature,
-        }
-    }
-    pub fn ret_arg_rule() -> Self {
-        KeywordArgRule {
-            kw: RetKeyword,
-            marker_kind: RetSignature,
-        }
-    }
-}
-
-impl Rule for KeywordArgRule {
+impl Rule for ArgSignatureRule {
     fn name(&self) -> String {
-        self.kw.name().to_string()
+        format!("ArgSignatureRule")
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        assert!(self.kw == RetKeyword || self.kw == InKeyword);
-        p.next_non(CMT_NL_WS) == self.kw
+        let ts: TokenSet = [InKeyword, RetKeyword, VarArgName, BareWord].into();
+        ts.contains(p.next_non(CMT_NL_WS))
     }
 
-    /// kw: type
-    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        assert!(self.kw == RetKeyword || self.kw == InKeyword);
-        let m = p.start();
-        p.expect_after(self.kw, CMT_NL_WS);
-        if p.expect_after(T![:], CMT_NL_WS) {
-            LuTypeRule {}.parse(p);
-        }
-        Some(m.complete(p, self.marker_kind))
-    }
-}
-
-struct ParamSignatureRule {}
-impl Rule for ParamSignatureRule {
-    fn name(&self) -> String {
-        "ParameterSignatureRule".into()
-    }
-
-    fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == BareWord
-    }
-
-    /// name (<:> type)? (<?>)?
+    /// name (<:> type)?
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        p.expect_after_as(BareWord, ParamName, CMT_NL_WS);
-        p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
+        p.expect_after_as(
+            [InKeyword, RetKeyword, VarArgName, BareWord],
+            ArgName,
+            CMT_NL_WS,
+        );
+        // TODO optional args?
+        // p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
         if p.eat_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);
         }
-        Some(m.complete(p, ParamSignature))
-    }
-}
-
-struct VarArgParamSignatureRule {}
-impl Rule for VarArgParamSignatureRule {
-    fn name(&self) -> String {
-        "VarArgParamSignatureRule".into()
-    }
-
-    fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == VarArgName
-    }
-
-    /// ...rest (<:> type)?
-    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        let m = p.start();
-        p.expect_after(VarArgName, CMT_NL_WS);
-        if p.eat_after(T![:], CMT_NL_WS) {
-            LuTypeRule {}.parse(p);
-        }
-        Some(m.complete(p, VarArgParamSignatureRule))
+        Some(m.complete(p, ArgSignature))
     }
 }
 
@@ -145,19 +89,10 @@ impl Rule for SignatureRule {
 
         p.expect_after(T!["("], CMT_NL_WS);
 
-        let param_rule = OrRule {
-            kind: None,
-            rules: vec_box![
-                KeywordArgRule::ret_arg_rule(),
-                KeywordArgRule::in_arg_rule(),
-                ParamSignatureRule {},
-            ],
-        };
+        let param_rule = ArgSignatureRule {};
         while param_rule.matches(p) {
             param_rule.parse(p);
         }
-
-        VarArgParamSignatureRule {}.opt(p);
 
         let flag_rule = FlagSignatureRule {};
         while flag_rule.matches(p) {

@@ -27,6 +27,7 @@ educe = "0.4.18"
 if_chain = "1.0.2"
 enum-as-inner = "0.3.3"
 bimap = "0.6.1"
+derive_more = "0.99.16"
 
 [dev-dependencies]
 lu_test_support = { version = "0.1.0", path = "../lu_test_support" }

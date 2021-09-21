@@ -4,9 +4,9 @@ Single arg
 ---
 - Start: Signature
 - Token: "LeftParenthesis (len: 1)"
-- Start: ParamSignature
+- Start: ArgSignature
 - Token: "Whitespace (len: 1)"
-- Token: "ParamName (len: 4)"
+- Token: "ArgName (len: 4)"
 - Finish: ""
 - Token: "Whitespace (len: 1)"
 - Token: "RightParenthesis (len: 1)"
@@ -18,16 +18,16 @@ Multiple Args
 ---
 - Start: Signature
 - Token: "LeftParenthesis (len: 1)"
-- Start: ParamSignature
-- Token: "ParamName (len: 4)"
+- Start: ArgSignature
+- Token: "ArgName (len: 4)"
 - Finish: ""
-- Start: ParamSignature
+- Start: ArgSignature
 - Token: "Whitespace (len: 1)"
-- Token: "ParamName (len: 4)"
+- Token: "ArgName (len: 4)"
 - Finish: ""
-- Start: ParamSignature
+- Start: ArgSignature
 - Token: "Whitespace (len: 1)"
-- Token: "ParamName (len: 4)"
+- Token: "ArgName (len: 4)"
 - Finish: ""
 - Token: "RightParenthesis (len: 1)"
 - Finish: ""
@@ -53,8 +53,8 @@ Arg with type
 ---
 - Start: Signature
 - Token: "LeftParenthesis (len: 1)"
-- Start: ParamSignature
-- Token: "ParamName (len: 4)"
+- Start: ArgSignature
+- Token: "ArgName (len: 4)"
 - Token: "DoublePoint (len: 1)"
 - Start: LuType
 - Token: "Whitespace (len: 1)"

@@ -9,15 +9,18 @@ use lu_syntax::{
     ast::{ConditionElement, IfBlockNode},
     AstElement, AstToken,
 };
-use lu_syntax_elements::BlockType;
+use lu_syntax_elements::{
+    constants::{IN_ARG_NAME, RET_ARG_NAME},
+    BlockType,
+};
 use lu_value::Value;
 
 use crate::{
-    callable::{InArgSignature, RetArgSignature},
+    callable::Decl,
     resolve::{Resolve, ResolveArg, Resolver},
     visit_arg::VisitArg,
     ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
-    Signature, ValueType, VarArgSignature, Variable, ARG_VAR_NAME,
+    Signature, ValueType, Variable, ARG_VAR_NAME,
 };
 
 impl Resolve for BlockStmtNode {
@@ -58,14 +61,9 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
 
     // Source the signature (either user provided or default)
     let sign = if let Some(sign_node) = fn_stmt.signature() {
-        source_signature(&sign_node, resolver)
+        source_signature(&sign_node, fn_stmt, resolver)
     } else {
-        // TODO shouldnt this be empty and var_arg == Any
-        // let var_arg = VarArgSignature::new("args".into(), None, None);
-        let args = (0..10)
-            .map(|i| ArgSignature::new(ARG_VAR_NAME.to_string() + &i.to_string(), None, true, None))
-            .collect();
-        Signature::new(args, None, vec![], None, None)
+        Signature::default_signature(fn_stmt)
     };
 
     let parent_frame_id = resolver.scope.lock().get_cur_frame_id();
@@ -78,27 +76,25 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
         .insert(func.name.clone(), Variable::new_func(func, fn_stmt.clone()));
 }
 
-fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signature {
-    let in_ty = sign_node.in_arg().map(|in_node| {
-        InArgSignature::new(
-            in_node.type_().map(|ty| get_ty_of_node(&ty, resolver)),
-            Some(in_node.clone()),
-        )
-    });
-    let ret_ty = sign_node.ret_arg().map(|ret_node| {
-        RetArgSignature::new(
-            ret_node.type_().map(|ty| get_ty_of_node(&ty, resolver)),
-            Some(ret_node.clone()),
-        )
-    });
+fn source_signature(
+    sign_node: &SignatureNode,
+    fn_stmt: &FnStmtNode,
+    resolver: &mut Resolver,
+) -> Signature {
+    let (in_ty, err) = ArgSignature::from_node(sign_node.in_arg(), IN_ARG_NAME, fn_stmt);
+    resolver.record_option(err);
+    let (ret_ty, err) = ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fn_stmt);
+    resolver.record_option(err);
     let args: Vec<ArgSignature> = sign_node
         .args()
+        .iter()
         .map(|arg_node| -> ArgSignature {
             let arg_name = arg_node.name();
             let ty = arg_node
                 .type_()
-                .map(|ty_node| get_ty_of_node(&ty_node, resolver));
-            ArgSignature::new(arg_name, ty, false, Some(arg_node))
+                .map(|ty_node| get_ty_of_node(&ty_node, resolver))
+                .unwrap_or(ValueType::Unspecified);
+            ArgSignature::new(arg_name, ty, arg_node.clone().into())
         })
         .collect();
     let flags = sign_node
@@ -108,7 +104,8 @@ fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signa
             let short_name = flag_node.short_name();
             let ty = flag_node
                 .type_()
-                .map(|ty_node| get_ty_of_node(&ty_node, resolver));
+                .map(|ty_node| get_ty_of_node(&ty_node, resolver))
+                .unwrap_or(ValueType::Unspecified);
             FlagSignature::new(long_name, short_name, ty, Some(flag_node))
         })
         .collect();
@@ -116,8 +113,9 @@ fn source_signature(sign_node: &SignatureNode, resolver: &mut Resolver) -> Signa
         let name = var_arg_node.name();
         let ty = var_arg_node
             .type_()
-            .map(|ty_node| get_ty_of_node(&ty_node, resolver));
-        VarArgSignature::new(name, ty, Some(var_arg_node))
+            .map(|ty_node| get_ty_of_node(&ty_node, resolver))
+            .unwrap_or(ValueType::Any);
+        ArgSignature::new(name, ty, var_arg_node.into())
     });
     Signature::new(args, var_arg, flags, in_ty, ret_ty)
 }

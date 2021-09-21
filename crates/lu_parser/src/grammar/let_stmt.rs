@@ -22,6 +22,7 @@ impl Rule for LetStmtRule {
         p.eat_while(CMT_NL_WS);
         if !p.expect(LetKeyword) {
             // We better stop here, before doing more
+            m.abandon(p);
             return None;
         }
         p.eat_while(CMT_NL_WS);

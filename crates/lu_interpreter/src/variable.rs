@@ -1,9 +1,6 @@
 use lu_error::SourceCodeItem;
 use lu_syntax::{
-    ast::{
-        FnStmtNode, ForStmtNode, InSignatureNode, LetStmtNode, ParamSignatureNode,
-        RetSignatureNode, VarArgParamSignatureRuleNode,
-    },
+    ast::{ArgSignatureNode, FnStmtNode, ForStmtNode, LetStmtNode},
     AstNode, AstToken,
 };
 use lu_value::Value;
@@ -17,10 +14,7 @@ pub enum VarDeclNode {
     FnStmt(FnStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
-    ArgSignature(ParamSignatureNode),
-    VarArgSignature(VarArgParamSignatureRuleNode),
-    InArgSignature(InSignatureNode),
-    RetArgSignature(RetSignatureNode),
+    ArgSignature(ArgSignatureNode),
 }
 
 impl VarDeclNode {
@@ -29,9 +23,6 @@ impl VarDeclNode {
             VarDeclNode::LetStmt(n) => n.into_item(),
             VarDeclNode::FnStmt(n) => n.into_item(),
             VarDeclNode::ArgSignature(n) => n.into_item(),
-            VarDeclNode::VarArgSignature(n) => n.into_item(),
-            VarDeclNode::InArgSignature(n) => n.into_item(),
-            VarDeclNode::RetArgSignature(n) => n.into_item(),
             VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].into_item(),
         }
     }

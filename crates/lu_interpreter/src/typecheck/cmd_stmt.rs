@@ -5,7 +5,7 @@ use lu_error::TyErr;
 use lu_pipeline_stage::ErrorContainer;
 use lu_syntax::{
     ast::{CmdStmtNode, LetStmtNode},
-    AstElement,
+    AstElement, AstNode,
 };
 use lu_value::Value;
 use rusttyc::TcKey;
@@ -21,24 +21,30 @@ impl TypeCheck for CmdStmtNode {
         debug!("Scope: {:?}", ty_state.scope);
         debug!("Cur Scope Frame: {:?}", ty_state.scope.cur_frame());
         let possibl_longest_name = self.possible_longest_cmd_call_name();
+        // Finding result type here
         if let Some(var) = ty_state
             .scope
             .find_var_with_longest_match(&possibl_longest_name)
             .map(|(_, var)| var)
             .cloned()
         {
-            if let Some(func) = ty_state.tc_func_table.get(&var) {
-                func.ret_ty
-            } else {
-                // This error should be catched more elaborated in special check for this
-                debug!(
-                    "Expected {} to be a function, but isn't present in tc_func_table",
-                    var.name
-                );
-                Some(ty_state.get_tc_error_key())
-            }
+            let ret_key = ty_state
+                .tc_func_table
+                .get(&var)
+                .map(|func| func.ret_ty)
+                .unwrap_or_else(|| {
+                    // We have found such a var, but its not a function
+                    // This error should be catched more elaborated in special check for this
+                    debug!(
+                        "Expected {} to be a function, but isn't present in tc_func_table",
+                        var.name
+                    );
+                    ty_state.get_tc_error_key()
+                });
+            Some(ty_state.new_term_key_equated(self.into_item(), ret_key))
         } else {
-            todo!("TODO what should external cmds return?")
+            // External cmds return string
+            Some(ty_state.new_term_key_concretiziesd(self.into_item(), ValueType::String))
         }
     }
 }

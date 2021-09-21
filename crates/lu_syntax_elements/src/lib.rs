@@ -1,4 +1,5 @@
 mod block_type;
+pub mod constants;
 
 pub use block_type::BlockType;
 

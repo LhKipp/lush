@@ -7,6 +7,7 @@ edition = "2018"
 
 [dependencies]
 lu_parser = { version = "0.1.0", path = "../lu_parser" }
+lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_text_util = { version = "0.1.0", path = "../lu_text_util" }

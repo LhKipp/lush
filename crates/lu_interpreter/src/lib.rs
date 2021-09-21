@@ -1,3 +1,4 @@
+extern crate derive_more;
 #[macro_use]
 extern crate derive_new;
 #[macro_use]
@@ -17,8 +18,8 @@ pub use crate::evaluate::{EvalArg, Evaluable};
 pub use crate::interpreter::Interpreter;
 pub use crate::variable::{VarDeclNode, Variable};
 pub use callable::{
-    ArgSignature, Callable, Command, FlagSignature, Function, InArgSignature, RetArgSignature,
-    RunExternalCmd, Signature, VarArgSignature, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
+    ArgSignature, Callable, Command, FlagSignature, Function, RunExternalCmd, Signature,
+    ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
 };
 
 pub use evaluate::*;
