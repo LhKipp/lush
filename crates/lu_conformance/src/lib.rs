@@ -284,7 +284,6 @@ fn build_tests(args: AttrArgs, fun: syn::ItemFn, manifest_dir: PathBuf) -> Token
         Err(e) => return e,
     };
 
-    // let filepath = tests_path.to_string_lossy().to_string();
     let filename = tests_path
         .file_stem()
         .unwrap()
@@ -308,12 +307,31 @@ fn build_tests(args: AttrArgs, fun: syn::ItemFn, manifest_dir: PathBuf) -> Token
             output,
             path,
         } = test;
-        let path = path.to_string_lossy().to_string();
-        let test_name = quote::format_ident!("{}{}", filename, name);
+        let last_2_components: Vec<_> = path
+            .components()
+            .rev()
+            .take(2)
+            .map(|s| s.as_os_str())
+            .map(|s| {
+                Path::new(s)
+                    .file_stem()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string()
+            })
+            .collect();
+        let test_name = quote::format_ident!(
+            // TODO there is ___ if format_layout is {}__{}__{}
+            "{}__{}_{}",
+            last_2_components[1],
+            last_2_components[0],
+            name
+        );
+        let path_as_str = path.to_string_lossy().to_string();
         tts.extend(quote! {
             #[test]
             fn #test_name() -> Result<(), Box<dyn ::std::error::Error>> {
-                const _: &str = include_str!(#path);
+                const _: &str = include_str!(#path_as_str);
                 lu_test_support::init_logger();
                 #testing_fn(#output, #input)
             }
