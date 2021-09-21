@@ -21,6 +21,7 @@ mod math_expr;
 mod piped_cmds_stmt;
 mod source_file;
 mod statement;
+mod test;
 
 #[derive(Clone, Debug)]
 pub enum EvalArg {

@@ -11,19 +11,3 @@ impl Evaluable for FnStmtNode {
         Ok(Value::Nil)
     }
 }
-
-#[cfg(test)]
-mod test {
-    use lu_error::LuResults;
-    use lu_test_support::{init_logger, make_test_interpreter};
-    use lu_value::Value;
-    use {conformance, serde_json};
-
-    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/fn_stmt/general.json_test")]
-    fn general_interpreter_tests(s: &str) -> LuResults<Value> {
-        init_logger();
-        let mut itprtr = make_test_interpreter();
-
-        itprtr.eval(s.to_string().into())
-    }
-}

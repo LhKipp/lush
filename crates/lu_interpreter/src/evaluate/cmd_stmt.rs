@@ -45,31 +45,3 @@ impl Evaluable for CmdStmtNode {
         cmd.run(state)
     }
 }
-
-#[cfg(test)]
-mod test {
-    use lu_error::LuResult;
-    use lu_test_support::{init_logger, make_test_interpreter};
-    use lu_value::Value;
-    use {conformance, serde_json};
-
-    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/cmd_stmt/general.json_test")]
-    fn general_cmd_tests(s: &str) -> LuResult<Value> {
-        init_logger();
-        let mut evaluator = make_test_interpreter();
-
-        evaluator
-            .eval(s.to_string().into())
-            .map_err(|errs| errs[0].clone())
-    }
-
-    #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/cmd_stmt/external.json_test")]
-    fn external_cmd_tests(s: &str) -> LuResult<Value> {
-        init_logger();
-        let mut evaluator = make_test_interpreter();
-
-        evaluator
-            .eval(s.to_string().into())
-            .map_err(|errs| errs[0].clone())
-    }
-}

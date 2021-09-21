@@ -79,21 +79,3 @@ fn eval_assign_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
 fn eval_right_stream(_lhs: Value, _rhs: Value) -> LuResult<Value> {
     todo!()
 }
-
-// #[cfg(test)]
-// mod test {
-//     use lu_error::LuResult;
-//     use lu_syntax::ast::SourceFileNode;
-//     use lu_test_support::{init_logger, make_test_interpreter};
-//     use lu_text_util::SourceCode;
-//     use lu_value::Value;
-//     use {conformance, serde_json};
-
-//     #[conformance::tests(exact, serde=serde_json, file="test_data/evaluate/if_stmt/single_if.json_test")]
-//     fn general_interpreter_tests(s: &str) -> LuResult<Value> {
-//         init_logger();
-//         let mut evaluator = make_test_interpreter();
-
-//         evaluator.eval(SourceCode::Text(s.to_string()))
-//     }
-// }
