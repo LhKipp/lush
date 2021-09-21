@@ -1,7 +1,6 @@
-1
+cmd returns ret_ty of called fn
 ===
 fn func_1(ret: num)
-    1
 end
 func_1
 ---
@@ -9,4 +8,13 @@ func_1
   "Ok": "Number"
 }
 ...
-
+passing arg_ty num does not generate error
+===
+fn func(arg: num ret: num)
+end
+func 1
+---
+{
+  "Ok": "Number"
+}
+...
