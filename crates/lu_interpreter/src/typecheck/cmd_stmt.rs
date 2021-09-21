@@ -104,32 +104,3 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
         )
     }
 }
-
-#[cfg(test)]
-mod test {
-    use lu_error::LuResults;
-    use lu_test_support::{init_logger, make_test_interpreter};
-
-    use lu_interpreter::ValueType;
-
-    use {conformance, serde_json};
-
-    #[conformance::tests(exact, serde=serde_json, file="test_data/typecheck/cmd_stmt/cmd_simple.json_test")]
-    fn general_interpreter_tests(s: &str) -> LuResults<Option<ValueType>> {
-        init_logger();
-        let mut itprtr = make_test_interpreter();
-
-        itprtr
-            .ty_check(s.to_string().into())
-            .map(|ty_checker| ty_checker.result)
-    }
-
-    #[conformance::tests(exact, serde=serde_json, file="test_data/typecheck/cmd_stmt/cmd_wrong_arg_count.json_test")]
-    fn general_interpreter_tests_2(s: &str) -> LuResults<Option<ValueType>> {
-        init_logger();
-        let mut itprtr = make_test_interpreter();
-        itprtr
-            .ty_check(s.to_string().into())
-            .map(|ty_checker| ty_checker.result)
-    }
-}

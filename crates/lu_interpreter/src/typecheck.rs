@@ -17,6 +17,7 @@ mod let_stmt;
 mod piped_cmds_stmt;
 mod source_file;
 mod statement;
+mod test;
 
 pub struct TypeChecker {
     /// Input from previous stage

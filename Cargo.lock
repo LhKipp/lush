@@ -507,6 +507,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "lu_conformance"
+version = "0.1.0"
+dependencies = [
+ "glob",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "walkdir",
+]
+
+[[package]]
 name = "lu_error"
 version = "0.1.0"
 dependencies = [
@@ -540,6 +551,7 @@ dependencies = [
  "if_chain",
  "indextree",
  "log",
+ "lu_conformance",
  "lu_error",
  "lu_fs",
  "lu_interpreter",

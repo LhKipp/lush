@@ -57,18 +57,3 @@ impl TypeCheck for LetStmtNode {
         None
     }
 }
-
-#[cfg(test)]
-mod test {
-    use lu_error::LuResults;
-    use lu_test_support::{init_logger, make_test_interpreter};
-    use {conformance, serde_json};
-
-    #[conformance::tests(exact, serde=serde_json, file="test_data/typecheck/let_stmt/wrong_decl.json_test")]
-    fn general_interpreter_tests(s: &str) -> LuResults<()> {
-        init_logger();
-        let mut itprtr = make_test_interpreter();
-
-        itprtr.ty_check(s.to_string().into()).map(|_| ())
-    }
-}
