@@ -371,6 +371,34 @@ impl HasRule for ArrayTypeNode{
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FnTypeNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for FnTypeNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FnType }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for FnTypeNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+
+use lu_parser::grammar::FnTypeRule;
+impl HasRule for FnTypeNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(FnTypeRule{})
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OptModifierToken {
     pub(crate) syntax: SyntaxToken,
 }

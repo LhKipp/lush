@@ -64,3 +64,29 @@ Arg with type
 - Token: "RightParenthesis (len: 1)"
 - Finish: ""
 ...
+Signature with fn type
+===
+(func: fn(arg1))
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ArgSignature
+- Token: "ArgName (len: 4)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Start: FnType
+- Token: "FnKeyword (len: 2)"
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ArgSignature
+- Token: "ArgName (len: 4)"
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...

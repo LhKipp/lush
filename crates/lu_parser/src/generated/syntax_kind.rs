@@ -39,6 +39,7 @@ pub enum SyntaxKind {
     #[token("ret")]
     RetKeyword,
     ArrayType,
+    FnType,
     OptModifier,
     #[token("(")]
     LeftParenthesis,
@@ -166,6 +167,7 @@ impl SyntaxKind{
             SyntaxKind::StringKeyword => "StringKeyword",
             SyntaxKind::RetKeyword => "RetKeyword",
             SyntaxKind::ArrayType => "ArrayType",
+            SyntaxKind::FnType => "FnType",
             SyntaxKind::OptModifier => "OptModifier",
             SyntaxKind::LeftParenthesis => "LeftParenthesis",
             SyntaxKind::RightParenthesis => "RightParenthesis",

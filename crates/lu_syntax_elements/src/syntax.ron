@@ -20,6 +20,7 @@ Config(
 
     // === TYPES ===
     ( name: "ArrayType"                  , is_node: true                                , has_rule: true ) ,
+    ( name: "FnType"                     , is_node: true                                , has_rule: true ) ,
     // === MODIFIER ===
     ( name: "OptModifier"                , is_token: true                               , )                ,
     // === PUNCTUATION ===

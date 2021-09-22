@@ -5,7 +5,7 @@ use crate::{
 };
 use vec_box::vec_box;
 
-use super::{OrRule, Rule};
+use super::{OrRule, Rule, SignatureRule};
 
 pub struct ArrayTypeRule;
 impl Rule for ArrayTypeRule {
@@ -29,6 +29,25 @@ impl Rule for ArrayTypeRule {
     }
 }
 
+pub struct FnTypeRule;
+impl Rule for FnTypeRule {
+    fn name(&self) -> String {
+        "FnTypeRule".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == FnKeyword
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
+        p.expect_after(FnKeyword, CMT_NL_WS);
+
+        SignatureRule {}.opt(p);
+        Some(m.complete(p, FnType))
+    }
+}
+
 fn lu_type_specifier() -> OrRule {
     OrRule {
         kind: Some("LuTypeSpecifier".to_string()),
@@ -38,7 +57,7 @@ fn lu_type_specifier() -> OrRule {
             NilKeyword,
             BoolKeyword,
             StringKeyword,
-            FnKeyword,
+            FnTypeRule{},
             ArrayTypeRule {},
             BareWord,
         ],

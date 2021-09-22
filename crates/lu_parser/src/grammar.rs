@@ -63,7 +63,7 @@ pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use ret_stmt::RetStmtRule;
 pub use signature::SignatureRule;
-pub use type_::{ArrayTypeRule, LuTypeRule};
+pub use type_::{ArrayTypeRule, FnTypeRule, LuTypeRule};
 pub use value_path_expr::ValuePathExprRule;
 
 pub trait Rule {
