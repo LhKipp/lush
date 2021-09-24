@@ -1,4 +1,6 @@
 #[allow(unused_imports)]
+use serde::Serialize;
+#[allow(unused_imports)]
 use crate::{
     Rule,
     ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
@@ -9,7 +11,7 @@ use crate::{
 {% for syn_elem in syntax_elements -%}
 {% if syn_elem.is_token -%}
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct {{ syn_elem.struct_name }} {
     pub(crate) syntax: SyntaxToken,
 }
@@ -32,7 +34,7 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
 
 {% elif syn_elem.is_node -%}
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct {{ syn_elem.struct_name }} {
     pub(crate) syntax: SyntaxNode,
 }
@@ -55,7 +57,7 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
 
 {% elif syn_elem.is_generic -%}
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum {{ syn_elem.struct_name }} {
     {% for represented in syn_elem.represents -%}
     {{represented.name}}({{represented.struct_name}}),

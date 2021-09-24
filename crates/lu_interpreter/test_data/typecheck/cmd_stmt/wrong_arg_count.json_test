@@ -48,9 +48,9 @@ func unexpected_arg
             ]
           },
           "fn_decl": {
-            "content": "fn func()",
+            "content": "()",
             "range": [
-              0,
+              7,
               9
             ]
           }

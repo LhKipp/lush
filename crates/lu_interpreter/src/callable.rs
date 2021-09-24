@@ -3,20 +3,20 @@ mod function;
 mod run_external_cmd;
 
 pub use command::{Command, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME};
+use derive_more::From;
 use enum_as_inner::EnumAsInner;
 pub use function::*;
+use lu_error::SourceCodeItem;
 pub use run_external_cmd::RunExternalCmd;
 
 use crate::{EvalArg, Evaluator};
 
-#[derive(Clone, Debug, EnumAsInner)]
+#[derive(Clone, Debug, EnumAsInner, From)]
 pub enum Callable {
     Func(Function),
     InternalCmd(Box<dyn Command>),
     ExternalCmd(RunExternalCmd),
 }
-
-impl Callable {}
 
 impl Command for Callable {
     fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> lu_error::LuResult<lu_value::Value> {
@@ -34,16 +34,20 @@ impl Command for Callable {
             Callable::ExternalCmd(cmd) => cmd.name(),
         }
     }
-}
 
-impl From<Box<dyn Command>> for Callable {
-    fn from(cmd: Box<dyn Command>) -> Self {
-        Callable::InternalCmd(cmd)
+    fn signature(&self) -> &Signature {
+        match self {
+            Callable::Func(f) => f.signature(),
+            Callable::InternalCmd(cmd) => cmd.signature(),
+            Callable::ExternalCmd(cmd) => cmd.signature(),
+        }
     }
-}
 
-impl From<Function> for Callable {
-    fn from(func: Function) -> Self {
-        Callable::Func(func)
+    fn signature_item(&self) -> SourceCodeItem {
+        match self {
+            Callable::Func(f) => f.signature_item(),
+            Callable::InternalCmd(cmd) => cmd.signature_item(),
+            Callable::ExternalCmd(cmd) => cmd.signature_item(),
+        }
     }
 }

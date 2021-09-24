@@ -55,22 +55,26 @@ impl TypeCheck for BlockStmtNode {
     }
 }
 
-fn add_entry_for_funcs(ty_checker: &mut TypeChecker) {
-    // Handle funcs in the source file block first
-    let var_funcs_to_insert = ty_checker
-        .scope
-        .cur_frame()
-        .elems
-        .iter()
-        .filter_map(|(_, var)| {
-            var.val_as_callable()
-                .map(|callable| callable.as_func())
-                .flatten()
-                .map(|func| (var.clone(), func.clone()))
-        })
-        .collect::<Vec<_>>();
-    for (var, func) in var_funcs_to_insert {
-        let tc_func = TcFunc::from_func(func, ty_checker);
-        ty_checker.tc_func_table.insert(var, tc_func);
-    }
+fn add_entry_for_funcs(_: &mut TypeChecker) {
+    // TODO should be unnecessary. loaded on demand
+    // // Handle funcs in the source file block first
+    // let var_funcs_to_insert = ty_checker
+    //     .scope
+    //     .cur_frame()
+    //     .elems
+    //     .iter()
+    //     .filter_map(|(_, var)| {
+    //         var.val_as_callable()
+    //             .map(|callable| callable.as_func())
+    //             .flatten()
+    //             .map(|func| (var.clone(), func.clone()))
+    //     })
+    //     .collect::<Vec<_>>();
+    // for (var, func) in var_funcs_to_insert {
+    //     // We handle functions as variables here.
+    //     let tc_func = TcFunc::from_callable(func, ty_checker);
+    //     // The var refers to the func
+    //     ty_checker.tc_table.insert(var, tc_func.self_key);
+    //     ty_checker.tc_func_table.insert(tc_func.self_key, tc_func);
+    // }
 }

@@ -15,7 +15,7 @@ pub fn init_logger() {
 }
 
 fn make_test_scope() -> Scope<Variable> {
-    let cmds: Vec<Box<dyn Command>> = vec_box![PrintCmd {}, TestPrintCmd {}];
+    let cmds: Vec<Box<dyn Command>> = vec_box![PrintCmd::new(), TestPrintCmd::new()];
 
     let mut scope = Scope::new();
     let (_, frame) = scope.push_frame(ScopeFrameTag::GlobalFrame);

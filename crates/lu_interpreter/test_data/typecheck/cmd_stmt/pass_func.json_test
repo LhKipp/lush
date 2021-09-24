@@ -1,0 +1,51 @@
+Pass correct func
+===
+fn ret_num_fn(ret: num)
+end
+
+fn take_ret_num_fn(ret: num func: fn(ret: num))
+end
+
+take_ret_num_fn $ret_num_fn
+---
+{
+  "Ok": "Number"
+}
+...
+Pass wrong func
+===
+fn ret_str_fn(ret: str)
+end
+
+fn take_ret_num_fn(func: fn(ret: num))
+end
+
+take_ret_num_fn $ret_str_fn
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "ret: num",
+            "range": [
+              57,
+              65
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "ret: str",
+            "range": [
+              14,
+              22
+            ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...

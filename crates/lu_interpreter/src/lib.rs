@@ -19,7 +19,7 @@ pub use crate::interpreter::Interpreter;
 pub use crate::variable::{VarDeclNode, Variable};
 pub use callable::{
     ArgSignature, Callable, Command, FlagSignature, Function, RunExternalCmd, Signature,
-    ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
+    SignatureBuilder, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
 };
 
 pub use evaluate::*;

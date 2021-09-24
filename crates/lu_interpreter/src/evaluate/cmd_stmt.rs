@@ -20,10 +20,10 @@ impl Evaluable for CmdStmtNode {
         } else {
             (
                 1,
-                Callable::ExternalCmd(RunExternalCmd {
-                    cmd_node: self.clone(),
-                    cmd_name: possibl_longest_name[0].clone(),
-                }),
+                Callable::ExternalCmd(RunExternalCmd::new(
+                    self.clone(),
+                    possibl_longest_name[0].clone(),
+                )),
             )
         };
 

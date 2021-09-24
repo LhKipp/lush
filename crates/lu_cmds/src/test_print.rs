@@ -1,13 +1,38 @@
-use log::debug;
-// use log::debug;
-use lu_error::LuResult;
-use lu_interpreter::{Command, EvalArg, Evaluator, Variable};
-use lu_value::Value;
+use crate::cmd_prelude::*;
 
 #[derive(Debug, Clone)]
-pub struct TestPrintCmd {}
+pub struct TestPrintCmd {
+    sign: Signature,
+}
+
+impl TestPrintCmd {
+    pub fn new() -> Self {
+        let print_decl = lu_source_code_item!();
+        let mut sign_builder = SignatureBuilder::default();
+        sign_builder
+            .decl(print_decl.clone())
+            .var_arg(ArgSignature::new(
+                "to_print".into(),
+                ValueType::Any,
+                print_decl.clone().into(),
+            ))
+            .in_type(ArgSignature::void(print_decl.clone().into()))
+            .ret_type(ArgSignature::void(print_decl.into()));
+        TestPrintCmd {
+            sign: sign_builder.build().unwrap(),
+        }
+    }
+}
 
 impl Command for TestPrintCmd {
+    fn signature_item(&self) -> lu_error::SourceCodeItem {
+        lu_source_code_item!()
+    }
+
+    fn signature(&self) -> &lu_interpreter::Signature {
+        todo!()
+    }
+
     fn name(&self) -> &str {
         "tprint"
     }

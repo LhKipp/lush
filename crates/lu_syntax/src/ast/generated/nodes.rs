@@ -1,4 +1,6 @@
 #[allow(unused_imports)]
+use serde::Serialize;
+#[allow(unused_imports)]
 use crate::{
     Rule,
     ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
@@ -6,7 +8,7 @@ use crate::{
     SyntaxNode, SyntaxToken, SyntaxElement
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -27,7 +29,7 @@ impl HasSyntaxKind for LetKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -48,7 +50,7 @@ impl HasSyntaxKind for FnKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ForKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -69,7 +71,7 @@ impl HasSyntaxKind for ForKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElifKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -90,7 +92,7 @@ impl HasSyntaxKind for ElifKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElseKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -111,7 +113,7 @@ impl HasSyntaxKind for ElseKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct IfKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -132,7 +134,7 @@ impl HasSyntaxKind for IfKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct WhileKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -153,7 +155,7 @@ impl HasSyntaxKind for WhileKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct EndKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -174,7 +176,7 @@ impl HasSyntaxKind for EndKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BeginKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -195,7 +197,7 @@ impl HasSyntaxKind for BeginKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct InKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -216,7 +218,7 @@ impl HasSyntaxKind for InKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct AnyKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -237,7 +239,7 @@ impl HasSyntaxKind for AnyKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NilKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -258,7 +260,7 @@ impl HasSyntaxKind for NilKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BoolKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -279,7 +281,7 @@ impl HasSyntaxKind for BoolKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NumberKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -300,7 +302,7 @@ impl HasSyntaxKind for NumberKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StringKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -321,7 +323,7 @@ impl HasSyntaxKind for StringKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -342,7 +344,7 @@ impl HasSyntaxKind for RetKeywordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArrayTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -370,7 +372,7 @@ impl HasRule for ArrayTypeNode{
         Box::new(ArrayTypeRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -398,7 +400,7 @@ impl HasRule for FnTypeNode{
         Box::new(FnTypeRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct OptModifierToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -419,7 +421,7 @@ impl HasSyntaxKind for OptModifierToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LeftParenthesisToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -440,7 +442,7 @@ impl HasSyntaxKind for LeftParenthesisToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightParenthesisToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -461,7 +463,7 @@ impl HasSyntaxKind for RightParenthesisToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LeftCurlyBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -482,7 +484,7 @@ impl HasSyntaxKind for LeftCurlyBracketsToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightCurlyBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -503,7 +505,7 @@ impl HasSyntaxKind for RightCurlyBracketsToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LeftRectangularBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -524,7 +526,7 @@ impl HasSyntaxKind for LeftRectangularBracketsToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightRectangularBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -545,7 +547,7 @@ impl HasSyntaxKind for RightRectangularBracketsToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct PlusSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -566,7 +568,7 @@ impl HasSyntaxKind for PlusSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct MinusSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -587,7 +589,7 @@ impl HasSyntaxKind for MinusSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct MultSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -608,7 +610,7 @@ impl HasSyntaxKind for MultSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DivSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -629,7 +631,7 @@ impl HasSyntaxKind for DivSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LessThanSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -650,7 +652,7 @@ impl HasSyntaxKind for LessThanSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LessOrEqualSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -671,7 +673,7 @@ impl HasSyntaxKind for LessOrEqualSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct EqualitySignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -692,7 +694,7 @@ impl HasSyntaxKind for EqualitySignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct InequalitySignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -713,7 +715,7 @@ impl HasSyntaxKind for InequalitySignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BiggerThanSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -734,7 +736,7 @@ impl HasSyntaxKind for BiggerThanSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BiggerOrEqualSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -755,7 +757,7 @@ impl HasSyntaxKind for BiggerOrEqualSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct AssignSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -776,7 +778,7 @@ impl HasSyntaxKind for AssignSignToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightStreamToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -797,7 +799,7 @@ impl HasSyntaxKind for RightStreamToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct PipeToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -818,7 +820,7 @@ impl HasSyntaxKind for PipeToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DollarToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -839,7 +841,7 @@ impl HasSyntaxKind for DollarToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct QuestionMarkToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -860,7 +862,7 @@ impl HasSyntaxKind for QuestionMarkToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct PointToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -881,7 +883,7 @@ impl HasSyntaxKind for PointToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DoublePointToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -902,7 +904,7 @@ impl HasSyntaxKind for DoublePointToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DoubleQuoteToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -923,7 +925,7 @@ impl HasSyntaxKind for DoubleQuoteToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct SingleQuoteToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -944,7 +946,7 @@ impl HasSyntaxKind for SingleQuoteToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ErrorToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -965,7 +967,7 @@ impl HasSyntaxKind for ErrorToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ParserInternalToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -986,7 +988,7 @@ impl HasSyntaxKind for ParserInternalToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct EofNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1007,7 +1009,7 @@ impl HasSyntaxKind for EofNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct TombstoneNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1028,7 +1030,7 @@ impl HasSyntaxKind for TombstoneNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct WhitespaceToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1049,7 +1051,7 @@ impl HasSyntaxKind for WhitespaceToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct CommentToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1070,7 +1072,7 @@ impl HasSyntaxKind for CommentToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NewlineToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1091,7 +1093,7 @@ impl HasSyntaxKind for NewlineToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BareWordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1112,7 +1114,7 @@ impl HasSyntaxKind for BareWordToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StringContentToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1133,7 +1135,7 @@ impl HasSyntaxKind for StringContentToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct VarDeclNameToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1154,7 +1156,7 @@ impl HasSyntaxKind for VarDeclNameToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnDeclNameToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1175,7 +1177,7 @@ impl HasSyntaxKind for FnDeclNameToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArgNameToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1196,7 +1198,7 @@ impl HasSyntaxKind for ArgNameToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct VarArgNameToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1217,7 +1219,7 @@ impl HasSyntaxKind for VarArgNameToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LongFlagToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1238,7 +1240,7 @@ impl HasSyntaxKind for LongFlagToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ShortFlagToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1259,7 +1261,7 @@ impl HasSyntaxKind for ShortFlagToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NumberToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1280,7 +1282,7 @@ impl HasSyntaxKind for NumberToken{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1308,7 +1310,7 @@ impl HasRule for SourceFileNode{
         Box::new(SourceFileRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1336,7 +1338,7 @@ impl HasRule for LetStmtNode{
         Box::new(LetStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1364,7 +1366,7 @@ impl HasRule for FnStmtNode{
         Box::new(FnStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1392,7 +1394,7 @@ impl HasRule for RetStmtNode{
         Box::new(RetStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct IfStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1420,7 +1422,7 @@ impl HasRule for IfStmtNode{
         Box::new(IfStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct IfBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1441,7 +1443,7 @@ impl HasSyntaxKind for IfBlockNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElifBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1462,7 +1464,7 @@ impl HasSyntaxKind for ElifBlockNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElseBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1483,7 +1485,7 @@ impl HasSyntaxKind for ElseBlockNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ForStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1511,7 +1513,7 @@ impl HasRule for ForStmtNode{
         Box::new(ForStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct CmdStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1539,7 +1541,7 @@ impl HasRule for CmdStmtNode{
         Box::new(CmdStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct PipedCmdsStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1567,7 +1569,7 @@ impl HasRule for PipedCmdsStmtNode{
         Box::new(PipedCmdsStmtRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BlockStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1588,7 +1590,7 @@ impl HasSyntaxKind for BlockStmtNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct SignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1616,7 +1618,7 @@ impl HasRule for SignatureNode{
         Box::new(SignatureRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FlagSignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1637,7 +1639,7 @@ impl HasSyntaxKind for FlagSignatureNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArgSignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1658,7 +1660,7 @@ impl HasSyntaxKind for ArgSignatureNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LuTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1686,7 +1688,7 @@ impl HasRule for LuTypeNode{
         Box::new(LuTypeRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct MathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1707,7 +1709,7 @@ impl HasSyntaxKind for MathExprNode{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StringExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1735,7 +1737,7 @@ impl HasRule for StringExprNode{
         Box::new(StringExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NumberExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1763,7 +1765,7 @@ impl HasRule for NumberExprNode{
         Box::new(NumberExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ValuePathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1791,7 +1793,7 @@ impl HasRule for ValuePathExprNode{
         Box::new(ValuePathExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArrayExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1819,7 +1821,7 @@ impl HasRule for ArrayExprNode{
         Box::new(ArrayExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct TableExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1847,7 +1849,7 @@ impl HasRule for TableExprNode{
         Box::new(TableExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum CmdOrValueExprElement {
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
@@ -1910,7 +1912,7 @@ impl HasSyntaxKind for CmdOrValueExprElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum ValueExprElement {
     BareWord(BareWordToken),
     NumberExpr(NumberExprNode),
@@ -2008,7 +2010,7 @@ impl HasRule for ValueExprElement{
         Box::new(ValueExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum StatementElement {
     ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
@@ -2103,7 +2105,7 @@ impl HasSyntaxKind for StatementElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum ConditionElement {
     CmdStmt(CmdStmtNode),
     ValueExpr(ValueExprElement),
@@ -2158,7 +2160,7 @@ impl HasSyntaxKind for ConditionElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum OperatorExprElement {
     PlusSign(PlusSignToken),
     MinusSign(MinusSignToken),
@@ -2289,15 +2291,15 @@ impl HasSyntaxKind for OperatorExprElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum LuTypeSpecifierElement {
     NumberKeyword(NumberKeywordToken),
     AnyKeyword(AnyKeywordToken),
     NilKeyword(NilKeywordToken),
     BoolKeyword(BoolKeywordToken),
     StringKeyword(StringKeywordToken),
-    FnKeyword(FnKeywordToken),
     ArrayType(ArrayTypeNode),
+    FnType(FnTypeNode),
     BareWord(BareWordToken),
     }
 
@@ -2316,7 +2318,7 @@ impl AstElement for LuTypeSpecifierElement {
         
         
         match kind{
-            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | FnKeyword | ArrayType | BareWord => true,
+            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | ArrayType | FnType | BareWord => true,
             _ => false,
         }
     }
@@ -2336,8 +2338,8 @@ impl AstElement for LuTypeSpecifierElement {
             NilKeyword => LuTypeSpecifierElement::NilKeyword(NilKeywordToken { syntax: syntax.into_token().unwrap() }),
             BoolKeyword => LuTypeSpecifierElement::BoolKeyword(BoolKeywordToken { syntax: syntax.into_token().unwrap() }),
             StringKeyword => LuTypeSpecifierElement::StringKeyword(StringKeywordToken { syntax: syntax.into_token().unwrap() }),
-            FnKeyword => LuTypeSpecifierElement::FnKeyword(FnKeywordToken { syntax: syntax.into_token().unwrap() }),
             ArrayType => LuTypeSpecifierElement::ArrayType(ArrayTypeNode { syntax: syntax.into_node().unwrap() }),
+            FnType => LuTypeSpecifierElement::FnType(FnTypeNode { syntax: syntax.into_node().unwrap() }),
             BareWord => LuTypeSpecifierElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
             _ => return None,
         };
@@ -2362,10 +2364,10 @@ impl AstElement for LuTypeSpecifierElement {
             LuTypeSpecifierElement::StringKeyword(it) => it.syntax.clone().into(),
             
             
-            LuTypeSpecifierElement::FnKeyword(it) => it.syntax.clone().into(),
-            
-            
             LuTypeSpecifierElement::ArrayType(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::FnType(it) => it.syntax.clone().into(),
             
             
             LuTypeSpecifierElement::BareWord(it) => it.syntax.clone().into(),
@@ -2381,8 +2383,8 @@ impl HasSyntaxKind for LuTypeSpecifierElement{
             LuTypeSpecifierElement::NilKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::BoolKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::StringKeyword(it) => it.get_syntax_kind(),
-            LuTypeSpecifierElement::FnKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::ArrayType(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::FnType(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::BareWord(it) => it.get_syntax_kind(),
             }
     }

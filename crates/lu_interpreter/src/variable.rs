@@ -35,7 +35,7 @@ pub struct Variable {
     /// The evaluation value of this variable, Value::Nil in other stages of interpretation
     pub val: Value,
     #[serde(skip)]
-    pub decl: Option<VarDeclNode>,
+    pub decl: Option<VarDeclNode>, // TODO doesn't need to be optional, decl can be in rust code
 }
 
 impl Variable {

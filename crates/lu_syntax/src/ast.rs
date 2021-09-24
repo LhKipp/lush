@@ -122,6 +122,21 @@ pub trait AstElement {
     }
 }
 
+// TODO not working
+// macro_rules! impl_from_for_source_code_item {
+//     ($t:ident) => {
+//         impl From<&dyn $t> for SourceCodeItem {
+//             fn from(n: &dyn $t) -> Self {
+//                 n.into_item()
+//             }
+//         }
+//     };
+// }
+
+// impl_from_for_source_code_item!(AstElement);
+// impl_from_for_source_code_item!(AstToken);
+// impl_from_for_source_code_item!(AstNode);
+
 /// An iterator over `SyntaxNode` children of a particular AST type.
 #[derive(Debug, Clone)]
 pub struct AstNodeChildren<N> {

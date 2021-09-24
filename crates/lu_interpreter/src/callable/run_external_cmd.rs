@@ -1,20 +1,49 @@
 use std::{io::Write, process::Stdio};
 
-use crate::{Command, EvalArg, Evaluator};
-use lu_error::{EvalErr, LuResult};
+use crate::{ArgSignature, Command, EvalArg, Evaluator, Signature, ValueType};
+use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
 use lu_syntax::{ast::CmdStmtNode, AstNode};
+use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use lu_value::Value;
+use once_cell::unsync::OnceCell;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, new)]
 pub struct RunExternalCmd {
     /// The node in the AST which is evaluated by this Command
     pub cmd_node: CmdStmtNode,
     pub cmd_name: String,
+    // TODO this could be global..., but would need adaptation of the signature() method from
+    // Command
+    #[new(default)]
+    signature: OnceCell<Signature>,
 }
 
 impl Command for RunExternalCmd {
+    fn signature_item(&self) -> SourceCodeItem {
+        lu_source_code_item!() // TODO fixup line number
+    }
+
     fn name(&self) -> &str {
         &self.cmd_name
+    }
+
+    fn signature(&self) -> &Signature {
+        self.signature.get_or_init(|| {
+            let lu_item = lu_source_code_item!();
+            let sign = Signature::new(
+                Vec::new(),
+                Some(ArgSignature::new(
+                    VAR_ARGS_DEF_NAME.into(),
+                    ValueType::Any,
+                    lu_item.clone(),
+                )),
+                Vec::new(),
+                ArgSignature::new(IN_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
+                ArgSignature::new(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
+                lu_item,
+            );
+            sign
+        })
     }
 
     fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {

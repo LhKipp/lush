@@ -1,14 +1,16 @@
 use bimap::BiHashMap;
 use log::debug;
-use lu_error::{LuErr, LuResults};
+use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::PipelineStage;
-use lu_syntax::ast::SourceFileNode;
+use lu_syntax::ast::{CmdStmtNode, SourceFileNode};
+use lu_syntax::AstNode;
+use lu_value::Value;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::{collections::HashMap, fmt::Debug};
 
-use crate::ValueTypeErr;
-use crate::{visit_arg::VisitArg, FlagSignature, Function, Resolver, Scope, ValueType, Variable};
+use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
+use crate::{Command, RunExternalCmd, Signature, ValueTypeErr};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -29,8 +31,8 @@ pub struct TypeChecker {
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
     /// Variable to tckey (for simple variables)
     pub tc_table: BiHashMap<Variable, TcKey>,
-    /// Variable to tcfunc (for func variables)
-    pub tc_func_table: HashMap<Variable, TcFunc>,
+    /// TcKey to TcFunc
+    pub tc_func_table: HashMap<TcKey, TcFunc>,
 
     /// To not spam the tables with error keys, we keep one
     #[allow(dead_code)]
@@ -98,6 +100,13 @@ impl TypeChecker {
     ) -> TcKey {
         let key = self.new_term_key(term);
         let res = self.checker.impose(key.equate_with(equate_with));
+
+        // If other is a func, we need to also equate the inner func_keys
+        // We do so by inserting cloning and reinserting the tc_func
+        if let Some(tc_func) = self.tc_func_table.get(&equate_with).cloned() {
+            self.tc_func_table.insert(key, tc_func);
+        }
+
         self.handle_tc_result(res);
         key
     }
@@ -107,10 +116,16 @@ impl TypeChecker {
         term: SourceCodeItem,
         ty: ValueType,
     ) -> TcKey {
-        let key = self.new_term_key(term);
-        let res = self.checker.impose(key.concretizes_explicit(ty));
-        self.handle_tc_result(res);
-        key
+        if let Some(func_ty) = ty.as_func() {
+            // new key is a func and needs to be inserted like that
+            let tc_func = TcFunc::from_signature(&*func_ty, self); // Generate func first
+            self.new_term_key_equated(term, tc_func.self_key) // Set term equal to func
+        } else {
+            let key = self.new_term_key(term);
+            let res = self.checker.impose(key.concretizes_explicit(ty));
+            self.handle_tc_result(res);
+            key
+        }
     }
 
     // This is prob a very bad idea
@@ -183,8 +198,98 @@ impl TypeChecker {
         }
     }
 
-    pub fn get_item_of<'a>(&'a self, non_passed_arg: &TcKey) -> &'a SourceCodeItem {
-        self.tc_expr_table.get(non_passed_arg).unwrap()
+    /// Get the SourceCodeItem behind the key
+    pub(crate) fn get_item_of<'a>(&'a self, key: &TcKey) -> &'a SourceCodeItem {
+        self.tc_expr_table.get(key).unwrap()
+    }
+
+    /// Returns the key of the var. If the var is not in scope, it will record an error and return
+    /// None
+    // TODO the interface of this func is horrible.
+    pub(crate) fn expect_key_of_var(
+        &mut self,
+        (var_name, var_name_usage): (String, SourceCodeItem),
+    ) -> TcKey {
+        if let Some(var) = self.scope.find_var(&var_name).cloned() {
+            if let Some(var_key) = self.tc_table.get_by_left(&var) {
+                *var_key
+            } else {
+                // Var is in scope, but doesn't have a tc_key yet (might be func or something else)
+                debug!("Found var {}, which has no tc_key yet", var_name);
+                if let Some(callable) = var.val_as_callable() {
+                    debug!(
+                        "First time usage of func {}. Inserting new tc_func.",
+                        var_name
+                    );
+                    let tc_func = TcFunc::from_signature(callable.signature(), self);
+                    self.tc_table.insert(var.clone(), tc_func.self_key.clone());
+                    tc_func.self_key
+                } else {
+                    panic!("Var is not present, but not func: {}", var_name)
+                }
+            }
+        } else {
+            // TODO move this error generation into resolve? or somewhere else?
+            self.errors
+                .push(AstErr::VarNotInScope(var_name_usage.clone()).into());
+            // var not present. We provide a new term key and keep going
+            // TODO should we pass a decl here?
+            let var = Variable::new(var_name.to_string(), Value::Nil, None);
+            let key = self.new_term_key(var_name_usage);
+            self.scope.cur_mut_frame().insert_var(var.clone());
+            self.tc_table.insert(var, key);
+
+            key
+        }
+    }
+
+    pub(crate) fn find_callable(
+        &mut self,
+        possibl_longest_name: &[String],
+        caller_node: &CmdStmtNode,
+    ) -> Option<(usize, TcFunc)> {
+        if let Some((name_args_split_i, _)) = self
+            .scope
+            .find_var_with_longest_match(&possibl_longest_name)
+            .map(|(i, var)| (i, var.clone()))
+        {
+            // Lets assume var is a cmd here (error checking is below)
+            // The cmd might not yet been inserted into the tables, as it is the first
+            // usage. Therefore we can't assume to find the key here.
+            let var_name = possibl_longest_name[0..name_args_split_i].join(" ");
+            let var_key = self.expect_key_of_var((var_name.clone(), caller_node.into_item()));
+
+            if let Some(called_func) = self.tc_func_table.get(&var_key) {
+                // The variable is already inserted as a TcFunc
+                Some((name_args_split_i, called_func.clone()))
+            } else {
+                // We have found such a var, but its not a function
+                // This error should be catched more elaborated in special check for this
+                self.errors.push(
+                    TyErr::VarExpectedToBeFunc {
+                        // TODO make var.decl not optional and use it here
+                        var_decl: SourceCodeItem::tmp_todo_item(),
+                        var_usage: SourceCodeItem::tmp_todo_item(),
+                    }
+                    .into(),
+                );
+                None
+            }
+        } else {
+            // Called cmd is not found --> It's prob an external cmd
+            let cmd_node = caller_node.clone();
+            let cmd_name = possibl_longest_name[0].clone();
+            Some((
+                1,
+                TcFunc::from_signature(&RunExternalCmd::new(cmd_node, cmd_name).signature(), self),
+            ))
+        }
+    }
+
+    fn get_expr_of(&self, key: TcKey) -> &SourceCodeItem {
+        self.tc_expr_table
+            .get(&key)
+            .expect("Key is always inserted in expr-table")
     }
 }
 
@@ -210,6 +315,9 @@ pub enum TcEntry {
 
 #[derive(Debug, Clone)]
 pub struct TcFunc {
+    /// Key of this func decl. (used to get SourceCodeItem from tc_expr_table)
+    self_key: TcKey,
+
     in_ty: TcKey,
     ret_ty: TcKey,
     args_ty: Vec<TcKey>,
@@ -220,32 +328,33 @@ pub struct TcFunc {
 impl TcFunc {
     /// generate a TcFunc from func. Each arg / flag / in / ret type of the func
     /// will be inserted as a seperate pseudo variable
-    pub fn from_func(func: Function, ty_checker: &mut TypeChecker) -> Self {
-        // ret and in are always concretly infered.
-        // if there is no decl, it's infered as AnyOf<T>
+    pub fn from_signature(sign: &Signature, ty_checker: &mut TypeChecker) -> Self {
+        debug!("Generating TcFunc for Signature: {:?}", sign);
+        let self_key = ty_checker.new_term_key(sign.decl.clone());
 
-        let in_item = func.signature.in_type.decl.into_item();
-        let in_ty = ty_checker.new_term_key_concretiziesd(in_item, func.signature.in_type.type_);
+        let in_ty = ty_checker
+            .new_term_key_concretiziesd(sign.in_type.decl.clone(), sign.in_type.type_.clone());
 
-        let ret_item = func.signature.ret_type.decl.into_item();
-        let ret_ty = ty_checker.new_term_key_concretiziesd(ret_item, func.signature.ret_type.type_);
+        let ret_ty = ty_checker
+            .new_term_key_concretiziesd(sign.ret_type.decl.clone(), sign.ret_type.type_.clone());
 
-        let var_arg_ty = func
-            .signature
+        let var_arg_ty = sign
             .var_arg
-            .map(|var_arg_sign| (var_arg_sign.decl.into_item(), var_arg_sign.type_))
-            .map(|(decl, ty)| ty_checker.new_term_key_concretiziesd(decl, ty));
+            .as_ref()
+            .map(|var_arg_sign| (var_arg_sign.decl.clone(), var_arg_sign.type_.clone()))
+            .map(|(decl, ty)| ty_checker.new_term_key_concretiziesd(decl, ty))
+            .clone();
 
-        let args_ty = func
-            .signature
+        let args_ty = sign
             .args
-            .into_iter()
+            .iter()
             .map(|arg_sign| {
-                ty_checker.new_term_key_concretiziesd(arg_sign.decl.into_item(), arg_sign.type_)
+                ty_checker.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.type_.clone())
             })
             .collect();
 
         let ty_func = Self {
+            self_key,
             in_ty,
             ret_ty,
             args_ty,
@@ -254,7 +363,49 @@ impl TcFunc {
             flags_ty: HashMap::new(),
         };
 
+        ty_checker
+            .tc_func_table
+            .insert(ty_func.self_key.clone(), ty_func.clone());
+
         ty_func
+    }
+
+    fn same_arity_as(&self, other: &TcFunc) -> bool {
+        match (self.var_arg_ty, other.var_arg_ty) {
+            (None, None) => self.args_ty.len() == other.args_ty.len(),
+            // case self.args_ty.len == other.args_ty.len:
+            //      works, as both expect same arg count
+            // case self.args_ty.len > other.args_ty.len:
+            //      works, as other args can be filled up in var_arg
+            // case self.args_ty.len < other.args_ty.len:
+            //      doesn't work, as (other.args_ty.len - self.args_ty.len) to many args for self
+            (None, Some(_)) => self.args_ty.len() >= other.args_ty.len(),
+            // See above
+            (Some(_), None) => self.args_ty.len() <= other.args_ty.len(),
+            (Some(_), Some(_)) => true,
+        }
+    }
+
+    // TODO return Vec<Constraint> when constraint is pub
+    fn equate_with(&self, other: &TcFunc, ty_state: &mut TypeChecker) {
+        assert!(
+            self.same_arity_as(other),
+            "Should only equate fns with same arity???"
+        );
+        let in_ret_constr = [
+            self.in_ty.equate_with(other.in_ty),
+            self.ret_ty.equate_with(other.ret_ty),
+        ];
+        let self_args_ty_iter = self.args_ty.iter().chain(self.var_arg_ty.as_ref());
+        let other_args_ty_iter = other.args_ty.iter().chain(other.var_arg_ty.as_ref());
+        let args_constr = itertools::zip(self_args_ty_iter, other_args_ty_iter)
+            .map(|(self_arg_key, other_arg_key)| self_arg_key.equate_with(*other_arg_key))
+            .chain(in_ret_constr);
+
+        for constr in args_constr {
+            let res = ty_state.checker.impose(constr);
+            ty_state.handle_tc_result(res);
+        }
     }
 }
 

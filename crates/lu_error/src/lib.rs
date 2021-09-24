@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::{convert::TryInto, error::Error, ops::Range};
 use text_size::TextRange;
 
+mod ast_err;
 mod eval_err;
 mod fs_err;
 mod parse_err;
@@ -11,6 +12,7 @@ mod ty_err;
 extern crate derive_new;
 extern crate strum_macros;
 
+pub use ast_err::*;
 pub use eval_err::EvalErr;
 pub use fs_err::FsErr;
 pub use parse_err::{ParseErr, ParseErrs};
@@ -27,6 +29,7 @@ pub enum LuErr {
     Ty(TyErr),
     FS(FsErr),
     Eval(EvalErr),
+    Ast(AstErr),
     Internal(String),
     Errors(),
 }
@@ -54,6 +57,11 @@ impl From<TyErr> for LuErr {
         LuErr::Ty(e)
     }
 }
+impl From<AstErr> for LuErr {
+    fn from(e: AstErr) -> Self {
+        LuErr::Ast(e)
+    }
+}
 
 // impl From<FsErr> for LuErr {
 //     fn from(e: FsErr) -> Self {
@@ -62,7 +70,7 @@ impl From<TyErr> for LuErr {
 // }
 
 /// An item in the source code to be used in the `Error` enum.
-#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
 pub struct SourceCodeItem {
     content: String,
     range: TextRange,
@@ -80,4 +88,21 @@ impl SourceCodeItem {
             content,
         }
     }
+
+    pub fn tmp_todo_item() -> SourceCodeItem {
+        SourceCodeItem::new(999..999, "TMP_ITEM")
+    }
+}
+
+/// New SourceCodeItem pointing to the file and line from the caller
+#[macro_export]
+macro_rules! lu_source_code_item {
+    () => {{
+        {
+            let f_name = file!();
+            let line = line!();
+            // TODO better source code item
+            SourceCodeItem::new(0..line as usize, f_name.clone())
+        }
+    }};
 }

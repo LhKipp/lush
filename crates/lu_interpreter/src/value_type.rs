@@ -1,43 +1,83 @@
-use std::{collections::HashMap, fmt::Display};
+use std::fmt::Display;
 
+use enum_as_inner::EnumAsInner;
 use log::warn;
 use lu_error::LuErr;
-use lu_syntax::ast::LuTypeSpecifierElement;
+use lu_syntax::{ast::LuTypeSpecifierElement, AstNode};
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
 
-use crate::FlagSignature;
+use crate::Signature;
 
-#[derive(Educe)]
-#[educe(Hash)]
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub struct FuncType {
-    in_ty: Option<ValueType>,
-    ret_ty: Option<ValueType>,
-    args_ty: Vec<ValueType>,
-    var_arg_ty: Option<ValueType>,
-    #[educe(Hash(ignore))]
-    flags_ty: HashMap<FlagSignature, ValueType>,
+fn cmp_sign_types(_: &Signature, _: &Signature) -> bool {
+    todo!()
+    // a.in_type == b.in_type && a.ret_type == b.ret_type &&
+    //     a.iter
 }
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+// #[derive(Educe)]
+// #[educe(Hash)]
+// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+// // We need something being able to Serialize, Deserialize. Therefore we don't reuse Signature here
+// pub struct FuncType {
+//     in_ty: ValueType,
+//     ret_ty: ValueType,
+//     args_ty: Vec<ValueType>,
+//     var_arg_ty: Option<ValueType>,
+//     #[educe(Hash(ignore))]
+//     flags_ty: Vec<FlagSignature>,
+// }
+// #[derive(Educe)] // TODO educe partial eq not working
+// #[educe(PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, Hash, EnumAsInner, Eq)]
 pub enum ValueType {
     /// Variant to indicate an already occured error. Error acts like any does, but
     /// further ty_checking does not generate errors based on this ValueType::Error
     Error,
+    /// Unspecified, but can be refined by any other type during type_checking
     Unspecified,
-    /// Any that can be only of one type
+    /// Type that can be of any type and will not be restricted
     Any,
+    /// Type to indicate the emptiness // TODO is this the same as Nil?
+    Void,
+    /// The empty void type
     Nil,
     Bool,
     Number,
     String,
     BareWord,
     Array(Box<ValueType>),
-    Func(Box<FuncType>),
+    // #[educe(PartialEq(method = "cmp_sign_types"))]
+    Func(Box<Signature>),
+}
+
+impl PartialEq for ValueType {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (ValueType::Error, ValueType::Error) => true,
+            (ValueType::Unspecified, ValueType::Unspecified) => true,
+            (ValueType::Any, ValueType::Any) => true,
+            (ValueType::Void, ValueType::Void) => true,
+            (ValueType::Nil, ValueType::Nil) => true,
+            (ValueType::Bool, ValueType::Bool) => true,
+            (ValueType::Number, ValueType::Number) => true,
+            (ValueType::String, ValueType::String) => true,
+            (ValueType::BareWord, ValueType::BareWord) => true,
+            (ValueType::Array(a_inner), ValueType::Array(b_inner)) => a_inner == b_inner,
+            (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
+            _ => false,
+        }
+    }
 }
 
 impl ValueType {
+    pub fn new_array(inner_ty: ValueType) -> Self {
+        ValueType::Array(Box::new(inner_ty))
+    }
+
+    pub fn new_func(sign: Signature) -> Self {
+        ValueType::Func(Box::new(sign))
+    }
+
     pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => {
@@ -56,8 +96,14 @@ impl ValueType {
                     ValueType::Unspecified
                 }
             }
-            _ => todo!(),
-            // LuTypeSpecifierElement::FnKeyword(_) => ValueType::F,;
+            LuTypeSpecifierElement::FnType(fn_ty) => {
+                let (sign, errs) =
+                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.into_item());
+                if !errs.is_empty() {
+                    todo!("Return (valuety, err)");
+                }
+                ValueType::new_func(sign)
+            }
         };
         Ok(ty)
     }
@@ -128,15 +174,16 @@ impl TcVariant for ValueType {
     fn arity(&self) -> Arity {
         match self {
             ValueType::Unspecified
+            | ValueType::Void
             | ValueType::Any
             | ValueType::Nil
             | ValueType::Bool
             | ValueType::Number
             | ValueType::String
+            | ValueType::Func(_)
             | ValueType::BareWord => Arity::Fixed(0),
             ValueType::Array(_) => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
-            ValueType::Func(_) => todo!(),
         }
     }
 }
@@ -162,6 +209,7 @@ impl Display for ValueType {
             ValueType::BareWord => write!(f, "bare_word"),
             ValueType::Array(t) => write!(f, "[{}]", t),
             ValueType::Func(_) => todo!(),
+            ValueType::Void => todo!(),
         }
     }
 }

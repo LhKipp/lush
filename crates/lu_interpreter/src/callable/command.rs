@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 use std::rc::Rc;
 
-use crate::{EvalArg, Evaluator, Scope, Variable};
+use crate::{EvalArg, Evaluator, Scope, Signature, Variable};
 
 use log::debug;
-use lu_error::LuResult;
+use lu_error::{LuResult, SourceCodeItem};
 use lu_value::{Value, NIL_VAL};
 
 // pub struct CommandArgs {
@@ -31,6 +31,11 @@ pub const ARG_VAR_NAME: &str = "arg";
 
 pub trait Command: CommandClone + Debug {
     fn name(&self) -> &str;
+
+    fn signature(&self) -> &Signature;
+
+    /// Returns SourceCodeItem into the signature/declaration of the command
+    fn signature_item(&self) -> SourceCodeItem;
 
     /// Returns $args
     fn expect_args<'a>(&self, scope: &'a Scope<Variable>) -> &'a Rc<Vec<Value>> {

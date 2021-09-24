@@ -147,8 +147,8 @@ Config(
             "NilKeyword",
             "BoolKeyword",
             "StringKeyword",
-            "FnKeyword",
             "ArrayType",
+            "FnType",
             "BareWord"
         ],),
     ]

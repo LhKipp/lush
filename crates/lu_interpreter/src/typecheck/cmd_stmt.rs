@@ -26,33 +26,12 @@ impl TypeCheck for CmdStmtNode {
         debug!("Cur Scope Frame: {:?}", ty_state.scope.cur_frame());
         let possibl_longest_name = self.possible_longest_cmd_call_name();
         // Finding result type here
-        let ret_ty = if let Some((name_args_split_i, var)) = ty_state
-            .scope
-            .find_var_with_longest_match(&possibl_longest_name)
+        let ret_ty = if let Some((name_args_split_i, called_func)) =
+            ty_state.find_callable(&possibl_longest_name, self)
         {
             let args = self.name_with_args().skip(name_args_split_i);
-            let var = var.clone();
-
-            if let Some(func) = ty_state.tc_func_table.get(&var).cloned() {
-                assert!(matches!(var.decl.as_ref().unwrap(), VarDeclNode::FnStmt(_)));
-                ty_check_cmd_args(
-                    self,
-                    args,
-                    &func,
-                    var.decl.as_ref().unwrap().into_item(),
-                    ty_state,
-                );
-                func.ret_ty.clone()
-            } else {
-                // We have found such a var, but its not a function
-                // This error should be catched more elaborated in special check for this
-                debug!(
-                    "Expected {} to be a function, but isn't present in tc_func_table",
-                    var.name
-                );
-
-                ty_state.new_term_key_concretiziesd(self.into_item(), ValueType::Error)
-            }
+            ty_check_cmd_args(self, args, &called_func, ty_state);
+            called_func.ret_ty.clone()
         } else {
             // External cmds return string
             ty_state.new_term_key_concretiziesd(self.into_item(), ValueType::String)
@@ -65,26 +44,26 @@ impl TypeCheck for CmdStmtNode {
 fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
     cmd_node: &CmdStmtNode,
     args: ArgIter,
-    func: &TcFunc,
-    fn_decl: SourceCodeItem,
+    called_func: &TcFunc,
     ty_state: &mut TypeChecker,
 ) {
-    let mut func_arg_ty_iter = func.args_ty.iter();
+    let mut func_arg_ty_iter = called_func.args_ty.iter();
 
     for arg in args {
         match func_arg_ty_iter.next() {
-            Some(k) => {
-                ty_state.new_term_key_equated(arg.into_item(), *k);
+            Some(func_arg_ty) => {
+                ty_check_cmd_arg(arg, func_arg_ty, cmd_node, ty_state);
             }
             None => {
-                if let Some(var_arg_ty) = func.var_arg_ty {
+                if let Some(var_arg_ty) = called_func.var_arg_ty {
                     ty_state.new_term_key_equated(arg.into_item(), var_arg_ty);
                 } else {
                     // Found unexpected argument
+                    let called_func_decl = ty_state.get_expr_of(called_func.self_key).clone();
                     ty_state.errors.push(
                         TyErr::UnexpectedArg {
                             arg: arg.into_item(),
-                            fn_decl: fn_decl.clone(),
+                            fn_decl: called_func_decl.clone(),
                         }
                         .into(),
                     )
@@ -102,5 +81,53 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
             }
             .into(),
         )
+    }
+}
+
+fn ty_check_cmd_arg(
+    passed_arg: ValueExprElement,
+    expected_arg_ty: &TcKey,
+    cmd_node: &CmdStmtNode,
+    ty_state: &mut TypeChecker,
+) {
+    // Check whether the expected arg is a function
+    if let Some(expected_fn_ty) = ty_state.tc_func_table.get(expected_arg_ty).cloned() {
+        debug!(
+            "TyChecking passed_arg: {:?}, against expected_fn_ty",
+            passed_arg.text()
+        );
+        // The function expects a function as an arg
+        // We need to ty check the passed arg against the accepted func
+        let matched = match passed_arg {
+            ValueExprElement::ValuePathExpr(ref passed_var_path) => {
+                let var_repr = (
+                    passed_var_path.var_name_parts()[0].clone(),
+                    passed_var_path.into_item(),
+                );
+                let passed_var_key = ty_state.expect_key_of_var(var_repr);
+                let passed_arg_key =
+                    ty_state.new_term_key_equated(passed_arg.into_item(), passed_var_key);
+                // Check that var_key is a func_key
+                if let Some(passed_fn_ty) = ty_state.tc_func_table.get(&passed_var_key).cloned() {
+                    expected_fn_ty.equate_with(&passed_fn_ty, ty_state);
+                    true
+                } else {
+                    false
+                }
+            }
+            ValueExprElement::MathExpr(_) => {
+                todo!("Expected func, provided math expr. This should work")
+            }
+            _ => false,
+        };
+
+        if !matched {
+            // Expected_ty did not match with passed arg. We must generate an error.
+            // We call new_term_key_equated, as that goes then through a unified interface
+            ty_state.new_term_key_equated(passed_arg.into_item(), *expected_arg_ty);
+        }
+    } else {
+        // Everything else is a primitive type. No deeper ty check necessary
+        ty_state.new_term_key_equated(passed_arg.into_item(), *expected_arg_ty);
     }
 }

@@ -1,3 +1,4 @@
+mod cmd_prelude;
 mod print;
 mod test_print;
 

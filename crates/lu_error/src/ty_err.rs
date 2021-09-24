@@ -30,6 +30,10 @@ pub enum TyErr {
         arg_decl: SourceCodeItem,
         cmd_stmt: SourceCodeItem,
     },
+    VarExpectedToBeFunc {
+        var_decl: SourceCodeItem,
+        var_usage: SourceCodeItem,
+    },
 }
 
 impl TyErr {
@@ -46,6 +50,10 @@ impl TyErr {
             } => todo!(),
             TyErr::UnexpectedArg { arg, fn_decl } => todo!(),
             TyErr::UnsatisfiedArg { arg_decl, cmd_stmt } => todo!(),
+            TyErr::VarExpectedToBeFunc {
+                var_decl,
+                var_usage,
+            } => todo!(),
         }
     }
 }
