@@ -178,7 +178,7 @@ impl TyCheckState {
     }
 
     /// Get the SourceCodeItem behind the key
-    pub(crate) fn get_item_of<'a>(&'a self, key: &TcKey) -> &'a SourceCodeItem {
+    pub(crate) fn get_item_of(&self, key: &TcKey) -> &SourceCodeItem {
         self.tc_expr_table.get(key).unwrap()
     }
 
@@ -318,20 +318,20 @@ impl TcFunc {
         debug!("Generating TcFunc for Signature: {:?}", sign);
         let self_key = ty_state.new_term_key(sign.decl.clone());
 
-        let in_ty =
+        let in_key =
             ty_state.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());
 
-        let ret_ty =
+        let ret_key =
             ty_state.new_term_key_concretiziesd(sign.ret_arg.decl.clone(), sign.ret_arg.ty.clone());
 
-        let var_arg_ty = sign
+        let var_arg_key = sign
             .var_arg
             .as_ref()
             .map(|var_arg_sign| (var_arg_sign.decl.clone(), var_arg_sign.ty.clone()))
             .map(|(decl, ty)| ty_state.new_term_key_concretiziesd(decl, ty))
             .clone();
 
-        let args_ty = sign
+        let args_keys = sign
             .args
             .iter()
             .map(|arg_sign| {
@@ -341,10 +341,10 @@ impl TcFunc {
 
         let ty_func = Self {
             self_key,
-            in_key: in_ty,
-            ret_key: ret_ty,
-            args_keys: args_ty,
-            var_arg_key: var_arg_ty,
+            in_key,
+            ret_key,
+            args_keys,
+            var_arg_key,
             // TODO gen flags tc keys
             flags_keys: HashMap::new(),
         };
@@ -382,9 +382,9 @@ impl TcFunc {
             self.in_key.equate_with(other.in_key),
             self.ret_key.equate_with(other.ret_key),
         ];
-        let self_args_ty_iter = self.args_keys.iter().chain(self.var_arg_key.as_ref());
-        let other_args_ty_iter = other.args_keys.iter().chain(other.var_arg_key.as_ref());
-        let args_constr = itertools::zip(self_args_ty_iter, other_args_ty_iter)
+        let self_args_key_iter = self.args_keys.iter().chain(self.var_arg_key.as_ref());
+        let other_args_key_iter = other.args_keys.iter().chain(other.var_arg_key.as_ref());
+        let args_constr = itertools::zip(self_args_key_iter, other_args_key_iter)
             .map(|(self_arg_key, other_arg_key)| self_arg_key.equate_with(*other_arg_key))
             .chain(in_ret_constr);
 
