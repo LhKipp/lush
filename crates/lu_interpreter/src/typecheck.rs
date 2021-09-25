@@ -34,10 +34,6 @@ pub struct TypeChecker {
     /// TcKey to TcFunc
     tc_func_table: HashMap<TcKey, TcFunc>,
 
-    /// To not spam the tables with error keys, we keep one
-    #[allow(dead_code)]
-    tc_error_key: Option<TcKey>,
-
     /// Final result of typechecking
     pub ty_table: HashMap<TcKey, ValueType>,
 
@@ -62,7 +58,6 @@ impl TypeChecker {
             tc_expr_table: HashMap::new(),
             tc_func_table: HashMap::new(),
             ty_table: HashMap::new(),
-            tc_error_key: None,
             result: None,
         }
     }
@@ -100,14 +95,13 @@ impl TypeChecker {
     ) -> TcKey {
         let key = self.new_term_key(term);
         let res = self.checker.impose(key.equate_with(equate_with));
+        self.handle_tc_result(res);
 
         // If other is a func, we need to also equate the inner func_keys
         // We do so by inserting cloning and reinserting the tc_func
         if let Some(tc_func) = self.tc_func_table.get(&equate_with).cloned() {
             self.tc_func_table.insert(key, tc_func);
         }
-
-        self.handle_tc_result(res);
         key
     }
 
@@ -125,21 +119,6 @@ impl TypeChecker {
             let res = self.checker.impose(key.concretizes_explicit(ty));
             self.handle_tc_result(res);
             key
-        }
-    }
-
-    // This is prob a very bad idea
-    #[allow(dead_code)]
-    pub(crate) fn get_tc_error_key(&mut self) -> TcKey {
-        if let Some(key) = self.tc_error_key {
-            key
-        } else {
-            let error_key = self.checker.new_term_key();
-            self.checker
-                .impose(error_key.concretizes_explicit(ValueType::Error))
-                .unwrap();
-            self.tc_error_key = Some(error_key);
-            error_key
         }
     }
 
