@@ -4,7 +4,7 @@ use std::iter;
 
 use log::debug;
 use lu_error::{SourceCodeItem, TyErr};
-use lu_pipeline_stage::ErrorContainer;
+use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{CmdStmtNode, LetStmtNode, ValueExprElement},
     AstElement, AstNode,
@@ -60,7 +60,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
                 } else {
                     // Found unexpected argument
                     let called_func_decl = ty_state.get_expr_of(called_func.self_key).clone();
-                    ty_state.errors.push(
+                    ty_state.push_err(
                         TyErr::UnexpectedArg {
                             arg: arg.to_item(),
                             fn_decl: called_func_decl.clone(),
@@ -74,7 +74,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
 
     for non_passed_arg in func_arg_ty_iter {
         let arg_decl = ty_state.get_item_of(non_passed_arg).clone();
-        ty_state.errors.push(
+        ty_state.push_err(
             TyErr::UnsatisfiedArg {
                 arg_decl,
                 cmd_stmt: cmd_node.to_item(),

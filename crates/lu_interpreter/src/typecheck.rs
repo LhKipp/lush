@@ -137,7 +137,7 @@ impl TypeChecker {
                 ValueTypeErr::NotMeetAble { lhs_ty, rhs_ty } => {
                     let lhs_decl = key_to_item(&lhs_key);
                     let rhs_decl = key_to_item(&rhs_key);
-                    self.errors.push(
+                    self.push_err(
                         TyErr::TypesNotEqual {
                             lhs_decl,
                             lhs_ty: lhs_ty.to_string(),
@@ -153,7 +153,7 @@ impl TypeChecker {
                 ValueTypeErr::NotMeetAble { rhs_ty, lhs_ty } => {
                     let var_decl = key_to_item(&k);
                     let other_decl = o.as_ref().map(key_to_item).flatten();
-                    self.errors.push(
+                    self.push_err(
                         TyErr::TypesNotEqual {
                             lhs_decl: var_decl,
                             lhs_ty: lhs_ty.to_string(),
@@ -248,7 +248,7 @@ impl TypeChecker {
             } else {
                 // We have found such a var, but its not a function
                 // This error should be catched more elaborated in special check for this
-                self.errors.push(
+                self.push_err(
                     TyErr::VarExpectedToBeFunc {
                         // TODO make var.decl not optional and use it here
                         var_decl: var.decl.to_item(),

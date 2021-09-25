@@ -2,6 +2,7 @@
 use contracts::ensures;
 use log::debug;
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
+use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{BlockStmtNode, IfStmtNode, StatementElement},
     ast::{ConditionElement, IfBlockNode},
@@ -27,7 +28,7 @@ impl TypeCheck for BlockStmtNode {
             Some(TypeCheckArg::Arg(VisitArg::SourceFileBlock(f_path))) => {
                 if let Err(e) = ty_checker.scope.set_cur_source_frame(f_path) {
                     debug!("SourceFileBlock type check error which should not happen");
-                    ty_checker.errors.push(e);
+                    ty_checker.push_err(e);
                     return None;
                 }
                 add_entry_for_funcs(ty_checker);

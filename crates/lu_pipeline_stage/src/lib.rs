@@ -1,3 +1,4 @@
+use log::debug;
 use lu_error::LuErr;
 
 pub trait PipelineStage {
@@ -17,7 +18,8 @@ pub trait PipelineStage {
     }
 
     fn push_err(&mut self, e: LuErr) {
-        self.get_mut_errors().push(e)
+        debug!("Recording err: {:?}", e);
+        self.get_mut_errors().push(e);
     }
 
     fn succeeded(&self) -> bool {

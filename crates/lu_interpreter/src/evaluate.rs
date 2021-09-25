@@ -73,7 +73,7 @@ impl Evaluator {
             .unwrap();
         match node.evaluate(self) {
             Ok(v) => self.result = Some(v),
-            Err(e) => self.errors.push(e),
+            Err(e) => self.push_err(e),
         }
     }
 
@@ -88,21 +88,25 @@ impl Evaluator {
     //     source_file.evaluate(self)
     // }
 
-    pub fn failed(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
-    pub(crate) fn all_errors(&self) -> Vec<LuErr> {
-        let mut errs = self.ty_checker.collect_all_errors();
-        errs.extend(self.errors.clone());
-        errs
-    }
-
     pub(crate) fn as_result(self) -> Result<Value, Vec<LuErr>> {
         if self.failed() {
-            Err(self.all_errors())
+            Err(self.collect_all_errors())
         } else {
             Ok(self.result.unwrap())
         }
+    }
+}
+
+impl PipelineStage for Evaluator {
+    fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
+        Some(&self.ty_checker)
+    }
+
+    fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {
+        &mut self.errors
+    }
+
+    fn get_errors(&self) -> &Vec<LuErr> {
+        &self.errors
     }
 }
