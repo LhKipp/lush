@@ -20,8 +20,7 @@ impl TypeCheck for LetStmtNode {
             );
             let let_stmt_key = ty_state.new_term_key(self.item_till_value());
 
-            ty_state.scope.cur_mut_frame().insert_var(var.clone());
-            ty_state.tc_table.insert(var, let_stmt_key);
+            ty_state.insert_var(var.clone(), let_stmt_key);
 
             // unify key with decl
             if let Some(decl_ty) = self.decl_ty() {

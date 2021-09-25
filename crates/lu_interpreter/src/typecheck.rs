@@ -30,7 +30,7 @@ pub struct TypeChecker {
     // is enough
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
     /// Variable to tckey (for simple variables)
-    pub tc_table: BiHashMap<Variable, TcKey>,
+    tc_table: BiHashMap<Variable, TcKey>,
     /// TcKey to TcFunc
     pub tc_func_table: HashMap<TcKey, TcFunc>,
 
@@ -290,6 +290,11 @@ impl TypeChecker {
         self.tc_expr_table
             .get(&key)
             .expect("Key is always inserted in expr-table")
+    }
+
+    fn insert_var(&mut self, var: Variable, key: TcKey) -> () {
+        self.scope.cur_mut_frame().insert_var(var.clone());
+        self.tc_table.insert(var, key);
     }
 }
 
