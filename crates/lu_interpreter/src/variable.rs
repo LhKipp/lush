@@ -1,20 +1,29 @@
+use derive_more::From;
 use lu_error::SourceCodeItem;
 use lu_syntax::{
-    ast::{ArgSignatureNode, FnStmtNode, ForStmtNode, LetStmtNode},
+    ast::{ArgSignatureNode, CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode},
     AstNode, AstToken,
 };
+use lu_syntax_elements::constants::IN_ARG_NAME;
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
 use crate::{Callable, Command, Function};
 
-#[derive(Clone, Debug, Eq, PartialEq, new, Hash)]
+#[derive(Educe)]
+#[educe(Default)]
+#[derive(Clone, Debug, Eq, PartialEq, new, Hash, From)]
 pub enum VarDeclNode {
+    #[educe(Default)]
+    Dummy,
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
     ArgSignature(ArgSignatureNode),
+    // For $in (before it is mapped to the correct name)
+    PrevCmdStmt(CmdStmtNode),
+    ErrorUsage(SourceCodeItem),
 }
 
 impl VarDeclNode {
@@ -24,6 +33,9 @@ impl VarDeclNode {
             VarDeclNode::FnStmt(n) => n.decl_item(),
             VarDeclNode::ArgSignature(n) => n.into_item(),
             VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].into_item(),
+            VarDeclNode::Dummy => SourceCodeItem::tmp_todo_item(),
+            VarDeclNode::PrevCmdStmt(n) => n.into_item(),
+            VarDeclNode::ErrorUsage(item) => item.clone(),
         }
     }
 }
@@ -35,7 +47,7 @@ pub struct Variable {
     /// The evaluation value of this variable, Value::Nil in other stages of interpretation
     pub val: Value,
     #[serde(skip)]
-    pub decl: Option<VarDeclNode>, // TODO doesn't need to be optional, decl can be in rust code
+    pub decl: VarDeclNode, // TODO doesn't need to be optional, decl can be in rust code
 }
 
 impl Variable {
@@ -44,22 +56,23 @@ impl Variable {
         Variable::new(
             func.name().to_string(),
             Value::new_func(func),
-            Some(VarDeclNode::FnStmt(decl)),
+            VarDeclNode::FnStmt(decl),
         )
     }
 
-    pub fn new_in(val: Value) -> Self {
+    pub fn new_in(val: Value, decl: VarDeclNode) -> Self {
         Self {
-            name: "in".into(),
+            name: IN_ARG_NAME.to_string(),
             val,
-            decl: None,
+            decl,
         }
     }
     pub fn new_args(val: Value) -> Self {
         Self {
             name: "args".into(),
             val,
-            decl: None,
+            // TODO correct val
+            decl: VarDeclNode::Dummy,
         }
     }
 

@@ -13,7 +13,7 @@ impl Evaluable for LetStmtNode {
 
         state.scope.lock().cur_mut_frame().insert(
             var_name.to_string(),
-            Variable::new(var_name, val, Some(VarDeclNode::LetStmt(self.clone()))),
+            Variable::new(var_name, val, VarDeclNode::LetStmt(self.clone())),
         );
 
         Ok(Value::Nil)

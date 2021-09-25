@@ -10,7 +10,7 @@ use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
-use crate::{Command, RunExternalCmd, Signature, ValueTypeErr};
+use crate::{Command, RunExternalCmd, Signature, ValueTypeErr, VarDeclNode};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -213,7 +213,11 @@ impl TypeChecker {
                 .push(AstErr::VarNotInScope(var_name_usage.clone()).into());
             // var not present. We provide a new term key and keep going
             // TODO should we pass a decl here?
-            let var = Variable::new(var_name.to_string(), Value::Nil, None);
+            let var = Variable::new(
+                var_name.to_string(),
+                Value::Nil,
+                VarDeclNode::ErrorUsage(var_name_usage.clone()),
+            );
             let key = self.new_term_key(var_name_usage);
             self.scope.cur_mut_frame().insert_var(var.clone());
             self.tc_table.insert(var, key);
@@ -227,7 +231,7 @@ impl TypeChecker {
         possibl_longest_name: &[String],
         caller_node: &CmdStmtNode,
     ) -> Option<(usize, TcFunc)> {
-        if let Some((name_args_split_i, _)) = self
+        if let Some((name_args_split_i, var)) = self
             .scope
             .find_var_with_longest_match(&possibl_longest_name)
             .map(|(i, var)| (i, var.clone()))
@@ -247,8 +251,8 @@ impl TypeChecker {
                 self.errors.push(
                     TyErr::VarExpectedToBeFunc {
                         // TODO make var.decl not optional and use it here
-                        var_decl: SourceCodeItem::tmp_todo_item(),
-                        var_usage: SourceCodeItem::tmp_todo_item(),
+                        var_decl: var.decl.into_item(),
+                        var_usage: caller_node.into_item(),
                     }
                     .into(),
                 );

@@ -16,7 +16,7 @@ impl TypeCheck for LetStmtNode {
             let var = Variable::new(
                 var_name,
                 Value::Nil,
-                Some(VarDeclNode::LetStmt(self.clone())),
+                VarDeclNode::LetStmt(self.clone()),
             );
             let let_stmt_key = ty_state.new_term_key(self.item_till_value());
 

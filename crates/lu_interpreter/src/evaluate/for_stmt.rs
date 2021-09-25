@@ -40,7 +40,7 @@ impl Evaluable for ForStmtNode {
                             Variable::new(
                                 var_names[0].clone(),
                                 Value::String(char.to_string()),
-                                Some(VarDeclNode::ForStmt(self.clone(), 0)),
+                                VarDeclNode::ForStmt(self.clone(), 0),
                             ),
                         );
                     }

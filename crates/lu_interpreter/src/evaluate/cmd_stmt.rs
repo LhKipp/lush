@@ -3,7 +3,9 @@ use lu_error::LuResult;
 use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
-use crate::{Callable, Command, EvalArg, Evaluable, Evaluator, RunExternalCmd, Variable};
+use crate::{
+    Callable, Command, EvalArg, Evaluable, Evaluator, RunExternalCmd, Variable, ARGS_VAR_NAME,
+};
 
 impl Evaluable for CmdStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
@@ -30,6 +32,7 @@ impl Evaluable for CmdStmtNode {
         let cmd_name = possibl_longest_name[0..cmd_parts_count].join(" ");
         debug!("Calling cmd: {}", cmd_name);
 
+        // TODO map values to signature names
         // Push real cmd arguments (excluding cmd name, as $args)
         let mut args = Vec::new();
         for arg in self.name_with_args().skip(cmd_parts_count) {
@@ -38,7 +41,8 @@ impl Evaluable for CmdStmtNode {
         }
 
         state.scope.lock().cur_mut_frame().insert(
-            "args".to_string(),
+            ARGS_VAR_NAME.to_string(),
+            // TODO correct source
             Variable::new_args(Value::new_array(args)),
         );
 

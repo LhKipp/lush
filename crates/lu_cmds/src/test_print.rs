@@ -1,3 +1,5 @@
+use lu_interpreter::VarDeclNode;
+
 use crate::cmd_prelude::*;
 
 #[derive(Debug, Clone)]
@@ -51,7 +53,7 @@ impl Command for TestPrintCmd {
             debug!("Inserted t_printed");
             global_f.insert(
                 var.clone(),
-                Variable::new(var.clone(), Value::Array(args.clone()), None),
+                Variable::new(var.clone(), Value::Array(args.clone()), VarDeclNode::Dummy),
             );
         }
         Ok(Value::Nil)

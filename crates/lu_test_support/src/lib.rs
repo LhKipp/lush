@@ -4,7 +4,7 @@ extern crate vec_box;
 use pretty_env_logger::env_logger;
 
 use lu_cmds::{PrintCmd, TestPrintCmd};
-use lu_interpreter::{Callable, Command, Interpreter, Scope, ScopeFrameTag, Variable};
+use lu_interpreter::{Callable, Command, Interpreter, Scope, ScopeFrameTag, VarDeclNode, Variable};
 use lu_value::Value;
 
 pub fn init_logger() {
@@ -23,7 +23,11 @@ fn make_test_scope() -> Scope<Variable> {
         let cmd: Callable = cmd.into();
         frame.insert(
             cmd.name().to_string(),
-            Variable::new(cmd.name().to_string(), Value::new_func(cmd), None),
+            Variable::new(
+                cmd.name().to_string(),
+                Value::new_func(cmd),
+                VarDeclNode::Dummy,
+            ),
         )
     }
     scope
