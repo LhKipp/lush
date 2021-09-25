@@ -1,27 +1,10 @@
 1
 ===
 for x in "123"
-    tprint $x
+    print $x
 end
-print $t_printed
 ---
 {
-  "Ok": {
-    "Array": [
-      {
-        "Array": [
-          {
-            "String": "1"
-          },
-          {
-            "String": "2"
-          },
-          {
-            "String": "3"
-          }
-        ]
-      }
-    ]
-  }
+  "Ok": "Nil"
 }
 ...

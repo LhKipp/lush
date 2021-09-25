@@ -36,7 +36,7 @@ end
 2
 ===
 for x in "123"
-    tprint $x
+    print $x
 end
 ---
 - Start: ForStmt
@@ -56,7 +56,7 @@ end
 - Token: "Whitespace (len: 4)"
 - Start: Tombstone
 - Start: CmdStmt
-- Token: "BareWord (len: 6)"
+- Token: "BareWord (len: 5)"
 - Token: "Whitespace (len: 1)"
 - Start: ValuePathExpr
 - Token: "Dollar (len: 1)"

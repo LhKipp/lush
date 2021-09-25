@@ -1,21 +1,16 @@
 if_executed
 ===
 if 1 == 1
-    tprint if_
+    print if_
 else
-    tprint else_
+    print else_
 end
-print $t_printed
 ---
 {
   "Ok": {
     "Array": [
       {
-        "Array": [
-          {
-            "BareWord": "if_"
-          }
-        ]
+        "BareWord": "if_"
       }
     ]
   }
@@ -24,21 +19,16 @@ print $t_printed
 else_executed
 ===
 if 1 == 2
-    tprint if_
+    print if_
 else
-    tprint else_
+    print else_
 end
-print $t_printed
 ---
 {
   "Ok": {
     "Array": [
       {
-        "Array": [
-          {
-            "BareWord": "else_"
-          }
-        ]
+        "BareWord": "else_"
       }
     ]
   }

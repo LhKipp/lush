@@ -1,7 +1,7 @@
 1
 ===
 if 1 == 1
-    tprint 1
+    print 1
 end
 ---
 - Start: IfStmt
@@ -23,7 +23,7 @@ end
 - Token: "Whitespace (len: 4)"
 - Start: Tombstone
 - Start: CmdStmt
-- Token: "BareWord (len: 6)"
+- Token: "BareWord (len: 5)"
 - Token: "Whitespace (len: 1)"
 - Start: NumberExpr
 - Token: "Number (len: 1)"
