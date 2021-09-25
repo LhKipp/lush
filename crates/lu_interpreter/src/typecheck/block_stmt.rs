@@ -12,8 +12,8 @@ use lu_value::Value;
 use rusttyc::TcKey;
 
 use crate::{
-    visit_arg::VisitArg, EvalArg, Evaluable, Function, Interpreter, ScopeFrameTag, TcEntry, TcFunc,
-    TypeCheckArg, TypeChecker, Variable,
+    visit_arg::VisitArg, EvalArg, Evaluable, Function, Interpreter, ScopeFrameTag, TcFunc,
+    TypeCheckArg, TyCheckState, Variable,
 };
 
 use super::TypeCheck;

@@ -300,12 +300,6 @@ impl PipelineStage for TypeChecker {
 }
 
 #[derive(Debug, Clone)]
-pub enum TcEntry {
-    Func(TcFunc),
-    Var(TcKey),
-}
-
-#[derive(Debug, Clone)]
 pub struct TcFunc {
     /// Key of this func decl. (used to get SourceCodeItem from tc_expr_table)
     self_key: TcKey,
