@@ -13,14 +13,14 @@ use lu_value::Value;
 use rusttyc::TcKey;
 
 use crate::{
-    Callable, TcFunc, TypeCheck, TypeCheckArg, TypeChecker, ValueType, VarDeclNode, Variable,
+    Callable, TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable,
 };
 
 impl TypeCheck for CmdStmtNode {
     fn do_typecheck(
         &self,
         _args: &[TypeCheckArg],
-        ty_state: &mut crate::TypeChecker,
+        ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         debug!("Scope: {:?}", ty_state.scope);
         debug!("Cur Scope Frame: {:?}", ty_state.scope.cur_frame());
@@ -45,7 +45,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
     cmd_node: &CmdStmtNode,
     args: ArgIter,
     called_func: &TcFunc,
-    ty_state: &mut TypeChecker,
+    ty_state: &mut TyCheckState,
 ) {
     let mut func_arg_ty_iter = called_func.args_keys.iter();
 
@@ -88,7 +88,7 @@ fn ty_check_cmd_arg(
     passed_arg: ValueExprElement,
     expected_arg_ty: &TcKey,
     cmd_node: &CmdStmtNode,
-    ty_state: &mut TypeChecker,
+    ty_state: &mut TyCheckState,
 ) {
     // Check whether the expected arg is a function
     if let Some(expected_fn_ty) = ty_state.get_tc_func(expected_arg_ty).cloned() {

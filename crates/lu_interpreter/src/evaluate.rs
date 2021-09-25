@@ -7,7 +7,7 @@ use lu_syntax::ast::SourceFileNode;
 use lu_value::Value;
 use parking_lot::Mutex;
 
-use crate::{Scope, TypeChecker, Variable};
+use crate::{Scope, TyCheckState, Variable};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -45,7 +45,7 @@ pub trait Evaluable: Debug {
 }
 
 pub struct Evaluator {
-    pub ty_checker: TypeChecker,
+    pub ty_state: TyCheckState,
 
     pub scope: Arc<Mutex<Scope<Variable>>>,
     pub errors: Vec<LuErr>,
@@ -54,10 +54,10 @@ pub struct Evaluator {
 }
 
 impl Evaluator {
-    pub fn new(ty_checker: TypeChecker) -> Self {
-        let scope = ty_checker.resolve.scope.clone();
+    pub fn new(ty_state: TyCheckState) -> Self {
+        let scope = ty_state.resolve.scope.clone();
         Self {
-            ty_checker,
+            ty_state,
             scope,
             errors: Vec::new(),
             result: None,
@@ -66,7 +66,7 @@ impl Evaluator {
 
     pub fn evaluate(&mut self) {
         let node = self
-            .ty_checker
+            .ty_state
             .resolve
             .parse
             .cast::<SourceFileNode>()
@@ -99,7 +99,7 @@ impl Evaluator {
 
 impl PipelineStage for Evaluator {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
-        Some(&self.ty_checker)
+        Some(&self.ty_state)
     }
 
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {

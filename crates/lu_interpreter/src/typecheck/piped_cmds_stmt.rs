@@ -15,7 +15,7 @@ impl TypeCheck for PipedCmdsStmtNode {
     fn do_typecheck(
         &self,
         _args: &[TypeCheckArg],
-        ty_state: &mut crate::TypeChecker,
+        ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         todo!()
     }

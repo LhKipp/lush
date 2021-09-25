@@ -14,7 +14,7 @@ use lu_value::Value;
 use parking_lot::Mutex;
 use std::{path::PathBuf, sync::Arc};
 
-use crate::{typecheck::TypeChecker, Evaluable, Evaluator, Resolver, Scope, Variable};
+use crate::{typecheck::TyCheckState, Evaluable, Evaluator, Resolver, Scope, Variable};
 
 struct NamedSourceFileNode {
     node: SourceFileNode,
@@ -44,19 +44,19 @@ impl Interpreter {
         resolver
     }
 
-    pub fn typecheck(&mut self, resolve: Resolver) -> TypeChecker {
-        let mut ty_checker = TypeChecker::new(resolve);
-        ty_checker.typecheck();
-        ty_checker
+    pub fn typecheck(&mut self, resolve: Resolver) -> TyCheckState {
+        let mut ty_state = TyCheckState::new(resolve);
+        ty_state.typecheck();
+        ty_state
     }
 
-    pub fn evaluate(&mut self, ty_checker: TypeChecker) -> Option<Evaluator> {
+    pub fn evaluate(&mut self, ty_state: TyCheckState) -> Option<Evaluator> {
         // We don't allow evaluation if errors happend.
-        if ty_checker.failed() {
+        if ty_state.failed() {
             return None;
         }
 
-        let mut evaluator = Evaluator::new(ty_checker);
+        let mut evaluator = Evaluator::new(ty_state);
         evaluator.evaluate();
         Some(evaluator)
 
@@ -75,7 +75,7 @@ impl Interpreter {
         self.evaluate(ty_check).unwrap().as_result()
     }
 
-    pub fn ty_check(&mut self, code: SourceCode) -> LuResults<TypeChecker> {
+    pub fn ty_check(&mut self, code: SourceCode) -> LuResults<TyCheckState> {
         let parse = self.parse(code);
         let resolve = self.resolve(parse);
         let ty_check = self.typecheck(resolve);

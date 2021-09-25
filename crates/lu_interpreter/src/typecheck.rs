@@ -21,7 +21,7 @@ mod source_file;
 mod statement;
 mod test;
 
-pub struct TypeChecker {
+pub struct TyCheckState {
     /// Input from previous stage
     pub resolve: Resolver,
 
@@ -39,14 +39,14 @@ pub struct TypeChecker {
 
     pub errors: Vec<LuErr>,
 
-    /// The final result of this evaluator
+    /// The final result of this ty
     pub result: Option<ValueType>,
 
     scope: Scope<Variable>,
     checker: VarlessTypeChecker<ValueType>,
 }
 
-impl TypeChecker {
+impl TyCheckState {
     pub fn new(resolve: Resolver) -> Self {
         let scope = resolve.scope.lock().clone();
         Self {
@@ -169,7 +169,7 @@ impl TypeChecker {
         }
     }
 
-    pub(crate) fn as_result(self) -> LuResults<TypeChecker> {
+    pub(crate) fn as_result(self) -> LuResults<TyCheckState> {
         if self.failed() {
             Err(self.collect_all_errors())
         } else {
@@ -285,7 +285,7 @@ impl TypeChecker {
     }
 }
 
-impl PipelineStage for TypeChecker {
+impl PipelineStage for TyCheckState {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
         Some(&self.resolve)
     }
@@ -314,28 +314,28 @@ pub struct TcFunc {
 impl TcFunc {
     /// generate a TcFunc from func. Each arg / flag / in / ret type of the func
     /// will be inserted as a seperate pseudo variable
-    pub fn from_signature(sign: &Signature, ty_checker: &mut TypeChecker) -> Self {
+    pub fn from_signature(sign: &Signature, ty_state: &mut TyCheckState) -> Self {
         debug!("Generating TcFunc for Signature: {:?}", sign);
-        let self_key = ty_checker.new_term_key(sign.decl.clone());
+        let self_key = ty_state.new_term_key(sign.decl.clone());
 
         let in_ty =
-            ty_checker.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());
+            ty_state.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());
 
-        let ret_ty = ty_checker
-            .new_term_key_concretiziesd(sign.ret_arg.decl.clone(), sign.ret_arg.ty.clone());
+        let ret_ty =
+            ty_state.new_term_key_concretiziesd(sign.ret_arg.decl.clone(), sign.ret_arg.ty.clone());
 
         let var_arg_ty = sign
             .var_arg
             .as_ref()
             .map(|var_arg_sign| (var_arg_sign.decl.clone(), var_arg_sign.ty.clone()))
-            .map(|(decl, ty)| ty_checker.new_term_key_concretiziesd(decl, ty))
+            .map(|(decl, ty)| ty_state.new_term_key_concretiziesd(decl, ty))
             .clone();
 
         let args_ty = sign
             .args
             .iter()
             .map(|arg_sign| {
-                ty_checker.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.ty.clone())
+                ty_state.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.ty.clone())
             })
             .collect();
 
@@ -349,7 +349,7 @@ impl TcFunc {
             flags_keys: HashMap::new(),
         };
 
-        ty_checker
+        ty_state
             .tc_func_table
             .insert(ty_func.self_key.clone(), ty_func.clone());
 
@@ -373,7 +373,7 @@ impl TcFunc {
     }
 
     // TODO return Vec<Constraint> when constraint is pub
-    fn equate_with(&self, other: &TcFunc, ty_state: &mut TypeChecker) {
+    fn equate_with(&self, other: &TcFunc, ty_state: &mut TyCheckState) {
         assert!(
             self.same_arity_as(other),
             "Should only equate fns with same arity???"
@@ -406,16 +406,16 @@ pub trait TypeCheck: Debug {
     /// itself).
     // (A statement which does not have a return value can never be the rhs of something expecting
     // a type. This kind of error would be catched at parsing level (e.G. let x = let y = 1))
-    fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TypeChecker) -> Option<TcKey>;
+    fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey>;
 
-    fn typecheck(&self, ty_state: &mut TypeChecker) -> Option<TcKey> {
+    fn typecheck(&self, ty_state: &mut TyCheckState) -> Option<TcKey> {
         self.typecheck_with_args(&[], ty_state)
     }
 
     fn typecheck_with_args(
         &self,
         args: &[TypeCheckArg],
-        ty_state: &mut TypeChecker,
+        ty_state: &mut TyCheckState,
     ) -> Option<TcKey> {
         debug!("Typechecking: {:?}({:?})", self, args);
         let result = self.do_typecheck(args, ty_state);
@@ -432,7 +432,7 @@ pub trait TypeCheck: Debug {
 
 // TODO remove this. Its broken. Sometimes this is an error sometimes its not
 impl<T: TypeCheck> TypeCheck for Option<T> {
-    fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TypeChecker) -> Option<TcKey> {
+    fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
         match self {
             Some(n) => n.typecheck_with_args(args, ty_state),
             None => {

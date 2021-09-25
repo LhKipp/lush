@@ -12,6 +12,6 @@ mod test {
 
         itprtr
             .ty_check(s.to_string().into())
-            .map(|ty_checker| ty_checker.result)
+            .map(|ty_state| ty_state.result)
     }
 }

@@ -7,10 +7,10 @@ use lu_syntax::{
 };
 use rusttyc::TcKey;
 
-use crate::{TypeCheck, TypeCheckArg, TypeChecker, ValueType};
+use crate::{TyCheckState, TypeCheck, TypeCheckArg, ValueType};
 
 impl TypeCheck for ValueExprElement {
-    fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TypeChecker) -> Option<TcKey> {
+    fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self {
             ValueExprElement::BareWord(n) => n.typecheck(state),
             ValueExprElement::NumberExpr(n) => n.typecheck(state),
@@ -24,7 +24,7 @@ impl TypeCheck for ValueExprElement {
 }
 
 impl TypeCheck for CmdOrValueExprElement {
-    fn do_typecheck(&self, args: &[TypeCheckArg], state: &mut TypeChecker) -> Option<TcKey> {
+    fn do_typecheck(&self, args: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self {
             CmdOrValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, state),
             CmdOrValueExprElement::PipedCmdsStmt(n) => n.typecheck_with_args(args, state),
@@ -34,9 +34,9 @@ impl TypeCheck for CmdOrValueExprElement {
 }
 
 impl TypeCheck for BareWordToken {
-    fn do_typecheck(&self, _: &[TypeCheckArg], ty_checker: &mut TypeChecker) -> Option<TcKey> {
-        let key = ty_checker.checker.new_term_key();
-        ty_checker
+    fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        let key = ty_state.checker.new_term_key();
+        ty_state
             .checker
             .impose(key.concretizes_explicit(ValueType::BareWord))
             .unwrap();
@@ -45,9 +45,9 @@ impl TypeCheck for BareWordToken {
 }
 
 impl TypeCheck for NumberExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], ty_checker: &mut TypeChecker) -> Option<TcKey> {
-        let key = ty_checker.checker.new_term_key();
-        ty_checker
+    fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        let key = ty_state.checker.new_term_key();
+        ty_state
             .checker
             .impose(key.concretizes_explicit(ValueType::Number))
             .unwrap();
@@ -56,9 +56,9 @@ impl TypeCheck for NumberExprNode {
 }
 
 impl TypeCheck for StringExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], ty_checker: &mut TypeChecker) -> Option<TcKey> {
-        let key = ty_checker.new_term_key(self.to_item());
-        ty_checker
+    fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        let key = ty_state.new_term_key(self.to_item());
+        ty_state
             .checker
             .impose(key.concretizes_explicit(ValueType::String))
             .unwrap();
@@ -67,16 +67,16 @@ impl TypeCheck for StringExprNode {
 }
 
 impl TypeCheck for ValuePathExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TypeChecker) -> Option<TcKey> {
+    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TyCheckState) -> Option<TcKey> {
         todo!("Find other var and return that key")
     }
 }
 
 impl TypeCheck for ArrayExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TypeChecker) -> Option<TcKey> {
+    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TyCheckState) -> Option<TcKey> {
         todo!("TODO find sub type")
-        // let key = ty_checker.checker.new_term_key();
-        // ty_checker
+        // let key = ty_state.checker.new_term_key();
+        // ty_state
         //     .checker
         //     .impose(key.concretizes_explicit(ValueType::ArrayExprNode))
         //     .unwrap();
@@ -85,7 +85,7 @@ impl TypeCheck for ArrayExprNode {
 }
 
 impl TypeCheck for TableExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TypeChecker) -> Option<TcKey> {
+    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TyCheckState) -> Option<TcKey> {
         todo!()
     }
 }

@@ -13,7 +13,7 @@ use rusttyc::TcKey;
 
 use crate::{
     visit_arg::VisitArg, EvalArg, Evaluable, Function, Interpreter, ScopeFrameTag, TcFunc,
-    TypeCheckArg, TyCheckState, Variable,
+    TyCheckState, TypeCheckArg, Variable,
 };
 
 use super::TypeCheck;
@@ -22,22 +22,22 @@ impl TypeCheck for BlockStmtNode {
     fn do_typecheck(
         &self,
         args: &[super::TypeCheckArg],
-        ty_checker: &mut TypeChecker,
+        ty_state: &mut TyCheckState,
     ) -> Option<TcKey> {
         let frame_to_pop = match args.get(0) {
             Some(TypeCheckArg::Arg(VisitArg::SourceFileBlock(f_path))) => {
-                if let Err(e) = ty_checker.scope.set_cur_source_frame(f_path) {
+                if let Err(e) = ty_state.scope.set_cur_source_frame(f_path) {
                     debug!("SourceFileBlock type check error which should not happen");
-                    ty_checker.push_err(e);
+                    ty_state.push_err(e);
                     return None;
                 }
-                add_entry_for_funcs(ty_checker);
+                add_entry_for_funcs(ty_state);
 
                 None
             }
             Some(TypeCheckArg::Arg(VisitArg::BlockTypeArg(b_type))) => {
                 let frame_type: ScopeFrameTag = b_type.clone().into();
-                ty_checker.scope.push_frame(frame_type.clone());
+                ty_state.scope.push_frame(frame_type.clone());
                 Some(frame_type)
             }
             _ => unreachable!("Passing of either arg is required"),
@@ -45,21 +45,21 @@ impl TypeCheck for BlockStmtNode {
 
         let mut result = None;
         for stmt in self.statements() {
-            result = stmt.typecheck(ty_checker);
+            result = stmt.typecheck(ty_state);
         }
 
         if let Some(to_pop) = frame_to_pop {
-            ty_checker.scope.pop_frame(&to_pop);
+            ty_state.scope.pop_frame(&to_pop);
         }
 
         result
     }
 }
 
-fn add_entry_for_funcs(_: &mut TypeChecker) {
+fn add_entry_for_funcs(_: &mut TyCheckState) {
     // TODO should be unnecessary. loaded on demand
     // // Handle funcs in the source file block first
-    // let var_funcs_to_insert = ty_checker
+    // let var_funcs_to_insert = ty_state
     //     .scope
     //     .cur_frame()
     //     .elems
@@ -73,9 +73,9 @@ fn add_entry_for_funcs(_: &mut TypeChecker) {
     //     .collect::<Vec<_>>();
     // for (var, func) in var_funcs_to_insert {
     //     // We handle functions as variables here.
-    //     let tc_func = TcFunc::from_callable(func, ty_checker);
+    //     let tc_func = TcFunc::from_callable(func, ty_state);
     //     // The var refers to the func
-    //     ty_checker.tc_table.insert(var, tc_func.self_key);
-    //     ty_checker.tc_func_table.insert(tc_func.self_key, tc_func);
+    //     ty_state.tc_table.insert(var, tc_func.self_key);
+    //     ty_state.tc_func_table.insert(tc_func.self_key, tc_func);
     // }
 }

@@ -10,7 +10,7 @@ impl TypeCheck for LetStmtNode {
     fn do_typecheck(
         &self,
         _args: &[TypeCheckArg],
-        ty_state: &mut crate::TypeChecker,
+        ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         if let Some(var_name) = self.var_name() {
             let var = Variable::new(var_name, Value::Nil, VarDeclNode::LetStmt(self.clone()));
