@@ -32,7 +32,7 @@ pub struct TypeChecker {
     /// Variable to tckey (for simple variables)
     tc_table: BiHashMap<Variable, TcKey>,
     /// TcKey to TcFunc
-    pub tc_func_table: HashMap<TcKey, TcFunc>,
+    tc_func_table: HashMap<TcKey, TcFunc>,
 
     /// To not spam the tables with error keys, we keep one
     #[allow(dead_code)]
@@ -295,6 +295,10 @@ impl TypeChecker {
     fn insert_var(&mut self, var: Variable, key: TcKey) -> () {
         self.scope.cur_mut_frame().insert_var(var.clone());
         self.tc_table.insert(var, key);
+    }
+
+    fn get_tc_func(&self, key: &TcKey) -> Option<&TcFunc> {
+        self.tc_func_table.get(key)
     }
 }
 

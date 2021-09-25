@@ -91,7 +91,7 @@ fn ty_check_cmd_arg(
     ty_state: &mut TypeChecker,
 ) {
     // Check whether the expected arg is a function
-    if let Some(expected_fn_ty) = ty_state.tc_func_table.get(expected_arg_ty).cloned() {
+    if let Some(expected_fn_ty) = ty_state.get_tc_func(expected_arg_ty).cloned() {
         debug!(
             "TyChecking passed_arg: {:?}, against expected_fn_ty",
             passed_arg.text()
