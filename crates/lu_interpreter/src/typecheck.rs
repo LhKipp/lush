@@ -209,8 +209,7 @@ impl TyCheckState {
             }
         } else {
             // TODO move this error generation into resolve? or somewhere else?
-            self.errors
-                .push(AstErr::VarNotInScope(var_name_usage.clone()).into());
+            self.push_err(AstErr::VarNotInScope(var_name_usage.clone()).into());
             // var not present. We provide a new term key and keep going
             // TODO should we pass a decl here?
             let var = Variable::new(
