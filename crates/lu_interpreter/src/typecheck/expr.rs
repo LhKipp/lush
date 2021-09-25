@@ -57,7 +57,7 @@ impl TypeCheck for NumberExprNode {
 
 impl TypeCheck for StringExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_checker: &mut TypeChecker) -> Option<TcKey> {
-        let key = ty_checker.new_term_key(self.into_item());
+        let key = ty_checker.new_term_key(self.to_item());
         ty_checker
             .checker
             .impose(key.concretizes_explicit(ValueType::String))

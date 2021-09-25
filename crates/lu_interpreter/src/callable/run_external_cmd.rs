@@ -59,10 +59,7 @@ impl Command for RunExternalCmd {
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| {
-                EvalErr::SpawningExternalProcessFailed(
-                    self.cmd_node.into_item(),
-                    format!("{:?}", e),
-                )
+                EvalErr::SpawningExternalProcessFailed(self.cmd_node.to_item(), format!("{:?}", e))
             })?;
 
         if !stdin.is_nil() {
@@ -72,19 +69,19 @@ impl Command for RunExternalCmd {
                 .expect("Cmd stdin always correctly captured :)")
                 .write_all(stdin.to_string().as_bytes())
                 .map_err(|e| {
-                    EvalErr::ExternalCmdStdinWriteErr(self.cmd_node.into_item(), format!("{:?}", e))
+                    EvalErr::ExternalCmdStdinWriteErr(self.cmd_node.to_item(), format!("{:?}", e))
                 })?;
         }
 
         let output = child.wait_with_output().map_err(|e| {
-            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.into_item(), format!("{:?}", e))
+            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.to_item(), format!("{:?}", e))
         })?;
 
         if output.status.success() {
             let raw_output = String::from_utf8(output.stdout)?;
             Ok(Value::BareWord(raw_output))
         } else {
-            Err(EvalErr::ExternalCmdFailed(self.cmd_node.into_item()).into())
+            Err(EvalErr::ExternalCmdFailed(self.cmd_node.to_item()).into())
         }
     }
 }

@@ -240,7 +240,7 @@ impl TypeChecker {
             // The cmd might not yet been inserted into the tables, as it is the first
             // usage. Therefore we can't assume to find the key here.
             let var_name = possibl_longest_name[0..name_args_split_i].join(" ");
-            let var_key = self.expect_key_of_var((var_name.clone(), caller_node.into_item()));
+            let var_key = self.expect_key_of_var((var_name.clone(), caller_node.to_item()));
 
             if let Some(called_func) = self.tc_func_table.get(&var_key) {
                 // The variable is already inserted as a TcFunc
@@ -251,8 +251,8 @@ impl TypeChecker {
                 self.errors.push(
                     TyErr::VarExpectedToBeFunc {
                         // TODO make var.decl not optional and use it here
-                        var_decl: var.decl.into_item(),
-                        var_usage: caller_node.into_item(),
+                        var_decl: var.decl.to_item(),
+                        var_usage: caller_node.to_item(),
                     }
                     .into(),
                 );

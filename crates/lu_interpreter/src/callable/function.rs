@@ -48,7 +48,7 @@ impl ArgSignature {
         let fallback_ty = (ValueType::Unspecified, None);
         let decl: ArgDecl = n
             .as_ref()
-            .map(|n| n.into_item())
+            .map(|n| n.to_item())
             .unwrap_or_else(|| fallback_decl.into());
         let ty = n
             .as_ref()
@@ -156,7 +156,7 @@ impl Signature {
                     .map(|ty_node| get_ty_of_node(&ty_node))
                     .unwrap_or((ValueType::Unspecified, None));
                 err.map(|e| all_errs.push(e));
-                ArgSignature::new(arg_name, ty, arg_node.into_item())
+                ArgSignature::new(arg_name, ty, arg_node.to_item())
             })
             .collect();
         let flags = sign_node
@@ -179,10 +179,10 @@ impl Signature {
                 .map(|ty_node| get_ty_of_node(&ty_node))
                 .unwrap_or((ValueType::Any, None));
             err.map(|e| all_errs.push(e));
-            ArgSignature::new(name, ty, var_arg_node.into_item())
+            ArgSignature::new(name, ty, var_arg_node.to_item())
         });
         (
-            Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.into_item()),
+            Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.to_item()),
             all_errs,
         )
     }

@@ -98,7 +98,7 @@ impl ValueType {
             }
             LuTypeSpecifierElement::FnType(fn_ty) => {
                 let (sign, errs) =
-                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.into_item());
+                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item());
                 if !errs.is_empty() {
                     todo!("Return (valuety, err)");
                 }

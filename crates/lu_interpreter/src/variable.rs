@@ -27,14 +27,14 @@ pub enum VarDeclNode {
 }
 
 impl VarDeclNode {
-    pub fn into_item(&self) -> SourceCodeItem {
+    pub fn to_item(&self) -> SourceCodeItem {
         match self {
-            VarDeclNode::LetStmt(n) => n.into_item(),
+            VarDeclNode::LetStmt(n) => n.to_item(),
             VarDeclNode::FnStmt(n) => n.decl_item(),
-            VarDeclNode::ArgSignature(n) => n.into_item(),
-            VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].into_item(),
+            VarDeclNode::ArgSignature(n) => n.to_item(),
+            VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].to_item(),
             VarDeclNode::Dummy => SourceCodeItem::tmp_todo_item(),
-            VarDeclNode::PrevCmdStmt(n) => n.into_item(),
+            VarDeclNode::PrevCmdStmt(n) => n.to_item(),
             VarDeclNode::ErrorUsage(item) => item.clone(),
         }
     }

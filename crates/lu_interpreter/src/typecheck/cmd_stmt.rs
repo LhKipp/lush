@@ -34,10 +34,10 @@ impl TypeCheck for CmdStmtNode {
             called_func.ret_ty.clone()
         } else {
             // External cmds return string
-            ty_state.new_term_key_concretiziesd(self.into_item(), ValueType::String)
+            ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
         };
 
-        Some(ty_state.new_term_key_equated(self.into_item(), ret_ty))
+        Some(ty_state.new_term_key_equated(self.to_item(), ret_ty))
     }
 }
 
@@ -56,13 +56,13 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
             }
             None => {
                 if let Some(var_arg_ty) = called_func.var_arg_ty {
-                    ty_state.new_term_key_equated(arg.into_item(), var_arg_ty);
+                    ty_state.new_term_key_equated(arg.to_item(), var_arg_ty);
                 } else {
                     // Found unexpected argument
                     let called_func_decl = ty_state.get_expr_of(called_func.self_key).clone();
                     ty_state.errors.push(
                         TyErr::UnexpectedArg {
-                            arg: arg.into_item(),
+                            arg: arg.to_item(),
                             fn_decl: called_func_decl.clone(),
                         }
                         .into(),
@@ -77,7 +77,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
         ty_state.errors.push(
             TyErr::UnsatisfiedArg {
                 arg_decl,
-                cmd_stmt: cmd_node.into_item(),
+                cmd_stmt: cmd_node.to_item(),
             }
             .into(),
         )
@@ -102,11 +102,11 @@ fn ty_check_cmd_arg(
             ValueExprElement::ValuePathExpr(ref passed_var_path) => {
                 let var_repr = (
                     passed_var_path.var_name_parts()[0].clone(),
-                    passed_var_path.into_item(),
+                    passed_var_path.to_item(),
                 );
                 let passed_var_key = ty_state.expect_key_of_var(var_repr);
                 let passed_arg_key =
-                    ty_state.new_term_key_equated(passed_arg.into_item(), passed_var_key);
+                    ty_state.new_term_key_equated(passed_arg.to_item(), passed_var_key);
                 // Check that var_key is a func_key
                 if let Some(passed_fn_ty) = ty_state.tc_func_table.get(&passed_var_key).cloned() {
                     expected_fn_ty.equate_with(&passed_fn_ty, ty_state);
@@ -124,10 +124,10 @@ fn ty_check_cmd_arg(
         if !matched {
             // Expected_ty did not match with passed arg. We must generate an error.
             // We call new_term_key_equated, as that goes then through a unified interface
-            ty_state.new_term_key_equated(passed_arg.into_item(), *expected_arg_ty);
+            ty_state.new_term_key_equated(passed_arg.to_item(), *expected_arg_ty);
         }
     } else {
         // Everything else is a primitive type. No deeper ty check necessary
-        ty_state.new_term_key_equated(passed_arg.into_item(), *expected_arg_ty);
+        ty_state.new_term_key_equated(passed_arg.to_item(), *expected_arg_ty);
     }
 }

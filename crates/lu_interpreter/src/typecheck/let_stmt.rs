@@ -13,11 +13,7 @@ impl TypeCheck for LetStmtNode {
         ty_state: &mut crate::TypeChecker,
     ) -> Option<TcKey> {
         if let Some(var_name) = self.var_name() {
-            let var = Variable::new(
-                var_name,
-                Value::Nil,
-                VarDeclNode::LetStmt(self.clone()),
-            );
+            let var = Variable::new(var_name, Value::Nil, VarDeclNode::LetStmt(self.clone()));
             let let_stmt_key = ty_state.new_term_key(self.item_till_value());
 
             ty_state.insert_var(var.clone(), let_stmt_key);
@@ -45,7 +41,7 @@ impl TypeCheck for LetStmtNode {
                     assert!(rhs.is_some(), "Option<T> always returns something for none");
                     ty_state
                         .errors
-                        .push(TyErr::TermDoesNotReturnType(rhs.unwrap().into_item()).into())
+                        .push(TyErr::TermDoesNotReturnType(rhs.unwrap().to_item()).into())
                 }
             };
         } else {
