@@ -3,7 +3,7 @@ extern crate vec_box;
 
 use pretty_env_logger::env_logger;
 
-use lu_cmds::{PrintCmd, TestPrintCmd};
+use lu_cmds::PrintCmd;
 use lu_interpreter::{Callable, Command, Interpreter, Scope, ScopeFrameTag, VarDeclNode, Variable};
 use lu_value::Value;
 
@@ -15,7 +15,7 @@ pub fn init_logger() {
 }
 
 fn make_test_scope() -> Scope<Variable> {
-    let cmds: Vec<Box<dyn Command>> = vec_box![PrintCmd::new(), TestPrintCmd::new()];
+    let cmds: Vec<Box<dyn Command>> = vec_box![PrintCmd::new()];
 
     let mut scope = Scope::new();
     let (_, frame) = scope.push_frame(ScopeFrameTag::GlobalFrame);
