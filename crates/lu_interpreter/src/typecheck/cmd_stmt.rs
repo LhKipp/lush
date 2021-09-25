@@ -31,7 +31,7 @@ impl TypeCheck for CmdStmtNode {
         {
             let args = self.name_with_args().skip(name_args_split_i);
             ty_check_cmd_args(self, args, &called_func, ty_state);
-            called_func.ret_ty.clone()
+            called_func.ret_key.clone()
         } else {
             // External cmds return string
             ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
@@ -47,7 +47,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
     called_func: &TcFunc,
     ty_state: &mut TypeChecker,
 ) {
-    let mut func_arg_ty_iter = called_func.args_ty.iter();
+    let mut func_arg_ty_iter = called_func.args_keys.iter();
 
     for arg in args {
         match func_arg_ty_iter.next() {
@@ -55,7 +55,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
                 ty_check_cmd_arg(arg, func_arg_ty, cmd_node, ty_state);
             }
             None => {
-                if let Some(var_arg_ty) = called_func.var_arg_ty {
+                if let Some(var_arg_ty) = called_func.var_arg_key {
                     ty_state.new_term_key_equated(arg.to_item(), var_arg_ty);
                 } else {
                     // Found unexpected argument

@@ -15,7 +15,7 @@ pub type ArgDecl = SourceCodeItem;
 #[derive(Clone, Debug, Hash, new, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ArgSignature {
     pub name: String,
-    pub type_: ValueType,
+    pub ty: ValueType,
     #[new(default)] // TODO this default should be false, making every flag necessary
     pub is_opt: bool, // TODO this is prob a bad idea???
     pub decl: ArgDecl,
@@ -72,7 +72,7 @@ impl ArgSignature {
 pub struct FlagSignature {
     pub long_name: Option<String>,
     pub short_name: Option<char>,
-    pub type_: ValueType,
+    pub ty: ValueType,
     #[new(default)] // TODO this default should be false, making every flag necessary
     pub is_opt: bool,
     #[serde(skip)]
@@ -87,8 +87,8 @@ pub struct Signature {
     pub var_arg: Option<ArgSignature>,
     #[builder(default)]
     pub flags: Vec<FlagSignature>,
-    pub in_type: ArgSignature,
-    pub ret_type: ArgSignature,
+    pub in_arg: ArgSignature,
+    pub ret_arg: ArgSignature,
 
     pub decl: SourceCodeItem,
 }

@@ -310,11 +310,11 @@ pub struct TcFunc {
     /// Key of this func decl. (used to get SourceCodeItem from tc_expr_table)
     self_key: TcKey,
 
-    in_ty: TcKey,
-    ret_ty: TcKey,
-    args_ty: Vec<TcKey>,
-    var_arg_ty: Option<TcKey>,
-    flags_ty: HashMap<FlagSignature, TcKey>,
+    in_key: TcKey,
+    ret_key: TcKey,
+    args_keys: Vec<TcKey>,
+    var_arg_key: Option<TcKey>,
+    flags_keys: HashMap<FlagSignature, TcKey>,
 }
 
 impl TcFunc {
@@ -324,16 +324,16 @@ impl TcFunc {
         debug!("Generating TcFunc for Signature: {:?}", sign);
         let self_key = ty_checker.new_term_key(sign.decl.clone());
 
-        let in_ty = ty_checker
-            .new_term_key_concretiziesd(sign.in_type.decl.clone(), sign.in_type.type_.clone());
+        let in_ty =
+            ty_checker.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());
 
         let ret_ty = ty_checker
-            .new_term_key_concretiziesd(sign.ret_type.decl.clone(), sign.ret_type.type_.clone());
+            .new_term_key_concretiziesd(sign.ret_arg.decl.clone(), sign.ret_arg.ty.clone());
 
         let var_arg_ty = sign
             .var_arg
             .as_ref()
-            .map(|var_arg_sign| (var_arg_sign.decl.clone(), var_arg_sign.type_.clone()))
+            .map(|var_arg_sign| (var_arg_sign.decl.clone(), var_arg_sign.ty.clone()))
             .map(|(decl, ty)| ty_checker.new_term_key_concretiziesd(decl, ty))
             .clone();
 
@@ -341,18 +341,18 @@ impl TcFunc {
             .args
             .iter()
             .map(|arg_sign| {
-                ty_checker.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.type_.clone())
+                ty_checker.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.ty.clone())
             })
             .collect();
 
         let ty_func = Self {
             self_key,
-            in_ty,
-            ret_ty,
-            args_ty,
-            var_arg_ty,
+            in_key: in_ty,
+            ret_key: ret_ty,
+            args_keys: args_ty,
+            var_arg_key: var_arg_ty,
             // TODO gen flags tc keys
-            flags_ty: HashMap::new(),
+            flags_keys: HashMap::new(),
         };
 
         ty_checker
@@ -363,17 +363,17 @@ impl TcFunc {
     }
 
     fn same_arity_as(&self, other: &TcFunc) -> bool {
-        match (self.var_arg_ty, other.var_arg_ty) {
-            (None, None) => self.args_ty.len() == other.args_ty.len(),
+        match (self.var_arg_key, other.var_arg_key) {
+            (None, None) => self.args_keys.len() == other.args_keys.len(),
             // case self.args_ty.len == other.args_ty.len:
             //      works, as both expect same arg count
             // case self.args_ty.len > other.args_ty.len:
             //      works, as other args can be filled up in var_arg
             // case self.args_ty.len < other.args_ty.len:
             //      doesn't work, as (other.args_ty.len - self.args_ty.len) to many args for self
-            (None, Some(_)) => self.args_ty.len() >= other.args_ty.len(),
+            (None, Some(_)) => self.args_keys.len() >= other.args_keys.len(),
             // See above
-            (Some(_), None) => self.args_ty.len() <= other.args_ty.len(),
+            (Some(_), None) => self.args_keys.len() <= other.args_keys.len(),
             (Some(_), Some(_)) => true,
         }
     }
@@ -385,11 +385,11 @@ impl TcFunc {
             "Should only equate fns with same arity???"
         );
         let in_ret_constr = [
-            self.in_ty.equate_with(other.in_ty),
-            self.ret_ty.equate_with(other.ret_ty),
+            self.in_key.equate_with(other.in_key),
+            self.ret_key.equate_with(other.ret_key),
         ];
-        let self_args_ty_iter = self.args_ty.iter().chain(self.var_arg_ty.as_ref());
-        let other_args_ty_iter = other.args_ty.iter().chain(other.var_arg_ty.as_ref());
+        let self_args_ty_iter = self.args_keys.iter().chain(self.var_arg_key.as_ref());
+        let other_args_ty_iter = other.args_keys.iter().chain(other.var_arg_key.as_ref());
         let args_constr = itertools::zip(self_args_ty_iter, other_args_ty_iter)
             .map(|(self_arg_key, other_arg_key)| self_arg_key.equate_with(*other_arg_key))
             .chain(in_ret_constr);

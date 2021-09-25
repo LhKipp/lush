@@ -16,8 +16,8 @@ impl PrintCmd {
                 ValueType::Any,
                 print_decl.clone().into(),
             ))
-            .in_type(ArgSignature::void(print_decl.clone().into()))
-            .ret_type(ArgSignature::ret(
+            .in_arg(ArgSignature::void(print_decl.clone().into()))
+            .ret_arg(ArgSignature::ret(
                 ValueType::new_array(ValueType::Any),
                 print_decl.into(),
             ));
