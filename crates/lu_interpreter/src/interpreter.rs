@@ -16,11 +16,6 @@ use std::{path::PathBuf, sync::Arc};
 
 use crate::{typecheck::TyCheckState, Evaluable, Evaluator, Resolver, Scope, Variable};
 
-struct NamedSourceFileNode {
-    node: SourceFileNode,
-    path: PathBuf,
-}
-
 /// The interpreter holds data (scope), getting transformed while interpreting the ast.
 pub struct Interpreter {
     pub scope: Arc<Mutex<Scope<Variable>>>,
