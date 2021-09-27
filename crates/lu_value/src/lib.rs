@@ -24,6 +24,8 @@ pub enum Value {
     Array(Rc<Vec<Value>>),
     #[serde(skip)]
     Function(Rc<dyn Any>),
+    #[serde(skip)]
+    Strct(Rc<dyn Any>),
 }
 
 impl PartialEq for Value {
@@ -55,6 +57,7 @@ impl Hash for Value {
             Value::BareWord(v) => v.hash(state),
             Value::Array(v) => v.hash(state),
             Value::Function(func) => Rc::as_ptr(func).hash(state),
+            Value::Strct(strct) => Rc::as_ptr(strct).hash(state),
         }
     }
 }
@@ -62,6 +65,9 @@ impl Hash for Value {
 impl Value {
     pub fn new_func<F: Any + Sized>(func: F) -> Self {
         Value::Function(Rc::new(func))
+    }
+    pub fn new_strct<S: Any + Sized>(strct: S) -> Self {
+        Value::Strct(Rc::new(strct))
     }
 
     pub fn new_array(vals: Vec<Value>) -> Self {
@@ -94,6 +100,7 @@ impl Value {
             Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
             Value::Array(arr) => Some(!arr.is_empty()),
             Value::Function(_) => None,
+            Value::Strct(_) => None,
         }
     }
 }
@@ -106,8 +113,9 @@ impl Display for Value {
             Value::Number(v) => v.fmt(f),
             Value::String(v) => v.fmt(f),
             Value::BareWord(v) => v.fmt(f),
-            Value::Function(v) => write!(f, "{:p}", Rc::as_ptr(v)),
             Value::Array(arr) => write!(f, "{:?}", arr),
+            Value::Function(v) => write!(f, "{:p}", Rc::as_ptr(v)),
+            Value::Strct(v) => write!(f, "{:p}", Rc::as_ptr(v)),
         }
     }
 }

@@ -22,6 +22,11 @@ pub trait PipelineStage {
         self.get_mut_errors().push(e);
     }
 
+    fn push_errs(&mut self, e: Vec<LuErr>) {
+        debug!("Recording errors: {:?}", e);
+        self.get_mut_errors().extend(e);
+    }
+
     fn succeeded(&self) -> bool {
         self.get_errors().is_empty()
             && self

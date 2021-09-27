@@ -9,6 +9,7 @@ mod let_stmt;
 mod math_expr;
 mod piped_cmds_stmt;
 mod signature;
+mod struct_stmt;
 mod type_;
 mod value_path_expr;
 use std::marker::PhantomData;

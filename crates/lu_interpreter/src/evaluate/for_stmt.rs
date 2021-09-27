@@ -54,6 +54,7 @@ impl Evaluable for ForStmtNode {
             Value::Array(_arr) => todo!(),
             Value::Bool(_) => todo!(),
             Value::Function(_) => todo!(),
+            Value::Strct(_) => todo!(),
         }
 
         Ok(Value::Nil)

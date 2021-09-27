@@ -3,8 +3,8 @@ use contracts::ensures;
 use log::debug;
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
 use lu_syntax::{
-    ast::{BlockStmtNode, IfStmtNode, StatementElement},
-    ast::{ConditionElement, IfBlockNode},
+    ast::{BlockStmtNode, ConditionElement, IfBlockNode},
+    ast::{IfStmtNode, StatementElement, StructStmtNode},
     AstElement, AstToken,
 };
 use lu_value::Value;

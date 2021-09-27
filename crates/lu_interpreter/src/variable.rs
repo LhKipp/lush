@@ -1,14 +1,14 @@
 use derive_more::From;
 use lu_error::SourceCodeItem;
 use lu_syntax::{
-    ast::{ArgSignatureNode, CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode},
+    ast::{ArgSignatureNode, CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StructStmtNode},
     AstNode, AstToken,
 };
 use lu_syntax_elements::constants::IN_ARG_NAME;
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
-use crate::{Callable, Command, Function};
+use crate::{Callable, Command, Function, Strct};
 
 #[derive(Educe)]
 #[educe(Default)]
@@ -18,6 +18,7 @@ pub enum VarDeclNode {
     Dummy,
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
+    StrctStmt(StructStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
     ArgSignature(ArgSignatureNode),
@@ -35,6 +36,7 @@ impl VarDeclNode {
             VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].to_item(),
             VarDeclNode::Dummy => SourceCodeItem::tmp_todo_item(),
             VarDeclNode::PrevCmdStmt(n) => n.to_item(),
+            VarDeclNode::StrctStmt(n) => n.to_item(),
             VarDeclNode::ErrorUsage(item) => item.clone(),
         }
     }
@@ -60,6 +62,14 @@ impl Variable {
         )
     }
 
+    pub fn new_struct(strct: Strct, decl: StructStmtNode) -> Variable {
+        Variable::new(
+            strct.name.clone(),
+            Value::new_strct(strct),
+            VarDeclNode::StrctStmt(decl),
+        )
+    }
+
     pub fn new_in(val: Value, decl: VarDeclNode) -> Self {
         Self {
             name: IN_ARG_NAME.to_string(),
@@ -80,6 +90,13 @@ impl Variable {
         self.val.as_function().map(|func| {
             func.downcast_ref::<Callable>()
                 .expect("Func is always castable to Callable")
+        })
+    }
+    pub fn val_as_strct(&self) -> Option<&Strct> {
+        self.val.as_strct().map(|strct| {
+            strct
+                .downcast_ref::<Strct>()
+                .expect("Struct-Var is always castable to Struct")
         })
     }
 }

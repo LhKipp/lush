@@ -1,6 +1,6 @@
 use crate::{AstElementChildren, AstNode, AstNodeChildren};
 
-use super::{support, BlockStmtNode, FnStmtNode, StatementElement};
+use super::{support, BlockStmtNode, FnStmtNode, StatementElement, StructStmtNode};
 
 impl BlockStmtNode {
     pub fn statements(&self) -> AstElementChildren<StatementElement> {
@@ -12,6 +12,9 @@ impl BlockStmtNode {
     }
 
     pub fn fn_stmts(&self) -> AstNodeChildren<FnStmtNode> {
+        support::node_children(self.syntax())
+    }
+    pub fn struct_stmts(&self) -> AstNodeChildren<StructStmtNode> {
         support::node_children(self.syntax())
     }
 }

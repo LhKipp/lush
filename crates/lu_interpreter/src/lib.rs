@@ -10,6 +10,7 @@ mod interpreter;
 mod resolve;
 mod scope;
 mod typecheck;
+mod user_def_tys;
 mod value_type;
 mod variable;
 mod visit_arg;
@@ -21,6 +22,7 @@ pub use callable::{
     ArgSignature, Callable, Command, FlagSignature, Function, RunExternalCmd, Signature,
     SignatureBuilder, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME,
 };
+pub use user_def_tys::*;
 
 pub use evaluate::*;
 pub use resolve::*;
