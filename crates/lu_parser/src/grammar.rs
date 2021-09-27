@@ -39,6 +39,7 @@ mod let_stmt;
 mod piped_cmds_stmt;
 mod ret_stmt;
 mod signature;
+mod struct_stmt;
 mod type_;
 mod value_path_expr;
 
@@ -63,6 +64,7 @@ pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use ret_stmt::RetStmtRule;
 pub use signature::SignatureRule;
+pub use struct_stmt::StructStmtRule;
 pub use type_::{ArrayTypeRule, FnTypeRule, LuTypeRule};
 pub use value_path_expr::ValuePathExprRule;
 
@@ -185,6 +187,7 @@ fn second_level_stmt() -> OrRule {
 fn top_level_stmt() -> OrRule {
     let mut second_level_stmt = second_level_stmt();
     second_level_stmt.rules.push(Box::new(FnStmtRule {}));
+    second_level_stmt.rules.push(Box::new(StructStmtRule {}));
     second_level_stmt.kind = Some("Top level stmt".into());
 
     second_level_stmt

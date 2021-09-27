@@ -9,6 +9,27 @@ use crate::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StructKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for StructKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StructKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for StructKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1283,6 +1304,27 @@ impl HasSyntaxKind for NumberToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StructNameToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for StructNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StructName }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for StructNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1310,6 +1352,48 @@ impl HasRule for SourceFileNode{
         Box::new(SourceFileRule{})
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StructStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for StructStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StructStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for StructStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StructFieldNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for StructFieldNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StructField }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for StructFieldNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LetStmtNode {
     pub(crate) syntax: SyntaxNode,
