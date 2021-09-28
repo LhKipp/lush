@@ -1325,6 +1325,27 @@ impl HasSyntaxKind for StrctNameToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StrctFieldNameToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for StrctFieldNameToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctFieldName }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for StrctFieldNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2045,6 +2066,7 @@ pub enum ValueExprElement {
     MathExpr(MathExprNode),
     StringExpr(StringExprNode),
     ValuePathExpr(ValuePathExprNode),
+    StrctCtorExpr(StrctCtorExprNode),
     ArrayExpr(ArrayExprNode),
     TableExpr(TableExprNode),
     }
@@ -2062,12 +2084,14 @@ impl AstElement for ValueExprElement {
         
         
         
+        
         match kind{
-            BareWord | NumberExpr | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
+            BareWord | NumberExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | ArrayExpr | TableExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -2082,6 +2106,7 @@ impl AstElement for ValueExprElement {
             MathExpr => ValueExprElement::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
             StringExpr => ValueExprElement::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
             ValuePathExpr => ValueExprElement::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
+            StrctCtorExpr => ValueExprElement::StrctCtorExpr(StrctCtorExprNode { syntax: syntax.into_node().unwrap() }),
             ArrayExpr => ValueExprElement::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
             TableExpr => ValueExprElement::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
@@ -2107,6 +2132,9 @@ impl AstElement for ValueExprElement {
             ValueExprElement::ValuePathExpr(it) => it.syntax.clone().into(),
             
             
+            ValueExprElement::StrctCtorExpr(it) => it.syntax.clone().into(),
+            
+            
             ValueExprElement::ArrayExpr(it) => it.syntax.clone().into(),
             
             
@@ -2123,6 +2151,7 @@ impl HasSyntaxKind for ValueExprElement{
             ValueExprElement::MathExpr(it) => it.get_syntax_kind(),
             ValueExprElement::StringExpr(it) => it.get_syntax_kind(),
             ValueExprElement::ValuePathExpr(it) => it.get_syntax_kind(),
+            ValueExprElement::StrctCtorExpr(it) => it.get_syntax_kind(),
             ValueExprElement::ArrayExpr(it) => it.get_syntax_kind(),
             ValueExprElement::TableExpr(it) => it.get_syntax_kind(),
             }

@@ -73,7 +73,7 @@ impl Rule for StrctFieldCtorStmtRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        if !p.expect_after(BareWord, CMT_NL_WS) {
+        if !p.expect_after_as(BareWord, StrctFieldName, CMT_NL_WS) {
             m.abandon(p);
             return None;
         }

@@ -33,6 +33,7 @@ impl TypeCheck for CmdStmtNode {
             ty_check_cmd_args(self, args, &called_func, ty_state);
             called_func.ret_key.clone()
         } else {
+            // TODO this is wrong
             // External cmds return string
             ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
         };
@@ -59,7 +60,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
                     ty_state.new_term_key_equated(arg.to_item(), var_arg_ty);
                 } else {
                     // Found unexpected argument
-                    let called_func_decl = ty_state.get_expr_of(called_func.self_key).clone();
+                    let called_func_decl = ty_state.get_item_of(&called_func.self_key).clone();
                     ty_state.push_err(
                         TyErr::UnexpectedArg {
                             arg: arg.to_item(),

@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use enum_as_inner::EnumAsInner;
-use log::warn;
+use log::{debug, warn};
 use lu_error::LuErr;
 use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
@@ -66,6 +66,7 @@ impl PartialEq for ValueType {
             (ValueType::BareWord, ValueType::BareWord) => true,
             (ValueType::Array(a_inner), ValueType::Array(b_inner)) => a_inner == b_inner,
             (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
+            (ValueType::Strct(a), ValueType::Strct(b)) => a.name == b.name,
             _ => false,
         }
     }
@@ -80,6 +81,10 @@ impl ValueType {
         ValueType::Func(Box::new(sign))
     }
 
+    pub fn new_strct(strct: Strct) -> Self {
+        ValueType::Strct(Box::new(strct))
+    }
+
     pub fn from_node_or_err_ty(
         node: &LuTypeSpecifierElement,
         scope: &Scope<Variable>,
@@ -92,6 +97,7 @@ impl ValueType {
         node: &LuTypeSpecifierElement,
         scope: &Scope<Variable>, // TODO maybe this should be a func.. can value_type rely on variable??
     ) -> Result<ValueType, LuErr> {
+        // TODO make return type (ValueType, Option<LuErr>)
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => {
                 warn!("RETURNING WRONG VALUE_TYPE: Any INSTEAD OF AnyOf");
@@ -103,6 +109,7 @@ impl ValueType {
             LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
             LuTypeSpecifierElement::StrctName(n) => {
+                debug!("Looking for struct with name {}", n.text());
                 let strct = scope.expect_strct(n.text(), n.to_item())?;
                 ValueType::Strct(Box::new(strct.clone()))
             }
@@ -226,9 +233,15 @@ impl Display for ValueType {
             ValueType::String => write!(f, "str"),
             ValueType::BareWord => write!(f, "bare_word"),
             ValueType::Array(t) => write!(f, "[{}]", t),
+            ValueType::Strct(strct) => {
+                write!(f, "{}{{ ", strct.name)?;
+                for field in &strct.fields {
+                    write!(f, "{}: {}", field.name, field.ty)?;
+                }
+                write!(f, "}}")
+            }
             ValueType::Func(_) => todo!(),
             ValueType::Void => todo!(),
-            ValueType::Strct(_) => todo!(),
         }
     }
 }

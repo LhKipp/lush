@@ -20,6 +20,7 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::ValuePathExpr(n) => n.evaluate(state),
             ValueExprElement::ArrayExpr(n) => n.evaluate(state),
             ValueExprElement::TableExpr(n) => n.evaluate(state),
+            ValueExprElement::StrctCtorExpr(_) => todo!(),
         }
     }
 }

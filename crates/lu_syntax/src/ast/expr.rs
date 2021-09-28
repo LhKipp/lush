@@ -14,6 +14,7 @@ impl ValueExprElement {
             ValueExprElement::MathExpr(n) => n.value(),
             ValueExprElement::StringExpr(n) => n.value(),
             ValueExprElement::ValuePathExpr(n) => n.value(),
+            ValueExprElement::StrctCtorExpr(_) => todo!(),
             ValueExprElement::ArrayExpr(n) => n.value(),
             ValueExprElement::TableExpr(n) => n.value(),
         }

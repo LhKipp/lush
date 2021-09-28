@@ -120,6 +120,7 @@ pub enum SyntaxKind {
     Number,
     #[regex("[A-Z]+[_a-zA-Z0-9]")]
     StrctName,
+    StrctFieldName,
     SourceFile,
     StrctStmt,
     StrctField,
@@ -220,6 +221,7 @@ impl SyntaxKind{
             SyntaxKind::ShortFlag => "ShortFlag",
             SyntaxKind::Number => "Number",
             SyntaxKind::StrctName => "StrctName",
+            SyntaxKind::StrctFieldName => "StrctFieldName",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::StrctStmt => "StrctStmt",
             SyntaxKind::StrctField => "StrctField",

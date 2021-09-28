@@ -1,4 +1,5 @@
 use bimap::BiHashMap;
+use itertools::Itertools;
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
@@ -10,7 +11,7 @@ use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
-use crate::{Command, RunExternalCmd, Signature, ValueTypeErr, VarDeclNode};
+use crate::{Command, RunExternalCmd, Signature, Strct, ValueTypeErr, VarDeclNode};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -33,6 +34,8 @@ pub struct TyCheckState {
     tc_table: BiHashMap<Variable, TcKey>,
     /// TcKey to TcFunc
     tc_func_table: HashMap<TcKey, TcFunc>,
+    /// TcKey to TcStrct
+    tc_strct_table: HashMap<TcKey, TcStrct>,
 
     /// Final result of typechecking
     pub ty_table: HashMap<TcKey, ValueType>,
@@ -57,6 +60,7 @@ impl TyCheckState {
             tc_table: BiHashMap::new(),
             tc_expr_table: HashMap::new(),
             tc_func_table: HashMap::new(),
+            tc_strct_table: HashMap::new(),
             ty_table: HashMap::new(),
             result: None,
         }
@@ -94,14 +98,7 @@ impl TyCheckState {
         equate_with: TcKey,
     ) -> TcKey {
         let key = self.new_term_key(term);
-        let res = self.checker.impose(key.equate_with(equate_with));
-        self.handle_tc_result(res);
-
-        // If other is a func, we need to also equate the inner func_keys
-        // We do so by inserting cloning and reinserting the tc_func
-        if let Some(tc_func) = self.tc_func_table.get(&equate_with).cloned() {
-            self.tc_func_table.insert(key, tc_func);
-        }
+        self.equate_keys(key, equate_with);
         key
     }
 
@@ -119,6 +116,21 @@ impl TyCheckState {
             let res = self.checker.impose(key.concretizes_explicit(ty));
             self.handle_tc_result(res);
             key
+        }
+    }
+
+    pub(crate) fn equate_keys(&mut self, key1: TcKey, key2: TcKey) {
+        let res = key1.equate_with(key2);
+        let res = self.checker.impose(res);
+        self.handle_tc_result(res);
+
+        // If other is a func, we need to also equate the inner func_keys
+        // We do so by inserting cloning and reinserting the tc_func
+        if let Some(tc_func) = self.tc_func_table.get(&key2).cloned() {
+            self.tc_func_table.insert(key1, tc_func);
+        } else if let Some(tc_func) = self.tc_func_table.get(&key1).cloned() {
+            // this func is commutative
+            self.tc_func_table.insert(key2, tc_func);
         }
     }
 
@@ -177,11 +189,6 @@ impl TyCheckState {
         }
     }
 
-    /// Get the SourceCodeItem behind the key
-    pub(crate) fn get_item_of(&self, key: &TcKey) -> &SourceCodeItem {
-        self.tc_expr_table.get(key).unwrap()
-    }
-
     /// Returns the key of the var. If the var is not in scope, it will record an error and return
     /// None
     // TODO the interface of this func is horrible.
@@ -203,8 +210,16 @@ impl TyCheckState {
                     let tc_func = TcFunc::from_signature(callable.signature(), self);
                     self.tc_table.insert(var.clone(), tc_func.self_key.clone());
                     tc_func.self_key
+                } else if let Some(strct) = var.val_as_strct().cloned() {
+                    debug!(
+                        "First time usage of strct {}. Inserting new tc_strct.",
+                        strct.name
+                    );
+                    let tc_strct = TcStrct::from_strct(strct, self);
+                    self.tc_table.insert(var.clone(), tc_strct.self_key.clone());
+                    tc_strct.self_key
                 } else {
-                    panic!("Var is not present, but not func: {}", var_name)
+                    panic!("Var is present, but not func: {}", var_name)
                 }
             }
         } else {
@@ -225,6 +240,12 @@ impl TyCheckState {
         }
     }
 
+    pub(crate) fn expect_strct(&mut self, name: &str, usage: SourceCodeItem) -> Option<&TcStrct> {
+        let strct_ty_key = self.expect_key_of_var((name.to_string(), usage));
+        self.tc_strct_table.get(&strct_ty_key)
+    }
+
+    /// Some for internal and external cmds
     pub(crate) fn find_callable(
         &mut self,
         possibl_longest_name: &[String],
@@ -235,9 +256,6 @@ impl TyCheckState {
             .find_var_with_longest_match(&possibl_longest_name)
             .map(|(i, var)| (i, var.clone()))
         {
-            // Lets assume var is a cmd here (error checking is below)
-            // The cmd might not yet been inserted into the tables, as it is the first
-            // usage. Therefore we can't assume to find the key here.
             let var_name = possibl_longest_name[0..name_args_split_i].join(" ");
             let var_key = self.expect_key_of_var((var_name.clone(), caller_node.to_item()));
 
@@ -268,10 +286,9 @@ impl TyCheckState {
         }
     }
 
-    fn get_expr_of(&self, key: TcKey) -> &SourceCodeItem {
-        self.tc_expr_table
-            .get(&key)
-            .expect("Key is always inserted in expr-table")
+    /// Get the SourceCodeItem behind the key
+    pub(crate) fn get_item_of(&self, key: &TcKey) -> &SourceCodeItem {
+        self.tc_expr_table.get(key).unwrap()
     }
 
     fn insert_var(&mut self, var: Variable, key: TcKey) -> () {
@@ -297,6 +314,50 @@ impl PipelineStage for TyCheckState {
         &self.errors
     }
 }
+#[derive(Debug, Clone, new)]
+pub struct TcStrct {
+    /// Key of this strct decl. (used to get SourceCodeItem from tc_expr_table)
+    self_key: TcKey,
+    /// Always sorted by field name
+    field_keys: Vec<(String, TcKey)>,
+}
+
+impl TcStrct {
+    pub fn from_strct(strct: Strct, ty_state: &mut TyCheckState) -> Self {
+        debug!("Generating TcStrct for Struct: {:?}", strct);
+        let field_keys = strct
+            .fields
+            .iter()
+            .map(|field| {
+                (
+                    field.name.clone(),
+                    ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
+                )
+            })
+            .sorted_by(|a, b| Ord::cmp(&a.0, &b.0))
+            .collect();
+
+        let self_key =
+            ty_state.new_term_key_concretiziesd(strct.decl.clone(), ValueType::new_strct(strct));
+
+        let tc_strct = Self {
+            self_key,
+            field_keys,
+        };
+
+        ty_state
+            .tc_strct_table
+            .insert(tc_strct.self_key.clone(), tc_strct.clone());
+
+        // TODO assert fields are sorted
+        // assert!(
+        //     tc_strct.field_keys.is_sorted_by_key(|(name, _)| name),
+        //     "Fields must be sorted by name"
+        // );
+
+        tc_strct
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct TcFunc {
@@ -315,7 +376,7 @@ impl TcFunc {
     /// will be inserted as a seperate pseudo variable
     pub fn from_signature(sign: &Signature, ty_state: &mut TyCheckState) -> Self {
         debug!("Generating TcFunc for Signature: {:?}", sign);
-        let self_key = ty_state.new_term_key(sign.decl.clone());
+        let self_key = ty_state.new_term_key(sign.decl.clone()); // TODO shouldn't self key be concretizied to be fn???
 
         let in_key =
             ty_state.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());
