@@ -1,5 +1,5 @@
 mod function;
-mod struct_;
+mod strct;
 
 pub use function::*;
-pub use struct_::*;
+pub use strct::*;

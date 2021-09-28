@@ -7,53 +7,53 @@ struct Ip{
     d: num
 }
 ---
-- Start: StructStmt
-- Token: "StructKeyword (len: 6)"
-- Token: "Whitespace (len: 1)"
-- Token: "StructName (len: 2)"
-- Token: "LeftCurlyBrackets (len: 1)"
-- Start: StructField
-- Token: "Newline (len: 1)"
-- Token: "Whitespace (len: 4)"
-- Token: "BareWord (len: 1)"
-- Token: "DoublePoint (len: 1)"
-- Start: LuType
-- Token: "Whitespace (len: 1)"
-- Token: "NumberKeyword (len: 3)"
-- Finish: ""
-- Finish: ""
-- Start: StructField
-- Token: "Newline (len: 1)"
-- Token: "Whitespace (len: 4)"
-- Token: "BareWord (len: 1)"
-- Token: "DoublePoint (len: 1)"
-- Start: LuType
-- Token: "Whitespace (len: 1)"
-- Token: "NumberKeyword (len: 3)"
-- Finish: ""
-- Finish: ""
-- Start: StructField
-- Token: "Newline (len: 1)"
-- Token: "Whitespace (len: 4)"
-- Token: "BareWord (len: 1)"
-- Token: "DoublePoint (len: 1)"
-- Start: LuType
-- Token: "Whitespace (len: 1)"
-- Token: "NumberKeyword (len: 3)"
-- Finish: ""
-- Finish: ""
-- Start: StructField
-- Token: "Newline (len: 1)"
-- Token: "Whitespace (len: 4)"
-- Token: "BareWord (len: 1)"
-- Token: "DoublePoint (len: 1)"
-- Start: LuType
-- Token: "Whitespace (len: 1)"
-- Token: "NumberKeyword (len: 3)"
-- Finish: ""
-- Finish: ""
-- Token: "Newline (len: 1)"
-- Token: "RightCurlyBrackets (len: 1)"
-- Finish: ""
+- Start: StrctStmt 
+- Token: "StrctKeyword (len: 6)" 
+- Token: "Whitespace (len: 1)" 
+- Token: "StructName (len: 2)" 
+- Token: "LeftCurlyBrackets (len: 1)" 
+- Start: StrctField 
+- Token: "Newline (len: 1)" 
+- Token: "Whitespace (len: 4)" 
+- Token: "BareWord (len: 1)" 
+- Token: "DoublePoint (len: 1)" 
+- Start: LuType 
+- Token: "Whitespace (len: 1)" 
+- Token: "NumberKeyword (len: 3)" 
+- Finish: "" 
+- Finish: "" 
+- Start: StrctField 
+- Token: "Newline (len: 1)" 
+- Token: "Whitespace (len: 4)" 
+- Token: "BareWord (len: 1)" 
+- Token: "DoublePoint (len: 1)" 
+- Start: LuType 
+- Token: "Whitespace (len: 1)" 
+- Token: "NumberKeyword (len: 3)" 
+- Finish: "" 
+- Finish: "" 
+- Start: StrctField 
+- Token: "Newline (len: 1)" 
+- Token: "Whitespace (len: 4)" 
+- Token: "BareWord (len: 1)" 
+- Token: "DoublePoint (len: 1)" 
+- Start: LuType 
+- Token: "Whitespace (len: 1)" 
+- Token: "NumberKeyword (len: 3)" 
+- Finish: "" 
+- Finish: "" 
+- Start: StrctField 
+- Token: "Newline (len: 1)" 
+- Token: "Whitespace (len: 4)" 
+- Token: "BareWord (len: 1)" 
+- Token: "DoublePoint (len: 1)" 
+- Start: LuType 
+- Token: "Whitespace (len: 1)" 
+- Token: "NumberKeyword (len: 3)" 
+- Finish: "" 
+- Finish: "" 
+- Token: "Newline (len: 1)" 
+- Token: "RightCurlyBrackets (len: 1)" 
+- Finish: "" 
 ...
 

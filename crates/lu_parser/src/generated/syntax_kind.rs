@@ -7,7 +7,7 @@ use ::serde::{Deserialize, Serialize};
 pub enum SyntaxKind {
     
     #[token("struct")]
-    StructKeyword,
+    StrctKeyword,
     #[token("let")]
     LetKeyword,
     #[token("fn")]
@@ -121,8 +121,8 @@ pub enum SyntaxKind {
     #[regex("[A-Z]+[_a-zA-Z0-9]")]
     StructName,
     SourceFile,
-    StructStmt,
-    StructField,
+    StrctStmt,
+    StrctField,
     LetStmt,
     FnStmt,
     RetStmt,
@@ -156,7 +156,7 @@ pub enum SyntaxKind {
 impl SyntaxKind{
     pub const fn name(self) -> &'static str {
         match self {
-            SyntaxKind::StructKeyword => "StructKeyword",
+            SyntaxKind::StrctKeyword => "StrctKeyword",
             SyntaxKind::LetKeyword => "LetKeyword",
             SyntaxKind::FnKeyword => "FnKeyword",
             SyntaxKind::ForKeyword => "ForKeyword",
@@ -219,8 +219,8 @@ impl SyntaxKind{
             SyntaxKind::Number => "Number",
             SyntaxKind::StructName => "StructName",
             SyntaxKind::SourceFile => "SourceFile",
-            SyntaxKind::StructStmt => "StructStmt",
-            SyntaxKind::StructField => "StructField",
+            SyntaxKind::StrctStmt => "StrctStmt",
+            SyntaxKind::StrctField => "StrctField",
             SyntaxKind::LetStmt => "LetStmt",
             SyntaxKind::FnStmt => "FnStmt",
             SyntaxKind::RetStmt => "RetStmt",
@@ -256,7 +256,7 @@ impl SyntaxKind{
 
 #[macro_export]
 macro_rules! T {
-    [struct] => {$crate::SyntaxKind::StructKeyword };
+    [struct] => {$crate::SyntaxKind::StrctKeyword };
     [let] => {$crate::SyntaxKind::LetKeyword };
     [fn] => {$crate::SyntaxKind::FnKeyword };
     [for] => {$crate::SyntaxKind::ForKeyword };

@@ -4,7 +4,7 @@ use log::debug;
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
 use lu_syntax::{
     ast::{BlockStmtNode, ConditionElement, IfBlockNode},
-    ast::{IfStmtNode, StatementElement, StructStmtNode},
+    ast::{IfStmtNode, StatementElement, StrctStmtNode},
     AstElement, AstToken,
 };
 use lu_value::Value;

@@ -1,7 +1,7 @@
 use derive_more::From;
 use lu_error::SourceCodeItem;
 use lu_syntax::{
-    ast::{ArgSignatureNode, CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StructStmtNode},
+    ast::{ArgSignatureNode, CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StrctStmtNode},
     AstNode, AstToken,
 };
 use lu_syntax_elements::constants::IN_ARG_NAME;
@@ -18,7 +18,7 @@ pub enum VarDeclNode {
     Dummy,
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
-    StrctStmt(StructStmtNode),
+    StrctStmt(StrctStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
     ArgSignature(ArgSignatureNode),
@@ -62,7 +62,7 @@ impl Variable {
         )
     }
 
-    pub fn new_struct(strct: Strct, decl: StructStmtNode) -> Variable {
+    pub fn new_struct(strct: Strct, decl: StrctStmtNode) -> Variable {
         Variable::new(
             strct.name.clone(),
             Value::new_strct(strct),

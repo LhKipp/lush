@@ -1,6 +1,6 @@
 use derive_new::new;
 use lu_error::{LuErr, SourceCodeItem};
-use lu_syntax::ast::StructFieldNode;
+use lu_syntax::ast::StrctFieldNode;
 use lu_syntax::AstNode;
 
 use crate::ValueType;
@@ -13,7 +13,7 @@ pub struct StrctField {
 }
 
 impl StrctField {
-    pub fn from_node(field_node: &StructFieldNode) -> (StrctField, Vec<LuErr>) {
+    pub fn from_node(field_node: &StrctFieldNode) -> (StrctField, Vec<LuErr>) {
         let name = field_node.name();
         let decl = field_node.to_item();
         let fallback_ty = (ValueType::Unspecified, vec![]);

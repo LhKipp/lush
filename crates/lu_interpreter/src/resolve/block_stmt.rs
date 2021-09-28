@@ -7,7 +7,7 @@ use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{
         BlockStmtNode, FnStmtNode, IfStmtNode, LuTypeNode, SignatureNode, StatementElement,
-        StructStmtNode,
+        StrctStmtNode,
     },
     ast::{ConditionElement, IfBlockNode},
     AstElement, AstNode, AstToken,
@@ -79,7 +79,7 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
         .insert(func.name.clone(), Variable::new_func(func, fn_stmt.clone()));
 }
 
-fn source_struct_stmt(struct_stmt: &StructStmtNode, resolver: &mut Resolver) {
+fn source_struct_stmt(struct_stmt: &StrctStmtNode, resolver: &mut Resolver) {
     let name = struct_stmt.name().unwrap_or("".to_string());
 
     // Source the struct fields (either user provided or default)
