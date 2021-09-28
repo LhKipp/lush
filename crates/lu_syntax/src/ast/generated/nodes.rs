@@ -1,24 +1,19 @@
 #[allow(unused_imports)]
-use crate::{
-    ast::{
-        self, support, AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken, HasRule,
-        HasSyntaxKind,
-    },
-    Rule, SyntaxElement,
-    SyntaxKind::{self, *},
-    SyntaxNode, SyntaxToken,
-};
-#[allow(unused_imports)]
 use serde::Serialize;
+#[allow(unused_imports)]
+use crate::{
+    Rule,
+    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
+    SyntaxKind::{self, *},
+    SyntaxNode, SyntaxToken, SyntaxElement
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StrctKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for StrctKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StrctKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -26,12 +21,10 @@ impl AstToken for StrctKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for StrctKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StrctKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -41,9 +34,7 @@ pub struct LetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LetKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LetKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LetKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -51,12 +42,10 @@ impl AstToken for LetKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LetKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LetKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -66,9 +55,7 @@ pub struct FnKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for FnKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FnKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FnKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -76,12 +63,10 @@ impl AstToken for FnKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for FnKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for FnKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -91,9 +76,7 @@ pub struct ForKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ForKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ForKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ForKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -101,12 +84,10 @@ impl AstToken for ForKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ForKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ForKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -116,9 +97,7 @@ pub struct ElifKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ElifKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ElifKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElifKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -126,12 +105,10 @@ impl AstToken for ElifKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ElifKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ElifKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -141,9 +118,7 @@ pub struct ElseKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ElseKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ElseKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElseKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -151,12 +126,10 @@ impl AstToken for ElseKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ElseKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ElseKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -166,9 +139,7 @@ pub struct IfKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for IfKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::IfKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -176,12 +147,10 @@ impl AstToken for IfKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for IfKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for IfKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -191,9 +160,7 @@ pub struct WhileKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for WhileKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::WhileKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::WhileKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -201,12 +168,10 @@ impl AstToken for WhileKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for WhileKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for WhileKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -216,9 +181,7 @@ pub struct EndKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for EndKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EndKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::EndKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -226,12 +189,10 @@ impl AstToken for EndKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for EndKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for EndKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -241,9 +202,7 @@ pub struct BeginKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for BeginKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BeginKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BeginKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -251,12 +210,10 @@ impl AstToken for BeginKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for BeginKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for BeginKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -266,9 +223,7 @@ pub struct InKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for InKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::InKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::InKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -276,12 +231,10 @@ impl AstToken for InKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for InKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for InKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -291,9 +244,7 @@ pub struct AnyKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for AnyKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::AnyKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::AnyKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -301,12 +252,10 @@ impl AstToken for AnyKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for AnyKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for AnyKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -316,9 +265,7 @@ pub struct NilKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for NilKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NilKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::NilKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -326,12 +273,10 @@ impl AstToken for NilKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for NilKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for NilKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -341,9 +286,7 @@ pub struct BoolKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for BoolKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BoolKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BoolKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -351,12 +294,10 @@ impl AstToken for BoolKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for BoolKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for BoolKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -366,9 +307,7 @@ pub struct NumberKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for NumberKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NumberKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::NumberKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -376,12 +315,10 @@ impl AstToken for NumberKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for NumberKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for NumberKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -391,9 +328,7 @@ pub struct StringKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for StringKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StringKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StringKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -401,12 +336,10 @@ impl AstToken for StringKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for StringKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StringKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -416,9 +349,7 @@ pub struct RetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for RetKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RetKeyword
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RetKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -426,12 +357,10 @@ impl AstToken for RetKeywordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for RetKeywordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for RetKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -441,9 +370,7 @@ pub struct ArrayTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ArrayTypeNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ArrayType
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArrayType }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -451,20 +378,19 @@ impl AstNode for ArrayTypeNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ArrayTypeNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ArrayTypeNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::ArrayTypeRule;
-impl HasRule for ArrayTypeNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(ArrayTypeRule {})
+impl HasRule for ArrayTypeNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ArrayTypeRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -472,9 +398,7 @@ pub struct FnTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for FnTypeNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FnType
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FnType }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -482,20 +406,19 @@ impl AstNode for FnTypeNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for FnTypeNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for FnTypeNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::FnTypeRule;
-impl HasRule for FnTypeNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(FnTypeRule {})
+impl HasRule for FnTypeNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(FnTypeRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -503,9 +426,7 @@ pub struct OptModifierToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for OptModifierToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::OptModifier
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptModifier }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -513,12 +434,10 @@ impl AstToken for OptModifierToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for OptModifierToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for OptModifierToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -528,9 +447,7 @@ pub struct LeftParenthesisToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LeftParenthesisToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LeftParenthesis
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LeftParenthesis }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -538,12 +455,10 @@ impl AstToken for LeftParenthesisToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LeftParenthesisToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LeftParenthesisToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -553,9 +468,7 @@ pub struct RightParenthesisToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for RightParenthesisToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RightParenthesis
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RightParenthesis }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -563,12 +476,10 @@ impl AstToken for RightParenthesisToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for RightParenthesisToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for RightParenthesisToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -578,9 +489,7 @@ pub struct LeftCurlyBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LeftCurlyBracketsToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LeftCurlyBrackets
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LeftCurlyBrackets }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -588,12 +497,10 @@ impl AstToken for LeftCurlyBracketsToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LeftCurlyBracketsToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LeftCurlyBracketsToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -603,9 +510,7 @@ pub struct RightCurlyBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for RightCurlyBracketsToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RightCurlyBrackets
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RightCurlyBrackets }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -613,12 +518,10 @@ impl AstToken for RightCurlyBracketsToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for RightCurlyBracketsToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for RightCurlyBracketsToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -628,9 +531,7 @@ pub struct LeftRectangularBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LeftRectangularBracketsToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LeftRectangularBrackets
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LeftRectangularBrackets }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -638,12 +539,10 @@ impl AstToken for LeftRectangularBracketsToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LeftRectangularBracketsToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LeftRectangularBracketsToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -653,9 +552,7 @@ pub struct RightRectangularBracketsToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for RightRectangularBracketsToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RightRectangularBrackets
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RightRectangularBrackets }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -663,12 +560,10 @@ impl AstToken for RightRectangularBracketsToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for RightRectangularBracketsToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for RightRectangularBracketsToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -678,9 +573,7 @@ pub struct PlusSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for PlusSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PlusSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::PlusSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -688,12 +581,10 @@ impl AstToken for PlusSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for PlusSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for PlusSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -703,9 +594,7 @@ pub struct MinusSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for MinusSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::MinusSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MinusSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -713,12 +602,10 @@ impl AstToken for MinusSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for MinusSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for MinusSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -728,9 +615,7 @@ pub struct MultSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for MultSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::MultSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MultSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -738,12 +623,10 @@ impl AstToken for MultSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for MultSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for MultSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -753,9 +636,7 @@ pub struct DivSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for DivSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DivSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::DivSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -763,12 +644,10 @@ impl AstToken for DivSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for DivSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for DivSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -778,9 +657,7 @@ pub struct LessThanSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LessThanSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LessThanSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LessThanSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -788,12 +665,10 @@ impl AstToken for LessThanSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LessThanSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LessThanSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -803,9 +678,7 @@ pub struct LessOrEqualSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LessOrEqualSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LessOrEqualSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LessOrEqualSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -813,12 +686,10 @@ impl AstToken for LessOrEqualSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LessOrEqualSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LessOrEqualSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -828,9 +699,7 @@ pub struct EqualitySignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for EqualitySignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EqualitySign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::EqualitySign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -838,12 +707,10 @@ impl AstToken for EqualitySignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for EqualitySignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for EqualitySignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -853,9 +720,7 @@ pub struct InequalitySignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for InequalitySignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::InequalitySign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::InequalitySign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -863,12 +728,10 @@ impl AstToken for InequalitySignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for InequalitySignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for InequalitySignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -878,9 +741,7 @@ pub struct BiggerThanSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for BiggerThanSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BiggerThanSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BiggerThanSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -888,12 +749,10 @@ impl AstToken for BiggerThanSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for BiggerThanSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for BiggerThanSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -903,9 +762,7 @@ pub struct BiggerOrEqualSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for BiggerOrEqualSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BiggerOrEqualSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BiggerOrEqualSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -913,12 +770,10 @@ impl AstToken for BiggerOrEqualSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for BiggerOrEqualSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for BiggerOrEqualSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -928,9 +783,7 @@ pub struct AssignSignToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for AssignSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::AssignSign
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::AssignSign }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -938,12 +791,10 @@ impl AstToken for AssignSignToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for AssignSignToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for AssignSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -953,9 +804,7 @@ pub struct RightStreamToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for RightStreamToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RightStream
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RightStream }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -963,12 +812,10 @@ impl AstToken for RightStreamToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for RightStreamToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for RightStreamToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -978,9 +825,7 @@ pub struct PipeToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for PipeToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Pipe
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Pipe }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -988,12 +833,10 @@ impl AstToken for PipeToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for PipeToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for PipeToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1003,9 +846,7 @@ pub struct DollarToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for DollarToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Dollar
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Dollar }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1013,12 +854,10 @@ impl AstToken for DollarToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for DollarToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for DollarToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1028,9 +867,7 @@ pub struct QuestionMarkToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for QuestionMarkToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::QuestionMark
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::QuestionMark }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1038,12 +875,10 @@ impl AstToken for QuestionMarkToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for QuestionMarkToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for QuestionMarkToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1053,9 +888,7 @@ pub struct PointToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for PointToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Point
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Point }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1063,12 +896,10 @@ impl AstToken for PointToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for PointToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for PointToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1078,9 +909,7 @@ pub struct DoublePointToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for DoublePointToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DoublePoint
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::DoublePoint }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1088,12 +917,10 @@ impl AstToken for DoublePointToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for DoublePointToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for DoublePointToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1103,9 +930,7 @@ pub struct DoubleQuoteToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for DoubleQuoteToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DoubleQuote
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::DoubleQuote }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1113,12 +938,10 @@ impl AstToken for DoubleQuoteToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for DoubleQuoteToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for DoubleQuoteToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1128,9 +951,7 @@ pub struct SingleQuoteToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for SingleQuoteToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SingleQuote
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::SingleQuote }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1138,12 +959,10 @@ impl AstToken for SingleQuoteToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for SingleQuoteToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for SingleQuoteToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1153,9 +972,7 @@ pub struct ErrorToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ErrorToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Error
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Error }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1163,12 +980,10 @@ impl AstToken for ErrorToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ErrorToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ErrorToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1178,9 +993,7 @@ pub struct ParserInternalToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ParserInternalToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ParserInternal
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParserInternal }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1188,12 +1001,10 @@ impl AstToken for ParserInternalToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ParserInternalToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ParserInternalToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1203,9 +1014,7 @@ pub struct EofNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for EofNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Eof
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Eof }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1213,12 +1022,10 @@ impl AstNode for EofNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for EofNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for EofNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1228,9 +1035,7 @@ pub struct TombstoneNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for TombstoneNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Tombstone
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Tombstone }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1238,12 +1043,10 @@ impl AstNode for TombstoneNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for TombstoneNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for TombstoneNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1253,9 +1056,7 @@ pub struct WhitespaceToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for WhitespaceToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Whitespace
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Whitespace }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1263,12 +1064,10 @@ impl AstToken for WhitespaceToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for WhitespaceToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for WhitespaceToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1278,9 +1077,7 @@ pub struct CommentToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for CommentToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Comment
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Comment }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1288,12 +1085,10 @@ impl AstToken for CommentToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for CommentToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for CommentToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1303,9 +1098,7 @@ pub struct NewlineToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for NewlineToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Newline
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Newline }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1313,12 +1106,10 @@ impl AstToken for NewlineToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for NewlineToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for NewlineToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1328,9 +1119,7 @@ pub struct BareWordToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for BareWordToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BareWord
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BareWord }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1338,12 +1127,10 @@ impl AstToken for BareWordToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for BareWordToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for BareWordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1353,9 +1140,7 @@ pub struct StringContentToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for StringContentToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StringContent
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StringContent }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1363,12 +1148,10 @@ impl AstToken for StringContentToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for StringContentToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StringContentToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1378,9 +1161,7 @@ pub struct VarDeclNameToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for VarDeclNameToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::VarDeclName
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::VarDeclName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1388,12 +1169,10 @@ impl AstToken for VarDeclNameToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for VarDeclNameToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for VarDeclNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1403,9 +1182,7 @@ pub struct FnDeclNameToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for FnDeclNameToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FnDeclName
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FnDeclName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1413,12 +1190,10 @@ impl AstToken for FnDeclNameToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for FnDeclNameToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for FnDeclNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1428,9 +1203,7 @@ pub struct ArgNameToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ArgNameToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ArgName
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArgName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1438,12 +1211,10 @@ impl AstToken for ArgNameToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ArgNameToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ArgNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1453,9 +1224,7 @@ pub struct VarArgNameToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for VarArgNameToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::VarArgName
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::VarArgName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1463,12 +1232,10 @@ impl AstToken for VarArgNameToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for VarArgNameToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for VarArgNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1478,9 +1245,7 @@ pub struct LongFlagToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for LongFlagToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LongFlag
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LongFlag }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1488,12 +1253,10 @@ impl AstToken for LongFlagToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for LongFlagToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LongFlagToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1503,9 +1266,7 @@ pub struct ShortFlagToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for ShortFlagToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ShortFlag
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ShortFlag }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1513,12 +1274,10 @@ impl AstToken for ShortFlagToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for ShortFlagToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ShortFlagToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1528,9 +1287,7 @@ pub struct NumberToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for NumberToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Number
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Number }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1538,12 +1295,10 @@ impl AstToken for NumberToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for NumberToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for NumberToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1553,9 +1308,7 @@ pub struct StrctNameToken {
     pub(crate) syntax: SyntaxToken,
 }
 impl AstToken for StrctNameToken {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StrctName
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctName }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1563,12 +1316,10 @@ impl AstToken for StrctNameToken {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxToken {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for StrctNameToken {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StrctNameToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1578,9 +1329,7 @@ pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for SourceFileNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SourceFile
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::SourceFile }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1588,20 +1337,19 @@ impl AstNode for SourceFileNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for SourceFileNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for SourceFileNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::SourceFileRule;
-impl HasRule for SourceFileNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(SourceFileRule {})
+impl HasRule for SourceFileNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(SourceFileRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1609,9 +1357,7 @@ pub struct StrctStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for StrctStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StrctStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1619,12 +1365,10 @@ impl AstNode for StrctStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for StrctStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StrctStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1634,9 +1378,7 @@ pub struct StrctFieldNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for StrctFieldNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StrctField
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctField }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1644,12 +1386,10 @@ impl AstNode for StrctFieldNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for StrctFieldNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StrctFieldNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1659,9 +1399,7 @@ pub struct StrctCtorExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for StrctCtorExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StrctCtorExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctCtorExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1669,12 +1407,10 @@ impl AstNode for StrctCtorExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for StrctCtorExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StrctCtorExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1684,9 +1420,7 @@ pub struct StrctFieldCtorStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for StrctFieldCtorStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StrctFieldCtorStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctFieldCtorStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1694,12 +1428,10 @@ impl AstNode for StrctFieldCtorStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for StrctFieldCtorStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StrctFieldCtorStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1709,9 +1441,7 @@ pub struct LetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for LetStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LetStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LetStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1719,20 +1449,19 @@ impl AstNode for LetStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for LetStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LetStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::LetStmtRule;
-impl HasRule for LetStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(LetStmtRule {})
+impl HasRule for LetStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(LetStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1740,9 +1469,7 @@ pub struct FnStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for FnStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FnStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FnStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1750,20 +1477,19 @@ impl AstNode for FnStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for FnStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for FnStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::FnStmtRule;
-impl HasRule for FnStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(FnStmtRule {})
+impl HasRule for FnStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(FnStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1771,9 +1497,7 @@ pub struct RetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for RetStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RetStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RetStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1781,20 +1505,19 @@ impl AstNode for RetStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for RetStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for RetStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::RetStmtRule;
-impl HasRule for RetStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(RetStmtRule {})
+impl HasRule for RetStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(RetStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1802,9 +1525,7 @@ pub struct IfStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for IfStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::IfStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1812,20 +1533,19 @@ impl AstNode for IfStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for IfStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for IfStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::IfStmtRule;
-impl HasRule for IfStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(IfStmtRule {})
+impl HasRule for IfStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(IfStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1833,9 +1553,7 @@ pub struct IfBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for IfBlockNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::IfBlock
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfBlock }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1843,12 +1561,10 @@ impl AstNode for IfBlockNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for IfBlockNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for IfBlockNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1858,9 +1574,7 @@ pub struct ElifBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ElifBlockNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ElifBlock
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElifBlock }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1868,12 +1582,10 @@ impl AstNode for ElifBlockNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ElifBlockNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ElifBlockNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1883,9 +1595,7 @@ pub struct ElseBlockNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ElseBlockNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ElseBlock
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElseBlock }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1893,12 +1603,10 @@ impl AstNode for ElseBlockNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ElseBlockNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ElseBlockNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -1908,9 +1616,7 @@ pub struct ForStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ForStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ForStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ForStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1918,20 +1624,19 @@ impl AstNode for ForStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ForStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ForStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::ForStmtRule;
-impl HasRule for ForStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(ForStmtRule {})
+impl HasRule for ForStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ForStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1939,9 +1644,7 @@ pub struct CmdStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for CmdStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CmdStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::CmdStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1949,20 +1652,19 @@ impl AstNode for CmdStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for CmdStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for CmdStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::CmdStmtRule;
-impl HasRule for CmdStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(CmdStmtRule {})
+impl HasRule for CmdStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(CmdStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -1970,9 +1672,7 @@ pub struct PipedCmdsStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for PipedCmdsStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PipedCmdsStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::PipedCmdsStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -1980,20 +1680,19 @@ impl AstNode for PipedCmdsStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for PipedCmdsStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for PipedCmdsStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::PipedCmdsStmtRule;
-impl HasRule for PipedCmdsStmtNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(PipedCmdsStmtRule {})
+impl HasRule for PipedCmdsStmtNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(PipedCmdsStmtRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2001,9 +1700,7 @@ pub struct BlockStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for BlockStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BlockStmt
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::BlockStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2011,12 +1708,10 @@ impl AstNode for BlockStmtNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for BlockStmtNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for BlockStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -2026,9 +1721,7 @@ pub struct SignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for SignatureNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::Signature
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Signature }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2036,20 +1729,19 @@ impl AstNode for SignatureNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for SignatureNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for SignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::SignatureRule;
-impl HasRule for SignatureNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(SignatureRule {})
+impl HasRule for SignatureNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(SignatureRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2057,9 +1749,7 @@ pub struct FlagSignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for FlagSignatureNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FlagSignature
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FlagSignature }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2067,12 +1757,10 @@ impl AstNode for FlagSignatureNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for FlagSignatureNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for FlagSignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -2082,9 +1770,7 @@ pub struct ArgSignatureNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ArgSignatureNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ArgSignature
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArgSignature }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2092,12 +1778,10 @@ impl AstNode for ArgSignatureNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ArgSignatureNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ArgSignatureNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -2107,9 +1791,7 @@ pub struct LuTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for LuTypeNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LuType
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::LuType }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2117,20 +1799,19 @@ impl AstNode for LuTypeNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for LuTypeNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LuTypeNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::LuTypeRule;
-impl HasRule for LuTypeNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(LuTypeRule {})
+impl HasRule for LuTypeNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(LuTypeRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2138,9 +1819,7 @@ pub struct MathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for MathExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::MathExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MathExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2148,12 +1827,10 @@ impl AstNode for MathExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for MathExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for MathExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
@@ -2163,9 +1840,7 @@ pub struct StringExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for StringExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::StringExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StringExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2173,20 +1848,19 @@ impl AstNode for StringExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for StringExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StringExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::StringExprRule;
-impl HasRule for StringExprNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(StringExprRule {})
+impl HasRule for StringExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(StringExprRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2194,9 +1868,7 @@ pub struct NumberExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for NumberExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NumberExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::NumberExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2204,20 +1876,19 @@ impl AstNode for NumberExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for NumberExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for NumberExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::NumberExprRule;
-impl HasRule for NumberExprNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(NumberExprRule {})
+impl HasRule for NumberExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(NumberExprRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2225,9 +1896,7 @@ pub struct ValuePathExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ValuePathExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ValuePathExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ValuePathExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2235,20 +1904,19 @@ impl AstNode for ValuePathExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ValuePathExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ValuePathExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::ValuePathExprRule;
-impl HasRule for ValuePathExprNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(ValuePathExprRule {})
+impl HasRule for ValuePathExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ValuePathExprRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2256,9 +1924,7 @@ pub struct ArrayExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for ArrayExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ArrayExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ArrayExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2266,20 +1932,19 @@ impl AstNode for ArrayExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for ArrayExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ArrayExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::ArrayExprRule;
-impl HasRule for ArrayExprNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(ArrayExprRule {})
+impl HasRule for ArrayExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ArrayExprRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2287,9 +1952,7 @@ pub struct TableExprNode {
     pub(crate) syntax: SyntaxNode,
 }
 impl AstNode for TableExprNode {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::TableExpr
-    }
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::TableExpr }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2297,20 +1960,19 @@ impl AstNode for TableExprNode {
             None
         }
     }
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for TableExprNode {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for TableExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
+
 use lu_parser::grammar::TableExprRule;
-impl HasRule for TableExprNode {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(TableExprRule {})
+impl HasRule for TableExprNode{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(TableExprRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2318,30 +1980,35 @@ pub enum CmdOrValueExprElement {
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
     ValueExpr(ValueExprElement),
+    }
+
+impl CmdOrValueExprElement {
 }
 
-impl CmdOrValueExprElement {}
-
 impl AstElement for CmdOrValueExprElement {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        ValueExprElement::can_cast(kind)
-            || match kind {
-                CmdStmt | PipedCmdsStmt | ValueExpr => true,
-                _ => false,
-            }
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
+        match kind{
+            CmdStmt | PipedCmdsStmt | ValueExpr => true,
+            _ => false,
+        }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
-        if let Some(casted) = ValueExprElement::cast(syntax.clone()) {
-            return Some(Self::ValueExpr(casted));
-        }
-
+        
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
         let res = match syntax.kind() {
-            CmdStmt => CmdOrValueExprElement::CmdStmt(CmdStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            PipedCmdsStmt => CmdOrValueExprElement::PipedCmdsStmt(PipedCmdsStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
+            CmdStmt => CmdOrValueExprElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
+            PipedCmdsStmt => CmdOrValueExprElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2349,21 +2016,25 @@ impl AstElement for CmdOrValueExprElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
             CmdOrValueExprElement::CmdStmt(it) => it.syntax.clone().into(),
-
+            
+            
             CmdOrValueExprElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
-
+            
+            
             CmdOrValueExprElement::ValueExpr(it) => it.syntax().clone().into(),
-        }
+            
+            }
     }
 }
-impl HasSyntaxKind for CmdOrValueExprElement {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for CmdOrValueExprElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             CmdOrValueExprElement::CmdStmt(it) => it.get_syntax_kind(),
             CmdOrValueExprElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
             CmdOrValueExprElement::ValueExpr(it) => it.get_syntax_kind(),
-        }
+            }
     }
 }
 
@@ -2376,41 +2047,43 @@ pub enum ValueExprElement {
     ValuePathExpr(ValuePathExprNode),
     ArrayExpr(ArrayExprNode),
     TableExpr(TableExprNode),
+    }
+
+impl ValueExprElement {
 }
 
-impl ValueExprElement {}
-
 impl AstElement for ValueExprElement {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        match kind {
-            BareWord | NumberExpr | MathExpr | StringExpr | ValuePathExpr | ArrayExpr
-            | TableExpr => true,
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        
+        match kind{
+            BareWord | NumberExpr | MathExpr | StringExpr | ValuePathExpr | ArrayExpr | TableExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        
         let res = match syntax.kind() {
-            BareWord => ValueExprElement::BareWord(BareWordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            NumberExpr => ValueExprElement::NumberExpr(NumberExprNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            MathExpr => ValueExprElement::MathExpr(MathExprNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            StringExpr => ValueExprElement::StringExpr(StringExprNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            ValuePathExpr => ValueExprElement::ValuePathExpr(ValuePathExprNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            ArrayExpr => ValueExprElement::ArrayExpr(ArrayExprNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            TableExpr => ValueExprElement::TableExpr(TableExprNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
+            BareWord => ValueExprElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            NumberExpr => ValueExprElement::NumberExpr(NumberExprNode { syntax: syntax.into_node().unwrap() }),
+            MathExpr => ValueExprElement::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
+            StringExpr => ValueExprElement::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
+            ValuePathExpr => ValueExprElement::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
+            ArrayExpr => ValueExprElement::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
+            TableExpr => ValueExprElement::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2418,24 +2091,32 @@ impl AstElement for ValueExprElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
             ValueExprElement::BareWord(it) => it.syntax.clone().into(),
-
+            
+            
             ValueExprElement::NumberExpr(it) => it.syntax.clone().into(),
-
+            
+            
             ValueExprElement::MathExpr(it) => it.syntax.clone().into(),
-
+            
+            
             ValueExprElement::StringExpr(it) => it.syntax.clone().into(),
-
+            
+            
             ValueExprElement::ValuePathExpr(it) => it.syntax.clone().into(),
-
+            
+            
             ValueExprElement::ArrayExpr(it) => it.syntax.clone().into(),
-
+            
+            
             ValueExprElement::TableExpr(it) => it.syntax.clone().into(),
-        }
+            
+            }
     }
 }
-impl HasSyntaxKind for ValueExprElement {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ValueExprElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             ValueExprElement::BareWord(it) => it.get_syntax_kind(),
             ValueExprElement::NumberExpr(it) => it.get_syntax_kind(),
@@ -2444,14 +2125,15 @@ impl HasSyntaxKind for ValueExprElement {
             ValueExprElement::ValuePathExpr(it) => it.get_syntax_kind(),
             ValueExprElement::ArrayExpr(it) => it.get_syntax_kind(),
             ValueExprElement::TableExpr(it) => it.get_syntax_kind(),
-        }
+            }
     }
 }
 
+
 use lu_parser::grammar::ValueExprRule;
-impl HasRule for ValueExprElement {
-    fn get_belonging_rule() -> Box<dyn Rule> {
-        Box::new(ValueExprRule {})
+impl HasRule for ValueExprElement{
+    fn get_belonging_rule() -> Box<dyn Rule>{
+        Box::new(ValueExprRule{})
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -2463,42 +2145,47 @@ pub enum StatementElement {
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
     ValueExpr(ValueExprElement),
+    }
+
+impl StatementElement {
 }
 
-impl StatementElement {}
-
 impl AstElement for StatementElement {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        ValueExprElement::can_cast(kind)
-            || match kind {
-                ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
-                _ => false,
-            }
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
+        match kind{
+            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
+            _ => false,
+        }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
-        if let Some(casted) = ValueExprElement::cast(syntax.clone()) {
-            return Some(Self::ValueExpr(casted));
-        }
-
+        
+        
+        
+        
+        
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
         let res = match syntax.kind() {
-            ForStmt => StatementElement::ForStmt(ForStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            LetStmt => StatementElement::LetStmt(LetStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            FnStmt => StatementElement::FnStmt(FnStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            IfStmt => StatementElement::IfStmt(IfStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            CmdStmt => StatementElement::CmdStmt(CmdStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            PipedCmdsStmt => StatementElement::PipedCmdsStmt(PipedCmdsStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
+            ForStmt => StatementElement::ForStmt(ForStmtNode { syntax: syntax.into_node().unwrap() }),
+            LetStmt => StatementElement::LetStmt(LetStmtNode { syntax: syntax.into_node().unwrap() }),
+            FnStmt => StatementElement::FnStmt(FnStmtNode { syntax: syntax.into_node().unwrap() }),
+            IfStmt => StatementElement::IfStmt(IfStmtNode { syntax: syntax.into_node().unwrap() }),
+            CmdStmt => StatementElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
+            PipedCmdsStmt => StatementElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2506,24 +2193,32 @@ impl AstElement for StatementElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
             StatementElement::ForStmt(it) => it.syntax.clone().into(),
-
+            
+            
             StatementElement::LetStmt(it) => it.syntax.clone().into(),
-
+            
+            
             StatementElement::FnStmt(it) => it.syntax.clone().into(),
-
+            
+            
             StatementElement::IfStmt(it) => it.syntax.clone().into(),
-
+            
+            
             StatementElement::CmdStmt(it) => it.syntax.clone().into(),
-
+            
+            
             StatementElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
-
+            
+            
             StatementElement::ValueExpr(it) => it.syntax().clone().into(),
-        }
+            
+            }
     }
 }
-impl HasSyntaxKind for StatementElement {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for StatementElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             StatementElement::ForStmt(it) => it.get_syntax_kind(),
             StatementElement::LetStmt(it) => it.get_syntax_kind(),
@@ -2532,7 +2227,7 @@ impl HasSyntaxKind for StatementElement {
             StatementElement::CmdStmt(it) => it.get_syntax_kind(),
             StatementElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
             StatementElement::ValueExpr(it) => it.get_syntax_kind(),
-        }
+            }
     }
 }
 
@@ -2540,27 +2235,32 @@ impl HasSyntaxKind for StatementElement {
 pub enum ConditionElement {
     CmdStmt(CmdStmtNode),
     ValueExpr(ValueExprElement),
+    }
+
+impl ConditionElement {
 }
 
-impl ConditionElement {}
-
 impl AstElement for ConditionElement {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        ValueExprElement::can_cast(kind)
-            || match kind {
-                CmdStmt | ValueExpr => true,
-                _ => false,
-            }
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
+        match kind{
+            CmdStmt | ValueExpr => true,
+            _ => false,
+        }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
-        if let Some(casted) = ValueExprElement::cast(syntax.clone()) {
-            return Some(Self::ValueExpr(casted));
-        }
-
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
         let res = match syntax.kind() {
-            CmdStmt => ConditionElement::CmdStmt(CmdStmtNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
+            CmdStmt => ConditionElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2568,18 +2268,21 @@ impl AstElement for ConditionElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
             ConditionElement::CmdStmt(it) => it.syntax.clone().into(),
-
+            
+            
             ConditionElement::ValueExpr(it) => it.syntax().clone().into(),
-        }
+            
+            }
     }
 }
-impl HasSyntaxKind for ConditionElement {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for ConditionElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             ConditionElement::CmdStmt(it) => it.get_syntax_kind(),
             ConditionElement::ValueExpr(it) => it.get_syntax_kind(),
-        }
+            }
     }
 }
 
@@ -2597,57 +2300,58 @@ pub enum OperatorExprElement {
     BiggerOrEqualSign(BiggerOrEqualSignToken),
     AssignSign(AssignSignToken),
     RightStream(RightStreamToken),
+    }
+
+impl OperatorExprElement {
 }
 
-impl OperatorExprElement {}
-
 impl AstElement for OperatorExprElement {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        match kind {
-            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign
-            | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | AssignSign
-            | RightStream => true,
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        match kind{
+            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | AssignSign | RightStream => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         let res = match syntax.kind() {
-            PlusSign => OperatorExprElement::PlusSign(PlusSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            MinusSign => OperatorExprElement::MinusSign(MinusSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            MultSign => OperatorExprElement::MultSign(MultSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            DivSign => OperatorExprElement::DivSign(DivSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            LessThanSign => OperatorExprElement::LessThanSign(LessThanSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            LessOrEqualSign => OperatorExprElement::LessOrEqualSign(LessOrEqualSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            EqualitySign => OperatorExprElement::EqualitySign(EqualitySignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            InequalitySign => OperatorExprElement::InequalitySign(InequalitySignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            BiggerThanSign => OperatorExprElement::BiggerThanSign(BiggerThanSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            BiggerOrEqualSign => OperatorExprElement::BiggerOrEqualSign(BiggerOrEqualSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            AssignSign => OperatorExprElement::AssignSign(AssignSignToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            RightStream => OperatorExprElement::RightStream(RightStreamToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
+            PlusSign => OperatorExprElement::PlusSign(PlusSignToken { syntax: syntax.into_token().unwrap() }),
+            MinusSign => OperatorExprElement::MinusSign(MinusSignToken { syntax: syntax.into_token().unwrap() }),
+            MultSign => OperatorExprElement::MultSign(MultSignToken { syntax: syntax.into_token().unwrap() }),
+            DivSign => OperatorExprElement::DivSign(DivSignToken { syntax: syntax.into_token().unwrap() }),
+            LessThanSign => OperatorExprElement::LessThanSign(LessThanSignToken { syntax: syntax.into_token().unwrap() }),
+            LessOrEqualSign => OperatorExprElement::LessOrEqualSign(LessOrEqualSignToken { syntax: syntax.into_token().unwrap() }),
+            EqualitySign => OperatorExprElement::EqualitySign(EqualitySignToken { syntax: syntax.into_token().unwrap() }),
+            InequalitySign => OperatorExprElement::InequalitySign(InequalitySignToken { syntax: syntax.into_token().unwrap() }),
+            BiggerThanSign => OperatorExprElement::BiggerThanSign(BiggerThanSignToken { syntax: syntax.into_token().unwrap() }),
+            BiggerOrEqualSign => OperatorExprElement::BiggerOrEqualSign(BiggerOrEqualSignToken { syntax: syntax.into_token().unwrap() }),
+            AssignSign => OperatorExprElement::AssignSign(AssignSignToken { syntax: syntax.into_token().unwrap() }),
+            RightStream => OperatorExprElement::RightStream(RightStreamToken { syntax: syntax.into_token().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2655,34 +2359,47 @@ impl AstElement for OperatorExprElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
             OperatorExprElement::PlusSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::MinusSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::MultSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::DivSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::LessThanSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::LessOrEqualSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::EqualitySign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::InequalitySign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::BiggerThanSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::BiggerOrEqualSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::AssignSign(it) => it.syntax.clone().into(),
-
+            
+            
             OperatorExprElement::RightStream(it) => it.syntax.clone().into(),
-        }
+            
+            }
     }
 }
-impl HasSyntaxKind for OperatorExprElement {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for OperatorExprElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             OperatorExprElement::PlusSign(it) => it.get_syntax_kind(),
             OperatorExprElement::MinusSign(it) => it.get_syntax_kind(),
@@ -2696,7 +2413,7 @@ impl HasSyntaxKind for OperatorExprElement {
             OperatorExprElement::BiggerOrEqualSign(it) => it.get_syntax_kind(),
             OperatorExprElement::AssignSign(it) => it.get_syntax_kind(),
             OperatorExprElement::RightStream(it) => it.get_syntax_kind(),
-        }
+            }
     }
 }
 
@@ -2711,47 +2428,49 @@ pub enum LuTypeSpecifierElement {
     StrctName(StrctNameToken),
     ArrayType(ArrayTypeNode),
     FnType(FnTypeNode),
+    }
+
+impl LuTypeSpecifierElement {
 }
 
-impl LuTypeSpecifierElement {}
-
 impl AstElement for LuTypeSpecifierElement {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        match kind {
-            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | BareWord
-            | StrctName | ArrayType | FnType => true,
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        match kind{
+            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | BareWord | StrctName | ArrayType | FnType => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         let res = match syntax.kind() {
-            NumberKeyword => LuTypeSpecifierElement::NumberKeyword(NumberKeywordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            AnyKeyword => LuTypeSpecifierElement::AnyKeyword(AnyKeywordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            NilKeyword => LuTypeSpecifierElement::NilKeyword(NilKeywordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            BoolKeyword => LuTypeSpecifierElement::BoolKeyword(BoolKeywordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            StringKeyword => LuTypeSpecifierElement::StringKeyword(StringKeywordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            BareWord => LuTypeSpecifierElement::BareWord(BareWordToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            StrctName => LuTypeSpecifierElement::StrctName(StrctNameToken {
-                syntax: syntax.into_token().unwrap(),
-            }),
-            ArrayType => LuTypeSpecifierElement::ArrayType(ArrayTypeNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
-            FnType => LuTypeSpecifierElement::FnType(FnTypeNode {
-                syntax: syntax.into_node().unwrap(),
-            }),
+            NumberKeyword => LuTypeSpecifierElement::NumberKeyword(NumberKeywordToken { syntax: syntax.into_token().unwrap() }),
+            AnyKeyword => LuTypeSpecifierElement::AnyKeyword(AnyKeywordToken { syntax: syntax.into_token().unwrap() }),
+            NilKeyword => LuTypeSpecifierElement::NilKeyword(NilKeywordToken { syntax: syntax.into_token().unwrap() }),
+            BoolKeyword => LuTypeSpecifierElement::BoolKeyword(BoolKeywordToken { syntax: syntax.into_token().unwrap() }),
+            StringKeyword => LuTypeSpecifierElement::StringKeyword(StringKeywordToken { syntax: syntax.into_token().unwrap() }),
+            BareWord => LuTypeSpecifierElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            StrctName => LuTypeSpecifierElement::StrctName(StrctNameToken { syntax: syntax.into_token().unwrap() }),
+            ArrayType => LuTypeSpecifierElement::ArrayType(ArrayTypeNode { syntax: syntax.into_node().unwrap() }),
+            FnType => LuTypeSpecifierElement::FnType(FnTypeNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2759,28 +2478,38 @@ impl AstElement for LuTypeSpecifierElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
             LuTypeSpecifierElement::NumberKeyword(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::AnyKeyword(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::NilKeyword(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::BoolKeyword(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::StringKeyword(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::BareWord(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::StrctName(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::ArrayType(it) => it.syntax.clone().into(),
-
+            
+            
             LuTypeSpecifierElement::FnType(it) => it.syntax.clone().into(),
-        }
+            
+            }
     }
 }
-impl HasSyntaxKind for LuTypeSpecifierElement {
-    fn get_syntax_kind(&self) -> SyntaxKind {
+impl HasSyntaxKind for LuTypeSpecifierElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             LuTypeSpecifierElement::NumberKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::AnyKeyword(it) => it.get_syntax_kind(),
@@ -2791,6 +2520,7 @@ impl HasSyntaxKind for LuTypeSpecifierElement {
             LuTypeSpecifierElement::StrctName(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::ArrayType(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::FnType(it) => it.get_syntax_kind(),
-        }
+            }
     }
 }
+

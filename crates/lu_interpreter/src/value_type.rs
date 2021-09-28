@@ -3,7 +3,7 @@ use std::fmt::Display;
 use enum_as_inner::EnumAsInner;
 use log::warn;
 use lu_error::LuErr;
-use lu_syntax::{ast::LuTypeSpecifierElement, AstNode};
+use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
 
@@ -45,6 +45,8 @@ pub enum ValueType {
     Number,
     String,
     BareWord,
+    /// Struct with name
+    Strct(String),
     Array(Box<ValueType>),
     // #[educe(PartialEq(method = "cmp_sign_types"))]
     Func(Box<Signature>),
@@ -88,6 +90,7 @@ impl ValueType {
             LuTypeSpecifierElement::NilKeyword(_) => ValueType::Nil,
             LuTypeSpecifierElement::BoolKeyword(_) => ValueType::Bool,
             LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
+            LuTypeSpecifierElement::StrctName(n) => ValueType::Strct(n.text().to_string()),
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
             LuTypeSpecifierElement::ArrayType(arr) => {
                 if let Some(inner) = arr.inner_type() {
@@ -181,6 +184,7 @@ impl TcVariant for ValueType {
             | ValueType::Number
             | ValueType::String
             | ValueType::Func(_)
+            | ValueType::Strct(_)
             | ValueType::BareWord => Arity::Fixed(0),
             ValueType::Array(_) => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
@@ -210,6 +214,7 @@ impl Display for ValueType {
             ValueType::Array(t) => write!(f, "[{}]", t),
             ValueType::Func(_) => todo!(),
             ValueType::Void => todo!(),
+            ValueType::Strct(_) => todo!(),
         }
     }
 }

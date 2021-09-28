@@ -60,6 +60,7 @@ fn lu_type_specifier() -> OrRule {
             FnTypeRule{},
             ArrayTypeRule {},
             BareWord,
+            StrctName,
         ],
     }
 }
