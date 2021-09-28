@@ -64,7 +64,7 @@ pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use ret_stmt::RetStmtRule;
 pub use signature::SignatureRule;
-pub use struct_stmt::StrctStmtRule;
+pub use struct_stmt::{StrctCtorExprRule, StrctStmtRule};
 pub use type_::{ArrayTypeRule, FnTypeRule, LuTypeRule};
 pub use value_path_expr::ValuePathExprRule;
 

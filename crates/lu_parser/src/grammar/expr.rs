@@ -100,6 +100,7 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(NumberExprRule {}),
             Box::new(ValuePathExprRule {}),
             Box::new(StringExprRule {}),
+            Box::new(StrctCtorExprRule {}),
             Box::new(BareWord),
             Box::new(table_or_array_rule()),
         ],

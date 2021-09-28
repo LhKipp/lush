@@ -1395,6 +1395,48 @@ impl HasSyntaxKind for StrctFieldNode{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StrctCtorExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for StrctCtorExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctCtorExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for StrctCtorExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct StrctFieldCtorStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for StrctFieldCtorStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::StrctFieldCtorStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for StrctFieldCtorStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LetStmtNode {
     pub(crate) syntax: SyntaxNode,
 }

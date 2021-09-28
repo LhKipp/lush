@@ -1,0 +1,30 @@
+1
+===
+Ip{ a: 1 b: 2 }
+---
+- Start: StrctCtorExpr
+- Token: "StructName (len: 2)"
+- Token: "LeftCurlyBrackets (len: 1)"
+- Start: StrctFieldCtorStmt
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 1)"
+- Token: "DoublePoint (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+- Start: StrctFieldCtorStmt
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 1)"
+- Token: "DoublePoint (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightCurlyBrackets (len: 1)"
+- Finish: ""
+...
+
