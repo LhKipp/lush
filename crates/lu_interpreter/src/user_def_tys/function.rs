@@ -1,4 +1,5 @@
 use crate::scope::ScopeFrameId;
+use crate::Scope;
 use crate::ValueType;
 use crate::Variable;
 use derive_builder::Builder;
@@ -34,14 +35,12 @@ impl ArgSignature {
         ArgSignature::new(RET_ARG_NAME.into(), ty, decl)
     }
 
-    pub fn from_node<IntoArgDecl>(
+    pub fn from_node(
         n: Option<ArgSignatureNode>,
         fallback_name: &str,
-        fallback_decl: IntoArgDecl,
-    ) -> (Self, Option<LuErr>)
-    where
-        IntoArgDecl: Into<ArgDecl>,
-    {
+        fallback_decl: ArgDecl,
+        scope: &Scope<Variable>,
+    ) -> (Self, Option<LuErr>) {
         let name = n.as_ref().map(|n| n.name()).unwrap_or(fallback_name.into());
         let fallback_ty = (ValueType::Unspecified, None);
         let decl: ArgDecl = n
@@ -55,8 +54,7 @@ impl ArgSignature {
                     .type_()
                     .map(|ty| {
                         // Ty should always be some
-                        ValueType::from_node(&ty.into_type())
-                            .map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
+                        ValueType::from_node_or_err_ty(&ty.into_type(), scope)
                     })
                     .unwrap_or(fallback_ty.clone()) // But for incomplete input we fallback
             })
@@ -118,9 +116,10 @@ impl Signature {
     pub fn from_sign_and_stmt(
         sign_node: Option<SignatureNode>,
         fn_signature_decl: SourceCodeItem,
+        scope: &Scope<Variable>,
     ) -> (Signature, Vec<LuErr>) {
         if let Some(sign_node) = sign_node {
-            Signature::source_signature(sign_node, fn_signature_decl)
+            Signature::source_signature(sign_node, fn_signature_decl, scope)
         } else {
             (Signature::default_signature(fn_signature_decl), vec![])
         }
@@ -129,17 +128,21 @@ impl Signature {
     pub fn source_signature(
         sign_node: SignatureNode,
         fallback_arg_decl: SourceCodeItem,
+        scope: &Scope<Variable>,
     ) -> (Signature, Vec<LuErr>) {
-        fn get_ty_of_node(ty_node: &LuTypeNode) -> (ValueType, Option<LuErr>) {
-            ValueType::from_node(&ty_node.into_type())
-                .map_or_else(|e| (ValueType::Error, Some(e)), |ty| (ty, None))
-        }
+        let get_ty_of_node = |ty_node: &LuTypeNode| -> (ValueType, Option<LuErr>) {
+            ValueType::from_node_or_err_ty(&ty_node.into_type(), scope)
+        };
         let mut all_errs = vec![];
 
-        let (in_ty, in_err) =
-            ArgSignature::from_node(sign_node.in_arg(), IN_ARG_NAME, fallback_arg_decl.clone());
+        let (in_ty, in_err) = ArgSignature::from_node(
+            sign_node.in_arg(),
+            IN_ARG_NAME,
+            fallback_arg_decl.clone(),
+            scope,
+        );
         let (ret_ty, ret_err) =
-            ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fallback_arg_decl);
+            ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fallback_arg_decl, scope);
 
         in_err.map(|e| all_errs.push(e));
         ret_err.map(|e| all_errs.push(e));

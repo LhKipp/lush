@@ -66,7 +66,11 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
     let name = fn_stmt.name().unwrap_or("".to_string());
 
     // Source the signature (either user provided or default)
-    let (sign, errs) = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
+    let (sign, errs) = Signature::from_sign_and_stmt(
+        fn_stmt.signature(),
+        fn_stmt.decl_item(),
+        &resolver.scope.lock(),
+    );
     resolver.get_mut_errors().extend(errs);
 
     let parent_frame_id = resolver.scope.lock().get_cur_frame_id();
@@ -86,7 +90,7 @@ fn source_struct_stmt(struct_stmt: &StrctStmtNode, resolver: &mut Resolver) {
     let fields: Vec<StrctField> = struct_stmt
         .fields()
         .map(|field| {
-            let (field, errs) = StrctField::from_node(&field);
+            let (field, errs) = StrctField::from_node(&field, &resolver.scope.lock());
             resolver.push_errs(errs);
             field
         })

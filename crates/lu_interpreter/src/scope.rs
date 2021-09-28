@@ -1,13 +1,13 @@
 use indextree::{Arena, NodeId};
 use log::debug;
-use lu_error::{LuErr, LuResult};
+use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use std::{collections::HashMap, fmt, path::PathBuf};
 use tap::prelude::*;
 
 pub use indextree::NodeId as ScopeFrameId;
 use lu_syntax_elements::BlockType;
 
-use crate::{Callable, Variable};
+use crate::{Callable, Strct, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ScopeFrameTag {
@@ -237,6 +237,18 @@ impl Scope<Variable> {
         self.find_var(name)
             .map(|var| var.val_as_callable())
             .flatten()
+    }
+
+    #[allow(unused)]
+    pub fn find_strct(&self, name: &str) -> Option<&Strct> {
+        debug!("Finding cmd {} from {:?} on", name, self.get_cur_tag());
+        // TODO write check that no variable shadows a func name
+        self.find_var(name).map(|var| var.val_as_strct()).flatten()
+    }
+
+    pub fn expect_strct(&self, name: &str, usage: SourceCodeItem) -> LuResult<&Strct> {
+        self.find_strct(name)
+            .ok_or(AstErr::StrctNotInScope(usage).into())
     }
 
     /// Find the command, having the longest match with name_parts (where not every part of

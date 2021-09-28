@@ -1,0 +1,64 @@
+Incompatible variable decl_ty with struct assignment
+===
+struct Ip{ v: num }
+let x:str = Ip { v: 1 }
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "let x:num",
+            "range": [
+              0,
+              9
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "\"Hello World\"",
+            "range": [
+              12,
+              25
+            ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...
+Variable decl_ty compatible with struct_ty
+===
+struct Ip{ v: num}
+let x:Ip = Ip{v:1}
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "let x:str",
+            "range": [
+              36,
+              45
+            ]
+          },
+          "lhs_ty": "str",
+          "rhs_decl": {
+            "content": "ret: num",
+            "range": [
+              11,
+              19
+            ]
+          },
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...

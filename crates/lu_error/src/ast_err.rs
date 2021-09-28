@@ -16,6 +16,7 @@ use crate::{LuErr, LuResult, SourceCodeItem};
 pub enum AstErr {
     Message(String),
     VarNotInScope(SourceCodeItem),
+    StrctNotInScope(SourceCodeItem),
 }
 
 impl AstErr {
@@ -24,6 +25,7 @@ impl AstErr {
         match self {
             AstErr::Message(_) => todo!(),
             AstErr::VarNotInScope(_) => todo!(),
+            AstErr::StrctNotInScope(_) => todo!(),
         }
     }
 }

@@ -7,7 +7,7 @@ use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
 
-use crate::Signature;
+use crate::{Scope, Signature, Strct, Variable};
 
 fn cmp_sign_types(_: &Signature, _: &Signature) -> bool {
     todo!()
@@ -46,7 +46,7 @@ pub enum ValueType {
     String,
     BareWord,
     /// Struct with name
-    Strct(String),
+    Strct(Box<Strct>),
     Array(Box<ValueType>),
     // #[educe(PartialEq(method = "cmp_sign_types"))]
     Func(Box<Signature>),
@@ -80,7 +80,18 @@ impl ValueType {
         ValueType::Func(Box::new(sign))
     }
 
-    pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
+    pub fn from_node_or_err_ty(
+        node: &LuTypeSpecifierElement,
+        scope: &Scope<Variable>,
+    ) -> (ValueType, Option<LuErr>) {
+        ValueType::from_node(node, scope)
+            .map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
+    }
+
+    pub fn from_node(
+        node: &LuTypeSpecifierElement,
+        scope: &Scope<Variable>, // TODO maybe this should be a func.. can value_type rely on variable??
+    ) -> Result<ValueType, LuErr> {
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => {
                 warn!("RETURNING WRONG VALUE_TYPE: Any INSTEAD OF AnyOf");
@@ -90,18 +101,21 @@ impl ValueType {
             LuTypeSpecifierElement::NilKeyword(_) => ValueType::Nil,
             LuTypeSpecifierElement::BoolKeyword(_) => ValueType::Bool,
             LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
-            LuTypeSpecifierElement::StrctName(n) => ValueType::Strct(n.text().to_string()),
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
+            LuTypeSpecifierElement::StrctName(n) => {
+                let strct = scope.expect_strct(n.text(), n.to_item())?;
+                ValueType::Strct(Box::new(strct.clone()))
+            }
             LuTypeSpecifierElement::ArrayType(arr) => {
                 if let Some(inner) = arr.inner_type() {
-                    ValueType::from_node(&inner.into_type())?
+                    ValueType::from_node(&inner.into_type(), scope)?
                 } else {
                     ValueType::Unspecified
                 }
             }
             LuTypeSpecifierElement::FnType(fn_ty) => {
                 let (sign, errs) =
-                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item());
+                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item(), scope);
                 if !errs.is_empty() {
                     todo!("Return (valuety, err)");
                 }
