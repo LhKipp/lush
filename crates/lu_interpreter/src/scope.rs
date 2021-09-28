@@ -303,7 +303,6 @@ impl Scope<Variable> {
                         {
                             match self.arena.get(sipling).unwrap().get().get_tag() {
                                 ScopeFrameTag::SourceFileFrame(f_name) => {
-                                    debug!("{:?} == {:?} ???", f_name, f_to_set);
                                     if f_name == f_to_set {
                                         debug!("set_cur_frame_id found matching source file frame {:?}", f_name);
                                         self.set_cur_frame_id(sipling);
