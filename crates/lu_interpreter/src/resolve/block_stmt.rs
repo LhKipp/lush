@@ -19,10 +19,9 @@ use lu_syntax_elements::{
 use lu_value::Value;
 
 use crate::{
-    callable::ArgDecl,
     resolve::{Resolve, ResolveArg, Resolver},
     visit_arg::VisitArg,
-    ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
+    ArgDecl, ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
     Signature, Strct, StrctField, ValueType, Variable, ARG_VAR_NAME,
 };
 
