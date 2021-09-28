@@ -3,7 +3,7 @@
 Ip{ a: 1 b: 2 }
 ---
 - Start: StrctCtorExpr
-- Token: "StructName (len: 2)"
+- Token: "StrctName (len: 2)"
 - Token: "LeftCurlyBrackets (len: 1)"
 - Start: StrctFieldCtorStmt
 - Token: "Whitespace (len: 1)"
