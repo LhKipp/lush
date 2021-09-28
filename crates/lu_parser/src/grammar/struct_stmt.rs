@@ -47,7 +47,7 @@ impl Rule for StrctStmtRule {
             m.abandon(p);
             return None;
         }
-        p.expect_after(StructName, CMT_NL_WS);
+        p.expect_after(StrctName, CMT_NL_WS);
         p.expect_after(T!["{"], CMT_NL_WS);
 
         //consume all <name: <Type>? args
@@ -89,7 +89,7 @@ impl Rule for StrctFieldCtorStmtRule {
 pub struct StrctCtorExprRule;
 impl Rule for StrctCtorExprRule {
     fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == StructName
+        p.next_non(CMT_NL_WS) == StrctName
     }
 
     fn name(&self) -> String {
@@ -98,7 +98,7 @@ impl Rule for StrctCtorExprRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        if !p.expect_after(StructName, CMT_NL_WS) {
+        if !p.expect_after(StrctName, CMT_NL_WS) {
             m.abandon(p);
             return None;
         }

@@ -1,10 +1,10 @@
 use crate::{AstNode, AstNodeChildren, AstToken};
 
-use super::{support, BareWordToken, LuTypeNode, StrctFieldNode, StrctStmtNode, StructNameToken};
+use super::{support, BareWordToken, LuTypeNode, StrctFieldNode, StrctNameToken, StrctStmtNode};
 
 impl StrctStmtNode {
     pub fn name(&self) -> Option<String> {
-        support::token_child::<StructNameToken>(self.syntax()).map(|n| n.text().to_string())
+        support::token_child::<StrctNameToken>(self.syntax()).map(|n| n.text().to_string())
     }
     pub fn fields(&self) -> AstNodeChildren<StrctFieldNode> {
         support::node_children(self.syntax())

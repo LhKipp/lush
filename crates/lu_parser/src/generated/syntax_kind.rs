@@ -119,7 +119,7 @@ pub enum SyntaxKind {
     #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
     Number,
     #[regex("[A-Z]+[_a-zA-Z0-9]")]
-    StructName,
+    StrctName,
     SourceFile,
     StrctStmt,
     StrctField,
@@ -219,7 +219,7 @@ impl SyntaxKind{
             SyntaxKind::LongFlag => "LongFlag",
             SyntaxKind::ShortFlag => "ShortFlag",
             SyntaxKind::Number => "Number",
-            SyntaxKind::StructName => "StructName",
+            SyntaxKind::StrctName => "StrctName",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::StrctStmt => "StrctStmt",
             SyntaxKind::StrctField => "StrctField",

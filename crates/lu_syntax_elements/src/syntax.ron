@@ -73,7 +73,7 @@ Config(
 
     ( name: "Number"                     , regex: "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , is_token: true   , ) ,
 
-    ( name: "StructName"                 , regex: "[A-Z]+[_a-zA-Z0-9]" , is_token: true   , ),
+    ( name: "StrctName"                 , regex: "[A-Z]+[_a-zA-Z0-9]" , is_token: true   , ),
 
     // === RULES ===
     ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
@@ -154,9 +154,10 @@ Config(
             "NilKeyword",
             "BoolKeyword",
             "StringKeyword",
+            "BareWord",
+            "StrctName",
             "ArrayType",
             "FnType",
-            "BareWord"
         ],),
     ]
 )
