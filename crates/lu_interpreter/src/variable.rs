@@ -30,7 +30,7 @@ pub enum VarDeclNode {
 impl VarDeclNode {
     pub fn to_item(&self) -> SourceCodeItem {
         match self {
-            VarDeclNode::LetStmt(n) => n.to_item(),
+            VarDeclNode::LetStmt(n) => n.item_till_assign(),
             VarDeclNode::FnStmt(n) => n.decl_item(),
             VarDeclNode::ArgSignature(n) => n.to_item(),
             VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].to_item(),

@@ -26,7 +26,7 @@ impl LetStmtNode {
         support::node_child(self.syntax())
     }
 
-    pub fn item_till_value(&self) -> SourceCodeItem {
+    pub fn item_till_assign(&self) -> SourceCodeItem {
         // We want to capture "let var : type"
         let start = support::token_child::<LetKeywordToken>(self.syntax())
             .unwrap()

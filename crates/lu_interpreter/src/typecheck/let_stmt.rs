@@ -14,18 +14,14 @@ impl TypeCheck for LetStmtNode {
     ) -> Option<TcKey> {
         if let Some(var_name) = self.var_name() {
             let var = Variable::new(var_name, Value::Nil, VarDeclNode::LetStmt(self.clone()));
-            let let_stmt_key = ty_state.new_term_key(self.item_till_value());
-
-            ty_state.insert_var(var.clone(), let_stmt_key);
+            let let_stmt_key = ty_state.insert_var(var.clone());
 
             // unify key with decl
             if let Some(decl_ty) = self.decl_ty() {
-                let ty = ValueType::from_node(&decl_ty.into_type(), &ty_state.scope);
-                let ty = ty_state.ok_or_record(ty).unwrap_or(ValueType::Error);
-                let tc_res = ty_state
-                    .checker
-                    .impose(let_stmt_key.concretizes_explicit(ty));
-                ty_state.handle_tc_result(tc_res);
+                let (ty, err) =
+                    ValueType::from_node_or_err_ty(&decl_ty.into_type(), &ty_state.scope);
+                ty_state.record_option(err);
+                ty_state.concretizes_key(let_stmt_key, ty);
             }
 
             // Combine key with rhs

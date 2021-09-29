@@ -1,6 +1,6 @@
 use bimap::BiHashMap;
 use itertools::Itertools;
-use log::debug;
+use log::{debug, warn};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::PipelineStage;
@@ -32,7 +32,7 @@ pub struct TyCheckState {
     // is enough
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
     /// Variable to tckey (for simple variables)
-    tc_table: BiHashMap<Variable, TcKey>,
+    tc_var_table: BiHashMap<Variable, TcKey>,
     /// TcKey to TcFunc
     tc_func_table: HashMap<TcKey, TcFunc>,
     /// TcKey to TcStrct
@@ -58,7 +58,7 @@ impl TyCheckState {
             scope,
             checker: VarlessTypeChecker::new(),
             errors: Vec::new(),
-            tc_table: BiHashMap::new(),
+            tc_var_table: BiHashMap::new(),
             tc_expr_table: HashMap::new(),
             tc_func_table: HashMap::new(),
             tc_strct_table: HashMap::new(),
@@ -108,16 +108,9 @@ impl TyCheckState {
         term: SourceCodeItem,
         ty: ValueType,
     ) -> TcKey {
-        if let Some(func_ty) = ty.as_func() {
-            // new key is a func and needs to be inserted like that
-            let tc_func = TcFunc::from_signature(&*func_ty, self); // Generate func first
-            self.new_term_key_equated(term, tc_func.self_key) // Set term equal to func
-        } else {
-            let key = self.new_term_key(term);
-            let res = self.checker.impose(key.concretizes_explicit(ty));
-            self.handle_tc_result(res);
-            key
-        }
+        let new_key = self.new_term_key(term);
+        self.concretizes_key(new_key, ty);
+        new_key
     }
 
     pub(crate) fn equate_keys(&mut self, key1: TcKey, key2: TcKey) {
@@ -135,6 +128,17 @@ impl TyCheckState {
             self.tc_strct_table.insert(key1, tc_strct);
         } else if let Some(tc_strct) = self.tc_strct_table.get(&key1).cloned() {
             self.tc_strct_table.insert(key2, tc_strct);
+        }
+    }
+
+    fn concretizes_key(&mut self, key: TcKey, ty: ValueType) {
+        if let Some(func_ty) = ty.as_func() {
+            let tc_func = TcFunc::from_signature(&*func_ty, self); // Generate func first
+            self.equate_keys(key, tc_func.self_key) // Set term equal to func
+        } else {
+            warn!("Array and strct not handled");
+            let res = self.checker.impose(key.concretizes_explicit(ty));
+            self.handle_tc_result(res);
         }
     }
 
@@ -201,7 +205,7 @@ impl TyCheckState {
         (var_name, var_name_usage): (String, SourceCodeItem),
     ) -> TcKey {
         if let Some(var) = self.scope.find_var(&var_name).cloned() {
-            if let Some(var_key) = self.tc_table.get_by_left(&var) {
+            if let Some(var_key) = self.tc_var_table.get_by_left(&var) {
                 *var_key
             } else {
                 // Var is in scope, but doesn't have a tc_key yet (might be func or something else)
@@ -212,7 +216,8 @@ impl TyCheckState {
                         var_name
                     );
                     let tc_func = TcFunc::from_signature(callable.signature(), self);
-                    self.tc_table.insert(var.clone(), tc_func.self_key.clone());
+                    self.tc_var_table
+                        .insert(var.clone(), tc_func.self_key.clone());
                     tc_func.self_key
                 } else if let Some(strct) = var.val_as_strct().cloned() {
                     debug!(
@@ -220,7 +225,8 @@ impl TyCheckState {
                         strct.name
                     );
                     let tc_strct = TcStrct::from_strct(strct, self);
-                    self.tc_table.insert(var.clone(), tc_strct.self_key.clone());
+                    self.tc_var_table
+                        .insert(var.clone(), tc_strct.self_key.clone());
                     tc_strct.self_key
                 } else {
                     panic!("Var is present, but not func: {}", var_name)
@@ -238,7 +244,7 @@ impl TyCheckState {
             );
             let key = self.new_term_key(var_name_usage);
             self.scope.cur_mut_frame().insert_var(var.clone());
-            self.tc_table.insert(var, key);
+            self.tc_var_table.insert(var, key);
 
             key
         }
@@ -295,9 +301,11 @@ impl TyCheckState {
         self.tc_expr_table.get(key).unwrap()
     }
 
-    fn insert_var(&mut self, var: Variable, key: TcKey) -> () {
+    fn insert_var(&mut self, var: Variable) -> TcKey {
         self.scope.cur_mut_frame().insert_var(var.clone());
-        self.tc_table.insert(var, key);
+        let key = self.new_term_key(var.decl.to_item());
+        self.tc_var_table.insert(var, key.clone());
+        key
     }
 
     fn get_tc_func(&self, key: &TcKey) -> Option<&TcFunc> {
