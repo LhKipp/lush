@@ -27,7 +27,7 @@ impl TypeCheck for CmdStmtNode {
         let possibl_longest_name = self.possible_longest_cmd_call_name();
         // Finding result type here
         let ret_ty = if let Some((name_args_split_i, called_func)) =
-            ty_state.find_callable(&possibl_longest_name, self)
+            ty_state.expect_callable_with_longest_name(&possibl_longest_name, self)
         {
             let args = self.name_with_args().skip(name_args_split_i);
             ty_check_cmd_args(self, args, &called_func, ty_state);
@@ -101,15 +101,14 @@ fn ty_check_cmd_arg(
         // We need to ty check the passed arg against the accepted func
         let matched = match passed_arg {
             ValueExprElement::ValuePathExpr(ref passed_var_path) => {
-                let var_repr = (
+                let (var_name, var_usage) = (
                     passed_var_path.var_name_parts()[0].clone(),
                     passed_var_path.to_item(),
                 );
-                let passed_var_key = ty_state.expect_key_of_var(var_repr);
-                let passed_arg_key =
-                    ty_state.new_term_key_equated(passed_arg.to_item(), passed_var_key);
-                // Check that var_key is a func_key
-                if let Some(passed_fn_ty) = ty_state.tc_func_table.get(&passed_var_key).cloned() {
+                if let Some(passed_fn_ty) = ty_state.expect_callable(&var_name, var_usage).cloned()
+                {
+                    // CHECK maybe we should create a new key for the passed arg here. But atm it
+                    // doesn't make a difference
                     expected_fn_ty.equate_with(&passed_fn_ty, ty_state);
                     true
                 } else {

@@ -6,12 +6,11 @@ use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::ast::{CmdStmtNode, SourceFileNode};
 use lu_syntax::AstNode;
-use lu_value::Value;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
-use crate::{Command, RunExternalCmd, Signature, Strct, ValueTypeErr, VarDeclNode};
+use crate::{Command, RunExternalCmd, Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -197,16 +196,11 @@ impl TyCheckState {
         }
     }
 
-    /// Returns the key of the var. If the var is not in scope, it will record an error and return
-    /// None
-    // TODO the interface of this func is horrible.
-    pub(crate) fn expect_key_of_var(
-        &mut self,
-        (var_name, var_name_usage): (String, SourceCodeItem),
-    ) -> TcKey {
-        if let Some(var) = self.scope.find_var(&var_name).cloned() {
+    /// Returns the key of the var (if present, (or still has to be inserted))
+    fn get_key_of_var(&mut self, var_name: &str) -> Option<TcKey> {
+        if let Some(var) = self.scope.find_var(var_name).cloned() {
             if let Some(var_key) = self.tc_var_table.get_by_left(&var) {
-                *var_key
+                Some(*var_key)
             } else {
                 // Var is in scope, but doesn't have a tc_key yet (might be func or something else)
                 debug!("Found var {}, which has no tc_key yet", var_name);
@@ -218,7 +212,7 @@ impl TyCheckState {
                     let tc_func = TcFunc::from_signature(callable.signature(), self);
                     self.tc_var_table
                         .insert(var.clone(), tc_func.self_key.clone());
-                    tc_func.self_key
+                    Some(tc_func.self_key)
                 } else if let Some(strct) = var.val_as_strct().cloned() {
                     debug!(
                         "First time usage of strct {}. Inserting new tc_strct.",
@@ -227,64 +221,64 @@ impl TyCheckState {
                     let tc_strct = TcStrct::from_strct(strct, self);
                     self.tc_var_table
                         .insert(var.clone(), tc_strct.self_key.clone());
-                    tc_strct.self_key
+                    Some(tc_strct.self_key)
                 } else {
                     panic!("Var is present, but not func: {}", var_name)
                 }
             }
         } else {
-            // TODO move this error generation into resolve? or somewhere else?
-            self.push_err(AstErr::VarNotInScope(var_name_usage.clone()).into());
-            // var not present. We provide a new term key and keep going
-            // TODO should we pass a decl here?
-            let var = Variable::new(
-                var_name.to_string(),
-                Value::Nil,
-                VarDeclNode::ErrorUsage(var_name_usage.clone()),
-            );
-            let key = self.new_term_key(var_name_usage);
-            self.scope.cur_mut_frame().insert_var(var.clone());
-            self.tc_var_table.insert(var, key);
-
-            key
+            None
         }
     }
 
+    /// Returns Some(var_key) if var is present, none otherwise (and an error will be generated)
+    pub(crate) fn expect_var(&mut self, var_name: &str, usage: SourceCodeItem) -> Option<TcKey> {
+        if let Some(var_key) = self.get_key_of_var(var_name) {
+            Some(var_key)
+        } else {
+            self.push_err(AstErr::VarNotInScope(usage.clone()).into());
+            None
+        }
+    }
+
+    /// Some if such a struct is found. None otherwise (and an error will be generated)
     pub(crate) fn expect_strct(&mut self, name: &str, usage: SourceCodeItem) -> Option<&TcStrct> {
-        let strct_ty_key = self.expect_key_of_var((name.to_string(), usage));
-        self.tc_strct_table.get(&strct_ty_key)
+        if let Some(var_key) = self.get_key_of_var(name) {
+            self.tc_strct_table.get(&var_key)
+        } else {
+            self.push_err(AstErr::StrctNotInScope(usage.clone()).into()); // TODO this err might already be recorded in value_type
+            None
+        }
+    }
+
+    /// Some if such a callable is found. None otherwise (and an error will be generated)
+    pub(crate) fn expect_callable(
+        &mut self,
+        var_name: &str,
+        var_usage: SourceCodeItem,
+    ) -> Option<&TcFunc> {
+        if let Some(var_key) = self.get_key_of_var(&var_name) {
+            self.tc_func_table.get(&var_key)
+        } else {
+            self.push_err(TyErr::VarExpectedToBeFunc { var_usage }.into());
+            None
+        }
     }
 
     /// Some for internal and external cmds
-    pub(crate) fn find_callable(
+    pub(crate) fn expect_callable_with_longest_name(
         &mut self,
         possibl_longest_name: &[String],
         caller_node: &CmdStmtNode,
     ) -> Option<(usize, TcFunc)> {
-        if let Some((name_args_split_i, var)) = self
+        if let Some((name_args_split_i, _)) = self
             .scope
             .find_var_with_longest_match(&possibl_longest_name)
             .map(|(i, var)| (i, var.clone()))
         {
             let var_name = possibl_longest_name[0..name_args_split_i].join(" ");
-            let var_key = self.expect_key_of_var((var_name.clone(), caller_node.to_item()));
-
-            if let Some(called_func) = self.tc_func_table.get(&var_key) {
-                // The variable is already inserted as a TcFunc
-                Some((name_args_split_i, called_func.clone()))
-            } else {
-                // We have found such a var, but its not a function
-                // This error should be catched more elaborated in special check for this
-                self.push_err(
-                    TyErr::VarExpectedToBeFunc {
-                        // TODO make var.decl not optional and use it here
-                        var_decl: var.decl.to_item(),
-                        var_usage: caller_node.to_item(),
-                    }
-                    .into(),
-                );
-                None
-            }
+            self.expect_callable(&var_name, caller_node.to_item())
+                .map(|callabl| (name_args_split_i, callabl.clone()))
         } else {
             // Called cmd is not found --> It's prob an external cmd
             let cmd_node = caller_node.clone();

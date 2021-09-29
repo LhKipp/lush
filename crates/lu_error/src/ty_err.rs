@@ -31,7 +31,6 @@ pub enum TyErr {
         cmd_stmt: SourceCodeItem,
     },
     VarExpectedToBeFunc {
-        var_decl: SourceCodeItem,
         var_usage: SourceCodeItem,
     },
     VarIsNotStruct(SourceCodeItem),
@@ -56,10 +55,7 @@ impl TyErr {
             } => todo!(),
             TyErr::UnexpectedArg { arg, fn_decl } => todo!(),
             TyErr::UnsatisfiedArg { arg_decl, cmd_stmt } => todo!(),
-            TyErr::VarExpectedToBeFunc {
-                var_decl,
-                var_usage,
-            } => todo!(),
+            TyErr::VarExpectedToBeFunc { var_usage } => todo!(),
             TyErr::VarIsNotStruct(_) => todo!(),
             TyErr::StructDoesNotHaveField {
                 field_name,

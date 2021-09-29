@@ -38,7 +38,14 @@ impl TypeCheck for ValuePathExprNode {
                 }
             } else {
                 // No previous part, this is no field indexing
-                prev_key = Some(state.expect_key_of_var((part, item)));
+                if let Some(var_key) = state.expect_var(&part, item) {
+                    prev_key = Some(var_key)
+                } else {
+                    // Var not present, error key
+                    return Some(
+                        state.new_term_key_concretiziesd(self.to_item(), ValueType::Error),
+                    );
+                }
             }
         }
 
