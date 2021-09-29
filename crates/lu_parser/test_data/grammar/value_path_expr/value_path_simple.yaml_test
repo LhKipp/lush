@@ -7,4 +7,15 @@ $in
 - Token: "BareWord (len: 2)"
 - Finish: ""
 ...
+2
+===
+$v.x
+---
+- Start: ValuePathExpr
+- Token: "Dollar (len: 1)"
+- Token: "BareWord (len: 1)"
+- Token: "Point (len: 1)"
+- Token: "BareWord (len: 1)"
+- Finish: ""
+...
 

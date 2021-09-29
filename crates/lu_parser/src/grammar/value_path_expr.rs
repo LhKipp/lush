@@ -19,13 +19,13 @@ impl Rule for ValuePathExprRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
-        p.expect(Dollar);
+        p.expect(T![$]);
         loop {
             if !p.expect_as([BareWord, InKeyword], BareWord) {
                 // in`$in` in is represented as in keyword
                 break;
             }
-            if !p.at(Point) {
+            if !p.eat(Point) {
                 break;
             }
         }

@@ -21,6 +21,7 @@ mod piped_cmds_stmt;
 mod source_file;
 mod statement;
 mod test;
+mod value_path_expr;
 
 pub struct TyCheckState {
     /// Input from previous stage
@@ -129,8 +130,11 @@ impl TyCheckState {
         if let Some(tc_func) = self.tc_func_table.get(&key2).cloned() {
             self.tc_func_table.insert(key1, tc_func);
         } else if let Some(tc_func) = self.tc_func_table.get(&key1).cloned() {
-            // this func is commutative
             self.tc_func_table.insert(key2, tc_func);
+        } else if let Some(tc_strct) = self.tc_strct_table.get(&key2).cloned() {
+            self.tc_strct_table.insert(key1, tc_strct);
+        } else if let Some(tc_strct) = self.tc_strct_table.get(&key1).cloned() {
+            self.tc_strct_table.insert(key2, tc_strct);
         }
     }
 
@@ -298,6 +302,16 @@ impl TyCheckState {
 
     fn get_tc_func(&self, key: &TcKey) -> Option<&TcFunc> {
         self.tc_func_table.get(key)
+    }
+
+    /// Returns the strct behind key if key is a Strct. Records an error otherwise
+    /// Therefore the user does not have to handle the None case
+    fn expect_tc_strct(&mut self, key: &TcKey) -> Option<&TcStrct> {
+        if !self.tc_strct_table.contains_key(key) {
+            let item = self.get_item_of(key).clone();
+            self.push_err(TyErr::VarIsNotStruct(item).into());
+        };
+        self.tc_strct_table.get(key)
     }
 }
 

@@ -34,6 +34,12 @@ pub enum TyErr {
         var_decl: SourceCodeItem,
         var_usage: SourceCodeItem,
     },
+    VarIsNotStruct(SourceCodeItem),
+    StructDoesNotHaveField {
+        field_name: String,
+        strct_decl: SourceCodeItem,
+        usage: SourceCodeItem,
+    },
 }
 
 impl TyErr {
@@ -53,6 +59,12 @@ impl TyErr {
             TyErr::VarExpectedToBeFunc {
                 var_decl,
                 var_usage,
+            } => todo!(),
+            TyErr::VarIsNotStruct(_) => todo!(),
+            TyErr::StructDoesNotHaveField {
+                field_name,
+                strct_decl,
+                usage,
             } => todo!(),
         }
     }

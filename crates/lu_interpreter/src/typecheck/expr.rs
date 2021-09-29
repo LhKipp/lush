@@ -3,7 +3,7 @@ use log::warn;
 use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StrctCtorExprNode,
-        StringExprNode, TableExprNode, ValueExprElement, ValuePathExprNode,
+        StringExprNode, TableExprNode, ValueExprElement,
     },
     AstNode,
 };
@@ -66,12 +66,6 @@ impl TypeCheck for StringExprNode {
             .impose(key.concretizes_explicit(ValueType::String))
             .unwrap();
         Some(key)
-    }
-}
-
-impl TypeCheck for ValuePathExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TyCheckState) -> Option<TcKey> {
-        todo!("Find other var and return that key")
     }
 }
 

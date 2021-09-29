@@ -32,8 +32,7 @@ impl TypeCheck for LetStmtNode {
             let rhs = self.value();
             match rhs.typecheck(ty_state) {
                 Some(key) => {
-                    let res = ty_state.checker.impose(let_stmt_key.equate_with(key));
-                    ty_state.handle_tc_result(res);
+                    ty_state.equate_keys(let_stmt_key, key);
                 }
                 None => {
                     // Example of this path would be: let x = { let y = 1 }

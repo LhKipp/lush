@@ -60,7 +60,7 @@ impl Parser {
         assert!(n <= 3);
 
         let steps = self.steps.get();
-        if steps > 150 {
+        if steps > 500 {
             panic!("the parser seems stuck")
         }
         self.steps.set(steps + 1);
@@ -107,12 +107,7 @@ impl Parser {
             return false;
         }
         let cur = self.token_source.take_and_advance();
-        debug!(
-            "Eating {:?} as {:?} (kinds was: {:?})",
-            self.current(),
-            as_,
-            kinds
-        );
+        debug!("Eating {:?} as {:?} (kinds was: {:?})", cur, as_, kinds);
         let new = Token::new(as_, cur.len);
         self.do_bump(new);
         true
@@ -279,7 +274,9 @@ impl Parser {
     /// Checks if the current token is in `kinds`.
     pub(crate) fn at<TS: Into<TokenSet>>(&self, kinds: TS) -> bool {
         let kinds: TokenSet = kinds.into();
-        kinds.contains(self.current())
+        let ret = kinds.contains(self.current());
+        debug!("Parser at {:?} is contained in {:?}", self.current(), kinds);
+        ret
     }
 
     // /// Checks if the current token is contextual keyword with text `t`.
