@@ -1,7 +1,6 @@
 use log::debug;
 use std::mem;
 
-// TODO remove dead code when all done
 use lu_error::ParseErr;
 use lu_parser::{grammar::Rule, Event};
 use rowan::GreenNode;
