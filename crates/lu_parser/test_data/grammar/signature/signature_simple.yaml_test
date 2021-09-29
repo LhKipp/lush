@@ -90,3 +90,29 @@ Signature with fn type
 - Token: "RightParenthesis (len: 1)"
 - Finish: ""
 ...
+Signature with generic
+===
+(arg1: T1 arg2: T2)
+---
+- Start: Signature 
+- Token: "LeftParenthesis (len: 1)" 
+- Start: ArgSignature 
+- Token: "ArgName (len: 4)" 
+- Token: "DoublePoint (len: 1)" 
+- Start: LuType 
+- Token: "Whitespace (len: 1)" 
+- Token: "GenericType (len: 2)" 
+- Finish: "" 
+- Finish: "" 
+- Start: ArgSignature 
+- Token: "Whitespace (len: 1)" 
+- Token: "ArgName (len: 4)" 
+- Token: "DoublePoint (len: 1)" 
+- Start: LuType 
+- Token: "Whitespace (len: 1)" 
+- Token: "GenericType (len: 2)" 
+- Finish: "" 
+- Finish: "" 
+- Token: "RightParenthesis (len: 1)" 
+- Finish: "" 
+...

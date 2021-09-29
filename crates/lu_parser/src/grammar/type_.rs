@@ -52,15 +52,16 @@ fn lu_type_specifier() -> OrRule {
     OrRule {
         kind: Some("LuTypeSpecifier".to_string()),
         rules: vec_box![
+            GenericType,
             NumberKeyword,
             AnyKeyword,
             NilKeyword,
             BoolKeyword,
             StringKeyword,
-            FnTypeRule{},
+            FnTypeRule {},
             ArrayTypeRule {},
-            BareWord,
             StrctName,
+            BareWord,
         ],
     }
 }

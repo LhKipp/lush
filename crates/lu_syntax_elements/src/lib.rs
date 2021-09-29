@@ -30,6 +30,8 @@ pub struct SyntaxElement {
     #[serde(default)]
     regex: String,
     #[serde(default)]
+    priority: Option<i32>,
+    #[serde(default)]
     is_token: bool,
     #[serde(default)]
     is_node: bool,

@@ -11,9 +11,13 @@ pub enum SyntaxKind {
     #[error]
     {% elif syn_elem.name == "BareWord" -%}
     #[regex("{{syn_elem.regex}}", priority = 0)]
-    {% elif syn_elem.regex != "" -%}
-    #[regex("{{syn_elem.regex}}")]
-    {% elif syn_elem.token_text != "" -%}
+    {% elif syn_elem.regex and syn_elem.priority -%}
+    #[regex("{{syn_elem.regex}}", priority = {{syn_elem.priority}})]
+    {% elif syn_elem.token_text and syn_elem.priority -%}
+    #[token("{{syn_elem.token_text}}", priority = {{syn_elem.priority}})]
+    {% elif syn_elem.regex -%}
+    #[regex("{{syn_elem.regex}}{{syn_elem.priority}}")]
+    {% elif syn_elem.token_text -%}
     #[token("{{syn_elem.token_text}}")]
     {% endif -%}
     {{ syn_elem.name }},

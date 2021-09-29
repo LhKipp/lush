@@ -20,6 +20,7 @@ Config(
     ( name: "RetKeyword"              , token_text: "ret"                            , is_token: true   , ) ,
 
     // === TYPES ===
+    ( name: "GenericType"                , regex: "[T|U][0-9]", priority: Some(10) /* To beat StrctName */ , is_token: true   , ) ,
     ( name: "ArrayType"                  , is_node: true                                , has_rule: true ) ,
     ( name: "FnType"                     , is_node: true                                , has_rule: true ) ,
     // === MODIFIER ===
@@ -156,6 +157,7 @@ Config(
             "NilKeyword",
             "BoolKeyword",
             "StringKeyword",
+            "GenericType",
             "BareWord",
             "StrctName",
             "ArrayType",

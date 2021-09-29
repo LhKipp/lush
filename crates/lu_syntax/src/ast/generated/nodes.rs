@@ -366,6 +366,27 @@ impl HasSyntaxKind for RetKeywordToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct GenericTypeToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for GenericTypeToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::GenericType }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for GenericTypeToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArrayTypeNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2453,6 +2474,7 @@ pub enum LuTypeSpecifierElement {
     NilKeyword(NilKeywordToken),
     BoolKeyword(BoolKeywordToken),
     StringKeyword(StringKeywordToken),
+    GenericType(GenericTypeToken),
     BareWord(BareWordToken),
     StrctName(StrctNameToken),
     ArrayType(ArrayTypeNode),
@@ -2474,12 +2496,14 @@ impl AstElement for LuTypeSpecifierElement {
         
         
         
+        
         match kind{
-            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | BareWord | StrctName | ArrayType | FnType => true,
+            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | GenericType | BareWord | StrctName | ArrayType | FnType => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -2496,6 +2520,7 @@ impl AstElement for LuTypeSpecifierElement {
             NilKeyword => LuTypeSpecifierElement::NilKeyword(NilKeywordToken { syntax: syntax.into_token().unwrap() }),
             BoolKeyword => LuTypeSpecifierElement::BoolKeyword(BoolKeywordToken { syntax: syntax.into_token().unwrap() }),
             StringKeyword => LuTypeSpecifierElement::StringKeyword(StringKeywordToken { syntax: syntax.into_token().unwrap() }),
+            GenericType => LuTypeSpecifierElement::GenericType(GenericTypeToken { syntax: syntax.into_token().unwrap() }),
             BareWord => LuTypeSpecifierElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
             StrctName => LuTypeSpecifierElement::StrctName(StrctNameToken { syntax: syntax.into_token().unwrap() }),
             ArrayType => LuTypeSpecifierElement::ArrayType(ArrayTypeNode { syntax: syntax.into_node().unwrap() }),
@@ -2523,6 +2548,9 @@ impl AstElement for LuTypeSpecifierElement {
             LuTypeSpecifierElement::StringKeyword(it) => it.syntax.clone().into(),
             
             
+            LuTypeSpecifierElement::GenericType(it) => it.syntax.clone().into(),
+            
+            
             LuTypeSpecifierElement::BareWord(it) => it.syntax.clone().into(),
             
             
@@ -2545,6 +2573,7 @@ impl HasSyntaxKind for LuTypeSpecifierElement{
             LuTypeSpecifierElement::NilKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::BoolKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::StringKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::GenericType(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::BareWord(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::StrctName(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::ArrayType(it) => it.get_syntax_kind(),

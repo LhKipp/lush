@@ -41,6 +41,8 @@ pub enum ValueType {
     Void,
     /// The empty void type
     Nil,
+    /// e.G. T1, T2... Specially handled by engine
+    Generic(String),
     Bool,
     Number,
     String,
@@ -108,6 +110,7 @@ impl ValueType {
             LuTypeSpecifierElement::BoolKeyword(_) => ValueType::Bool,
             LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
+            LuTypeSpecifierElement::GenericType(n) => ValueType::Generic(n.text().to_string()),
             LuTypeSpecifierElement::StrctName(n) => {
                 debug!("Looking for struct with name {}", n.text());
                 let strct = scope.expect_strct(n.text(), n.to_item())?;
@@ -201,6 +204,7 @@ impl TcVariant for ValueType {
             | ValueType::Void
             | ValueType::Any
             | ValueType::Nil
+            | ValueType::Generic(_)
             | ValueType::Bool
             | ValueType::Number
             | ValueType::String
@@ -242,6 +246,7 @@ impl Display for ValueType {
             }
             ValueType::Func(_) => todo!(),
             ValueType::Void => todo!(),
+            ValueType::Generic(name) => write!(f, "{}", name),
         }
     }
 }

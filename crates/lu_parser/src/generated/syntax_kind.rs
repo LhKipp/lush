@@ -40,6 +40,8 @@ pub enum SyntaxKind {
     StringKeyword,
     #[token("ret")]
     RetKeyword,
+    #[regex("[T|U][0-9]", priority = 10)]
+    GenericType,
     ArrayType,
     FnType,
     OptModifier,
@@ -176,6 +178,7 @@ impl SyntaxKind{
             SyntaxKind::NumberKeyword => "NumberKeyword",
             SyntaxKind::StringKeyword => "StringKeyword",
             SyntaxKind::RetKeyword => "RetKeyword",
+            SyntaxKind::GenericType => "GenericType",
             SyntaxKind::ArrayType => "ArrayType",
             SyntaxKind::FnType => "FnType",
             SyntaxKind::OptModifier => "OptModifier",
