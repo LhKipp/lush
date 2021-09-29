@@ -1,3 +1,4 @@
+use log::warn;
 use lu_syntax::ast::StatementElement;
 use rusttyc::TcKey;
 
@@ -16,7 +17,10 @@ impl TypeCheck for StatementElement {
             // StatementElement::IfStmt(n) => n.typecheck(ty_state),
             StatementElement::CmdStmt(n) => n.typecheck(ty_state),
             // StatementElement::PipedCmdsStmt(n) => n.typecheck(ty_state),
-            _ => None,
+            _ => {
+                warn!("NOT TY CHECKING whole StatementElement!!! REturning NONE");
+                None
+            }
         }
     }
 }
