@@ -35,6 +35,7 @@ pub enum TyErr {
     },
     ItemExpectedToBeFunc(SourceCodeItem),
     ItemExpectedToBeStruct(SourceCodeItem),
+    ItemExpectedToBeArray(SourceCodeItem),
     StructDoesNotHaveField {
         field_name: String,
         strct_decl: SourceCodeItem,
@@ -64,6 +65,7 @@ impl TyErr {
                 usage,
             } => todo!(),
             TyErr::ItemExpectedToBeFunc(_) => todo!(),
+            TyErr::ItemExpectedToBeArray(_) => todo!(),
         }
     }
 }

@@ -1,0 +1,45 @@
+Pass correct array ty
+===
+fn take_str_array(arg: [str] ret: str)
+end
+
+take_str_array ["Hi"]
+---
+{
+  "Ok": "String"
+}
+...
+Pass wrong array ty
+===
+fn take_num_array(arg: [num] ret: num)
+end
+
+take_num_array ["Hi"]
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "num",
+            "range": [
+              24,
+              27
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "\"Hi\"",
+            "range": [
+              60,
+              64
+            ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...

@@ -129,11 +129,15 @@ impl ValueType {
                 ValueType::Strct(Box::new(strct.clone()))
             }
             LuTypeSpecifierElement::ArrayType(arr) => {
-                if let Some(inner) = arr.inner_type() {
-                    ValueType::from_node(&inner.into_type(), scope)?
+                let (inner_ty, inner_ty_decl) = if let Some(inner) = arr.inner_type() {
+                    (
+                        ValueType::from_node(&inner.into_type(), scope)?,
+                        inner.to_item(),
+                    )
                 } else {
-                    ValueType::Unspecified
-                }
+                    (ValueType::Unspecified, arr.to_item())
+                };
+                ValueType::new_array(inner_ty, inner_ty_decl)
             }
             LuTypeSpecifierElement::FnType(fn_ty) => {
                 let (sign, errs) =
@@ -162,7 +166,7 @@ impl TcVariant for ValueType {
     type Err = ValueTypeErr;
 
     fn top() -> Self {
-        ValueType::Any
+        ValueType::Unspecified
     }
 
     fn meet(lhs: Partial<Self>, rhs: Partial<Self>) -> Result<Partial<Self>, Self::Err> {
@@ -182,32 +186,32 @@ impl TcVariant for ValueType {
                 (ValueType::Any, other) | (other, ValueType::Any) => Some(other.clone()),
                 (ValueType::String, ValueType::BareWord) => Some(ValueType::String),
                 (ValueType::BareWord, ValueType::String) => Some(ValueType::String),
-                // (
-                //     ValueType::Array {
-                //         inner_ty: lhs_inner,
-                //         ..
-                //     },
-                //     ValueType::Array {
-                //         inner_ty: rhs_inner,
-                //         ..
-                //     },
-                // ) => {
-                //     let (lhs_arity, rhs_arity) = match (lhs_inner.arity(), rhs_inner.arity()) {
-                //         (Arity::Fixed(l), Arity::Fixed(r)) => (l, r),
-                //         _ => unreachable!("All types have fixed arity"),
-                //     };
-                //     let inner = ValueType::meet(
-                //         Partial {
-                //             variant: *lhs_inner.clone(),
-                //             least_arity: lhs_arity,
-                //         },
-                //         Partial {
-                //             variant: *rhs_inner.clone(),
-                //             least_arity: rhs_arity,
-                //         },
-                //     )?;
-                //     Some(ValueType::Array { inner_ty: Box::new(inner), inner_ty_decl: val })
-                // }
+                (
+                    ValueType::Array {
+                        inner_ty: lhs_inner,
+                        inner_ty_decl: lhs_decl,
+                    },
+                    ValueType::Array {
+                        inner_ty: rhs_inner,
+                        ..
+                    },
+                ) => {
+                    let (lhs_arity, rhs_arity) = match (lhs_inner.arity(), rhs_inner.arity()) {
+                        (Arity::Fixed(l), Arity::Fixed(r)) => (l, r),
+                        _ => unreachable!("All types have fixed arity"),
+                    };
+                    let inner = ValueType::meet(
+                        Partial {
+                            variant: *lhs_inner.clone(),
+                            least_arity: lhs_arity,
+                        },
+                        Partial {
+                            variant: *rhs_inner.clone(),
+                            least_arity: rhs_arity,
+                        },
+                    )?;
+                    Some(ValueType::new_array(inner.variant, lhs_decl.clone())) // TODO the decl may be wrong for some meets
+                }
                 _ => None,
             };
             coercable_ty.ok_or_else(|| ValueTypeErr::NotMeetAble {
@@ -221,6 +225,7 @@ impl TcVariant for ValueType {
             Arity::Fixed(arity) => arity,
         };
 
+        debug!("Result of meet: {}", ty);
         Ok(Partial {
             variant: ty,
             least_arity: arity,
@@ -274,7 +279,7 @@ impl Display for ValueType {
                 write!(f, "}}")
             }
             ValueType::Func(_) => todo!(),
-            ValueType::Void => todo!(),
+            ValueType::Void => write!(f, "void"),
             ValueType::Generic(name) => write!(f, "{}", name),
         }
     }

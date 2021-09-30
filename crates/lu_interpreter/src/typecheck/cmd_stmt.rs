@@ -114,7 +114,6 @@ fn ty_check_cmd_arg(
             }
         };
     } else {
-        warn!("Array as cmd arg not handled special");
         let passed_arg_key = passed_arg
             .typecheck(ty_state)
             .expect("Arg always returns a key");

@@ -1,9 +1,12 @@
 use itertools::{EitherOrBoth, Itertools};
 use log::warn;
-use lu_syntax::{AstNode, AstToken, ast::{
+use lu_syntax::{
+    ast::{
         ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StrctCtorExprNode,
         StringExprNode, TableExprNode, ValueExprElement,
-    }};
+    },
+    AstNode, AstToken,
+};
 use rusttyc::TcKey;
 
 use crate::{TyCheckState, TypeCheck, TypeCheckArg, ValueType};
@@ -47,24 +50,37 @@ impl TypeCheck for NumberExprNode {
 
 impl TypeCheck for StringExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
-        let key = ty_state.new_term_key(self.to_item());
-        ty_state
-            .checker
-            .impose(key.concretizes_explicit(ValueType::String))
-            .unwrap();
-        Some(key)
+        Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String))
     }
 }
 
 impl TypeCheck for ArrayExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TyCheckState) -> Option<TcKey> {
-        todo!("TODO find sub type")
-        // let key = ty_state.checker.new_term_key();
-        // ty_state
-        //     .checker
-        //     .impose(key.concretizes_explicit(ValueType::ArrayExprNode))
-        //     .unwrap();
-        // Some(key)
+    fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
+        // Equate all inner ty's (they must be of the same ty)
+        let mut prev_inner_tc: Option<TcKey> = None;
+        for array_elem in self.values() {
+            let elem_key = array_elem
+                .typecheck(state)
+                .expect("Array inner elems always have type");
+            if let Some(prev_inner_tc) = prev_inner_tc {
+                state.equate_keys(prev_inner_tc.clone(), elem_key.clone());
+            }
+            prev_inner_tc = Some(elem_key);
+        }
+        let array_key = state.new_term_key_concretiziesd(
+            self.to_item(),
+            ValueType::new_array(ValueType::Unspecified, self.to_item()),
+        );
+
+        if let Some(prev_inner_tc) = prev_inner_tc {
+            // If we have found an prev_inner_tc, we can specify the arr inner ty more concretly
+            let inner_ty_key = state
+                .expect_arr_inner_ty_from_key(array_key)
+                .expect("Prev inserted, always present");
+            state.equate_keys(prev_inner_tc, inner_ty_key);
+        }
+
+        Some(array_key)
     }
 }
 

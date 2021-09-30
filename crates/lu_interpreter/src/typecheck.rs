@@ -126,6 +126,17 @@ impl TyCheckState {
             self.get_item_of(&key1),
             self.get_item_of(&key2)
         );
+        // Check whether both are arrays
+        if let (Some(key1_arr_inner_tc), Some(key2_arr_inner_tc)) = (
+            self.get_arr_inner_tc(&key1).cloned(),
+            self.get_arr_inner_tc(&key2).cloned(),
+        ) {
+            self.equate_keys(key1_arr_inner_tc, key2_arr_inner_tc);
+            return; // No more work to do
+        }
+        // Todo check wether both are funcs
+
+        // Not some ty with inner tys
         let res = key1.equate_with(key2);
         let res = self.checker.impose(res);
         if self.handle_tc_result(res) {
@@ -353,6 +364,18 @@ impl TyCheckState {
         }
     }
 
+    /// Returns the inner_ty key behind key if key is a array. Records an error otherwise
+    /// Therefore the user does not have to handle the None case
+    fn expect_arr_inner_ty_from_key(&mut self, array_key: TcKey) -> Option<TcKey> {
+        let inner_ty_key = self.get_arr_inner_tc(&array_key.clone()).cloned();
+
+        if inner_ty_key.is_none() {
+            let key_item = self.get_item_of(&array_key).clone();
+            self.push_err(TyErr::ItemExpectedToBeArray(key_item).into());
+        }
+        inner_ty_key
+    }
+
     /// Get the SourceCodeItem behind the key
     pub(crate) fn get_item_of(&self, key: &TcKey) -> &SourceCodeItem {
         self.tc_expr_table.get(key).unwrap()
@@ -371,6 +394,10 @@ impl TyCheckState {
 
     fn get_tc_generic(&self, key: &TcKey) -> Option<&String> {
         self.tc_generic_table.get(key)
+    }
+
+    fn get_arr_inner_tc(&self, key: &TcKey) -> Option<&TcKey> {
+        self.tc_array_table.get(key)
     }
 }
 
