@@ -719,6 +719,7 @@ version = "0.1.0"
 dependencies = [
  "contracts",
  "derive-new",
+ "enum-as-inner",
  "glob",
  "heck",
  "log",

@@ -72,8 +72,8 @@ impl From<AstErr> for LuErr {
 /// An item in the source code to be used in the `Error` enum.
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
 pub struct SourceCodeItem {
-    content: String,
-    range: TextRange,
+    pub content: String,
+    pub range: TextRange,
 }
 
 impl SourceCodeItem {

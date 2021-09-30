@@ -1,6 +1,6 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 use serde::Serialize;
-#[allow(unused_imports)]
+use enum_as_inner::EnumAsInner;
 use crate::{
     Rule,
     ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
@@ -57,7 +57,7 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
 
 {% elif syn_elem.is_generic -%}
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum {{ syn_elem.struct_name }} {
     {% for represented in syn_elem.represents -%}
     {{represented.name}}({{represented.struct_name}}),

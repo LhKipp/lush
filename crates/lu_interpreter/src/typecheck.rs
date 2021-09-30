@@ -134,9 +134,17 @@ impl TyCheckState {
             self.equate_keys(key1_arr_inner_tc, key2_arr_inner_tc);
             return; // No more work to do
         }
-        // Todo check wether both are funcs
 
-        // Not some ty with inner tys
+        // Check whether both are funcs
+        if let (Some(key1_func_tc), Some(key2_func_tc)) = (
+            self.get_tc_func(&key1).cloned(),
+            self.get_tc_func(&key2).cloned(),
+        ) {
+            key1_func_tc.equate_with(&key2_func_tc, self);
+            return; // No more work to do
+        }
+
+        // Both are some atomic tys. Simple ty check is enough
         let res = key1.equate_with(key2);
         let res = self.checker.impose(res);
         if self.handle_tc_result(res) {

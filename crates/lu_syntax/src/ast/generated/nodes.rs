@@ -1,6 +1,6 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 use serde::Serialize;
-#[allow(unused_imports)]
+use enum_as_inner::EnumAsInner;
 use crate::{
     Rule,
     ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
@@ -2017,7 +2017,7 @@ impl HasRule for TableExprNode{
         Box::new(TableExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum CmdOrValueExprElement {
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
@@ -2080,7 +2080,7 @@ impl HasSyntaxKind for CmdOrValueExprElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum ValueExprElement {
     BareWord(BareWordToken),
     NumberExpr(NumberExprNode),
@@ -2186,7 +2186,7 @@ impl HasRule for ValueExprElement{
         Box::new(ValueExprRule{})
     }
 }
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum StatementElement {
     ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
@@ -2281,7 +2281,7 @@ impl HasSyntaxKind for StatementElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum ConditionElement {
     CmdStmt(CmdStmtNode),
     ValueExpr(ValueExprElement),
@@ -2336,7 +2336,7 @@ impl HasSyntaxKind for ConditionElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum OperatorExprElement {
     PlusSign(PlusSignToken),
     MinusSign(MinusSignToken),
@@ -2467,7 +2467,7 @@ impl HasSyntaxKind for OperatorExprElement{
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum LuTypeSpecifierElement {
     NumberKeyword(NumberKeywordToken),
     AnyKeyword(AnyKeywordToken),

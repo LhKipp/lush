@@ -91,33 +91,24 @@ fn ty_check_cmd_arg(
     cmd_node: &CmdStmtNode,
     ty_state: &mut TyCheckState,
 ) {
-    // Check whether the expected arg is a function
-    if let Some(expected_fn_ty) = ty_state.get_tc_func(called_func_arg_tc).cloned() {
-        debug!(
-            "TyChecking passed_arg: {:?}, against expected_fn_ty",
-            passed_arg.text()
-        );
-        // The function expects a function as an arg
-        // We need to ty check the passed arg against the accepted func
-        match passed_arg {
-            ValueExprElement::MathExpr(_) => {
-                todo!("Expected func, provided math expr. This should work. Hack around here ")
-            }
-            _ => {
-                let passed_arg_key = passed_arg.typecheck(ty_state).expect("Arg always has key");
-                if let Some(passed_fn_ty) = ty_state.expect_callable_from_key(passed_arg_key) {
-                    expected_fn_ty.equate_with(&passed_fn_ty, ty_state);
-                    true
-                } else {
-                    false
-                }
-            }
-        };
+    debug!(
+        "TyChecking passed_arg: {}, against {}",
+        passed_arg.text(),
+        ty_state.get_item_of(called_func_arg_tc).content
+    );
+
+    // Check whether we have to fixup the MathExpr to become a function
+    let passed_arg_key = if let (Some(passed_math_expr), Some(expected_fn_ty)) = (
+        passed_arg.as_math_expr(),
+        ty_state.get_tc_func(called_func_arg_tc).cloned(),
+    ) {
+        todo!("Expected func, provided math expr. This should work. Hack around here ")
+        // We need to make the math expr to a func
     } else {
-        let passed_arg_key = passed_arg
+        passed_arg
             .typecheck(ty_state)
-            .expect("Arg always returns a key");
-        // Everything else is a primitive type. No deeper ty check necessary
-        ty_state.equate_keys(passed_arg_key, *called_func_arg_tc);
-    }
+            .expect("Arg always returns a key")
+    };
+
+    ty_state.equate_keys(passed_arg_key, *called_func_arg_tc);
 }
