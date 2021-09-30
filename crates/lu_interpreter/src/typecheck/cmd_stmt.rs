@@ -48,12 +48,12 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
     called_func: &TcFunc,
     ty_state: &mut TyCheckState,
 ) {
-    let mut func_arg_ty_iter = called_func.args_keys.iter();
+    let mut called_func_arg_tc_iter = called_func.args_keys.iter();
 
     for arg in args {
-        match func_arg_ty_iter.next() {
-            Some(func_arg_ty) => {
-                ty_check_cmd_arg(arg, func_arg_ty, cmd_node, ty_state);
+        match called_func_arg_tc_iter.next() {
+            Some(called_func_arg_tc) => {
+                ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);
             }
             None => {
                 if let Some(var_arg_ty) = called_func.var_arg_key {
@@ -73,7 +73,7 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
         }
     }
 
-    for non_passed_arg in func_arg_ty_iter {
+    for non_passed_arg in called_func_arg_tc_iter {
         let arg_decl = ty_state.get_item_of(non_passed_arg).clone();
         ty_state.push_err(
             TyErr::UnsatisfiedArg {
@@ -87,12 +87,12 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
 
 fn ty_check_cmd_arg(
     passed_arg: ValueExprElement,
-    expected_arg_ty: &TcKey,
+    called_func_arg_tc: &TcKey,
     cmd_node: &CmdStmtNode,
     ty_state: &mut TyCheckState,
 ) {
     // Check whether the expected arg is a function
-    if let Some(expected_fn_ty) = ty_state.get_tc_func(expected_arg_ty).cloned() {
+    if let Some(expected_fn_ty) = ty_state.get_tc_func(called_func_arg_tc).cloned() {
         debug!(
             "TyChecking passed_arg: {:?}, against expected_fn_ty",
             passed_arg.text()
@@ -105,8 +105,7 @@ fn ty_check_cmd_arg(
                     passed_var_path.var_name_parts()[0].clone(),
                     passed_var_path.to_item(),
                 );
-                if let Some(passed_fn_ty) = ty_state.expect_callable(&var_name, var_usage).cloned()
-                {
+                if let Some(passed_fn_ty) = ty_state.expect_callable(&var_name, var_usage) {
                     // CHECK maybe we should create a new key for the passed arg here. But atm it
                     // doesn't make a difference
                     expected_fn_ty.equate_with(&passed_fn_ty, ty_state);
@@ -124,10 +123,13 @@ fn ty_check_cmd_arg(
         if !matched {
             // Expected_ty did not match with passed arg. We must generate an error.
             // We call new_term_key_equated, as that goes then through a unified interface
-            ty_state.new_term_key_equated(passed_arg.to_item(), *expected_arg_ty);
+            ty_state.new_term_key_equated(passed_arg.to_item(), *called_func_arg_tc);
         }
     } else {
+        let passed_arg_key = passed_arg
+            .typecheck(ty_state)
+            .expect("Arg always returns a key");
         // Everything else is a primitive type. No deeper ty check necessary
-        ty_state.new_term_key_equated(passed_arg.to_item(), *expected_arg_ty);
+        ty_state.equate_keys(passed_arg_key, *called_func_arg_tc);
     }
 }

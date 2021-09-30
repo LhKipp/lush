@@ -154,11 +154,15 @@ impl TcVariant for ValueType {
     }
 
     fn meet(lhs: Partial<Self>, rhs: Partial<Self>) -> Result<Partial<Self>, Self::Err> {
+        debug!("Meeting: {} {}", lhs.variant, rhs.variant);
         let ty = if lhs.variant == rhs.variant {
             lhs.variant
         } else {
             // Not equal check for special coercion rules
             let coercable_ty = match (&lhs.variant, &rhs.variant) {
+                (ValueType::Unspecified, other) | (other, ValueType::Unspecified) => {
+                    Some(other.clone())
+                }
                 (ValueType::Any, other) | (other, ValueType::Any) => Some(other.clone()),
                 (ValueType::String, ValueType::BareWord) => Some(ValueType::String),
                 (ValueType::BareWord, ValueType::String) => Some(ValueType::String),

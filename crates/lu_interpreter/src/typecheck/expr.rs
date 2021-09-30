@@ -1,12 +1,9 @@
 use itertools::{EitherOrBoth, Itertools};
 use log::warn;
-use lu_syntax::{
-    ast::{
+use lu_syntax::{AstNode, AstToken, ast::{
         ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StrctCtorExprNode,
         StringExprNode, TableExprNode, ValueExprElement,
-    },
-    AstNode,
-};
+    }};
 use rusttyc::TcKey;
 
 use crate::{TyCheckState, TypeCheck, TypeCheckArg, ValueType};
@@ -38,23 +35,13 @@ impl TypeCheck for CmdOrValueExprElement {
 
 impl TypeCheck for BareWordToken {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
-        let key = ty_state.checker.new_term_key();
-        ty_state
-            .checker
-            .impose(key.concretizes_explicit(ValueType::BareWord))
-            .unwrap();
-        Some(key)
+        Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::BareWord))
     }
 }
 
 impl TypeCheck for NumberExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
-        let key = ty_state.checker.new_term_key();
-        ty_state
-            .checker
-            .impose(key.concretizes_explicit(ValueType::Number))
-            .unwrap();
-        Some(key)
+        Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::Number))
     }
 }
 
@@ -90,7 +77,7 @@ impl TypeCheck for TableExprNode {
 impl TypeCheck for StrctCtorExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
         // panic!("Ty chekcing ");
-        let strct_key = ty_state.expect_strct(&self.name(), self.to_item());
+        let strct_key = ty_state.expect_strct_from_usage(&self.name(), self.to_item());
         if let Some(strct_key) = strct_key.cloned() {
             let usage_key = ty_state.new_term_key_equated(self.to_item(), strct_key.self_key);
             // Check that all fields have correct ty

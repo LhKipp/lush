@@ -7,6 +7,8 @@ use lu_pipeline_stage::PipelineStage;
 use lu_syntax::ast::{CmdStmtNode, SourceFileNode};
 use lu_syntax::AstNode;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
+use std::collections::hash_map::Entry;
+use std::iter;
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
@@ -36,6 +38,8 @@ pub struct TyCheckState {
     tc_func_table: HashMap<TcKey, TcFunc>,
     /// TcKey to TcStrct
     tc_strct_table: HashMap<TcKey, TcStrct>,
+    /// TcKey to Generic name
+    tc_generic_table: HashMap<TcKey, String>,
 
     /// Final result of typechecking
     pub ty_table: HashMap<TcKey, ValueType>,
@@ -63,6 +67,7 @@ impl TyCheckState {
             tc_strct_table: HashMap::new(),
             ty_table: HashMap::new(),
             result: None,
+            tc_generic_table: HashMap::new(),
         }
     }
 
@@ -113,6 +118,11 @@ impl TyCheckState {
     }
 
     pub(crate) fn equate_keys(&mut self, key1: TcKey, key2: TcKey) {
+        debug!(
+            "Equating keys: {:?} {:?}",
+            self.get_item_of(&key1),
+            self.get_item_of(&key2)
+        );
         let res = key1.equate_with(key2);
         let res = self.checker.impose(res);
         self.handle_tc_result(res);
@@ -134,6 +144,8 @@ impl TyCheckState {
         if let Some(func_ty) = ty.as_func() {
             let tc_func = TcFunc::from_signature(&*func_ty, self); // Generate func first
             self.equate_keys(key, tc_func.self_key) // Set term equal to func
+        } else if let Some(generic_name) = ty.as_generic() {
+            self.tc_generic_table.insert(key, generic_name.clone()); // No further concretization needed
         } else {
             warn!("Array and strct not handled");
             let res = self.checker.impose(key.concretizes_explicit(ty));
@@ -241,8 +253,22 @@ impl TyCheckState {
         }
     }
 
+    /// Returns the strct behind key if key is a Strct. Records an error otherwise
+    /// Therefore the user does not have to handle the None case
+    fn expect_strct_from_key(&mut self, key: &TcKey) -> Option<&TcStrct> {
+        if !self.tc_strct_table.contains_key(key) {
+            let item = self.get_item_of(key).clone();
+            self.push_err(TyErr::VarIsNotStruct(item).into());
+        };
+        self.tc_strct_table.get(key)
+    }
+
     /// Some if such a struct is found. None otherwise (and an error will be generated)
-    pub(crate) fn expect_strct(&mut self, name: &str, usage: SourceCodeItem) -> Option<&TcStrct> {
+    pub(crate) fn expect_strct_from_usage(
+        &mut self,
+        name: &str,
+        usage: SourceCodeItem,
+    ) -> Option<&TcStrct> {
         if let Some(var_key) = self.get_key_of_var(name) {
             self.tc_strct_table.get(&var_key)
         } else {
@@ -254,13 +280,23 @@ impl TyCheckState {
     /// Some if such a callable is found. None otherwise (and an error will be generated)
     pub(crate) fn expect_callable(
         &mut self,
-        var_name: &str,
-        var_usage: SourceCodeItem,
-    ) -> Option<&TcFunc> {
-        if let Some(var_key) = self.get_key_of_var(&var_name) {
-            self.tc_func_table.get(&var_key)
+        cllbl_name: &str,
+        cllbl_usage: SourceCodeItem,
+    ) -> Option<TcFunc> {
+        if let Some(var_key) = self.get_key_of_var(&cllbl_name) {
+            if let Some(tc_func) = self.tc_func_table.get(&var_key).cloned() {
+                Some(tc_func.substitute_generics(self))
+            } else {
+                self.push_err(
+                    TyErr::VarExpectedToBeFunc {
+                        var_usage: cllbl_usage,
+                    }
+                    .into(),
+                );
+                None
+            }
         } else {
-            self.push_err(TyErr::VarExpectedToBeFunc { var_usage }.into());
+            self.push_err(AstErr::CmdNotInScope(cllbl_usage).into());
             None
         }
     }
@@ -306,14 +342,8 @@ impl TyCheckState {
         self.tc_func_table.get(key)
     }
 
-    /// Returns the strct behind key if key is a Strct. Records an error otherwise
-    /// Therefore the user does not have to handle the None case
-    fn expect_tc_strct(&mut self, key: &TcKey) -> Option<&TcStrct> {
-        if !self.tc_strct_table.contains_key(key) {
-            let item = self.get_item_of(key).clone();
-            self.push_err(TyErr::VarIsNotStruct(item).into());
-        };
-        self.tc_strct_table.get(key)
+    fn get_tc_generic(&self, key: &TcKey) -> Option<&String> {
+        self.tc_generic_table.get(key)
     }
 }
 
@@ -388,6 +418,72 @@ pub struct TcFunc {
 }
 
 impl TcFunc {
+    #[allow(unused)]
+    pub fn all_keys_iter(&self) -> impl Iterator<Item = TcKey> + '_ {
+        iter::once(self.in_key.clone())
+            .chain(iter::once(self.ret_key.clone()))
+            .chain(self.args_keys.clone())
+            .chain(self.var_arg_key)
+    }
+
+    pub(crate) fn substitute_generics(self, ty_state: &mut TyCheckState) -> TcFunc {
+        let mut generics_key = HashMap::<String, TcKey>::new();
+        self.substitute_generics_rec(&mut generics_key, ty_state)
+    }
+
+    fn substitute_generics_rec(
+        mut self,
+        seen_generics: &mut HashMap<String, TcKey>,
+        ty_state: &mut TyCheckState,
+    ) -> TcFunc {
+        let mut subst_generic_key = |key: TcKey| {
+            if let Some(generic_name) = ty_state.get_tc_generic(&key).cloned() {
+                let key_item = ty_state.get_item_of(&key).clone();
+                // Generic key which needs to be substituted
+                let generic_key = ty_state.new_term_key(key_item.clone());
+                match seen_generics.entry(generic_name.clone()) {
+                    Entry::Occupied(already_inserted_key) => {
+                        let already_inserted_generic_item =
+                            ty_state.get_item_of(already_inserted_key.get());
+                        debug!(
+                            "Unifying {:?} with other generic {:?}",
+                            key_item, already_inserted_generic_item
+                        );
+                        ty_state.equate_keys(generic_key, already_inserted_key.get().clone());
+                    }
+                    Entry::Vacant(v) => {
+                        debug!(
+                            "Found generic ty: {:?} for first time and substituted it.",
+                            key_item
+                        );
+                        v.insert(generic_key);
+                    }
+                };
+                generic_key
+            } else if let Some(tc_func) = ty_state.get_tc_func(&key).cloned() {
+                // Recurse into tc_func which also needs to be substituted
+                let key = tc_func.self_key.clone();
+                tc_func.substitute_generics_rec(seen_generics, ty_state);
+                key
+            } else {
+                warn!("NOT RECURSING INTO ARRAY. NOT IMPL YET");
+                key
+            }
+        };
+
+        self.in_key = subst_generic_key(self.in_key);
+        self.ret_key = subst_generic_key(self.ret_key);
+        if let Some(var_arg_key) = &mut self.var_arg_key {
+            *var_arg_key = subst_generic_key(*var_arg_key);
+        }
+        for arg_key in self.args_keys.iter_mut() {
+            *arg_key = subst_generic_key(*arg_key)
+        }
+        // TODO handle flags
+
+        self
+    }
+
     /// generate a TcFunc from func. Each arg / flag / in / ret type of the func
     /// will be inserted as a seperate pseudo variable
     pub fn from_signature(sign: &Signature, ty_state: &mut TyCheckState) -> Self {

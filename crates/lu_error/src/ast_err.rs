@@ -17,6 +17,7 @@ pub enum AstErr {
     Message(String),
     VarNotInScope(SourceCodeItem),
     StrctNotInScope(SourceCodeItem),
+    CmdNotInScope(SourceCodeItem),
 }
 
 impl AstErr {
@@ -26,6 +27,7 @@ impl AstErr {
             AstErr::Message(_) => todo!(),
             AstErr::VarNotInScope(_) => todo!(),
             AstErr::StrctNotInScope(_) => todo!(),
+            AstErr::CmdNotInScope(_) => todo!(),
         }
     }
 }

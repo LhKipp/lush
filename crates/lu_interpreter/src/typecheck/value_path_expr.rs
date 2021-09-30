@@ -13,7 +13,7 @@ impl TypeCheck for ValuePathExprNode {
             if let Some(last_key) = prev_key {
                 // we have a part which is dependend on the previous value_path part
                 // e.G. $a.b (with part == "b" and last_key = key_of(a))
-                if let Some(strct) = state.expect_tc_strct(&last_key).cloned() {
+                if let Some(strct) = state.expect_strct_from_key(&last_key).cloned() {
                     if let Some(key) = strct
                         .field_keys
                         .iter()
