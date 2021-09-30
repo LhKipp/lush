@@ -188,6 +188,7 @@ fn second_level_stmt() -> OrRule {
 
 fn top_level_stmt() -> OrRule {
     let mut second_level_stmt = second_level_stmt();
+    second_level_stmt.rules.push(Box::new(UseStmtRule {}));
     second_level_stmt.rules.push(Box::new(FnStmtRule {}));
     second_level_stmt.rules.push(Box::new(StrctStmtRule {}));
     second_level_stmt.kind = Some("Top level stmt".into());
