@@ -2,7 +2,7 @@
 #![allow(unused_variables)]
 use std::iter;
 
-use log::debug;
+use log::{debug, warn};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
@@ -99,33 +99,22 @@ fn ty_check_cmd_arg(
         );
         // The function expects a function as an arg
         // We need to ty check the passed arg against the accepted func
-        let matched = match passed_arg {
-            ValueExprElement::ValuePathExpr(ref passed_var_path) => {
-                let (var_name, var_usage) = (
-                    passed_var_path.var_name_parts()[0].clone(),
-                    passed_var_path.to_item(),
-                );
-                if let Some(passed_fn_ty) = ty_state.expect_callable(&var_name, var_usage) {
-                    // CHECK maybe we should create a new key for the passed arg here. But atm it
-                    // doesn't make a difference
+        match passed_arg {
+            ValueExprElement::MathExpr(_) => {
+                todo!("Expected func, provided math expr. This should work. Hack around here ")
+            }
+            _ => {
+                let passed_arg_key = passed_arg.typecheck(ty_state).expect("Arg always has key");
+                if let Some(passed_fn_ty) = ty_state.expect_callable_from_key(passed_arg_key) {
                     expected_fn_ty.equate_with(&passed_fn_ty, ty_state);
                     true
                 } else {
                     false
                 }
             }
-            ValueExprElement::MathExpr(_) => {
-                todo!("Expected func, provided math expr. This should work")
-            }
-            _ => false,
         };
-
-        if !matched {
-            // Expected_ty did not match with passed arg. We must generate an error.
-            // We call new_term_key_equated, as that goes then through a unified interface
-            ty_state.new_term_key_equated(passed_arg.to_item(), *called_func_arg_tc);
-        }
     } else {
+        warn!("Array as cmd arg not handled special");
         let passed_arg_key = passed_arg
             .typecheck(ty_state)
             .expect("Arg always returns a key");

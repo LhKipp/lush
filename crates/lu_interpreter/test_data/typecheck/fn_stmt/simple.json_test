@@ -1,0 +1,43 @@
+Generics are of same type
+===
+fn func(arg1: T1 arg2: T1 ret: T1)
+end
+func 1 1
+---
+{
+  "Ok": "Number"
+}
+...
+Generics T_s of different type results in error
+===
+fn func(arg1: T1 arg2: T1 ret: T1)
+end
+func 1 "text"
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": " ret: T1",
+            "range": [
+              25,
+              33
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "\"text\"",
+            "range": [
+              46,
+              52
+            ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...

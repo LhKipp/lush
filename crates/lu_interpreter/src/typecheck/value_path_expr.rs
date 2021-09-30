@@ -38,7 +38,7 @@ impl TypeCheck for ValuePathExprNode {
                 }
             } else {
                 // No previous part, this is no field indexing
-                if let Some(var_key) = state.expect_var(&part, item) {
+                if let Some(var_key) = state.expect_key_from_var(&part, item) {
                     prev_key = Some(var_key)
                 } else {
                     // Var not present, error key

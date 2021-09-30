@@ -244,7 +244,11 @@ impl TyCheckState {
     }
 
     /// Returns Some(var_key) if var is present, none otherwise (and an error will be generated)
-    pub(crate) fn expect_var(&mut self, var_name: &str, usage: SourceCodeItem) -> Option<TcKey> {
+    pub(crate) fn expect_key_from_var(
+        &mut self,
+        var_name: &str,
+        usage: SourceCodeItem,
+    ) -> Option<TcKey> {
         if let Some(var_key) = self.get_key_of_var(var_name) {
             Some(var_key)
         } else {
@@ -258,7 +262,7 @@ impl TyCheckState {
     fn expect_strct_from_key(&mut self, key: &TcKey) -> Option<&TcStrct> {
         if !self.tc_strct_table.contains_key(key) {
             let item = self.get_item_of(key).clone();
-            self.push_err(TyErr::VarIsNotStruct(item).into());
+            self.push_err(TyErr::ItemExpectedToBeStruct(item).into());
         };
         self.tc_strct_table.get(key)
     }
@@ -277,26 +281,30 @@ impl TyCheckState {
         }
     }
 
+    /// Returns the strct behind key if key is a Strct. Records an error otherwise
+    /// Therefore the user does not have to handle the None case
+    fn expect_callable_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
+        let tc_callabl = self
+            .get_tc_func(&key.clone())
+            .cloned()
+            .map(|tc_func| tc_func.substitute_generics(self));
+
+        if tc_callabl.is_none() {
+            let key_item = self.get_item_of(&key).clone();
+            self.push_err(TyErr::ItemExpectedToBeFunc(key_item).into());
+        }
+        tc_callabl
+    }
+
     /// Some if such a callable is found. None otherwise (and an error will be generated)
-    pub(crate) fn expect_callable(
+    fn expect_callable_from_var(
         &mut self,
         cllbl_name: &str,
         cllbl_usage: SourceCodeItem,
     ) -> Option<TcFunc> {
-        if let Some(var_key) = self.get_key_of_var(&cllbl_name) {
-            if let Some(tc_func) = self.tc_func_table.get(&var_key).cloned() {
-                Some(tc_func.substitute_generics(self))
-            } else {
-                self.push_err(
-                    TyErr::VarExpectedToBeFunc {
-                        var_usage: cllbl_usage,
-                    }
-                    .into(),
-                );
-                None
-            }
+        if let Some(var_key) = self.expect_key_from_var(&cllbl_name, cllbl_usage) {
+            self.expect_callable_from_key(var_key)
         } else {
-            self.push_err(AstErr::CmdNotInScope(cllbl_usage).into());
             None
         }
     }
@@ -313,7 +321,7 @@ impl TyCheckState {
             .map(|(i, var)| (i, var.clone()))
         {
             let var_name = possibl_longest_name[0..name_args_split_i].join(" ");
-            self.expect_callable(&var_name, caller_node.to_item())
+            self.expect_callable_from_var(&var_name, caller_node.to_item())
                 .map(|callabl| (name_args_split_i, callabl.clone()))
         } else {
             // Called cmd is not found --> It's prob an external cmd
