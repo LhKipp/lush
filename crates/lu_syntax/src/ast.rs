@@ -12,6 +12,7 @@ mod signature;
 mod struct_stmt;
 mod type_;
 mod value_path_expr;
+mod use_stmt;
 use std::marker::PhantomData;
 
 use lu_error::SourceCodeItem;

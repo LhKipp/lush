@@ -2060,6 +2060,57 @@ impl HasRule for TableExprNode{
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum UsePathElement {
+    BareWord(BareWordToken),
+    MultSign(MultSignToken),
+    }
+
+impl UsePathElement {
+}
+
+impl AstElement for UsePathElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        match kind{
+            BareWord | MultSign => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        let res = match syntax.kind() {
+            BareWord => UsePathElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            MultSign => UsePathElement::MultSign(MultSignToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            UsePathElement::BareWord(it) => it.syntax.clone().into(),
+            
+            
+            UsePathElement::MultSign(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for UsePathElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            UsePathElement::BareWord(it) => it.get_syntax_kind(),
+            UsePathElement::MultSign(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum CmdOrValueExprElement {
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
