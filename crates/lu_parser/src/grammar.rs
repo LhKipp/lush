@@ -41,6 +41,7 @@ mod ret_stmt;
 mod signature;
 mod struct_stmt;
 mod type_;
+mod use_;
 mod value_path_expr;
 
 use itertools::Itertools;
@@ -66,6 +67,7 @@ pub use ret_stmt::RetStmtRule;
 pub use signature::SignatureRule;
 pub use struct_stmt::{StrctCtorExprRule, StrctStmtRule};
 pub use type_::{ArrayTypeRule, FnTypeRule, LuTypeRule};
+pub use use_::UseStmtRule;
 pub use value_path_expr::ValuePathExprRule;
 
 pub trait Rule {

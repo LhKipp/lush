@@ -2,6 +2,7 @@ Config(
     syntax_elements: [
     // === KEYWORDS ===
     ( name: "StrctKeyword"              , token_text: "struct"                         , is_token: true   , ) ,
+    ( name: "UseKeyword"                 , token_text: "use"                            , is_token: true   , ) ,
     ( name: "LetKeyword"                 , token_text: "let"                            , is_token: true   , ) ,
     ( name: "FnKeyword"                  , token_text: "fn"                             , is_token: true   , ) ,
     ( name: "ForKeyword"                 , token_text: "for"                            , is_token: true   , ) ,
@@ -80,6 +81,7 @@ Config(
     // === RULES ===
     ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "StrctStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
+    ( name: "UseStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "StrctField"                , is_node: true                                , has_rule: false   , ) , // TODO has rule but not needed
     ( name: "StrctCtorExpr"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "StrctFieldCtorStmt"                , is_node: true                                , has_rule: false   , ) , // TODO has rule but not needed

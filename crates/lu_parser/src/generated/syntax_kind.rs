@@ -8,6 +8,8 @@ pub enum SyntaxKind {
     
     #[token("struct")]
     StrctKeyword,
+    #[token("use")]
+    UseKeyword,
     #[token("let")]
     LetKeyword,
     #[token("fn")]
@@ -125,6 +127,7 @@ pub enum SyntaxKind {
     StrctFieldName,
     SourceFile,
     StrctStmt,
+    UseStmt,
     StrctField,
     StrctCtorExpr,
     StrctFieldCtorStmt,
@@ -162,6 +165,7 @@ impl SyntaxKind{
     pub const fn name(self) -> &'static str {
         match self {
             SyntaxKind::StrctKeyword => "StrctKeyword",
+            SyntaxKind::UseKeyword => "UseKeyword",
             SyntaxKind::LetKeyword => "LetKeyword",
             SyntaxKind::FnKeyword => "FnKeyword",
             SyntaxKind::ForKeyword => "ForKeyword",
@@ -227,6 +231,7 @@ impl SyntaxKind{
             SyntaxKind::StrctFieldName => "StrctFieldName",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::StrctStmt => "StrctStmt",
+            SyntaxKind::UseStmt => "UseStmt",
             SyntaxKind::StrctField => "StrctField",
             SyntaxKind::StrctCtorExpr => "StrctCtorExpr",
             SyntaxKind::StrctFieldCtorStmt => "StrctFieldCtorStmt",
@@ -266,6 +271,7 @@ impl SyntaxKind{
 #[macro_export]
 macro_rules! T {
     [struct] => {$crate::SyntaxKind::StrctKeyword };
+    [use] => {$crate::SyntaxKind::UseKeyword };
     [let] => {$crate::SyntaxKind::LetKeyword };
     [fn] => {$crate::SyntaxKind::FnKeyword };
     [for] => {$crate::SyntaxKind::ForKeyword };

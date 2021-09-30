@@ -30,6 +30,27 @@ impl HasSyntaxKind for StrctKeywordToken{
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct UseKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for UseKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::UseKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for UseKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1410,6 +1431,27 @@ impl AstNode for StrctStmtNode {
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
 impl HasSyntaxKind for StrctStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct UseStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for UseStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::UseStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for UseStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
