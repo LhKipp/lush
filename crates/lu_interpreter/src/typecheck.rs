@@ -38,6 +38,8 @@ pub struct TyCheckState {
     tc_func_table: HashMap<TcKey, TcFunc>,
     /// TcKey to TcStrct
     tc_strct_table: HashMap<TcKey, TcStrct>,
+    /// TcKey to Inner Tc of Array
+    tc_array_table: HashMap<TcKey, TcKey>,
     /// TcKey to Generic name
     tc_generic_table: HashMap<TcKey, String>,
 
@@ -65,9 +67,10 @@ impl TyCheckState {
             tc_expr_table: HashMap::new(),
             tc_func_table: HashMap::new(),
             tc_strct_table: HashMap::new(),
+            tc_generic_table: HashMap::new(),
+            tc_array_table: HashMap::new(),
             ty_table: HashMap::new(),
             result: None,
-            tc_generic_table: HashMap::new(),
         }
     }
 
@@ -125,7 +128,9 @@ impl TyCheckState {
         );
         let res = key1.equate_with(key2);
         let res = self.checker.impose(res);
-        self.handle_tc_result(res);
+        if self.handle_tc_result(res) {
+            return; // error no more equation
+        }
 
         // If other is a func, we need to also equate the inner func_keys
         // We do so by inserting cloning and reinserting the tc_func
@@ -137,6 +142,10 @@ impl TyCheckState {
             self.tc_strct_table.insert(key1, tc_strct);
         } else if let Some(tc_strct) = self.tc_strct_table.get(&key1).cloned() {
             self.tc_strct_table.insert(key2, tc_strct);
+        } else if let Some(tc_array) = self.tc_array_table.get(&key2).cloned() {
+            self.tc_array_table.insert(key1, tc_array);
+        } else if let Some(tc_array) = self.tc_array_table.get(&key1).cloned() {
+            self.tc_array_table.insert(key2, tc_array);
         }
     }
 
@@ -146,17 +155,27 @@ impl TyCheckState {
             self.equate_keys(key, tc_func.self_key) // Set term equal to func
         } else if let Some(generic_name) = ty.as_generic() {
             self.tc_generic_table.insert(key, generic_name.clone()); // No further concretization needed
+        } else if let Some((inner_ty, inner_ty_decl)) = ty.as_array() {
+            let inner_ty_key =
+                self.new_term_key_concretiziesd(inner_ty_decl.clone(), *inner_ty.clone());
+            self.tc_array_table.insert(key, inner_ty_key);
+
+            let res = self.checker.impose(key.concretizes_explicit(ty.clone()));
+            self.handle_tc_result(res);
         } else {
-            warn!("Array and strct not handled");
+            warn!("strct not handled");
             let res = self.checker.impose(key.concretizes_explicit(ty));
             self.handle_tc_result(res);
         }
     }
 
     /// TODO pass Constraint when Constraint is pub and do impose here instead on caller side
-    pub(crate) fn handle_tc_result(&mut self, res: Result<(), TcErr<ValueType>>) {
+    pub(crate) fn handle_tc_result(&mut self, res: Result<(), TcErr<ValueType>>) -> bool {
         if let Err(e) = res {
-            self.handle_tc_err(e)
+            self.handle_tc_err(e);
+            true
+        } else {
+            false
         }
     }
 

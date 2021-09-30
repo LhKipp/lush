@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use enum_as_inner::EnumAsInner;
 use log::{debug, warn};
-use lu_error::LuErr;
+use lu_error::{LuErr, SourceCodeItem};
 use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
@@ -49,7 +49,11 @@ pub enum ValueType {
     BareWord,
     /// Struct with name
     Strct(Box<Strct>),
-    Array(Box<ValueType>),
+    /// Box with inner ty and inner_ty_decl
+    Array {
+        inner_ty: Box<ValueType>,
+        inner_ty_decl: SourceCodeItem,
+    },
     // #[educe(PartialEq(method = "cmp_sign_types"))]
     Func(Box<Signature>),
 }
@@ -66,17 +70,25 @@ impl PartialEq for ValueType {
             (ValueType::Number, ValueType::Number) => true,
             (ValueType::String, ValueType::String) => true,
             (ValueType::BareWord, ValueType::BareWord) => true,
-            (ValueType::Array(a_inner), ValueType::Array(b_inner)) => a_inner == b_inner,
+            (ValueType::Array { inner_ty: a_ty, .. }, ValueType::Array { inner_ty: b_ty, .. }) => {
+                a_ty == b_ty
+            }
             (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
             (ValueType::Strct(a), ValueType::Strct(b)) => a.name == b.name,
-            _ => false,
+            (a, b) => {
+                warn!("Compared two value_types which are distinct: {} {}?", a, b);
+                false
+            }
         }
     }
 }
 
 impl ValueType {
-    pub fn new_array(inner_ty: ValueType) -> Self {
-        ValueType::Array(Box::new(inner_ty))
+    pub fn new_array(inner_ty: ValueType, inner_ty_decl: SourceCodeItem) -> Self {
+        ValueType::Array {
+            inner_ty: Box::new(inner_ty),
+            inner_ty_decl,
+        }
     }
 
     pub fn new_func(sign: Signature) -> Self {
@@ -154,6 +166,10 @@ impl TcVariant for ValueType {
     }
 
     fn meet(lhs: Partial<Self>, rhs: Partial<Self>) -> Result<Partial<Self>, Self::Err> {
+        assert!(
+            lhs.variant.as_generic().is_none() && rhs.variant.as_generic().is_none(),
+            "Generics have to be substituted before meet"
+        );
         debug!("Meeting: {} {}", lhs.variant, rhs.variant);
         let ty = if lhs.variant == rhs.variant {
             lhs.variant
@@ -166,23 +182,32 @@ impl TcVariant for ValueType {
                 (ValueType::Any, other) | (other, ValueType::Any) => Some(other.clone()),
                 (ValueType::String, ValueType::BareWord) => Some(ValueType::String),
                 (ValueType::BareWord, ValueType::String) => Some(ValueType::String),
-                (ValueType::Array(lhs_inner), ValueType::Array(rhs_inner)) => {
-                    let (lhs_arity, rhs_arity) = match (lhs_inner.arity(), rhs_inner.arity()) {
-                        (Arity::Fixed(l), Arity::Fixed(r)) => (l, r),
-                        _ => unreachable!("All types have fixed arity"),
-                    };
-                    let inner = ValueType::meet(
-                        Partial {
-                            variant: *lhs_inner.clone(),
-                            least_arity: lhs_arity,
-                        },
-                        Partial {
-                            variant: *rhs_inner.clone(),
-                            least_arity: rhs_arity,
-                        },
-                    )?;
-                    Some(ValueType::Array(Box::new(inner.variant)))
-                }
+                // (
+                //     ValueType::Array {
+                //         inner_ty: lhs_inner,
+                //         ..
+                //     },
+                //     ValueType::Array {
+                //         inner_ty: rhs_inner,
+                //         ..
+                //     },
+                // ) => {
+                //     let (lhs_arity, rhs_arity) = match (lhs_inner.arity(), rhs_inner.arity()) {
+                //         (Arity::Fixed(l), Arity::Fixed(r)) => (l, r),
+                //         _ => unreachable!("All types have fixed arity"),
+                //     };
+                //     let inner = ValueType::meet(
+                //         Partial {
+                //             variant: *lhs_inner.clone(),
+                //             least_arity: lhs_arity,
+                //         },
+                //         Partial {
+                //             variant: *rhs_inner.clone(),
+                //             least_arity: rhs_arity,
+                //         },
+                //     )?;
+                //     Some(ValueType::Array { inner_ty: Box::new(inner), inner_ty_decl: val })
+                // }
                 _ => None,
             };
             coercable_ty.ok_or_else(|| ValueTypeErr::NotMeetAble {
@@ -215,7 +240,7 @@ impl TcVariant for ValueType {
             | ValueType::Func(_)
             | ValueType::Strct(_)
             | ValueType::BareWord => Arity::Fixed(0),
-            ValueType::Array(_) => Arity::Fixed(1),
+            ValueType::Array { .. } => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
         }
     }
@@ -240,7 +265,7 @@ impl Display for ValueType {
             ValueType::Number => write!(f, "num"),
             ValueType::String => write!(f, "str"),
             ValueType::BareWord => write!(f, "bare_word"),
-            ValueType::Array(t) => write!(f, "[{}]", t),
+            ValueType::Array { inner_ty, .. } => write!(f, "[{}]", *inner_ty),
             ValueType::Strct(strct) => {
                 write!(f, "{}{{ ", strct.name)?;
                 for field in &strct.fields {
