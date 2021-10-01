@@ -5,6 +5,8 @@ use thiserror::Error;
 
 #[derive(Clone, Error, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum FsErr {
+    #[error("{0}")]
+    Message(String),
     #[error("Reading of file {0} failed with message\n:{1}")]
     ReadFailed(PathBuf, String),
     #[error("Writing of file {0} failed with message\n:{1}")]

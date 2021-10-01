@@ -1,0 +1,3 @@
+fn plugin1_f1(ret: num)
+    ret 5
+end

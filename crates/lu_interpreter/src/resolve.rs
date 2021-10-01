@@ -2,6 +2,7 @@
 
 mod block_stmt;
 mod source_file;
+mod test;
 
 use std::fmt::Debug;
 use std::path::PathBuf;
@@ -20,7 +21,7 @@ use lu_syntax::Parse;
 use lu_syntax_elements::BlockType;
 
 use crate::visit_arg::VisitArg;
-use crate::{FlagSignature, Function, Scope, Variable};
+use crate::{FlagSignature, Function, InterpreterCfg, Scope, Variable};
 use crate::{ScopeFrameTag, ValueType};
 
 pub trait Resolve: Debug {
@@ -47,10 +48,12 @@ pub trait Resolve: Debug {
 #[derive(Educe)]
 #[educe(Debug)]
 pub struct Resolver {
-    pub parse: Parse,
+    pub parses: Vec<Parse>,
     #[educe(Debug(ignore))]
     pub scope: Arc<Mutex<Scope<Variable>>>,
     pub errors: Vec<LuErr>,
+
+    pub config: Rc<InterpreterCfg>,
 }
 
 #[derive(Clone, Debug)]
@@ -59,28 +62,45 @@ pub enum ResolveArg {
 }
 
 impl Resolver {
-    pub fn new(parse: Parse, scope: Arc<Mutex<Scope<Variable>>>) -> Self {
+    pub fn new(
+        parse: Parse,
+        scope: Arc<Mutex<Scope<Variable>>>,
+        config: Rc<InterpreterCfg>,
+    ) -> Self {
         Self {
-            parse,
+            parses: vec![parse],
             scope,
             errors: Vec::new(),
+            config,
         }
     }
 
     pub(crate) fn resolve(&mut self) {
-        let source_file = self.parse.cast::<SourceFileNode>().unwrap();
-        let source_f_path = self.parse.source.path.clone();
+        let source_file = self.get_start_parse().cast::<SourceFileNode>().unwrap();
+        let source_f_path = self.get_start_parse().source.path.clone();
 
         source_file.resolve_dependant_names_with_args(
             &[ResolveArg::Arg(VisitArg::SourceFilePath(source_f_path))],
             self,
         );
     }
+
+    pub fn get_start_parse(&self) -> &Parse {
+        &self.parses[0]
+    }
 }
 
 impl PipelineStage for Resolver {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
-        Some(&self.parse)
+        Some(&self.parses[0])
+    }
+
+    fn collect_all_errors_cb(&self) -> Vec<LuErr> {
+        self.parses
+            .iter()
+            .map(|parse| parse.get_errors().clone())
+            .flatten()
+            .collect()
     }
 
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {

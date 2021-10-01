@@ -1,15 +1,17 @@
+use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
+use multimap::MultiMap;
 use std::{collections::HashMap, fmt, path::PathBuf};
-use tap::prelude::*;
+use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 use lu_syntax_elements::BlockType;
 
 use crate::{Callable, Strct, Variable};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, EnumAsInner)]
 pub enum ScopeFrameTag {
     None,
 
@@ -82,6 +84,9 @@ where
     pub arena: Arena<ScopeFrame<T>>,
     /// Always a valid id
     cur_frame_id: Option<NodeId>,
+
+    /// From NodeId of SourceFile to [NodeId of SourceFile]
+    pub use_stmts: MultiMap<NodeId, NodeId>,
 }
 
 impl<T: fmt::Debug + 'static> Scope<T> {
@@ -89,6 +94,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         Scope {
             arena: Arena::new(),
             cur_frame_id: None,
+            use_stmts: MultiMap::new(),
         }
     }
 
@@ -153,7 +159,17 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         }
     }
 
-    fn get_cur_tag(&self) -> ScopeFrameTag {
+    pub fn select_parent_frame(&mut self) {
+        debug!("Selecting parent frame");
+        self.cur_frame_id = self
+            .cur_frame_id
+            .unwrap()
+            .ancestors(&self.arena)
+            .skip(1)
+            .next();
+    }
+
+    pub fn get_cur_frame_tag(&self) -> ScopeFrameTag {
         if let Some(cur_frame_id) = self.cur_frame_id {
             let cur_frame = &self.arena[cur_frame_id];
             cur_frame.get().get_tag().clone()
@@ -172,7 +188,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         self.arena[id].get().get_tag()
     }
 
-    fn fmt_as_string(&self) -> String {
+    pub fn fmt_as_string(&self) -> String {
         if self.is_empty() {
             return "Empty Scope".to_string();
         }
@@ -210,29 +226,63 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 }
 
 impl Scope<Variable> {
-    pub fn find_var(&self, name: &str) -> Option<&Variable> {
-        debug!("Finding var {} from {:?} on", name, self.get_cur_tag());
+    fn cur_source_f_id(&self) -> Option<NodeId> {
         if let Some(cur_frame_id) = self.cur_frame_id {
-            cur_frame_id
-                .ancestors(&self.arena)
-                .map(|n_id| {
-                    self.arena
-                        .get(n_id)
-                        .expect("Current_id should always have at least 1 ancestor")
-                        .get()
-                })
-                .flat_map(|frame| frame.get(name))
-                .next()
-                .tap(|result| debug!("Found var: {:?}", result))
+            cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
+                let frame = self.arena[n_id].get();
+                if frame.get_tag().as_source_file_frame().is_some() {
+                    Some(n_id)
+                } else {
+                    None
+                }
+            })
         } else {
-            debug!("Tried to get_var, but scope is empty");
             None
         }
+    }
+    fn frames_to_find_var_in(&self) -> Vec<&ScopeFrame<Variable>> {
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            let mut frames_till_global: Vec<&ScopeFrame<Variable>> = cur_frame_id
+                .ancestors(&self.arena)
+                .map(|n_id| self.arena[n_id].get())
+                .collect();
+            if let Some(cur_source_f_id) = self.cur_source_f_id() {
+                if let Some(use_stmts_ids) = self.use_stmts.get_vec(&cur_source_f_id) {
+                    frames_till_global.extend(
+                        use_stmts_ids
+                            .iter()
+                            .map(|use_stmt_id| self.arena[*use_stmt_id].get()),
+                    )
+                }
+            }
+            frames_till_global
+        } else {
+            vec![]
+        }
+    }
+
+    pub fn find_var(&self, name: &str) -> Option<&Variable> {
+        debug!(
+            "Finding var {} from {:?} on",
+            name,
+            self.get_cur_frame_tag()
+        );
+        debug!("Scope is: {}", self.fmt_as_string());
+        let frames_to_check_var_for = self.frames_to_find_var_in();
+        frames_to_check_var_for
+            .iter()
+            .tap(|frame| debug!("Searching for var {} in {:?}", name, frame))
+            .find_map(|frame| frame.get(name))
+            .tap(|result| debug!("Result for find_var {}: {:?}", name, result))
     }
 
     #[allow(unused)]
     fn find_func(&self, name: &str) -> Option<&Callable> {
-        debug!("Finding cmd {} from {:?} on", name, self.get_cur_tag());
+        debug!(
+            "Finding cmd {} from {:?} on",
+            name,
+            self.get_cur_frame_tag()
+        );
         // TODO write check that no variable shadows a func name
         self.find_var(name)
             .map(|var| var.val_as_callable())
@@ -241,7 +291,11 @@ impl Scope<Variable> {
 
     #[allow(unused)]
     pub fn find_strct(&self, name: &str) -> Option<&Strct> {
-        debug!("Finding cmd {} from {:?} on", name, self.get_cur_tag());
+        debug!(
+            "Finding cmd {} from {:?} on",
+            name,
+            self.get_cur_frame_tag()
+        );
         // TODO write check that no variable shadows a func name
         self.find_var(name).map(|var| var.val_as_strct()).flatten()
     }

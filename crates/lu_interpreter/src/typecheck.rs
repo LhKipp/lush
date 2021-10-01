@@ -75,8 +75,12 @@ impl TyCheckState {
     }
 
     pub fn typecheck(&mut self) {
-        let source_file = self.resolve.parse.cast::<SourceFileNode>().unwrap();
-        let source_f_path = self.resolve.parse.source.path.clone();
+        let source_file = self
+            .resolve
+            .get_start_parse()
+            .cast::<SourceFileNode>()
+            .unwrap();
+        let source_f_path = self.resolve.get_start_parse().source.path.clone();
 
         let ret_key = source_file.typecheck_with_args(
             &[TypeCheckArg::Arg(VisitArg::SourceFilePath(source_f_path))],

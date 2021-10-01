@@ -12,19 +12,34 @@ use lu_text_util::SourceCode;
 use lu_value::Value;
 
 use parking_lot::Mutex;
-use std::{path::PathBuf, sync::Arc};
+use std::{path::PathBuf, rc::Rc, sync::Arc};
 
 use crate::{typecheck::TyCheckState, Evaluable, Evaluator, Resolver, Scope, Variable};
+
+#[derive(Debug)]
+pub struct InterpreterCfg {
+    pub plugin_dir: PathBuf,
+}
+
+impl Default for InterpreterCfg {
+    fn default() -> Self {
+        InterpreterCfg {
+            plugin_dir: "/home/leo/.config/lu/plugins".into(),
+        }
+    }
+}
 
 /// The interpreter holds data (scope), getting transformed while interpreting the ast.
 pub struct Interpreter {
     pub scope: Arc<Mutex<Scope<Variable>>>,
+    pub config: Rc<InterpreterCfg>,
 }
 
 impl Interpreter {
-    pub fn new(scope: Scope<Variable>) -> Self {
+    pub fn new(scope: Scope<Variable>, config: InterpreterCfg) -> Self {
         Interpreter {
             scope: Arc::new(Mutex::new(scope)),
+            config: Rc::new(config),
         }
     }
 
@@ -33,7 +48,7 @@ impl Interpreter {
     }
 
     pub fn resolve(&mut self, parse: Parse) -> Resolver {
-        let mut resolver = Resolver::new(parse, self.scope.clone());
+        let mut resolver = Resolver::new(parse, self.scope.clone(), self.config.clone());
         resolver.resolve();
 
         resolver

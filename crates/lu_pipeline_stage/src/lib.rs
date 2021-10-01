@@ -7,6 +7,11 @@ pub trait PipelineStage {
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr>;
     fn get_errors(&self) -> &Vec<LuErr>;
 
+    /// If all_errors in a stage != get_errors, this func can be overwritten to provide all errors
+    fn collect_all_errors_cb(&self) -> Vec<LuErr> {
+        self.get_errors().to_vec()
+    }
+
     fn collect_all_errors(&self) -> Vec<LuErr> {
         let mut prev_err = self
             .get_prev_stage()

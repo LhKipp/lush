@@ -20,6 +20,7 @@ log = "0.4.14"
 contracts = "0.6.2"
 derive-new = "0.5.9"
 enum-as-inner = "0.3.3"
+itertools = "0.10.1"
 
 [build-dependencies]
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }

@@ -65,10 +65,7 @@ impl Evaluator {
     }
 
     pub fn evaluate(&mut self) {
-        let node = self
-            .ty_state
-            .resolve
-            .parse
+        let node = self.ty_state.resolve.parses[0]
             .cast::<SourceFileNode>()
             .unwrap();
         match node.evaluate(self) {
