@@ -20,17 +20,6 @@ fn decl: fn'<' <InType> -> Signature -> <RetType> '>'
 
 end
 
-fn map<T,U> [T] -> (fn<(T)->U>) -> [U]
-end
-
-fn map [T] -> (mapper) -> [mapper T]
-fn accumulate [T] -> (acc_fn) -> acc_fn T T
-
-
-fn map [] -> (mapper) -> []
-
-end
-
 
 fn can_fail (line: num) -> str | nil
     let file_content = read /home/user/.my_config.txt | split "\n"
