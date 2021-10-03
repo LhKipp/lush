@@ -1,4 +1,4 @@
-use lu_error::{EvalErr, LuResult, SourceCodeItem};
+use lu_error::{EvalErr, LuErr, SourceCodeItem};
 use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StringExprNode,
@@ -8,10 +8,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator};
+use crate::{EvalArg, Evaluable, Evaluator, RetValOrErr};
 
 impl Evaluable for ValueExprElement {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         match self {
             ValueExprElement::BareWord(n) => n.evaluate(state),
             ValueExprElement::NumberExpr(n) => n.evaluate(state),
@@ -26,7 +26,7 @@ impl Evaluable for ValueExprElement {
 }
 
 impl Evaluable for CmdOrValueExprElement {
-    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         match self {
             CmdOrValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, state),
             CmdOrValueExprElement::PipedCmdsStmt(n) => n.evaluate_with_args(args, state),
@@ -36,41 +36,42 @@ impl Evaluable for CmdOrValueExprElement {
 }
 
 impl Evaluable for BareWordToken {
-    fn do_evaluate(&self, _: &[EvalArg], _: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], _: &mut Evaluator) -> Result<Value, RetValOrErr> {
         Ok(Value::BareWord(self.text().to_string()))
     }
 }
 
 impl Evaluable for NumberExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], _state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         Ok(self.value())
     }
 }
 
 impl Evaluable for StringExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], _state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         Ok(Value::String(self.text().to_string()))
     }
 }
 
 impl Evaluable for ValuePathExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         let name_parts = self.var_name_parts();
         assert_eq!(name_parts.len(), 1); // TODO handle indexing into table
         if let Some(var) = state.scope.lock().find_var(&name_parts[0]) {
             Ok(var.val.clone())
         } else {
-            EvalErr::VarNotFound(SourceCodeItem::new(
+            let e: RetValOrErr = LuErr::Eval(EvalErr::VarNotFound(SourceCodeItem::new(
                 self.syntax().text_range().into(),
                 self.syntax().text().to_string(),
-            ))
-            .into()
+            )))
+            .into();
+            Err(e)
         }
     }
 }
 
 impl Evaluable for ArrayExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         let mut values = Vec::new();
         for val in self.values() {
             values.push(val.evaluate(state)?);
@@ -80,7 +81,7 @@ impl Evaluable for ArrayExprNode {
 }
 
 impl Evaluable for TableExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], _state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         todo!()
     }
 }

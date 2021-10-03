@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 use contracts::ensures;
 use log::debug;
-use lu_error::{EvalErr, LuResult, SourceCodeItem};
+use lu_error::{EvalErr, LuErr, LuResult, SourceCodeItem};
 use lu_syntax::{
     ast::{BlockStmtNode, IfStmtNode},
     ast::{ConditionElement, IfBlockNode},
@@ -9,10 +9,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator, Interpreter, ScopeFrameTag};
+use crate::{EvalArg, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag};
 
 impl Evaluable for IfStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
         let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, state);
@@ -46,7 +46,7 @@ fn eval_block_if_true(
     cond: &ConditionElement,
     block: &BlockStmtNode,
     state: &mut Evaluator,
-) -> (bool, LuResult<Value>) {
+) -> (bool, Result<Value, RetValOrErr>) {
     let cond_val = match cond.evaluate(state) {
         Ok(v) => v,
         Err(e) => return (false, Err(e)),
@@ -56,11 +56,13 @@ fn eval_block_if_true(
         None => {
             return (
                 false,
-                EvalErr::NotConvertibleToBool(SourceCodeItem::new(
-                    cond.syntax().text_range().into(),
-                    cond.text(),
-                ))
-                .into(),
+                Err(
+                    LuErr::Eval(EvalErr::NotConvertibleToBool(SourceCodeItem::new(
+                        cond.syntax().text_range().into(),
+                        cond.text(),
+                    )))
+                    .into(),
+                ),
             )
         }
         Some(v) => v,
@@ -73,7 +75,7 @@ fn eval_block_if_true(
     }
 }
 
-fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> LuResult<Value> {
+fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> Result<Value, RetValOrErr> {
     state.scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
     let result = block.evaluate(state);
     state.scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);

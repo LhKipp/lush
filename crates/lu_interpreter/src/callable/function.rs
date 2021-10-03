@@ -1,7 +1,7 @@
 #![allow(dead_code)]
-use crate::Evaluator;
-use crate::{Command, Evaluable, Function, Signature};
-use lu_error::SourceCodeItem;
+use crate::{Command, Function, Signature};
+use crate::{Evaluable, Evaluator};
+use lu_error::{LuResult, SourceCodeItem};
 use lu_value::Value;
 
 impl Command for Function {
@@ -9,17 +9,9 @@ impl Command for Function {
         &self.name
     }
 
-    fn do_run(
-        &self,
-        _: &[crate::EvalArg],
-        state: &mut Evaluator,
-    ) -> lu_error::LuResult<lu_value::Value> {
-        // TODO typecheck and put vars into scope
-        if let Some(block) = self.fn_node.block_stmt() {
-            block.evaluate(state)
-        } else {
-            Ok(Value::Nil)
-        }
+    fn do_run(&self, _: &[crate::EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+        let eval_result = self.fn_node.evaluate(state);
+        Evaluator::eval_result_to_lu_result(eval_result)
     }
 
     fn signature(&self) -> &Signature {

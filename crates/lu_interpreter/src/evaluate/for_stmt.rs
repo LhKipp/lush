@@ -1,14 +1,13 @@
-use contracts::ensures;
 use log::debug;
-use lu_error::LuResult;
 use lu_syntax::{ast::ForStmtNode, AstToken};
 use lu_value::Value;
 
-use crate::{variable::VarDeclNode, EvalArg, Evaluable, Evaluator, ScopeFrameTag, Variable};
+use crate::{
+    variable::VarDeclNode, EvalArg, Evaluable, Evaluator, RetValOrErr, ScopeFrameTag, Variable,
+};
 
 impl Evaluable for ForStmtNode {
-    #[ensures(&ret.is_ok() -> (ret == LuResult::Ok(Value::Nil)))]
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         let block = self.block().unwrap();
         if block.is_empty() {
             debug!("Empty for stmt");

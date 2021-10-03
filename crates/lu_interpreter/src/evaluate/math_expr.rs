@@ -10,10 +10,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator, Interpreter, ScopeFrameTag};
+use crate::{EvalArg, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag};
 
 impl Evaluable for MathExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         let lhs = self.lhs().unwrap();
         let rhs = self.rhs().unwrap();
         let op = self.operator().unwrap();
@@ -40,42 +40,42 @@ impl Evaluable for MathExprNode {
     }
 }
 
-fn eval_plus_sign(lhs: Value, rhs: Value) -> LuResult<Value> {
+fn eval_plus_sign(lhs: Value, rhs: Value) -> Result<Value, RetValOrErr> {
     match (lhs, rhs) {
         (Value::Number(lhs), Value::Number(rhs)) => Ok(Value::Number(lhs + rhs)),
         _ => todo!(),
     }
 }
-fn eval_minus_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_minus_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_mult_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_mult_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_div_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_div_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_less_than_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_less_than_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_less_or_equal_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_less_or_equal_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_equality_sign(lhs: Value, rhs: Value) -> LuResult<Value> {
+fn eval_equality_sign(lhs: Value, rhs: Value) -> Result<Value, RetValOrErr> {
     Ok(Value::Bool(lhs == rhs))
 }
-fn eval_inequality_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_inequality_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_bigger_than_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_bigger_than_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_bigger_or_equal_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_bigger_or_equal_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_assign_sign(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_assign_sign(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }
-fn eval_right_stream(_lhs: Value, _rhs: Value) -> LuResult<Value> {
+fn eval_right_stream(_lhs: Value, _rhs: Value) -> Result<Value, RetValOrErr> {
     todo!()
 }

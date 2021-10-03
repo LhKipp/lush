@@ -1,3 +1,4 @@
+use derive_more::From;
 use std::{fmt::Debug, sync::Arc};
 
 use log::debug;
@@ -19,25 +20,43 @@ mod if_stmt;
 mod let_stmt;
 mod math_expr;
 mod piped_cmds_stmt;
+mod ret_stmt;
 mod source_file;
 mod statement;
 mod test;
-mod ret_stmt;
 
 #[derive(Clone, Debug)]
 pub enum EvalArg {
     ExternalCmdName(String),
 }
 
+#[derive(Debug, From)]
+pub enum RetValOrErr {
+    RetVal(Value),
+    Err(LuErr),
+}
+
+pub type EvalResult = Result<Value, RetValOrErr>;
+
+impl From<RetValOrErr> for EvalResult {
+    fn from(e: RetValOrErr) -> Self {
+        Err(e)
+    }
+}
+
 pub trait Evaluable: Debug {
     /// Evaluate the AST-Node/Token given the state.
-    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value>;
+    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr>;
 
-    fn evaluate(&self, state: &mut Evaluator) -> LuResult<Value> {
+    fn evaluate(&self, state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         self.evaluate_with_args(&[], state)
     }
 
-    fn evaluate_with_args(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn evaluate_with_args(
+        &self,
+        args: &[EvalArg],
+        state: &mut Evaluator,
+    ) -> Result<Value, RetValOrErr> {
         debug!("Evaluating: {:?}({:?})", self, args);
         let result = self.do_evaluate(args, state);
         debug!("Result of Evaluating: {:?}({:?}): {:?}", self, args, result);
@@ -69,17 +88,31 @@ impl Evaluator {
         let node = self.ty_state.resolve.parses[0]
             .cast::<SourceFileNode>()
             .unwrap();
-        match node.evaluate(self) {
+        let lu_result = Self::eval_result_to_lu_result(node.evaluate(self));
+        match lu_result {
             Ok(v) => self.result = Some(v),
             Err(e) => self.push_err(e),
         }
     }
 
+    pub fn lu_result_to_eval_result(result: LuResult<Value>) -> Result<Value, RetValOrErr> {
+        result.map_err(|e| e.into())
+    }
+
+    pub fn eval_result_to_lu_result(result: Result<Value, RetValOrErr>) -> LuResult<Value> {
+        result.map_err(|e| match e {
+            RetValOrErr::RetVal(v) => {
+                unreachable!("Ret val ({:?}) should always be catched by fn_stmt", v)
+            }
+            RetValOrErr::Err(e) => e,
+        })
+    }
+
     // /// Evaluate code as T
     // pub fn evaluate_as<T: Evaluable + HasRule + AstNode>(
-    //     &mut self,
     //     code: SourceCode,
-    // ) -> LuResult<Value> {
+    //     &mut self,
+    // ) -> Result<Value, RetValOrErr> {
     //     let parse_result = Parse::rule(&code.to_string()?, &*T::get_belonging_rule());
     //     // We don't allow evaluation if errors happend.
     //     let source_file = parse_result.ok::<T>()?;

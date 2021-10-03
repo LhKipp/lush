@@ -9,10 +9,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator, Interpreter, ScopeFrameTag, Variable};
+use crate::{EvalArg, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag, Variable};
 
 impl Evaluable for BlockStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
         // We need to bring all funcs into scope, before running any stmts
         // consider the following program
         // ```lu
