@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use crate::{Command, Function, Signature};
 use crate::{Evaluable, Evaluator};
 use lu_error::{LuResult, SourceCodeItem};
