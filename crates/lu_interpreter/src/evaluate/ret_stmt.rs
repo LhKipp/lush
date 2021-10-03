@@ -1,10 +1,9 @@
 use lu_syntax::ast::RetStmtNode;
-use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator, RetValOrErr};
+use crate::{EvalArg, EvalResult, Evaluable, Evaluator, RetValOrErr};
 
 impl Evaluable for RetStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
         Err(RetValOrErr::RetVal(
             self.returned_val().unwrap().evaluate(state)?,
         ))

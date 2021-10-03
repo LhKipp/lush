@@ -9,10 +9,10 @@ use lu_syntax::{
 };
 use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag};
+use crate::{EvalArg, EvalResult, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag};
 
 impl Evaluable for IfStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
         let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, state);
@@ -46,7 +46,7 @@ fn eval_block_if_true(
     cond: &ConditionElement,
     block: &BlockStmtNode,
     state: &mut Evaluator,
-) -> (bool, Result<Value, RetValOrErr>) {
+) -> (bool, EvalResult) {
     let cond_val = match cond.evaluate(state) {
         Ok(v) => v,
         Err(e) => return (false, Err(e)),
@@ -75,7 +75,7 @@ fn eval_block_if_true(
     }
 }
 
-fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> Result<Value, RetValOrErr> {
+fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> EvalResult {
     state.scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
     let result = block.evaluate(state);
     state.scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);

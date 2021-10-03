@@ -1,10 +1,9 @@
 use lu_syntax::ast::SourceFileNode;
-use lu_value::Value;
 
-use crate::{EvalArg, Evaluable, Evaluator, RetValOrErr};
+use crate::{EvalArg, EvalResult, Evaluable, Evaluator};
 
 impl Evaluable for SourceFileNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
         let stmts = self.statements().unwrap();
         let result = stmts.evaluate(state)?;
         Ok(result)

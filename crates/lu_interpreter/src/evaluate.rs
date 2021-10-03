@@ -46,17 +46,13 @@ impl From<RetValOrErr> for EvalResult {
 
 pub trait Evaluable: Debug {
     /// Evaluate the AST-Node/Token given the state.
-    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr>;
+    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> EvalResult;
 
-    fn evaluate(&self, state: &mut Evaluator) -> Result<Value, RetValOrErr> {
+    fn evaluate(&self, state: &mut Evaluator) -> EvalResult {
         self.evaluate_with_args(&[], state)
     }
 
-    fn evaluate_with_args(
-        &self,
-        args: &[EvalArg],
-        state: &mut Evaluator,
-    ) -> Result<Value, RetValOrErr> {
+    fn evaluate_with_args(&self, args: &[EvalArg], state: &mut Evaluator) -> EvalResult {
         debug!("Evaluating: {:?}({:?})", self, args);
         let result = self.do_evaluate(args, state);
         debug!("Result of Evaluating: {:?}({:?}): {:?}", self, args, result);
@@ -99,7 +95,7 @@ impl Evaluator {
         result.map_err(|e| e.into())
     }
 
-    pub fn eval_result_to_lu_result(result: Result<Value, RetValOrErr>) -> LuResult<Value> {
+    pub fn eval_result_to_lu_result(result: EvalResult) -> LuResult<Value> {
         result.map_err(|e| match e {
             RetValOrErr::RetVal(v) => {
                 unreachable!("Ret val ({:?}) should always be catched by fn_stmt", v)

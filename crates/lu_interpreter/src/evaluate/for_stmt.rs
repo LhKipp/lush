@@ -3,11 +3,11 @@ use lu_syntax::{ast::ForStmtNode, AstToken};
 use lu_value::Value;
 
 use crate::{
-    variable::VarDeclNode, EvalArg, Evaluable, Evaluator, RetValOrErr, ScopeFrameTag, Variable,
+    variable::VarDeclNode, EvalArg, EvalResult, Evaluable, Evaluator, ScopeFrameTag, Variable,
 };
 
 impl Evaluable for ForStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> Result<Value, RetValOrErr> {
+    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
         let block = self.block().unwrap();
         if block.is_empty() {
             debug!("Empty for stmt");
