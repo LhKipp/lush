@@ -7,7 +7,6 @@ use std::{collections::HashMap, fmt, path::PathBuf};
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
-use lu_syntax_elements::BlockType;
 
 use crate::{Callable, Strct, Variable};
 
@@ -16,22 +15,14 @@ pub enum ScopeFrameTag {
     None,
 
     GlobalFrame,
+    /// Source File Frame with path of the source file
     SourceFileFrame(PathBuf),
 
     BlockFrame,
-    FnFrame,
+    /// Fn Frame with name of fn
+    FnFrame(String),
     ForStmtFrame,
     IfStmtFrame,
-}
-
-impl From<BlockType> for ScopeFrameTag {
-    fn from(b_type: BlockType) -> Self {
-        match b_type {
-            BlockType::FnBlock => Self::FnFrame,
-            BlockType::ForBlock => Self::ForStmtFrame,
-            _ => unreachable!("TODO"),
-        }
-    }
 }
 
 /// The default scope frame being put on the scope stack, when entering a new scope
@@ -226,6 +217,19 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 }
 
 impl Scope<Variable> {
+    pub(crate) fn get_cur_func(&self) -> Option<&Callable> {
+        self.cur_frame_id
+            .map(|cur_frame_id| {
+                cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
+                    self.tag_of(n_id)
+                        .as_fn_frame()
+                        .map(|fn_name| self.find_func(fn_name))
+                })
+            })
+            .flatten()
+            .flatten()
+    }
+
     fn cur_source_f_id(&self) -> Option<NodeId> {
         if let Some(cur_frame_id) = self.cur_frame_id {
             cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
@@ -277,7 +281,7 @@ impl Scope<Variable> {
     }
 
     #[allow(unused)]
-    fn find_func(&self, name: &str) -> Option<&Callable> {
+    pub fn find_func(&self, name: &str) -> Option<&Callable> {
         debug!(
             "Finding cmd {} from {:?} on",
             name,

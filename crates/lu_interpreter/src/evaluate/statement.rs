@@ -14,6 +14,7 @@ impl Evaluable for StatementElement {
             StatementElement::ForStmt(n) => n.evaluate(state),
             StatementElement::PipedCmdsStmt(n) => n.evaluate(state),
             StatementElement::ValueExpr(n) => n.evaluate(state),
+            StatementElement::RetStmt(n) => n.evaluate(state),
         }
     }
 }

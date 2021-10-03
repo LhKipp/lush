@@ -2281,6 +2281,7 @@ impl HasRule for ValueExprElement{
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum StatementElement {
+    RetStmt(RetStmtNode),
     ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
@@ -2302,15 +2303,17 @@ impl AstElement for StatementElement {
         
         
         
+        
         ValueExprElement::can_cast(kind) ||
         
         
         match kind{
-            ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
+            RetStmt | ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -2323,6 +2326,7 @@ impl AstElement for StatementElement {
         
         
         let res = match syntax.kind() {
+            RetStmt => StatementElement::RetStmt(RetStmtNode { syntax: syntax.into_node().unwrap() }),
             ForStmt => StatementElement::ForStmt(ForStmtNode { syntax: syntax.into_node().unwrap() }),
             LetStmt => StatementElement::LetStmt(LetStmtNode { syntax: syntax.into_node().unwrap() }),
             FnStmt => StatementElement::FnStmt(FnStmtNode { syntax: syntax.into_node().unwrap() }),
@@ -2336,6 +2340,9 @@ impl AstElement for StatementElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
+            StatementElement::RetStmt(it) => it.syntax.clone().into(),
+            
             
             StatementElement::ForStmt(it) => it.syntax.clone().into(),
             
@@ -2363,6 +2370,7 @@ impl AstElement for StatementElement {
 impl HasSyntaxKind for StatementElement{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
+            StatementElement::RetStmt(it) => it.get_syntax_kind(),
             StatementElement::ForStmt(it) => it.get_syntax_kind(),
             StatementElement::LetStmt(it) => it.get_syntax_kind(),
             StatementElement::FnStmt(it) => it.get_syntax_kind(),

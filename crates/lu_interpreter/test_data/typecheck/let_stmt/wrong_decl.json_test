@@ -43,21 +43,21 @@ let x:str = ret_num
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
-            "content": "let x:str",
-            "range": [
-              36,
-              45
-            ]
-          },
-          "lhs_ty": "str",
-          "rhs_decl": {
             "content": "ret: num",
             "range": [
               11,
               19
             ]
           },
-          "rhs_ty": "num"
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "let x:str",
+            "range": [
+              36,
+              45
+            ]
+          },
+          "rhs_ty": "str"
         }
       }
     }

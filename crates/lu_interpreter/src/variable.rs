@@ -1,7 +1,7 @@
 use derive_more::From;
 use lu_error::SourceCodeItem;
 use lu_syntax::{
-    ast::{ArgSignatureNode, CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StrctStmtNode},
+    ast::{CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StrctStmtNode},
     AstNode, AstToken,
 };
 use lu_syntax_elements::constants::IN_ARG_NAME;
@@ -21,10 +21,10 @@ pub enum VarDeclNode {
     StrctStmt(StrctStmtNode),
     /// For stmt with usize being index into exact param
     ForStmt(ForStmtNode, usize),
-    ArgSignature(ArgSignatureNode),
     // For $in (before it is mapped to the correct name)
     PrevCmdStmt(CmdStmtNode),
-    ErrorUsage(SourceCodeItem),
+    // Used for errors and arg signature
+    CatchAll(SourceCodeItem),
 }
 
 impl VarDeclNode {
@@ -32,12 +32,11 @@ impl VarDeclNode {
         match self {
             VarDeclNode::LetStmt(n) => n.item_till_assign(),
             VarDeclNode::FnStmt(n) => n.decl_item(),
-            VarDeclNode::ArgSignature(n) => n.to_item(),
             VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].to_item(),
             VarDeclNode::Dummy => SourceCodeItem::tmp_todo_item(),
             VarDeclNode::PrevCmdStmt(n) => n.to_item(),
             VarDeclNode::StrctStmt(n) => n.to_item(),
-            VarDeclNode::ErrorUsage(item) => item.clone(),
+            VarDeclNode::CatchAll(item) => item.clone(),
         }
     }
 }

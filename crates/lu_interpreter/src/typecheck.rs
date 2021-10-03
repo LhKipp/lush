@@ -17,8 +17,10 @@ use crate::{Command, RunExternalCmd, Signature, Strct, ValueTypeErr};
 mod block_stmt;
 mod cmd_stmt;
 mod expr;
+mod fn_stmt;
 mod let_stmt;
 mod piped_cmds_stmt;
+mod ret_stmt;
 mod source_file;
 mod statement;
 mod test;
@@ -393,6 +395,7 @@ impl TyCheckState {
         self.tc_expr_table.get(key).unwrap()
     }
 
+    /// Insert var var with ty ty
     fn insert_var(&mut self, var: Variable) -> TcKey {
         self.scope.cur_mut_frame().insert_var(var.clone());
         let key = self.new_term_key(var.decl.to_item());

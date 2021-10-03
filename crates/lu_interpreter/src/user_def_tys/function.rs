@@ -7,6 +7,7 @@ use lu_error::{LuErr, SourceCodeItem};
 use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, LuTypeNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
+use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
 pub type ArgDecl = SourceCodeItem;
@@ -61,6 +62,10 @@ impl ArgSignature {
             .unwrap_or(fallback_ty); // or if in is not specified, use fallback
 
         (ArgSignature::new(name, ty.0, decl), ty.1)
+    }
+
+    pub fn to_var(&self) -> Variable {
+        Variable::new(self.name.clone(), Value::Nil, self.decl.clone().into())
     }
 }
 

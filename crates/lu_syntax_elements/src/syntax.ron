@@ -129,6 +129,7 @@ Config(
         "TableExpr",
         ],),
     ( name: "Statement",is_generic: true, represents_element_names: [
+        "RetStmt",
         "ForStmt",
         "LetStmt",
         "FnStmt",

@@ -22,6 +22,7 @@ mod piped_cmds_stmt;
 mod source_file;
 mod statement;
 mod test;
+mod ret_stmt;
 
 #[derive(Clone, Debug)]
 pub enum EvalArg {

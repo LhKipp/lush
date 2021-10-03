@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 use contracts::ensures;
-use log::debug;
+use log::{debug, warn};
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
@@ -27,20 +27,20 @@ impl TypeCheck for BlockStmtNode {
         let frame_to_pop = match args.get(0) {
             Some(TypeCheckArg::Arg(VisitArg::SourceFileBlock(f_path))) => {
                 if let Err(e) = ty_state.scope.set_cur_source_frame(f_path) {
-                    debug!("SourceFileBlock type check error which should not happen");
+                    warn!("SourceFileBlock type check error which should not happen");
                     ty_state.push_err(e);
                     return None;
                 }
-                add_entry_for_funcs(ty_state);
-
                 None
             }
             Some(TypeCheckArg::Arg(VisitArg::BlockTypeArg(b_type))) => {
-                let frame_type: ScopeFrameTag = b_type.clone().into();
-                ty_state.scope.push_frame(frame_type.clone());
-                Some(frame_type)
+                ty_state.scope.push_frame(b_type.clone());
+                Some(b_type)
             }
-            _ => unreachable!("Passing of either arg is required"),
+            _ => {
+                warn!("Ty checking BlockStmt without args");
+                None
+            }
         };
 
         let mut result = None;
@@ -54,28 +54,4 @@ impl TypeCheck for BlockStmtNode {
 
         result
     }
-}
-
-fn add_entry_for_funcs(_: &mut TyCheckState) {
-    // TODO should be unnecessary. loaded on demand
-    // // Handle funcs in the source file block first
-    // let var_funcs_to_insert = ty_state
-    //     .scope
-    //     .cur_frame()
-    //     .elems
-    //     .iter()
-    //     .filter_map(|(_, var)| {
-    //         var.val_as_callable()
-    //             .map(|callable| callable.as_func())
-    //             .flatten()
-    //             .map(|func| (var.clone(), func.clone()))
-    //     })
-    //     .collect::<Vec<_>>();
-    // for (var, func) in var_funcs_to_insert {
-    //     // We handle functions as variables here.
-    //     let tc_func = TcFunc::from_callable(func, ty_state);
-    //     // The var refers to the func
-    //     ty_state.tc_table.insert(var, tc_func.self_key);
-    //     ty_state.tc_func_table.insert(tc_func.self_key, tc_func);
-    // }
 }

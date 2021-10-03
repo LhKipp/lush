@@ -14,6 +14,7 @@ impl TypeCheck for LetStmtNode {
     ) -> Option<TcKey> {
         if let Some(var_name) = self.var_name() {
             let var = Variable::new(var_name, Value::Nil, VarDeclNode::LetStmt(self.clone()));
+            // TODO get ty first and then insert var once
             let let_stmt_key = ty_state.insert_var(var.clone());
 
             // unify key with decl

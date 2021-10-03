@@ -1,0 +1,43 @@
+Returned value has correct type
+===
+fn func(ret: num)
+    ret 1
+end
+---
+{
+  "Ok": null
+}
+...
+Returned value has incorrect type
+===
+fn func(ret: num)
+    ret "Hello"
+end
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "ret: num",
+            "range": [
+              8,
+              16
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "\"Hello\"",
+            "range": [
+              26,
+              33
+            ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...
