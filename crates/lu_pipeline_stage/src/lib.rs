@@ -15,8 +15,7 @@ pub trait PipelineStage {
     fn collect_all_errors(&self) -> Vec<LuErr> {
         let mut prev_err = self
             .get_prev_stage()
-            .map(PipelineStage::get_errors)
-            .cloned()
+            .map(PipelineStage::collect_all_errors_cb)
             .unwrap_or_else(Vec::new);
         prev_err.extend(self.get_errors().clone());
         prev_err
