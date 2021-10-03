@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+use log::debug;
 use lu_error::{LuErr, LuResult, LuResults, ParseErr};
 use lu_parser::grammar::SourceFileRule;
 use lu_pipeline_stage::PipelineStage;
@@ -63,6 +64,7 @@ impl Interpreter {
     pub fn evaluate(&mut self, ty_state: TyCheckState) -> Option<Evaluator> {
         // We don't allow evaluation if errors happend.
         if ty_state.failed() {
+            debug!("Ty state failed. Not evaluating");
             return None;
         }
 

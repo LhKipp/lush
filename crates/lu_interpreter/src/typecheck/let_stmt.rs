@@ -1,5 +1,5 @@
 use lu_error::TyErr;
-use lu_pipeline_stage::ErrorContainer;
+use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{ast::LetStmtNode, AstElement};
 use lu_value::Value;
 use rusttyc::TcKey;
@@ -35,9 +35,7 @@ impl TypeCheck for LetStmtNode {
                     // Example of this path would be: let x = { let y = 1 }
                     // The block does not return a type
                     assert!(rhs.is_some(), "Option<T> always returns something for none");
-                    ty_state
-                        .errors
-                        .push(TyErr::TermDoesNotReturnType(rhs.unwrap().to_item()).into())
+                    ty_state.push_err(TyErr::TermDoesNotReturnType(rhs.unwrap().to_item()).into())
                 }
             };
         } else {

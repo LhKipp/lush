@@ -1,0 +1,29 @@
+Value of ret stmt is returned
+===
+fn func_1(ret: str)
+    ret "func_1"
+end
+
+func_1
+---
+{
+  "Ok": {
+    "String": "func_1"
+  }
+}
+...
+Code after ret stmt is not executed
+===
+fn func_1(ret: str)
+    ret "func_1"
+    ret "Not executed"
+end
+
+func_1
+---
+{
+  "Ok": {
+    "String": "func_1"
+  }
+}
+...

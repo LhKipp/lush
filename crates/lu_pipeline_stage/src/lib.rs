@@ -33,6 +33,7 @@ pub trait PipelineStage {
     }
 
     fn succeeded(&self) -> bool {
+        // TODO wrong impl for Resolve (as it can have multiple parses)
         self.get_errors().is_empty()
             && self
                 .get_prev_stage()
