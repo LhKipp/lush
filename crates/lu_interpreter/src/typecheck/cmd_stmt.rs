@@ -12,9 +12,7 @@ use lu_syntax::{
 use lu_value::Value;
 use rusttyc::TcKey;
 
-use crate::{
-    Callable, TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable,
-};
+use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
 
 impl TypeCheck for CmdStmtNode {
     fn do_typecheck(

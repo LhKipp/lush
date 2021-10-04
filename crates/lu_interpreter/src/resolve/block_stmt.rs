@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-use crate::scope::ScopeFrameId;
+use crate::{scope::ScopeFrameId, Command};
 use lu_parser::grammar::SourceFileRule;
 use lu_text_util::SourceCode;
 use std::{
@@ -161,13 +161,13 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
     resolver.get_mut_errors().extend(errs);
 
     let parent_frame_id = resolver.scope.lock().get_cur_frame_id();
-    let func = Function::new(name, sign, fn_stmt.clone(), parent_frame_id);
+    let func = Function::new(name, sign, fn_stmt.clone(), parent_frame_id).boxed();
 
     resolver
         .scope
         .lock()
         .cur_mut_frame()
-        .insert(func.name.clone(), Variable::new_func(func, fn_stmt.clone()));
+        .insert_var(Variable::new_func(func));
 }
 
 fn source_struct_stmt(struct_stmt: &StrctStmtNode, resolver: &mut Resolver) {

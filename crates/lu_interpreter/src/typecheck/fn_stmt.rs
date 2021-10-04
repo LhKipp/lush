@@ -1,7 +1,7 @@
 use lu_syntax::ast::FnStmtNode;
 use rusttyc::TcKey;
 
-use crate::{Command, ScopeFrameTag, TyCheckState};
+use crate::{ScopeFrameTag, TyCheckState};
 
 use super::TypeCheck;
 

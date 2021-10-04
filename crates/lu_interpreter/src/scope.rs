@@ -9,7 +9,7 @@ use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Callable, Strct, Variable};
+use crate::{Command, Strct, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner)]
 pub enum ScopeFrameTag {
@@ -219,7 +219,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 
 impl Scope<Variable> {
     /// Returns the function, in which the current selected frame is.
-    pub(crate) fn get_cur_func(&self) -> Option<&Callable> {
+    pub(crate) fn get_cur_func(&self) -> Option<&Box<dyn Command>> {
         self.cur_frame_id
             .map(|cur_frame_id| {
                 cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
@@ -304,7 +304,7 @@ impl Scope<Variable> {
     }
 
     #[allow(unused)]
-    pub fn find_func(&self, name: &str) -> Option<&Callable> {
+    pub fn find_func(&self, name: &str) -> Option<&Box<dyn Command>> {
         debug!(
             "Finding cmd {} from {:?} on",
             name,
@@ -340,7 +340,10 @@ impl Scope<Variable> {
     /// will return (2, <git-add-cmd>)
     // The call side can not necessarily distinguish between cmd name parts and arguments.
     // Therefore we need to do some search here
-    pub fn find_cmd_with_longest_match(&self, name_parts: &[String]) -> Option<(usize, &Callable)> {
+    pub fn find_cmd_with_longest_match(
+        &self,
+        name_parts: &[String],
+    ) -> Option<(usize, &Box<dyn Command>)> {
         let result = self
             .find_var_with_longest_match(name_parts)
             .map(|(i, var)| (i, var.val_as_callable()));

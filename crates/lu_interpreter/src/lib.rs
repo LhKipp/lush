@@ -18,7 +18,7 @@ mod visit_arg;
 pub use crate::evaluate::{EvalArg, Evaluable};
 pub use crate::interpreter::{Interpreter, InterpreterCfg};
 pub use crate::variable::{VarDeclNode, Variable};
-pub use callable::{Callable, Command, RunExternalCmd, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME};
+pub use callable::{Command, RunExternalCmd, ARGS_VAR_NAME, ARG_VAR_NAME, IN_VAR_NAME};
 pub use user_def_tys::*;
 
 pub use evaluate::*;

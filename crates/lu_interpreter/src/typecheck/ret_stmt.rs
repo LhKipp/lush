@@ -2,7 +2,7 @@ use log::warn;
 use lu_syntax::{ast::RetStmtNode, AstToken};
 use rusttyc::TcKey;
 
-use crate::{Command, TyCheckState, ValueType};
+use crate::{TyCheckState, ValueType};
 
 use super::TypeCheck;
 

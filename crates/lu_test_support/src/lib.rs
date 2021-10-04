@@ -8,7 +8,7 @@ use pretty_env_logger::env_logger;
 
 use lu_cmds::PrintCmd;
 use lu_interpreter::{
-    Callable, Command, Interpreter, InterpreterCfg, Scope, ScopeFrameTag, VarDeclNode, Variable,
+    Command, Interpreter, InterpreterCfg, Scope, ScopeFrameTag, VarDeclNode, Variable,
 };
 use lu_value::Value;
 
@@ -25,7 +25,7 @@ fn make_test_scope() -> Scope<Variable> {
     let mut scope = Scope::new();
     let (_, frame) = scope.push_frame(ScopeFrameTag::GlobalFrame);
     for cmd in cmds {
-        let cmd: Callable = cmd.into();
+        let cmd: Box<dyn Command> = cmd.into();
         frame.insert(
             cmd.name().to_string(),
             Variable::new(

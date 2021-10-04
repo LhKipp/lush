@@ -100,6 +100,13 @@ pub trait Command: CommandClone + Debug {
 
         result
     }
+
+    fn boxed(self) -> Box<dyn Command>
+    where
+        Self: Sized + 'static,
+    {
+        Box::new(self)
+    }
 }
 
 // https://stackoverflow.com/questions/30353462/how-to-clone-a-struct-storing-a-boxed-trait-object

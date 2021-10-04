@@ -8,7 +8,7 @@ use lu_syntax_elements::constants::IN_ARG_NAME;
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
-use crate::{Callable, Command, Function, Strct};
+use crate::{Command, Strct};
 
 #[derive(Educe)]
 #[educe(Default)]
@@ -52,12 +52,13 @@ pub struct Variable {
 }
 
 impl Variable {
-    pub fn new_func(func: Function, decl: FnStmtNode) -> Variable {
-        let func: Callable = func.into();
+    pub fn new_func(func: Box<dyn Command>) -> Variable {
+        // TODO better decl here
+        let decl = func.signature().decl.clone();
         Variable::new(
             func.name().to_string(),
             Value::new_func(func),
-            VarDeclNode::FnStmt(decl),
+            VarDeclNode::CatchAll(decl),
         )
     }
 
@@ -85,10 +86,10 @@ impl Variable {
         }
     }
 
-    pub fn val_as_callable(&self) -> Option<&Callable> {
+    pub fn val_as_callable(&self) -> Option<&Box<dyn Command>> {
         self.val.as_function().map(|func| {
-            func.downcast_ref::<Callable>()
-                .expect("Func is always castable to Callable")
+            func.downcast_ref::<Box<dyn Command>>()
+                .expect("Func is always castable to Box<dyn Command>")
         })
     }
     pub fn val_as_strct(&self) -> Option<&Strct> {

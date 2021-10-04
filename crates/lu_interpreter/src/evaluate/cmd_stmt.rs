@@ -3,8 +3,7 @@ use lu_syntax::ast::CmdStmtNode;
 use lu_value::Value;
 
 use crate::{
-    callable::Callable, Command, EvalArg, EvalResult, Evaluable, Evaluator, RunExternalCmd,
-    Variable, ARGS_VAR_NAME,
+    Command, EvalArg, EvalResult, Evaluable, Evaluator, RunExternalCmd, Variable, ARGS_VAR_NAME,
 };
 
 impl Evaluable for CmdStmtNode {
@@ -12,22 +11,19 @@ impl Evaluable for CmdStmtNode {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let possibl_longest_name = self.possible_longest_cmd_call_name();
-        let (cmd_parts_count, cmd): (usize, Callable) = if let Some((cmd_parts_count, callable)) =
-            state
+        let (cmd_parts_count, cmd): (usize, Box<dyn Command>) =
+            if let Some((cmd_parts_count, callable)) = state
                 .scope
                 .lock()
                 .find_cmd_with_longest_match(&possibl_longest_name)
-        {
-            (cmd_parts_count, callable.clone())
-        } else {
-            (
-                1,
-                Callable::ExternalCmd(RunExternalCmd::new(
-                    self.clone(),
-                    possibl_longest_name[0].clone(),
-                )),
-            )
-        };
+            {
+                (cmd_parts_count, callable.clone())
+            } else {
+                (
+                    1,
+                    RunExternalCmd::new(self.clone(), possibl_longest_name[0].clone()).boxed(),
+                )
+            };
 
         let cmd_name = possibl_longest_name[0..cmd_parts_count].join(" ");
         debug!("Calling cmd: {}", cmd_name);
