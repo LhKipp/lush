@@ -1,13 +1,14 @@
-use crate::scope::ScopeFrameId;
-use crate::Scope;
-use crate::ValueType;
-use crate::Variable;
+use std::sync::Arc;
+
+use crate::{Command, Scope, ScopeFrameId, ValueType, Variable};
 use derive_builder::Builder;
-use lu_error::{LuErr, SourceCodeItem};
+use derive_new::new;
+use lu_error::{LuErr, LuResult, SourceCodeItem};
 use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, LuTypeNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use lu_value::Value;
+use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
 pub type ArgDecl = SourceCodeItem;
@@ -196,7 +197,9 @@ impl Signature {
 
 /// Function is a struct containing all needed information for a function/closure
 /// This should allow for less lookup in the ast later on
-#[derive(Clone, Debug)]
+#[derive(Educe)]
+#[educe(Debug)]
+#[derive(Clone)]
 pub struct Function {
     pub name: String,
     /// A signature is always present (if not user provided, defaulted.)
@@ -205,6 +208,9 @@ pub struct Function {
     pub parent_frame_id: ScopeFrameId,
     // For closures only
     pub captured_vars: Vec<Variable>,
+
+    #[educe(Debug(ignore))]
+    pub eval_fn: Box<fn(&Self, &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>>,
 }
 
 impl Function {
@@ -213,6 +219,7 @@ impl Function {
         signature: Signature,
         fn_node: FnStmtNode,
         parent_frame_id: ScopeFrameId,
+        eval_fn: Box<fn(&Self, &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>>,
     ) -> Self {
         Self {
             name,
@@ -220,6 +227,25 @@ impl Function {
             parent_frame_id,
             fn_node,
             captured_vars: Vec::new(),
+            eval_fn,
         }
+    }
+}
+
+impl Command for Function {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+        (self.eval_fn)(self, scope)
+    }
+
+    fn signature(&self) -> &Signature {
+        &self.signature
+    }
+
+    fn signature_item(&self) -> SourceCodeItem {
+        self.fn_node.decl_item()
     }
 }

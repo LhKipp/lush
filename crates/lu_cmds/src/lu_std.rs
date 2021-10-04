@@ -1,7 +1,8 @@
 mod array;
+mod test;
 
 use lu_error::LuResult;
-use lu_interpreter::{Scope, Variable};
+use lu_interpreter_structs::{Scope, Variable};
 
 pub use array::source_array_module;
 

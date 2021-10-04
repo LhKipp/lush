@@ -1,25 +1,18 @@
 #![allow(unused_imports)]
+use crate::evaluate::eval_prelude::*;
 use contracts::ensures;
-use log::debug;
-use lu_error::{EvalErr, LuResult, SourceCodeItem};
-use lu_syntax::{
-    ast::{
-        ConditionElement, IfBlockNode, IfStmtNode, MathExprNode, OperatorExprElement, StrctStmtNode,
-    },
-    AstElement, AstToken,
+use lu_syntax::ast::{
+    ConditionElement, IfBlockNode, IfStmtNode, MathExprNode, OperatorExprElement, StrctStmtNode,
 };
-use lu_value::Value;
-
-use crate::{EvalArg, EvalResult, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag};
 
 impl Evaluable for MathExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         let lhs = self.lhs().unwrap();
         let rhs = self.rhs().unwrap();
         let op = self.operator().unwrap();
 
-        let lhs = lhs.evaluate(state)?;
-        let rhs = rhs.evaluate(state)?;
+        let lhs = lhs.evaluate(scope)?;
+        let rhs = rhs.evaluate(scope)?;
 
         match op {
             OperatorExprElement::PlusSign(_) => return eval_plus_sign(lhs, rhs),

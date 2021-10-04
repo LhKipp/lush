@@ -13,6 +13,7 @@ use crate::{Scope, TyCheckState, Variable};
 mod block_stmt;
 mod cmd_stmt;
 mod condition;
+mod eval_prelude;
 mod expr;
 mod fn_stmt;
 mod for_stmt;
@@ -24,6 +25,8 @@ mod ret_stmt;
 mod source_file;
 mod statement;
 mod test;
+
+pub use fn_stmt::eval_function;
 
 #[derive(Clone, Debug)]
 pub enum EvalArg {
@@ -46,15 +49,19 @@ impl From<RetValOrErr> for EvalResult {
 
 pub trait Evaluable: Debug {
     /// Evaluate the AST-Node/Token given the state.
-    fn do_evaluate(&self, args: &[EvalArg], state: &mut Evaluator) -> EvalResult;
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult;
 
-    fn evaluate(&self, state: &mut Evaluator) -> EvalResult {
-        self.evaluate_with_args(&[], state)
+    fn evaluate(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+        self.evaluate_with_args(&[], scope)
     }
 
-    fn evaluate_with_args(&self, args: &[EvalArg], state: &mut Evaluator) -> EvalResult {
+    fn evaluate_with_args(
+        &self,
+        args: &[EvalArg],
+        scope: &mut Arc<Mutex<Scope<Variable>>>,
+    ) -> EvalResult {
         debug!("Evaluating: {:?}({:?})", self, args);
-        let result = self.do_evaluate(args, state);
+        let result = self.do_evaluate(args, scope);
         debug!("Result of Evaluating: {:?}({:?}): {:?}", self, args, result);
         result
     }
@@ -84,7 +91,7 @@ impl Evaluator {
         let node = self.ty_state.resolve.parses[0]
             .cast::<SourceFileNode>()
             .unwrap();
-        let lu_result = Self::eval_result_to_lu_result(node.evaluate(self));
+        let lu_result = Self::eval_result_to_lu_result(node.evaluate(&mut self.scope));
         match lu_result {
             Ok(v) => self.result = Some(v),
             Err(e) => self.push_err(e),

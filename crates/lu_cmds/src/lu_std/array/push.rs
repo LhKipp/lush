@@ -1,6 +1,8 @@
-use std::{ops::Deref, rc::Rc};
+use std::{ops::Deref, rc::Rc, sync::Arc};
 
 use crate::cmd_prelude::*;
+use lu_interpreter_structs::Scope;
+use parking_lot::Mutex;
 
 #[derive(Debug, Clone)]
 pub struct ArrayPushCmd {
@@ -41,8 +43,8 @@ impl Command for ArrayPushCmd {
         "push"
     }
 
-    fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
-        let mut l_scope = state.scope.lock();
+    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+        let mut l_scope = scope.lock();
         let values_to_push = self
             .expect_arg(&l_scope, VALUES_ARG_NAME)
             .as_array()

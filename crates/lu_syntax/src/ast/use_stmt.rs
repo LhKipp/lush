@@ -6,6 +6,13 @@ use crate::{AstElement, AstElementChildren, AstNode};
 use super::{support, UseStmtNode};
 
 impl UseStmtNode {
+    pub fn is_std_path(&self) -> bool {
+        self.path()
+            .next()
+            .map(|part| part.text() == "std")
+            .unwrap_or(false)
+    }
+
     pub fn path(&self) -> AstElementChildren<UsePathElement> {
         support::element_children(self.syntax())
     }

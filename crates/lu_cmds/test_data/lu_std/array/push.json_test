@@ -1,0 +1,16 @@
+Array push pushes element
+===
+use std:array
+
+fn func_1()
+    let values = []
+    push $values 1
+    ret $values
+end
+
+func_1
+---
+{
+  "Er": []
+}
+...

@@ -2,7 +2,7 @@ mod push;
 use lu_error::LuResult;
 use push::ArrayPushCmd;
 
-use lu_interpreter::{Command, Scope, Variable};
+use lu_interpreter_structs::{Command, Scope, Variable};
 use vec_box::vec_box;
 
 pub fn source_array_module(_: &[&str], scope: &mut Scope<Variable>) -> LuResult<()> {

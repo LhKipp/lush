@@ -219,7 +219,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 
 impl Scope<Variable> {
     /// Returns the function, in which the current selected frame is.
-    pub(crate) fn get_cur_func(&self) -> Option<&Box<dyn Command>> {
+    pub fn get_cur_command(&self) -> Option<&Box<dyn Command>> {
         self.cur_frame_id
             .map(|cur_frame_id| {
                 cur_frame_id.ancestors(&self.arena).find_map(|n_id| {

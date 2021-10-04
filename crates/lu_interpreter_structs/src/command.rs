@@ -1,33 +1,15 @@
-use std::fmt::Debug;
 use std::rc::Rc;
+use std::{fmt::Debug, sync::Arc};
 
-use crate::{EvalArg, Evaluator, Scope, Signature, VarDeclNode, Variable};
+use crate::{Scope, Signature, VarDeclNode, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
 use lu_value::Value;
-
-// pub struct CommandArgs {
-//     /// The name by which the command has been called
-//     pub cmd_call_name: Vec<String>,
-//     /// The value from stdin
-//     pub input: Value,
-//     /// The arguments of the command
-// }
-
-// impl CommandArgs {
-//     pub fn new() -> Self {
-//         CommandArgs {
-//             cmd_call_name: Vec::new(),
-//             input: Value::Nil,
-//         }
-//     }
-// }
+use parking_lot::Mutex;
 
 pub const IN_VAR_NAME: &str = "in";
 pub const ARGS_VAR_NAME: &str = "args";
-/// Default arg names are arg0 arg1 ...
-pub const ARG_VAR_NAME: &str = "arg";
 
 pub trait Command: CommandClone + Debug {
     fn name(&self) -> &str;
@@ -76,27 +58,20 @@ pub trait Command: CommandClone + Debug {
     //     assert!(&scope.overwrite_var_value(var_name, new_val))
     // }
 
-    fn do_run(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value>;
+    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>;
 
-    fn run(&self, state: &mut Evaluator) -> LuResult<Value> {
-        self.run_with_args(&[], state)
-    }
-
-    fn run_with_args(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
+    fn run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
         {
-            let l_scope = state.scope.lock();
+            let l_scope = scope.lock();
             debug!(
-                "Running command {:?} with args ({:?})\n$in: {:?}, $args {:?}",
+                "Running command {:?}\n$in: {:?}, $args {:?}",
                 self.name(),
-                args,
                 self.expect_in(&l_scope),
                 self.expect_args(&l_scope)
             )
         }
-        let result = self.do_run(args, state);
-        {
-            debug!("Result of running command {}: {:?}", self.name(), result);
-        }
+        let result = self.do_run_cmd(scope);
+        debug!("Result of running command {}: {:?}", self.name(), result);
 
         result
     }

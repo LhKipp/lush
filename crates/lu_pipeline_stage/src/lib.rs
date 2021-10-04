@@ -33,11 +33,13 @@ pub trait PipelineStage {
 
     fn succeeded(&self) -> bool {
         // TODO wrong impl for Resolve (as it can have multiple parses)
-        self.get_errors().is_empty()
+        let success = self.get_errors().is_empty()
             && self
                 .get_prev_stage()
                 .map(PipelineStage::succeeded)
-                .unwrap_or(true)
+                .unwrap_or(true);
+        debug!("Result of pipeline_stage succeeded: {}", success);
+        success
     }
 
     fn failed(&self) -> bool {

@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-use crate::{scope::ScopeFrameId, Command};
+use crate::{eval_function, Command, ScopeFrameId};
 use lu_parser::grammar::SourceFileRule;
 use lu_text_util::SourceCode;
 use std::{
@@ -29,7 +29,7 @@ use crate::{
     resolve::{Resolve, ResolveArg, Resolver},
     visit_arg::VisitArg,
     ArgDecl, ArgSignature, EvalArg, Evaluable, FlagSignature, Function, Interpreter, ScopeFrameTag,
-    Signature, Strct, StrctField, ValueType, Variable, ARG_VAR_NAME,
+    Signature, Strct, StrctField, ValueType, Variable,
 };
 
 impl Resolve for BlockStmtNode {
@@ -81,6 +81,11 @@ fn source_use_stmt(use_stmt: UseStmtNode, resolver: &mut Resolver) {
     // Save old source_file_frame_id and go to parent
     let orig_source_f_frame_id = resolver.scope.lock().get_cur_frame_id();
     resolver.scope.lock().select_parent_frame();
+
+    // if use_stmt.is_std_path() {
+    //     // lu_
+    // } else {
+    // }
 
     let path_to_source = resolver.config.plugin_dir.join(use_stmt.path_as_path_buf());
     debug!("sourcing plugin: {:?}", path_to_source);
@@ -161,7 +166,14 @@ fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
     resolver.get_mut_errors().extend(errs);
 
     let parent_frame_id = resolver.scope.lock().get_cur_frame_id();
-    let func = Function::new(name, sign, fn_stmt.clone(), parent_frame_id).boxed();
+    let func = Function::new(
+        name,
+        sign,
+        fn_stmt.clone(),
+        parent_frame_id,
+        Box::new(eval_function),
+    )
+    .boxed();
 
     resolver
         .scope

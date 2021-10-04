@@ -32,8 +32,8 @@ impl Command for PrintCmd {
         "print"
     }
 
-    fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
-        let l_scope = state.scope.lock();
+    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+        let l_scope = scope.lock();
         let args = self.expect_args(&l_scope);
         Ok(Value::Array(args.clone()))
     }

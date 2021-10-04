@@ -1,5 +1,5 @@
 [package]
-name = "lu_interpreter"
+name = "lu_interpreter_structs"
 version = "0.1.0"
 edition = "2018"
 
@@ -14,8 +14,6 @@ lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 lu_pipeline_stage = { version = "0.1.0", path = "../lu_pipeline_stage" }
-lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
-lu_cmds = { version = "0.1.0", path = "../lu_cmds" }
 
 derive-new = "0.5"
 indextree = {version = "4.3.1", features = ["deser"]}
@@ -38,13 +36,3 @@ derive_builder = "0.10.2"
 indexmap = "1.7.0"
 walkdir = "2.3.2"
 multimap = "0.8.3"
-
-[dev-dependencies]
-lu_test_support = { version = "0.1.0", path = "../lu_test_support" }
-lu_interpreter = { version = "0.1.0", path = "../lu_interpreter" }
-lu_conformance = { version = "0.1.0", path = "../lu_conformance" }
-conformance = "0.2.0"
-serde_json = "1.0.64"
-serde_yaml = "0.8.17"
-fs_extra = "1.2.0"
-# sugars = "3.0.0"

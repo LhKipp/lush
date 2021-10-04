@@ -1,10 +1,10 @@
-use std::{io::Write, process::Stdio};
+use crate::cmd_prelude::*;
+use std::{io::Write, process::Stdio, sync::Arc};
 
-use crate::{ArgSignature, Command, EvalArg, Evaluator, Signature, ValueType};
 use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
+use lu_interpreter_structs::{ArgSignature, ValueType};
 use lu_syntax::{ast::CmdStmtNode, AstNode};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
-use lu_value::Value;
 use once_cell::unsync::OnceCell;
 
 #[derive(Debug, Clone, new)]
@@ -46,8 +46,8 @@ impl Command for RunExternalCmd {
         })
     }
 
-    fn do_run(&self, _: &[EvalArg], state: &mut Evaluator) -> LuResult<Value> {
-        let l_scope = state.scope.lock();
+    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+        let l_scope = scope.lock();
 
         let args = self.expect_args(&l_scope);
         let args: Vec<String> = args.iter().map(Value::to_string).collect();

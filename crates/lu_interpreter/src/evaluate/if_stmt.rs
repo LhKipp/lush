@@ -1,21 +1,15 @@
 #![allow(unused_imports)]
-use contracts::ensures;
-use log::debug;
-use lu_error::{EvalErr, LuErr, LuResult, SourceCodeItem};
+use crate::evaluate::eval_prelude::*;
 use lu_syntax::{
     ast::{BlockStmtNode, IfStmtNode},
     ast::{ConditionElement, IfBlockNode},
-    AstElement, AstToken,
 };
-use lu_value::Value;
-
-use crate::{EvalArg, EvalResult, Evaluable, Evaluator, Interpreter, RetValOrErr, ScopeFrameTag};
 
 impl Evaluable for IfStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
-        let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, state);
+        let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, scope);
         if evaluated || result.is_err() {
             return result;
         }
@@ -23,14 +17,14 @@ impl Evaluable for IfStmtNode {
         for (elif_cond, elif_block) in self.elif_blocks() {
             let elif_cond = elif_cond.unwrap();
             let elif_block = elif_block.unwrap();
-            let (evaluated, result) = eval_block_if_true(&elif_cond, &elif_block, state);
+            let (evaluated, result) = eval_block_if_true(&elif_cond, &elif_block, scope);
             if evaluated || result.is_err() {
                 return result;
             }
         }
 
         if let Some(else_block) = self.else_block() {
-            return eval_block(&else_block, state);
+            return eval_block(&else_block, scope);
         }
 
         Ok(Value::Nil)
@@ -45,9 +39,9 @@ impl Evaluable for IfStmtNode {
 fn eval_block_if_true(
     cond: &ConditionElement,
     block: &BlockStmtNode,
-    state: &mut Evaluator,
+    scope: &mut Arc<Mutex<Scope<Variable>>>,
 ) -> (bool, EvalResult) {
-    let cond_val = match cond.evaluate(state) {
+    let cond_val = match cond.evaluate(scope) {
         Ok(v) => v,
         Err(e) => return (false, Err(e)),
     };
@@ -69,15 +63,15 @@ fn eval_block_if_true(
     };
 
     if cond_val {
-        (true, eval_block(block, state))
+        (true, eval_block(block, scope))
     } else {
         (false, Ok(Value::Nil))
     }
 }
 
-fn eval_block(block: &BlockStmtNode, state: &mut Evaluator) -> EvalResult {
-    state.scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
-    let result = block.evaluate(state);
-    state.scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);
+fn eval_block(block: &BlockStmtNode, scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
+    let result = block.evaluate(scope);
+    scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);
     result
 }

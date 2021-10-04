@@ -605,11 +605,23 @@ dependencies = [
 name = "lu_cmds"
 version = "0.1.0"
 dependencies = [
+ "conformance",
+ "derive-new",
+ "derive_more",
+ "educe",
  "log",
+ "lu_conformance",
  "lu_error",
  "lu_interpreter",
+ "lu_interpreter_structs",
+ "lu_syntax",
+ "lu_syntax_elements",
+ "lu_test_support",
  "lu_value",
+ "once_cell",
+ "parking_lot",
  "pretty_env_logger",
+ "serde_json",
  "vec_box",
 ]
 
@@ -664,10 +676,12 @@ dependencies = [
  "itertools",
  "lazy_static",
  "log",
+ "lu_cmds",
  "lu_conformance",
  "lu_error",
  "lu_fs",
  "lu_interpreter",
+ "lu_interpreter_structs",
  "lu_parser",
  "lu_pipeline_stage",
  "lu_syntax",
@@ -682,6 +696,41 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "tap",
+ "walkdir",
+]
+
+[[package]]
+name = "lu_interpreter_structs"
+version = "0.1.0"
+dependencies = [
+ "bimap",
+ "contracts",
+ "derive-new",
+ "derive_builder",
+ "derive_more",
+ "educe",
+ "enum-as-inner",
+ "enum_dispatch",
+ "if_chain",
+ "indexmap",
+ "indextree",
+ "itertools",
+ "lazy_static",
+ "log",
+ "lu_error",
+ "lu_fs",
+ "lu_parser",
+ "lu_pipeline_stage",
+ "lu_syntax",
+ "lu_syntax_elements",
+ "lu_text_util",
+ "lu_value",
+ "multimap",
+ "once_cell",
+ "parking_lot",
+ "rusttyc",
+ "serde",
  "tap",
  "walkdir",
 ]
@@ -761,12 +810,16 @@ dependencies = [
 name = "lu_test_support"
 version = "0.1.0"
 dependencies = [
+ "conformance",
  "log",
  "lu_cmds",
+ "lu_conformance",
+ "lu_error",
  "lu_interpreter",
  "lu_value",
  "parking_lot",
  "pretty_env_logger",
+ "serde_json",
  "temp_testdir",
  "vec_box",
 ]

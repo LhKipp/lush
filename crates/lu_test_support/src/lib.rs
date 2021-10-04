@@ -1,4 +1,5 @@
 mod playground;
+pub mod test_prelude;
 
 #[macro_use]
 extern crate vec_box;

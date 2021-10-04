@@ -1,17 +1,12 @@
-use log::debug;
-use lu_syntax::{ast::ForStmtNode, AstToken};
-use lu_value::Value;
-
-use crate::{
-    variable::VarDeclNode, EvalArg, EvalResult, Evaluable, Evaluator, ScopeFrameTag, Variable,
-};
+use crate::evaluate::eval_prelude::*;
+use lu_syntax::ast::ForStmtNode;
 
 impl Evaluable for ForStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], state: &mut Evaluator) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         let block = self.block().unwrap();
         if block.is_empty() {
             debug!("Empty for stmt");
-            // Empty for statement. This is a noop. Should have been a warning (at least).
+            // Empty for scopement. This is a noop. Should have been a warning (at least).
             return Ok(Value::Nil);
         }
         let var_names: Vec<String> = self
@@ -33,7 +28,7 @@ impl Evaluable for ForStmtNode {
                 for char in str_to_iter.chars() {
                     // We entered the for loop. We need to push a new scope and set the vars
                     {
-                        let mut scope = state.scope.lock();
+                        let mut scope = scope.lock();
                         scope.push_frame(ScopeFrameTag::ForStmtFrame).1.insert(
                             var_names[0].clone(),
                             Variable::new(
@@ -43,9 +38,9 @@ impl Evaluable for ForStmtNode {
                             ),
                         );
                     }
-                    block.evaluate(state)?;
+                    block.evaluate(scope)?;
                     {
-                        let mut scope = state.scope.lock();
+                        let mut scope = scope.lock();
                         scope.pop_frame(&ScopeFrameTag::ForStmtFrame);
                     }
                 }
