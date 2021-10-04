@@ -5,7 +5,7 @@ use crate::{EvalArg, Evaluator, Scope, Signature, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
-use lu_value::{Value, NIL_VAL};
+use lu_value::Value;
 
 // pub struct CommandArgs {
 //     /// The name by which the command has been called
@@ -47,11 +47,34 @@ pub trait Command: CommandClone + Debug {
 
     /// Returns $in
     fn expect_in<'a>(&self, scope: &'a Scope<Variable>) -> &'a Value {
-        &scope
-            .find_var(IN_VAR_NAME)
-            .map(|var| &var.val)
-            .unwrap_or(&NIL_VAL)
+        self.expect_arg(scope, IN_VAR_NAME)
     }
+
+    /// Returns $<arg_name>
+    fn expect_arg<'a>(&self, scope: &'a Scope<Variable>, arg_name: &str) -> &'a Value {
+        &scope
+            .find_var(arg_name)
+            .map(|var| &var.val)
+            .expect("Variable always present")
+    }
+
+    /// Returns $<arg_name>
+    fn expect_mut_arg<'a>(&self, scope: &'a mut Scope<Variable>, arg_name: &str) -> &'a mut Value {
+        &mut scope
+            .find_var_mut(arg_name)
+            .expect("Variable always present")
+            .val
+    }
+
+    // /// Returns $<arg_name>
+    // fn expect_overwrite_var<'a>(
+    //     &self,
+    //     scope: &'a mut Scope<Variable>,
+    //     var_name: &str,
+    //     new_val: Value,
+    // ) {
+    //     assert!(&scope.overwrite_var_value(var_name, new_val))
+    // }
 
     fn do_run(&self, args: &[EvalArg], state: &mut Evaluator) -> LuResult<Value>;
 

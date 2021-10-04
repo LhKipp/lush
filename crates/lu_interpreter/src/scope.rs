@@ -2,6 +2,7 @@ use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
+use lu_value::Value;
 use multimap::MultiMap;
 use std::{collections::HashMap, fmt, path::PathBuf};
 use tap::Tap;
@@ -217,6 +218,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 }
 
 impl Scope<Variable> {
+    /// Returns the function, in which the current selected frame is.
     pub(crate) fn get_cur_func(&self) -> Option<&Callable> {
         self.cur_frame_id
             .map(|cur_frame_id| {
@@ -244,19 +246,12 @@ impl Scope<Variable> {
             None
         }
     }
-    fn frames_to_find_var_in(&self) -> Vec<&ScopeFrame<Variable>> {
+    fn frames_to_find_var_in(&self) -> Vec<NodeId> {
         if let Some(cur_frame_id) = self.cur_frame_id {
-            let mut frames_till_global: Vec<&ScopeFrame<Variable>> = cur_frame_id
-                .ancestors(&self.arena)
-                .map(|n_id| self.arena[n_id].get())
-                .collect();
+            let mut frames_till_global: Vec<NodeId> = cur_frame_id.ancestors(&self.arena).collect();
             if let Some(cur_source_f_id) = self.cur_source_f_id() {
                 if let Some(use_stmts_ids) = self.use_stmts.get_vec(&cur_source_f_id) {
-                    frames_till_global.extend(
-                        use_stmts_ids
-                            .iter()
-                            .map(|use_stmt_id| self.arena[*use_stmt_id].get()),
-                    )
+                    frames_till_global.extend(use_stmts_ids)
                 }
             }
             frames_till_global
@@ -266,18 +261,46 @@ impl Scope<Variable> {
     }
 
     pub fn find_var(&self, name: &str) -> Option<&Variable> {
-        debug!(
-            "Finding var {} from {:?} on",
-            name,
-            self.get_cur_frame_tag()
-        );
-        debug!("Scope is: {}", self.fmt_as_string());
+        let start_frame = self.get_cur_frame_tag();
         let frames_to_check_var_for = self.frames_to_find_var_in();
         frames_to_check_var_for
             .iter()
-            .tap(|frame| debug!("Searching for var {} in {:?}", name, frame))
+            .map(|frame_id| self.arena[*frame_id].get())
             .find_map(|frame| frame.get(name))
-            .tap(|result| debug!("Result for find_var {}: {:?}", name, result))
+            .tap(|result| {
+                debug!(
+                    "Result for find_var {} from start_frame {:?}: {:?}",
+                    name, start_frame, result
+                )
+            })
+    }
+
+    pub fn find_var_mut(&mut self, name: &str) -> Option<&mut Variable> {
+        let frames_to_check_var_for = self.frames_to_find_var_in();
+        for frame in frames_to_check_var_for {
+            if self.arena[frame].get_mut().get_mut(name).is_some() {
+                return self.arena[frame].get_mut().get_mut(name);
+            }
+        }
+        None
+    }
+
+    #[deprecated]
+    pub fn overwrite_var_value(&mut self, name: &str, new_value: Value) -> bool {
+        for frame_id in self.frames_to_find_var_in() {
+            let frame = self.arena[frame_id].get_mut();
+            if let Some(var) = frame.get_mut(name) {
+                debug!("Overwriting var {} with value: {:?}", name, new_value);
+                var.val = new_value;
+                return true;
+            }
+        }
+
+        debug!(
+            "Not Overwriting var {} with value: {:?}. Var not found!",
+            name, new_value
+        );
+        false
     }
 
     #[allow(unused)]
