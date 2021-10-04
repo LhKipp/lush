@@ -23,7 +23,7 @@ pub enum VarDeclNode {
     ForStmt(ForStmtNode, usize),
     // For $in (before it is mapped to the correct name)
     PrevCmdStmt(CmdStmtNode),
-    // Used for errors and arg signature
+    // Used for errors and arg signature and others :)
     CatchAll(SourceCodeItem),
 }
 

@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::rc::Rc;
 
-use crate::{EvalArg, Evaluator, Scope, Signature, Variable};
+use crate::{EvalArg, Evaluator, Scope, Signature, VarDeclNode, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
@@ -120,5 +120,14 @@ where
 impl Clone for Box<dyn Command> {
     fn clone(&self) -> Box<dyn Command> {
         self.clone_box()
+    }
+}
+
+impl Into<Variable> for Box<dyn Command> {
+    fn into(self) -> Variable {
+        let name = self.name().to_string();
+        let decl = self.signature().decl.clone();
+        let value = Value::new_func(self);
+        Variable::new(name, value, VarDeclNode::CatchAll(decl))
     }
 }

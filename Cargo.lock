@@ -610,6 +610,7 @@ dependencies = [
  "lu_interpreter",
  "lu_value",
  "pretty_env_logger",
+ "vec_box",
 ]
 
 [[package]]
