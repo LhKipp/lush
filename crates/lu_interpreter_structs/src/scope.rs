@@ -311,7 +311,7 @@ impl Scope<Variable> {
         );
         // TODO write check that no variable shadows a func name
         self.find_var(name)
-            .map(|var| var.val.as_function())
+            .map(|var| var.val.as_command())
             .flatten()
     }
 
@@ -346,7 +346,7 @@ impl Scope<Variable> {
     ) -> Option<(usize, &Rc<dyn Command>)> {
         let result = self
             .find_var_with_longest_match(name_parts)
-            .map(|(i, var)| (i, var.val.as_function()));
+            .map(|(i, var)| (i, var.val.as_command()));
         if let Some((i, Some(callable))) = result {
             Some((i, callable))
         } else {

@@ -260,7 +260,7 @@ impl TyCheckState {
             } else {
                 // Var is in scope, but doesn't have a tc_key yet (might be func or something else)
                 debug!("Found var {}, which has no tc_key yet", var_name);
-                if let Some(callable) = var.val.as_function() {
+                if let Some(callable) = var.val.as_command() {
                     debug!(
                         "First time usage of func {}. Inserting new tc_func.",
                         var_name

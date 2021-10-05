@@ -27,7 +27,7 @@ pub enum Value {
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
     #[serde(skip)]
-    Function(Rc<dyn Command>),
+    Command(Rc<dyn Command>),
 
     /// Not really lu values. But treating them as one, allows us to store them in variables
     Strct(Rc<Strct>),
@@ -42,7 +42,7 @@ impl PartialEq for Value {
             (Value::String(lhs), Value::String(rhs)) => lhs == rhs,
             (Value::BareWord(lhs), Value::BareWord(rhs)) => lhs == rhs,
             (Value::Array(lhs), Value::Array(rhs)) => lhs == rhs,
-            (Value::Function(lhs), Value::Function(rhs)) => Rc::ptr_eq(lhs, rhs),
+            (Value::Command(lhs), Value::Command(rhs)) => Rc::ptr_eq(lhs, rhs),
             _ => false,
         }
     }
@@ -61,7 +61,7 @@ impl Hash for Value {
             Value::String(v) => v.hash(state),
             Value::BareWord(v) => v.hash(state),
             Value::Array(v) => v.hash(state),
-            Value::Function(func) => Rc::as_ptr(func).hash(state),
+            Value::Command(func) => Rc::as_ptr(func).hash(state),
             Value::Strct(strct) => Rc::as_ptr(strct).hash(state),
         }
     }
@@ -69,7 +69,7 @@ impl Hash for Value {
 
 impl Value {
     pub fn new_func(func: Rc<dyn Command>) -> Self {
-        Value::Function(func)
+        Value::Command(func)
     }
     pub fn new_strct(strct: Strct) -> Self {
         Value::Strct(Rc::new(strct))
@@ -90,7 +90,7 @@ impl Value {
     }
 
     pub fn is_func(&self) -> bool {
-        matches!(self, Value::Function(_))
+        matches!(self, Value::Command(_))
     }
 
     /// Returns Some(true|false) if self represents a true or false value
@@ -103,7 +103,7 @@ impl Value {
             Value::Number(n) => Some(*n != OrderedFloat::from(0f64)),
             Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
             Value::Array(arr) => Some(!arr.is_empty()),
-            Value::Function(_) => None,
+            Value::Command(_) => None,
             Value::Strct(_) => None,
         }
     }
@@ -118,7 +118,7 @@ impl Display for Value {
             Value::String(v) => v.fmt(f),
             Value::BareWord(v) => v.fmt(f),
             Value::Array(arr) => write!(f, "{:?}", arr),
-            Value::Function(v) => write!(f, "{:p}", Rc::as_ptr(v)),
+            Value::Command(v) => write!(f, "{:p}", Rc::as_ptr(v)),
             Value::Strct(v) => write!(f, "{:p}", Rc::as_ptr(v)),
         }
     }
