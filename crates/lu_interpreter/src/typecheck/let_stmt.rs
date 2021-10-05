@@ -19,8 +19,7 @@ impl TypeCheck for LetStmtNode {
 
             // unify key with decl
             if let Some(decl_ty) = self.decl_ty() {
-                let (ty, err) =
-                    ValueType::from_node_or_err_ty(&decl_ty.into_type(), &ty_state.scope);
+                let (ty, err) = ValueType::from_node_or_err_ty(&decl_ty.into_type());
                 ty_state.record_option(err);
                 ty_state.concretizes_key(let_stmt_key, ty);
             }

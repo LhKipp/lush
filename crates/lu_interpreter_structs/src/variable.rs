@@ -8,7 +8,7 @@ use lu_syntax_elements::constants::IN_ARG_NAME;
 use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
-use crate::{Command, Strct};
+use crate::{Command, Strct, UsePath};
 
 #[derive(Educe)]
 #[educe(Default)]
@@ -62,11 +62,22 @@ impl Variable {
         )
     }
 
-    pub fn new_struct(strct: Strct, decl: StrctStmtNode) -> Variable {
+    pub fn new_strct(strct: Strct) -> Variable {
+        let decl = strct.decl.clone();
         Variable::new(
             strct.name.clone(),
             Value::new_strct(strct),
-            VarDeclNode::StrctStmt(decl),
+            VarDeclNode::CatchAll(decl),
+        )
+    }
+
+    pub fn new_use_path(use_path: UsePath) -> Variable {
+        let decl = use_path.decl.clone();
+        // TODO better decl here
+        Variable::new(
+            use_path.to_string(),
+            Value::new_use_path(use_path),
+            VarDeclNode::CatchAll(decl),
         )
     }
 

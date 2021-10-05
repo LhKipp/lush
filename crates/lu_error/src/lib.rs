@@ -7,6 +7,7 @@ mod eval_err;
 mod fs_err;
 mod parse_err;
 mod ty_err;
+pub mod util;
 
 #[macro_use]
 extern crate derive_new;

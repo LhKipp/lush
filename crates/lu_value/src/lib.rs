@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 pub const NIL_VAL: Value = Value::Nil;
 
+// TODO move this to lu_interpreter_structs
 #[derive(Clone, Debug, Serialize, Deserialize, EnumAsInner)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about
@@ -26,6 +27,9 @@ pub enum Value {
     Function(Rc<dyn Any>),
     #[serde(skip)]
     Strct(Rc<dyn Any>),
+    /// See UsePath
+    #[serde(skip)]
+    UsePath(Rc<dyn Any>),
 }
 
 impl PartialEq for Value {
@@ -58,6 +62,7 @@ impl Hash for Value {
             Value::Array(v) => v.hash(state),
             Value::Function(func) => Rc::as_ptr(func).hash(state),
             Value::Strct(strct) => Rc::as_ptr(strct).hash(state),
+            Value::UsePath(_) => todo!(),
         }
     }
 }
@@ -68,6 +73,9 @@ impl Value {
     }
     pub fn new_strct<S: Any + Sized>(strct: S) -> Self {
         Value::Strct(Rc::new(strct))
+    }
+    pub fn new_use_path<S: Any + Sized>(path: S) -> Self {
+        Value::UsePath(Rc::new(path))
     }
 
     pub fn new_array(vals: Vec<Value>) -> Self {
@@ -101,6 +109,7 @@ impl Value {
             Value::Array(arr) => Some(!arr.is_empty()),
             Value::Function(_) => None,
             Value::Strct(_) => None,
+            Value::UsePath(_) => todo!(),
         }
     }
 }
@@ -116,6 +125,7 @@ impl Display for Value {
             Value::Array(arr) => write!(f, "{:?}", arr),
             Value::Function(v) => write!(f, "{:p}", Rc::as_ptr(v)),
             Value::Strct(v) => write!(f, "{:p}", Rc::as_ptr(v)),
+            Value::UsePath(_) => todo!(),
         }
     }
 }

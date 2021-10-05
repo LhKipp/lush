@@ -3,7 +3,7 @@ use lu_syntax::ast::SourceFileNode;
 
 impl Evaluable for SourceFileNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
-        let stmts = self.statements().unwrap();
+        let stmts = self.block().unwrap();
         let result = stmts.evaluate(scope)?;
         Ok(result)
     }

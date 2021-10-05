@@ -8,6 +8,7 @@ use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, LuTypeNode
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use lu_value::Value;
+use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +42,6 @@ impl ArgSignature {
         n: Option<ArgSignatureNode>,
         fallback_name: &str,
         fallback_decl: ArgDecl,
-        scope: &Scope<Variable>,
     ) -> (Self, Option<LuErr>) {
         let name = n.as_ref().map(|n| n.name()).unwrap_or(fallback_name.into());
         let fallback_ty = (ValueType::Unspecified, None);
@@ -56,7 +56,7 @@ impl ArgSignature {
                     .type_()
                     .map(|ty| {
                         // Ty should always be some
-                        ValueType::from_node_or_err_ty(&ty.into_type(), scope)
+                        ValueType::from_node_or_err_ty(&ty.into_type())
                     })
                     .unwrap_or(fallback_ty.clone()) // But for incomplete input we fallback
             })
@@ -122,10 +122,9 @@ impl Signature {
     pub fn from_sign_and_stmt(
         sign_node: Option<SignatureNode>,
         fn_signature_decl: SourceCodeItem,
-        scope: &Scope<Variable>,
     ) -> (Signature, Vec<LuErr>) {
         if let Some(sign_node) = sign_node {
-            Signature::source_signature(sign_node, fn_signature_decl, scope)
+            Signature::source_signature(sign_node, fn_signature_decl)
         } else {
             (Signature::default_signature(fn_signature_decl), vec![])
         }
@@ -134,21 +133,16 @@ impl Signature {
     pub fn source_signature(
         sign_node: SignatureNode,
         fallback_arg_decl: SourceCodeItem,
-        scope: &Scope<Variable>,
     ) -> (Signature, Vec<LuErr>) {
         let get_ty_of_node = |ty_node: &LuTypeNode| -> (ValueType, Option<LuErr>) {
-            ValueType::from_node_or_err_ty(&ty_node.into_type(), scope)
+            ValueType::from_node_or_err_ty(&ty_node.into_type())
         };
         let mut all_errs = vec![];
 
-        let (in_ty, in_err) = ArgSignature::from_node(
-            sign_node.in_arg(),
-            IN_ARG_NAME,
-            fallback_arg_decl.clone(),
-            scope,
-        );
+        let (in_ty, in_err) =
+            ArgSignature::from_node(sign_node.in_arg(), IN_ARG_NAME, fallback_arg_decl.clone());
         let (ret_ty, ret_err) =
-            ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fallback_arg_decl, scope);
+            ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fallback_arg_decl);
 
         in_err.map(|e| all_errs.push(e));
         ret_err.map(|e| all_errs.push(e));
@@ -205,30 +199,32 @@ pub struct Function {
     /// A signature is always present (if not user provided, defaulted.)
     pub signature: Signature,
     pub fn_node: FnStmtNode,
-    pub parent_frame_id: ScopeFrameId,
     // For closures only
     pub captured_vars: Vec<Variable>,
 
+    /// Set when function is inserted into scope
+    pub parent_frame_id: OnceCell<ScopeFrameId>,
+    /// Workaround, as we have to impl Command for Function, but can't access
+    /// FnStmtNode::evaluate. Therefore we store a pointer to FnStmtNode::evaluate which
+    /// is once set before evaluating the current scope
     #[educe(Debug(ignore))]
-    pub eval_fn: Box<fn(&Self, &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>>,
+    pub eval_fn: OnceCell<Box<fn(&Self, &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>>>,
 }
 
 impl Function {
-    pub fn new(
-        name: String,
-        signature: Signature,
-        fn_node: FnStmtNode,
-        parent_frame_id: ScopeFrameId,
-        eval_fn: Box<fn(&Self, &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>>,
-    ) -> Self {
+    pub fn new(name: String, signature: Signature, fn_node: FnStmtNode) -> Self {
         Self {
             name,
             signature,
-            parent_frame_id,
             fn_node,
             captured_vars: Vec::new(),
-            eval_fn,
+            parent_frame_id: OnceCell::new(),
+            eval_fn: OnceCell::new(),
         }
+    }
+
+    pub fn set_parent_frame_id(&self, parent_frame_id: ScopeFrameId) {
+        assert!(self.parent_frame_id.set(parent_frame_id).is_ok())
     }
 }
 
@@ -238,7 +234,7 @@ impl Command for Function {
     }
 
     fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
-        (self.eval_fn)(self, scope)
+        (self.eval_fn.get().unwrap())(self, scope)
     }
 
     fn signature(&self) -> &Signature {

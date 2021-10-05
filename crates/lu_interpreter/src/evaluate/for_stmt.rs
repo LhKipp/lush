@@ -16,6 +16,7 @@ impl Evaluable for ForStmtNode {
             .collect();
         assert!(var_names.len() > 0);
         // TODO iterate special over table
+        // TODO this shouldt be match all
         match self.iterated_value().unwrap().value() {
             Value::Nil => todo!(),
             Value::Number(_) => todo!(),
@@ -49,6 +50,7 @@ impl Evaluable for ForStmtNode {
             Value::Bool(_) => todo!(),
             Value::Function(_) => todo!(),
             Value::Strct(_) => todo!(),
+            Value::UsePath(_) => todo!(),
         }
 
         Ok(Value::Nil)

@@ -25,4 +25,7 @@ impl UseStmtNode {
             .join("/");
         PathBuf::from(path_as_str)
     }
+    pub fn parts(&self) -> Vec<String> {
+        self.path().map(|n|n.text()).collect()
+    }
 }

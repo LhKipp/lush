@@ -12,7 +12,7 @@ impl Resolve for SourceFileNode {
             _ => unreachable!("Passing of file name is mandatory"),
         };
 
-        let stmts = self.statements().unwrap();
+        let stmts = self.block().unwrap();
 
         stmts.resolve_dependant_names_with_args(
             &[ResolveArg::Arg(VisitArg::SourceFileBlock(f_path.clone()))],

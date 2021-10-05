@@ -56,18 +56,6 @@ impl Resolve for BlockStmtNode {
         //      $x = 3 # $x refers to global x
         // end
         // ```
-        for use_stmt in self.use_stmts() {
-            source_use_stmt(use_stmt, resolver);
-        }
-
-        for fn_stmt in self.fn_stmts() {
-            source_fn_stmt(&fn_stmt, resolver);
-        }
-        for struct_stmt in self.struct_stmts() {
-            source_struct_stmt(&struct_stmt, resolver);
-        }
-
-        // TODO source variables
 
         debug!(
             "Scope after resolving block stmt: {}",
@@ -77,6 +65,7 @@ impl Resolve for BlockStmtNode {
     }
 }
 
+#[allow(dead_code)]
 fn source_use_stmt(use_stmt: UseStmtNode, resolver: &mut Resolver) {
     // Save old source_file_frame_id and go to parent
     let orig_source_f_frame_id = resolver.scope.lock().get_cur_frame_id();
@@ -119,6 +108,7 @@ fn source_use_stmt(use_stmt: UseStmtNode, resolver: &mut Resolver) {
 
 /// Returns NodeId of sourced file
 /// Leaves scope cur_frame_id unchanged
+#[allow(dead_code)]
 fn source_file(code: SourceCode, resolver: &mut Resolver) -> ScopeFrameId {
     assert!(resolver
         .scope
@@ -152,52 +142,4 @@ fn source_file(code: SourceCode, resolver: &mut Resolver) -> ScopeFrameId {
         .as_global_frame()
         .is_some());
     new_source_f_id
-}
-
-fn source_fn_stmt(fn_stmt: &FnStmtNode, resolver: &mut Resolver) {
-    let name = fn_stmt.name().unwrap_or("".to_string());
-
-    // Source the signature (either user provided or default)
-    let (sign, errs) = Signature::from_sign_and_stmt(
-        fn_stmt.signature(),
-        fn_stmt.decl_item(),
-        &resolver.scope.lock(),
-    );
-    resolver.get_mut_errors().extend(errs);
-
-    let parent_frame_id = resolver.scope.lock().get_cur_frame_id();
-    let func = Function::new(
-        name,
-        sign,
-        fn_stmt.clone(),
-        parent_frame_id,
-        Box::new(eval_function),
-    )
-    .boxed();
-
-    resolver
-        .scope
-        .lock()
-        .cur_mut_frame()
-        .insert_var(Variable::new_func(func));
-}
-
-fn source_struct_stmt(struct_stmt: &StrctStmtNode, resolver: &mut Resolver) {
-    let name = struct_stmt.name().unwrap_or("".to_string());
-
-    // Source the struct fields (either user provided or default)
-    let fields: Vec<StrctField> = struct_stmt
-        .fields()
-        .map(|field| {
-            let (field, errs) = StrctField::from_node(&field, &resolver.scope.lock());
-            resolver.push_errs(errs);
-            field
-        })
-        .collect();
-    let strct = Strct::new(name, fields, struct_stmt.to_item());
-
-    resolver.scope.lock().cur_mut_frame().insert(
-        strct.name.clone(),
-        Variable::new_struct(strct, struct_stmt.clone()),
-    );
 }

@@ -773,6 +773,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "lu_structure_parse"
+version = "0.1.0"
+dependencies = [
+ "bimap",
+ "contracts",
+ "derive-new",
+ "derive_builder",
+ "derive_more",
+ "educe",
+ "enum-as-inner",
+ "enum_dispatch",
+ "if_chain",
+ "indexmap",
+ "indextree",
+ "itertools",
+ "lazy_static",
+ "log",
+ "lu_error",
+ "lu_fs",
+ "lu_interpreter_structs",
+ "lu_parser",
+ "lu_pipeline_stage",
+ "lu_syntax",
+ "lu_syntax_elements",
+ "lu_text_util",
+ "lu_value",
+ "multimap",
+ "once_cell",
+ "parking_lot",
+ "rusttyc",
+ "serde",
+ "tap",
+ "walkdir",
+]
+
+[[package]]
 name = "lu_syntax"
 version = "0.1.0"
 dependencies = [

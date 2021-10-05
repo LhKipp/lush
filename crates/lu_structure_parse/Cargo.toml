@@ -1,0 +1,39 @@
+[package]
+name = "lu_structure_parse"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lu_parser = { version = "0.1.0", path = "../lu_parser" }
+lu_error = { version = "0.1.0", path = "../lu_error" }
+lu_fs = { version = "0.1.0", path = "../lu_fs" }
+lu_text_util = { version = "0.1.0", path = "../lu_text_util" }
+lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
+lu_value = { version = "0.1.0", path = "../lu_value" }
+lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
+lu_pipeline_stage = { version = "0.1.0", path = "../lu_pipeline_stage" }
+lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
+
+derive-new = "0.5"
+indextree = {version = "4.3.1", features = ["deser"]}
+parking_lot = "0.11"
+log = "0.4.14"
+contracts = "0.6.2"
+tap = "1.0.1"
+serde = "1.0.129"
+rusttyc = "0.4.2"
+educe = "0.4.18"
+if_chain = "1.0.2"
+enum-as-inner = "0.3.3"
+bimap = "0.6.1"
+derive_more = "0.99.16"
+itertools = "0.10.1"
+lazy_static = "1.4.0"
+once_cell = "1.8.0"
+enum_dispatch = "0.3.7"
+derive_builder = "0.10.2"
+indexmap = "1.7.0"
+walkdir = "2.3.2"
+multimap = "0.8.3"

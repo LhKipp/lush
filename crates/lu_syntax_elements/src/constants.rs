@@ -1,3 +1,4 @@
+pub const USE_PATH_SEP: &str = ":";
 pub const IN_KW_NAME: &str = "in";
 pub const RET_KW_NAME: &str = "ret";
 

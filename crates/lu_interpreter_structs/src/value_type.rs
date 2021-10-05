@@ -7,7 +7,7 @@ use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize};
 
-use crate::{Scope, Signature, Strct, Variable};
+use crate::{Signature, Strct};
 
 fn cmp_sign_types(_: &Signature, _: &Signature) -> bool {
     todo!()
@@ -47,8 +47,12 @@ pub enum ValueType {
     Number,
     String,
     BareWord,
-    /// Struct with name
+    /// Struct with name (Final Strct type when)
     Strct(Box<Strct>),
+    /// Before resolving all UsePaths, the correct strct behind a StrctName can not be determined.
+    /// However we need to create a ValueType when sourcing functions etc. Therefore we introduce
+    /// this temporary type
+    StrctName(String),
     /// Box with inner ty and inner_ty_decl
     Array {
         inner_ty: Box<ValueType>,
@@ -99,18 +103,11 @@ impl ValueType {
         ValueType::Strct(Box::new(strct))
     }
 
-    pub fn from_node_or_err_ty(
-        node: &LuTypeSpecifierElement,
-        scope: &Scope<Variable>,
-    ) -> (ValueType, Option<LuErr>) {
-        ValueType::from_node(node, scope)
-            .map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
+    pub fn from_node_or_err_ty(node: &LuTypeSpecifierElement) -> (ValueType, Option<LuErr>) {
+        ValueType::from_node(node).map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
     }
 
-    pub fn from_node(
-        node: &LuTypeSpecifierElement,
-        scope: &Scope<Variable>, // TODO maybe this should be a func.. can value_type rely on variable??
-    ) -> Result<ValueType, LuErr> {
+    pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
         // TODO make return type (ValueType, Option<LuErr>)
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => {
@@ -123,17 +120,10 @@ impl ValueType {
             LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
             LuTypeSpecifierElement::GenericType(n) => ValueType::Generic(n.text().to_string()),
-            LuTypeSpecifierElement::StrctName(n) => {
-                debug!("Looking for struct with name {}", n.text());
-                let strct = scope.expect_strct(n.text(), n.to_item())?;
-                ValueType::Strct(Box::new(strct.clone()))
-            }
+            LuTypeSpecifierElement::StrctName(n) => ValueType::StrctName(n.text().to_string()),
             LuTypeSpecifierElement::ArrayType(arr) => {
                 let (inner_ty, inner_ty_decl) = if let Some(inner) = arr.inner_type() {
-                    (
-                        ValueType::from_node(&inner.into_type(), scope)?,
-                        inner.to_item(),
-                    )
+                    (ValueType::from_node(&inner.into_type())?, inner.to_item())
                 } else {
                     (ValueType::Unspecified, arr.to_item())
                 };
@@ -141,7 +131,7 @@ impl ValueType {
             }
             LuTypeSpecifierElement::FnType(fn_ty) => {
                 let (sign, errs) =
-                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item(), scope);
+                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item());
                 if !errs.is_empty() {
                     todo!("Return (valuety, err)");
                 }
@@ -247,6 +237,7 @@ impl TcVariant for ValueType {
             | ValueType::BareWord => Arity::Fixed(0),
             ValueType::Array { .. } => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
+            ValueType::StrctName(_) => unreachable!("Tmp type"),
         }
     }
 }
@@ -281,6 +272,7 @@ impl Display for ValueType {
             ValueType::Func(_) => todo!(),
             ValueType::Void => write!(f, "void"),
             ValueType::Generic(name) => write!(f, "{}", name),
+            ValueType::StrctName(name) => write!(f, "{}", name),
         }
     }
 }

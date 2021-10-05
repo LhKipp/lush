@@ -16,7 +16,7 @@ impl TypeCheck for SourceFileNode {
             _ => unreachable!("Passing of file name is mandatory"),
         };
 
-        let stmts = self.statements().unwrap();
+        let stmts = self.block().unwrap();
         stmts.typecheck_with_args(
             &[TypeCheckArg::Arg(VisitArg::SourceFileBlock(f_path.clone()))],
             ty_state,
