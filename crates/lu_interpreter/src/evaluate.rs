@@ -3,9 +3,9 @@ use std::{fmt::Debug, sync::Arc};
 
 use log::debug;
 use lu_error::{LuErr, LuResult};
+use lu_interpreter_structs::Value;
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::ast::SourceFileNode;
-use lu_value::Value;
 use parking_lot::Mutex;
 
 use crate::{Scope, TyCheckState, Variable};

@@ -1,11 +1,10 @@
 use std::rc::Rc;
 use std::{fmt::Debug, sync::Arc};
 
-use crate::{Scope, Signature, VarDeclNode, Variable};
+use crate::{Scope, Signature, Value, VarDeclNode, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
-use lu_value::Value;
 use parking_lot::Mutex;
 
 pub const IN_VAR_NAME: &str = "in";

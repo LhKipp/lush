@@ -11,7 +11,6 @@ lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_fs = { version = "0.1.0", path = "../lu_fs" }
 lu_text_util = { version = "0.1.0", path = "../lu_text_util" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
-lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 lu_pipeline_stage = { version = "0.1.0", path = "../lu_pipeline_stage" }
 lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }

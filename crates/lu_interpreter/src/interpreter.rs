@@ -3,6 +3,7 @@
 
 use log::debug;
 use lu_error::{LuErr, LuResult, LuResults, ParseErr};
+use lu_interpreter_structs::Value;
 use lu_parser::grammar::SourceFileRule;
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
@@ -10,7 +11,6 @@ use lu_syntax::{
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
-use lu_value::Value;
 
 use parking_lot::Mutex;
 use std::{path::PathBuf, rc::Rc, sync::Arc};

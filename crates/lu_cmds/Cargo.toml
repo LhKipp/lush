@@ -8,7 +8,6 @@ edition = "2018"
 [dependencies]
 lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
 lu_error = { version = "0.1.0", path = "../lu_error" }
-lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 

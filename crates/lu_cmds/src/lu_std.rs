@@ -1,5 +1,6 @@
 mod array;
 mod test;
+mod iter_funcs;
 
 use lu_error::LuResult;
 use lu_interpreter_structs::{Scope, Variable};

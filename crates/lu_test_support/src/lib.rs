@@ -9,9 +9,8 @@ use pretty_env_logger::env_logger;
 
 use lu_cmds::PrintCmd;
 use lu_interpreter::{
-    Command, Interpreter, InterpreterCfg, Scope, ScopeFrameTag, VarDeclNode, Variable,
+    Command, Interpreter, InterpreterCfg, Scope, ScopeFrameTag, Value, VarDeclNode, Variable,
 };
-use lu_value::Value;
 
 pub fn init_logger() {
     let _ = env_logger::builder()

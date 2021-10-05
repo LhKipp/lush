@@ -1,7 +1,7 @@
 use lu_error::TyErr;
+use lu_interpreter_structs::Value;
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{ast::LetStmtNode, AstElement};
-use lu_value::Value;
 use rusttyc::TcKey;
 
 use crate::{TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};

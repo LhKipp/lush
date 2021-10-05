@@ -5,10 +5,9 @@ use lu_syntax::{
     AstNode, AstToken,
 };
 use lu_syntax_elements::constants::IN_ARG_NAME;
-use lu_value::Value;
 use serde::{Deserialize, Serialize};
 
-use crate::{Command, Strct, UsePath};
+use crate::{Command, Strct, UsePath, Value};
 
 #[derive(Educe)]
 #[educe(Default)]

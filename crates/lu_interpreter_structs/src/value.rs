@@ -1,11 +1,12 @@
 use enum_as_inner::EnumAsInner;
+use lu_syntax::ast::{BareWordToken, NumberExprNode, StringExprNode};
 use ordered_float::OrderedFloat;
 use std::hash::{Hash, Hasher};
 use std::{any::Any, fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
-pub const NIL_VAL: Value = Value::Nil;
+// pub const NIL_VAL: Value = Value::Nil;
 
 // TODO move this to lu_interpreter_structs
 #[derive(Clone, Debug, Serialize, Deserialize, EnumAsInner)]
@@ -139,5 +140,23 @@ impl From<bool> for Value {
 impl From<OrderedFloat<f64>> for Value {
     fn from(v: OrderedFloat<f64>) -> Self {
         Value::Number(v)
+    }
+}
+
+impl From<&BareWordToken> for Value {
+    fn from(n: &BareWordToken) -> Self {
+        Value::BareWord(n.value())
+    }
+}
+
+impl From<&StringExprNode> for Value {
+    fn from(n: &StringExprNode) -> Self {
+        Value::String(n.value())
+    }
+}
+
+impl From<&NumberExprNode> for Value {
+    fn from(n: &NumberExprNode) -> Self {
+        Value::Number(n.value().into())
     }
 }

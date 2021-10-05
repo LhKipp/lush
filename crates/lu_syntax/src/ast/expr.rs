@@ -1,34 +1,18 @@
 use crate::{AstElementChildren, AstNode, AstToken};
 
 use super::{
-    support, ArrayExprNode, BareWordToken, MathExprNode, NumberExprNode, NumberToken,
-    StringContentToken, StringExprNode, TableExprNode, ValueExprElement, ValuePathExprNode,
+    support, ArrayExprNode, BareWordToken, NumberExprNode, NumberToken, StringContentToken,
+    StringExprNode, ValueExprElement,
 };
-use lu_value::Value;
 
-impl ValueExprElement {
-    pub fn value(&self) -> Value {
-        match self {
-            ValueExprElement::BareWord(n) => n.value(),
-            ValueExprElement::NumberExpr(n) => n.value(),
-            ValueExprElement::MathExpr(n) => n.value(),
-            ValueExprElement::StringExpr(n) => n.value(),
-            ValueExprElement::ValuePathExpr(n) => n.value(),
-            ValueExprElement::StrctCtorExpr(_) => todo!(),
-            ValueExprElement::ArrayExpr(n) => n.value(),
-            ValueExprElement::TableExpr(n) => n.value(),
-        }
-    }
-}
-
-impl MathExprNode {
-    pub fn value(&self) -> Value {
-        todo!()
-    }
-}
+// impl MathExprNode {
+//     pub fn value(&self) -> Value {
+//         todo!()
+//     }
+// }
 
 impl NumberExprNode {
-    pub fn value(&self) -> Value {
+    pub fn value(&self) -> f64 {
         support::token_child::<NumberToken>(self.syntax())
             .unwrap()
             .value()
@@ -36,46 +20,41 @@ impl NumberExprNode {
 }
 
 impl NumberToken {
-    pub fn value(&self) -> Value {
+    pub fn value(&self) -> f64 {
         // TODO parsing of number as binary num (0b1110), hex (0xF) or decimal
-        let val: f64 = self
-            .text()
-            .parse()
-            .expect(&format!("Error parsing {} to a number", self.text()));
-        Value::Number(val.into())
+        self.text()
+            .parse::<f64>()
+            .expect(&format!("Error parsing {} to a number", self.text()))
     }
 }
 
-impl TableExprNode {
-    pub fn value(&self) -> Value {
-        todo!()
-    }
-}
+// impl TableExprNode {
+//     pub fn value(&self) -> Value {
+//         todo!()
+//     }
+// }
 
-impl ValuePathExprNode {
-    pub fn value(&self) -> Value {
-        todo!()
-    }
-}
+// impl ValuePathExprNode {
+//     pub fn value(&self) -> Value {
+//         todo!()
+//     }
+// }
 
 impl BareWordToken {
-    pub fn value(&self) -> Value {
-        Value::BareWord(self.text().to_string())
+    pub fn value(&self) -> String {
+        self.text().to_string()
     }
 }
 
 impl ArrayExprNode {
-    pub fn value(&self) -> Value {
-        Value::new_array(self.values().map(|n| n.value()).collect())
-    }
     pub fn values(&self) -> AstElementChildren<ValueExprElement> {
         support::element_children(self.syntax())
     }
 }
 
 impl StringExprNode {
-    pub fn value(&self) -> Value {
-        Value::String(self.text())
+    pub fn value(&self) -> String {
+        self.text()
     }
     pub fn text(&self) -> String {
         support::token_child::<StringContentToken>(self.syntax())

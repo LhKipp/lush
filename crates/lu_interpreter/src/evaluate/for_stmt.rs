@@ -17,11 +17,11 @@ impl Evaluable for ForStmtNode {
         assert!(var_names.len() > 0);
         // TODO iterate special over table
         // TODO this shouldt be match all
-        match self.iterated_value().unwrap().value() {
-            Value::Nil => todo!(),
-            Value::Number(_) => todo!(),
-            Value::BareWord(_) => todo!(),
-            Value::String(str_to_iter) => {
+        if let Some(iterated_val) = self.iterated_value() {
+            let iterated_val = iterated_val.evaluate(scope)?;
+            if let Some(_) = iterated_val.as_array() {
+                todo!();
+            } else if let Some(str_to_iter) = iterated_val.as_string() {
                 // TODO ret error
                 assert_eq!(var_names.len(), 1);
                 debug!("Iterating over string {} in for", str_to_iter);
@@ -45,12 +45,10 @@ impl Evaluable for ForStmtNode {
                         scope.pop_frame(&ScopeFrameTag::ForStmtFrame);
                     }
                 }
+            } else {
+                // Error
+                todo!()
             }
-            Value::Array(_arr) => todo!(),
-            Value::Bool(_) => todo!(),
-            Value::Function(_) => todo!(),
-            Value::Strct(_) => todo!(),
-            Value::UsePath(_) => todo!(),
         }
 
         Ok(Value::Nil)

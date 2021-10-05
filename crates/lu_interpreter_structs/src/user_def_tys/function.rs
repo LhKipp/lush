@@ -1,13 +1,12 @@
 use std::sync::Arc;
 
-use crate::{Command, Scope, ScopeFrameId, ValueType, Variable};
+use crate::{Command, Scope, ScopeFrameId, Value, ValueType, Variable};
 use derive_builder::Builder;
 use derive_new::new;
 use lu_error::{LuErr, LuResult, SourceCodeItem};
 use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, LuTypeNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
-use lu_value::Value;
 use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};

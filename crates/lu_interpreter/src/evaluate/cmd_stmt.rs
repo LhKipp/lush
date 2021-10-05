@@ -1,7 +1,7 @@
 use crate::evaluate::eval_prelude::*;
 use log::debug;
+use lu_interpreter_structs::Value;
 use lu_syntax::ast::CmdStmtNode;
-use lu_value::Value;
 
 use crate::{Command, EvalArg, EvalResult, Evaluable, Evaluator, RunExternalCmd, Variable};
 

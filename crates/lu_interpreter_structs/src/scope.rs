@@ -2,14 +2,13 @@ use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
-use lu_value::Value;
 use multimap::MultiMap;
 use std::{collections::HashMap, fmt, path::PathBuf};
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, Strct, Variable};
+use crate::{Command, Strct, Value, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner)]
 pub enum ScopeFrameTag {

@@ -10,6 +10,7 @@ use walkdir::WalkDir;
 
 use log::debug;
 use lu_error::{EvalErr, FsErr, LuResult, SourceCodeItem};
+use lu_interpreter_structs::Value;
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{
@@ -23,7 +24,6 @@ use lu_syntax_elements::{
     constants::{IN_ARG_NAME, RET_ARG_NAME},
     BlockType,
 };
-use lu_value::Value;
 
 use crate::{
     resolve::{Resolve, ResolveArg, Resolver},

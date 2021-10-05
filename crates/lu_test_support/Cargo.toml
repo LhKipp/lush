@@ -9,7 +9,6 @@ edition = "2018"
 lu_interpreter = { version = "0.1.0", path = "../lu_interpreter" }
 lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_cmds = { version = "0.1.0", path = "../lu_cmds" }
-lu_value = { version = "0.1.0", path = "../lu_value" }
 lu_conformance = { version = "0.1.0", path = "../lu_conformance" }
 
 vec_box = "1.0.0"

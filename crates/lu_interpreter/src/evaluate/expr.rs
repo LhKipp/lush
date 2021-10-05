@@ -38,7 +38,7 @@ impl Evaluable for BareWordToken {
 
 impl Evaluable for NumberExprNode {
     fn do_evaluate(&self, _: &[EvalArg], _scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
-        Ok(self.value())
+        Ok(self.into())
     }
 }
 

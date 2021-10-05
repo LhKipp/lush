@@ -2,7 +2,7 @@
 mod test {
     // use lu_error::LuResults;
     // use lu_test_support::make_test_interpreter;
-    // use lu_value::Value;
+    // use lu_interpreter_structs::Value;
     // use {lu_conformance, serde_json};
     use lu_test_support::test_prelude::*;
 

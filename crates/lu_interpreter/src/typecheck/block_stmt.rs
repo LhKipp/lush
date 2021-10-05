@@ -2,13 +2,13 @@
 use contracts::ensures;
 use log::{debug, warn};
 use lu_error::{EvalErr, LuResult, SourceCodeItem};
+use lu_interpreter_structs::Value;
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{BlockStmtNode, IfStmtNode, StatementElement},
     ast::{ConditionElement, IfBlockNode},
     AstElement, AstToken,
 };
-use lu_value::Value;
 use rusttyc::TcKey;
 
 use crate::{
