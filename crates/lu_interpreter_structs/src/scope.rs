@@ -3,7 +3,7 @@ use indextree::{Arena, NodeId};
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use multimap::MultiMap;
-use std::{collections::HashMap, fmt, path::PathBuf};
+use std::{collections::HashMap, fmt, path::PathBuf, rc::Rc};
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
@@ -218,7 +218,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 
 impl Scope<Variable> {
     /// Returns the function, in which the current selected frame is.
-    pub fn get_cur_command(&self) -> Option<&Box<dyn Command>> {
+    pub fn get_cur_command(&self) -> Option<&Rc<dyn Command>> {
         self.cur_frame_id
             .map(|cur_frame_id| {
                 cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
@@ -303,7 +303,7 @@ impl Scope<Variable> {
     }
 
     #[allow(unused)]
-    pub fn find_func(&self, name: &str) -> Option<&Box<dyn Command>> {
+    pub fn find_func(&self, name: &str) -> Option<&Rc<dyn Command>> {
         debug!(
             "Finding cmd {} from {:?} on",
             name,
@@ -311,7 +311,7 @@ impl Scope<Variable> {
         );
         // TODO write check that no variable shadows a func name
         self.find_var(name)
-            .map(|var| var.val_as_callable())
+            .map(|var| var.val.as_function())
             .flatten()
     }
 
@@ -323,7 +323,8 @@ impl Scope<Variable> {
             self.get_cur_frame_tag()
         );
         // TODO write check that no variable shadows a func name
-        self.find_var(name).map(|var| var.val_as_strct()).flatten()
+        self.find_var(name)
+            .map(|var| var.val.as_strct().unwrap().as_ref())
     }
 
     pub fn expect_strct(&self, name: &str, usage: SourceCodeItem) -> LuResult<&Strct> {
@@ -342,10 +343,10 @@ impl Scope<Variable> {
     pub fn find_cmd_with_longest_match(
         &self,
         name_parts: &[String],
-    ) -> Option<(usize, &Box<dyn Command>)> {
+    ) -> Option<(usize, &Rc<dyn Command>)> {
         let result = self
             .find_var_with_longest_match(name_parts)
-            .map(|(i, var)| (i, var.val_as_callable()));
+            .map(|(i, var)| (i, var.val.as_function()));
         if let Some((i, Some(callable))) = result {
             Some((i, callable))
         } else {

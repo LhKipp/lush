@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::evaluate::eval_prelude::*;
 use log::debug;
 use lu_interpreter_structs::Value;
@@ -10,7 +12,7 @@ impl Evaluable for CmdStmtNode {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let possibl_longest_name = self.possible_longest_cmd_call_name();
-        let (cmd_parts_count, cmd): (usize, Box<dyn Command>) =
+        let (cmd_parts_count, cmd): (usize, Rc<dyn Command>) =
             if let Some((cmd_parts_count, callable)) = scope
                 .lock()
                 .find_cmd_with_longest_match(&possibl_longest_name)
@@ -19,7 +21,7 @@ impl Evaluable for CmdStmtNode {
             } else {
                 (
                     1,
-                    RunExternalCmd::new(self.clone(), possibl_longest_name[0].clone()).boxed(),
+                    RunExternalCmd::new(self.clone(), possibl_longest_name[0].clone()).rced(),
                 )
             };
 

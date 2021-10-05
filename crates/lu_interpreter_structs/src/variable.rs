@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use derive_more::From;
 use lu_error::SourceCodeItem;
 use lu_syntax::{
@@ -7,7 +9,7 @@ use lu_syntax::{
 use lu_syntax_elements::constants::IN_ARG_NAME;
 use serde::{Deserialize, Serialize};
 
-use crate::{Command, Strct, UsePath, Value};
+use crate::{Command, Strct, Value};
 
 #[derive(Educe)]
 #[educe(Default)]
@@ -51,7 +53,7 @@ pub struct Variable {
 }
 
 impl Variable {
-    pub fn new_func(func: Box<dyn Command>) -> Variable {
+    pub fn new_func(func: Rc<dyn Command>) -> Variable {
         // TODO better decl here
         let decl = func.signature().decl.clone();
         Variable::new(
@@ -70,16 +72,6 @@ impl Variable {
         )
     }
 
-    pub fn new_use_path(use_path: UsePath) -> Variable {
-        let decl = use_path.decl.clone();
-        // TODO better decl here
-        Variable::new(
-            use_path.to_string(),
-            Value::new_use_path(use_path),
-            VarDeclNode::CatchAll(decl),
-        )
-    }
-
     pub fn new_in(val: Value, decl: VarDeclNode) -> Self {
         Self {
             name: IN_ARG_NAME.to_string(),
@@ -94,19 +86,5 @@ impl Variable {
             // TODO correct val
             decl: VarDeclNode::Dummy,
         }
-    }
-
-    pub fn val_as_callable(&self) -> Option<&Box<dyn Command>> {
-        self.val.as_function().map(|func| {
-            func.downcast_ref::<Box<dyn Command>>()
-                .expect("Func is always castable to Box<dyn Command>")
-        })
-    }
-    pub fn val_as_strct(&self) -> Option<&Strct> {
-        self.val.as_strct().map(|strct| {
-            strct
-                .downcast_ref::<Strct>()
-                .expect("Struct-Var is always castable to Struct")
-        })
     }
 }

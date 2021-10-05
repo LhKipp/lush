@@ -81,30 +81,37 @@ pub trait Command: CommandClone + Debug {
     {
         Box::new(self)
     }
+
+    fn rced(self) -> Rc<dyn Command>
+    where
+        Self: Sized + 'static,
+    {
+        Rc::new(self)
+    }
 }
 
 // https://stackoverflow.com/questions/30353462/how-to-clone-a-struct-storing-a-boxed-trait-object
 pub trait CommandClone {
-    fn clone_box(&self) -> Box<dyn Command>;
+    fn clone_box(&self) -> Rc<dyn Command>;
 }
 
 impl<T> CommandClone for T
 where
     T: 'static + Command + Clone,
 {
-    fn clone_box(&self) -> Box<dyn Command> {
-        Box::new(self.clone())
+    fn clone_box(&self) -> Rc<dyn Command> {
+        Rc::new(self.clone())
     }
 }
 
-// We can now implement Clone manually by forwarding to clone_box.
-impl Clone for Box<dyn Command> {
-    fn clone(&self) -> Box<dyn Command> {
-        self.clone_box()
-    }
-}
+// // We can now implement Clone manually by forwarding to clone_box.
+// impl Clone for Rc<dyn Command> {
+//     fn clone(&self) -> Rc<dyn Command> {
+//         self.clone_box()
+//     }
+// }
 
-impl Into<Variable> for Box<dyn Command> {
+impl Into<Variable> for Rc<dyn Command> {
     fn into(self) -> Variable {
         let name = self.name().to_string();
         let decl = self.signature().decl.clone();

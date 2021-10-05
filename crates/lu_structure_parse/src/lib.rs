@@ -20,13 +20,13 @@ pub fn source_file_and_put_into_scope(
 
     for func in sourced_file.funcs {
         func.set_parent_frame_id(funcs_parent_frame_id);
-        frame.insert_var(Variable::new_func(func.boxed()));
+        frame.insert_var(Variable::new_func(func.rced()));
     }
     for strct in sourced_file.strcts {
         frame.insert_var(Variable::new_strct(strct));
     }
-    for use_path in sourced_file.use_paths {
-        frame.insert_var(Variable::new_use_path(use_path));
+    for _ in sourced_file.use_paths {
+        todo!();
     }
 
     Outcome::new((), errors)

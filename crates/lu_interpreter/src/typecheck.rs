@@ -260,7 +260,7 @@ impl TyCheckState {
             } else {
                 // Var is in scope, but doesn't have a tc_key yet (might be func or something else)
                 debug!("Found var {}, which has no tc_key yet", var_name);
-                if let Some(callable) = var.val_as_callable() {
+                if let Some(callable) = var.val.as_function() {
                     debug!(
                         "First time usage of func {}. Inserting new tc_func.",
                         var_name
@@ -269,12 +269,12 @@ impl TyCheckState {
                     self.tc_var_table
                         .insert(var.clone(), tc_func.self_key.clone());
                     Some(tc_func.self_key)
-                } else if let Some(strct) = var.val_as_strct().cloned() {
+                } else if let Some(strct) = var.val.as_strct().cloned() {
                     debug!(
                         "First time usage of strct {}. Inserting new tc_strct.",
                         strct.name
                     );
-                    let tc_strct = TcStrct::from_strct(strct, self);
+                    let tc_strct = TcStrct::from_strct(strct.as_ref().clone(), self);
                     self.tc_var_table
                         .insert(var.clone(), tc_strct.self_key.clone());
                     Some(tc_strct.self_key)

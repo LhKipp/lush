@@ -2,7 +2,9 @@ mod playground;
 pub mod test_prelude;
 
 #[macro_use]
-extern crate vec_box;
+extern crate vec_rc;
+
+use std::rc::Rc;
 
 pub use playground::*;
 use pretty_env_logger::env_logger;
@@ -20,12 +22,11 @@ pub fn init_logger() {
 }
 
 fn make_test_scope() -> Scope<Variable> {
-    let cmds: Vec<Box<dyn Command>> = vec_box![PrintCmd::new()];
+    let cmds: Vec<Rc<dyn Command>> = vec_rc![PrintCmd::new()];
 
     let mut scope = Scope::new();
     let (_, frame) = scope.push_frame(ScopeFrameTag::GlobalFrame);
     for cmd in cmds {
-        let cmd: Box<dyn Command> = cmd.into();
         frame.insert(
             cmd.name().to_string(),
             Variable::new(

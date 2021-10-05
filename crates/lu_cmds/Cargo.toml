@@ -11,6 +11,8 @@ lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 
+vec_rc = { version = "0.1.0", path = "../vec_rc" }
+
 log = "0.4.14"
 vec_box = "1.0.0"
 once_cell = "1.8.0"

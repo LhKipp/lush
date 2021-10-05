@@ -622,6 +622,7 @@ dependencies = [
  "pretty_env_logger",
  "serde_json",
  "vec_box",
+ "vec_rc",
 ]
 
 [[package]]
@@ -852,7 +853,7 @@ dependencies = [
  "pretty_env_logger",
  "serde_json",
  "temp_testdir",
- "vec_box",
+ "vec_rc",
 ]
 
 [[package]]
@@ -1535,6 +1536,10 @@ name = "vec_box"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5283fc94a1cd6b5199f707a4b4d7f885b9457d430d111c68a07d3e3d199fb2b"
+
+[[package]]
+name = "vec_rc"
+version = "0.1.0"
 
 [[package]]
 name = "walkdir"
