@@ -10,9 +10,8 @@ pub use playground::*;
 use pretty_env_logger::env_logger;
 
 use lu_cmds::PrintCmd;
-use lu_interpreter::{
-    Command, Interpreter, InterpreterCfg, Scope, ScopeFrameTag, Value, VarDeclNode, Variable,
-};
+use lu_interpreter::{Interpreter, InterpreterCfg};
+use lu_interpreter_structs::{Command, Scope, ScopeFrameTag, Value, VarDeclNode, Variable};
 
 pub fn init_logger() {
     let _ = env_logger::builder()

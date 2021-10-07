@@ -2062,7 +2062,8 @@ impl HasRule for TableExprNode{
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum UsePathElement {
     BareWord(BareWordToken),
-    MultSign(MultSignToken),
+    DoublePoint(DoublePointToken),
+    DivSign(DivSignToken),
     }
 
 impl UsePathElement {
@@ -2073,8 +2074,9 @@ impl AstElement for UsePathElement {
         
         
         
+        
         match kind{
-            BareWord | MultSign => true,
+            BareWord | DoublePoint | DivSign => true,
             _ => false,
         }
     }
@@ -2082,9 +2084,11 @@ impl AstElement for UsePathElement {
         
         
         
+        
         let res = match syntax.kind() {
             BareWord => UsePathElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
-            MultSign => UsePathElement::MultSign(MultSignToken { syntax: syntax.into_token().unwrap() }),
+            DoublePoint => UsePathElement::DoublePoint(DoublePointToken { syntax: syntax.into_token().unwrap() }),
+            DivSign => UsePathElement::DivSign(DivSignToken { syntax: syntax.into_token().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -2096,7 +2100,10 @@ impl AstElement for UsePathElement {
             UsePathElement::BareWord(it) => it.syntax.clone().into(),
             
             
-            UsePathElement::MultSign(it) => it.syntax.clone().into(),
+            UsePathElement::DoublePoint(it) => it.syntax.clone().into(),
+            
+            
+            UsePathElement::DivSign(it) => it.syntax.clone().into(),
             
             }
     }
@@ -2105,7 +2112,8 @@ impl HasSyntaxKind for UsePathElement{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             UsePathElement::BareWord(it) => it.get_syntax_kind(),
-            UsePathElement::MultSign(it) => it.get_syntax_kind(),
+            UsePathElement::DoublePoint(it) => it.get_syntax_kind(),
+            UsePathElement::DivSign(it) => it.get_syntax_kind(),
             }
     }
 }

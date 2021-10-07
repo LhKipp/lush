@@ -25,12 +25,12 @@ impl TypeCheck for BlockStmtNode {
         ty_state: &mut TyCheckState,
     ) -> Option<TcKey> {
         let frame_to_pop = match args.get(0) {
-            Some(TypeCheckArg::Arg(VisitArg::SourceFileBlock(f_path))) => {
-                if let Err(e) = ty_state.scope.set_cur_source_frame(f_path) {
-                    warn!("SourceFileBlock type check error which should not happen");
-                    ty_state.push_err(e);
-                    return None;
-                }
+            Some(TypeCheckArg::Arg(VisitArg::SourceFileBlock(_))) => {
+                // if let Err(e) = ty_state.scope.set_cur_source_frame(f_path) {
+                //     warn!("SourceFileBlock type check error which should not happen");
+                //     ty_state.push_err(e);
+                //     return None;
+                // }
                 None
             }
             Some(TypeCheckArg::Arg(VisitArg::BlockTypeArg(b_type))) => {

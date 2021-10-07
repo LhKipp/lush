@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{Command, Scope, ScopeFrameId, Value, ValueType, Variable};
+use crate::{Command, Scope, UsePath, Value, ValueType, Variable};
 use derive_builder::Builder;
 use derive_new::new;
 use lu_error::{LuErr, LuResult, SourceCodeItem};
@@ -202,7 +202,7 @@ pub struct Function {
     pub captured_vars: Vec<Variable>,
 
     /// Set when function is inserted into scope
-    pub parent_frame_id: OnceCell<ScopeFrameId>,
+    pub source_file_id: UsePath,
     /// Workaround, as we have to impl Command for Function, but can't access
     /// FnStmtNode::evaluate. Therefore we store a pointer to FnStmtNode::evaluate which
     /// is once set before evaluating the current scope
@@ -211,19 +211,20 @@ pub struct Function {
 }
 
 impl Function {
-    pub fn new(name: String, signature: Signature, fn_node: FnStmtNode) -> Self {
+    pub fn new(
+        name: String,
+        signature: Signature,
+        fn_node: FnStmtNode,
+        source_file_id: UsePath,
+    ) -> Self {
         Self {
             name,
             signature,
             fn_node,
             captured_vars: Vec::new(),
-            parent_frame_id: OnceCell::new(),
+            source_file_id,
             eval_fn: OnceCell::new(),
         }
-    }
-
-    pub fn set_parent_frame_id(&self, parent_frame_id: ScopeFrameId) {
-        assert!(self.parent_frame_id.set(parent_frame_id).is_ok())
     }
 }
 

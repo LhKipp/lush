@@ -1,9 +1,7 @@
-use std::path::PathBuf;
-
 use crate::ast::UsePathElement;
-use crate::{AstElement, AstElementChildren, AstNode};
+use crate::{AstElement, AstElementChildren, AstNode, AstToken};
 
-use super::{support, UseStmtNode};
+use super::{support, BareWordToken, UseStmtNode};
 
 impl UseStmtNode {
     pub fn is_std_path(&self) -> bool {
@@ -12,20 +10,24 @@ impl UseStmtNode {
             .map(|part| part.text() == "std")
             .unwrap_or(false)
     }
-
-    pub fn path(&self) -> AstElementChildren<UsePathElement> {
-        support::element_children(self.syntax())
+    pub fn is_file_path(&self) -> bool {
+        true // TODO
     }
-
-    pub fn path_as_path_buf(&self) -> PathBuf {
-        let path_as_str = self
-            .path()
-            .map(|path| path.text())
-            .collect::<Vec<_>>()
-            .join("/");
-        PathBuf::from(path_as_str)
+    pub fn is_plugin_path(&self) -> bool {
+        let path: Vec<_> = self.path().collect();
+        path.len() == 1
+            || path
+                .get(1)
+                .map(|n| matches!(n, UsePathElement::DoublePoint(_)))
+                .unwrap_or(false)
     }
     pub fn parts(&self) -> Vec<String> {
-        self.path().map(|n|n.text()).collect()
+        support::token_children::<BareWordToken>(self.syntax())
+            .iter()
+            .map(|t| t.text().to_string())
+            .collect()
+    }
+    pub fn path(&self) -> AstElementChildren<UsePathElement> {
+        support::element_children(self.syntax())
     }
 }

@@ -62,6 +62,7 @@ pub enum ValueType {
     Func(Box<Signature>),
 }
 
+// TODO remove this method and derive PartialEq
 impl PartialEq for ValueType {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
@@ -79,8 +80,10 @@ impl PartialEq for ValueType {
             }
             (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
             (ValueType::Strct(a), ValueType::Strct(b)) => a.name == b.name,
+            (ValueType::Generic(a), ValueType::Generic(b)) => a == b,
             (a, b) => {
                 warn!("Compared two value_types which are distinct: {} {}?", a, b);
+                warn!("If these 2?", a, b);
                 false
             }
         }

@@ -496,6 +496,10 @@ impl TcFunc {
     }
 
     pub(crate) fn substitute_generics(self, ty_state: &mut TyCheckState) -> TcFunc {
+        debug!(
+            "Substituting generics in: {:?}",
+            ty_state.get_item_of(&self.self_key)
+        );
         let mut generics_key = HashMap::<String, TcKey>::new();
         self.substitute_generics_rec(&mut generics_key, ty_state)
     }
@@ -505,7 +509,11 @@ impl TcFunc {
         seen_generics: &mut HashMap<String, TcKey>,
         ty_state: &mut TyCheckState,
     ) -> TcFunc {
-        let mut subst_generic_key = |key: TcKey| {
+        fn subst_generic_key(
+            key: TcKey,
+            seen_generics: &mut HashMap<String, TcKey>,
+            ty_state: &mut TyCheckState,
+        ) -> TcKey {
             if let Some(generic_name) = ty_state.get_tc_generic(&key).cloned() {
                 let key_item = ty_state.get_item_of(&key).clone();
                 // Generic key which needs to be substituted
@@ -530,23 +538,26 @@ impl TcFunc {
                 };
                 generic_key
             } else if let Some(tc_func) = ty_state.get_tc_func(&key).cloned() {
-                // Recurse into tc_func which also needs to be substituted
+                debug!("Substitute Generics: Found inner func_ty. Recursing into that");
                 let key = tc_func.self_key.clone();
                 tc_func.substitute_generics_rec(seen_generics, ty_state);
                 key
+            } else if let Some(inner_arr_key) = ty_state.get_arr_inner_tc(&key).cloned() {
+                debug!("Substitute Generics: Found inner array_ty. Recursing into that");
+                subst_generic_key(inner_arr_key, seen_generics, ty_state)
             } else {
-                warn!("NOT RECURSING INTO ARRAY. NOT IMPL YET");
+                debug!("Found non generic normal key. Not substituting");
                 key
             }
-        };
+        }
 
-        self.in_key = subst_generic_key(self.in_key);
-        self.ret_key = subst_generic_key(self.ret_key);
+        self.in_key = subst_generic_key(self.in_key, seen_generics, ty_state);
+        self.ret_key = subst_generic_key(self.ret_key, seen_generics, ty_state);
         if let Some(var_arg_key) = &mut self.var_arg_key {
-            *var_arg_key = subst_generic_key(*var_arg_key);
+            *var_arg_key = subst_generic_key(*var_arg_key, seen_generics, ty_state);
         }
         for arg_key in self.args_keys.iter_mut() {
-            *arg_key = subst_generic_key(*arg_key)
+            *arg_key = subst_generic_key(*arg_key, seen_generics, ty_state)
         }
         // TODO handle flags
 

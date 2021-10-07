@@ -1,22 +1,27 @@
+use derive_more::Display;
 use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use multimap::MultiMap;
-use std::{collections::HashMap, fmt, path::PathBuf, rc::Rc};
+use std::{collections::HashMap, fmt, rc::Rc};
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, Strct, Value, Variable};
+use crate::{Command, Strct, UsePath, Value, Variable};
 
-#[derive(Clone, Debug, PartialEq, Eq, EnumAsInner)]
+#[derive(Clone, Debug, PartialEq, Eq, EnumAsInner, is_enum_variant, Display)]
 pub enum ScopeFrameTag {
     None,
 
     GlobalFrame,
     /// Source File Frame with path of the source file
-    SourceFileFrame(PathBuf),
+    #[display(fmt = "SFFrame {}", id)]
+    SourceFileFrame {
+        id: UsePath,
+        use_paths: Vec<UsePath>,
+    },
 
     BlockFrame,
     /// Fn Frame with name of fn
@@ -25,14 +30,32 @@ pub enum ScopeFrameTag {
     IfStmtFrame,
 }
 
+impl ScopeFrameTag {
+    pub fn new_source_file_tag(id: UsePath, use_paths: Vec<UsePath>) -> Self {
+        Self::SourceFileFrame { id, use_paths }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ScopeFrameState {
+    /// At construction
+    Initial,
+    /// After Modules are loaded
+    ModulesLoaded,
+    /// After ValueType::StrctName is converted to ValueType::Strct
+    StrctsResolved,
+}
+
 /// The default scope frame being put on the scope stack, when entering a new scope
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Display)]
+#[display(fmt = "{}", tag)]
 pub struct ScopeFrame<Elem>
 where
     Elem: fmt::Debug,
 {
     pub tag: ScopeFrameTag,
     pub elems: HashMap<String, Elem>,
+    pub state: ScopeFrameState,
 }
 
 impl<Elem: fmt::Debug> ScopeFrame<Elem> {
@@ -40,6 +63,7 @@ impl<Elem: fmt::Debug> ScopeFrame<Elem> {
         Self {
             tag,
             elems: HashMap::new(),
+            state: ScopeFrameState::Initial,
         }
     }
 
@@ -231,6 +255,7 @@ impl Scope<Variable> {
             .flatten()
     }
 
+    #[allow(dead_code)]
     fn cur_source_f_id(&self) -> Option<NodeId> {
         if let Some(cur_frame_id) = self.cur_frame_id {
             cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
@@ -245,18 +270,21 @@ impl Scope<Variable> {
             None
         }
     }
+
     fn frames_to_find_var_in(&self) -> Vec<NodeId> {
-        if let Some(cur_frame_id) = self.cur_frame_id {
-            let mut frames_till_global: Vec<NodeId> = cur_frame_id.ancestors(&self.arena).collect();
-            if let Some(cur_source_f_id) = self.cur_source_f_id() {
-                if let Some(use_stmts_ids) = self.use_stmts.get_vec(&cur_source_f_id) {
-                    frames_till_global.extend(use_stmts_ids)
-                }
+        let mut frames_to_find_var_in = vec![];
+        for frame in self.get_cur_frame_id().ancestors(&self.arena) {
+            frames_to_find_var_in.push(frame);
+            if let Some((_, use_stmts)) = self.tag_of(frame).as_source_file_frame() {
+                // TODO obay pub use paths (if it should land)
+                frames_to_find_var_in.extend(
+                    use_stmts
+                        .iter()
+                        .map(|path| self.get_id_of_sf_frame(path).unwrap()),
+                )
             }
-            frames_till_global
-        } else {
-            vec![]
         }
+        frames_to_find_var_in
     }
 
     pub fn find_var(&self, name: &str) -> Option<&Variable> {
@@ -265,7 +293,10 @@ impl Scope<Variable> {
         frames_to_check_var_for
             .iter()
             .map(|frame_id| self.arena[*frame_id].get())
-            .find_map(|frame| frame.get(name))
+            .find_map(|frame| {
+                debug!("Finding var: \"{}\" in frame: {}", name, frame);
+                frame.get(name)
+            })
             .tap(|result| {
                 debug!(
                     "Result for find_var {} from start_frame {:?}: {:?}",
@@ -369,43 +400,43 @@ impl Scope<Variable> {
         result
     }
 
-    pub fn set_cur_source_frame(&mut self, f_to_set: &PathBuf) -> LuResult<()> {
-        debug!("set_cur_source_frame");
-        if let Some(cur_frame_id) = self.cur_frame_id {
-            let stages = cur_frame_id
-                .ancestors(&self.arena)
-                .chain(cur_frame_id.descendants(&self.arena));
-            for id in stages {
-                match self.arena.get(id).unwrap().get().get_tag() {
-                    ScopeFrameTag::SourceFileFrame(_) => {
-                        // Source file frame stage reached
-                        // Now iterate over left and right to find matching frame
-                        debug!("Found source file frame stage");
-                        for sipling in id
-                            .preceding_siblings(&self.arena)
-                            .chain(id.following_siblings(&self.arena))
-                        {
-                            match self.arena.get(sipling).unwrap().get().get_tag() {
-                                ScopeFrameTag::SourceFileFrame(f_name) => {
-                                    if f_name == f_to_set {
-                                        debug!("set_cur_frame_id found matching source file frame {:?}", f_name);
-                                        self.set_cur_frame_id(sipling);
-                                        return Ok(());
-                                    }
-                                }
-                                _ => unreachable!(""),
-                            }
-                        }
-                    }
-                    _ => {}
-                };
-            }
-        }
+    fn get_sf_frames_parent(&self) -> NodeId {
+        // All sf_frames are below the global_frame
+        self.root_id().unwrap()
+    }
 
-        debug!("set_cur_source_frame returning error");
-        Err(LuErr::Internal(
-            "Expected the scope to have at least 1 element".to_string(),
-        ))
+    pub fn push_sf_frame(&mut self, frame: ScopeFrame<Variable>) {
+        assert!(frame.get_tag().is_source_file_frame());
+        let sf_frames_parent = self.get_sf_frames_parent();
+        let new_frame_id = self.arena.new_node(frame);
+        sf_frames_parent.append(new_frame_id, &mut self.arena);
+    }
+
+    fn get_id_of_sf_frame(&self, path: &UsePath) -> Option<NodeId> {
+        let sf_frames_parent = self.get_sf_frames_parent();
+        sf_frames_parent
+            .children(&self.arena)
+            .filter(|sf_id| {
+                let (id, _) = self.arena[*sf_id]
+                    .get()
+                    .get_tag()
+                    .as_source_file_frame()
+                    .unwrap();
+                id == path
+            })
+            .next()
+    }
+
+    pub fn select_sf_frame(&mut self, f_to_set: &UsePath) -> LuResult<()> {
+        if let Some(sf_to_select) = self.get_id_of_sf_frame(f_to_set) {
+            self.cur_frame_id = Some(sf_to_select);
+            Ok(())
+        } else {
+            Err(LuErr::Internal(format!(
+                "Scope does not contain source file {} ",
+                f_to_set
+            )))
+        }
     }
 }
 

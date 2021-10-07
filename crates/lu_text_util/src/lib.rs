@@ -11,7 +11,7 @@ impl SourceCode {
     pub fn new_text(text: String) -> SourceCode {
         SourceCode {
             text,
-            path: "tmp_text".into(),
+            path: "__TMP_TEXT__".into(),
         }
     }
 

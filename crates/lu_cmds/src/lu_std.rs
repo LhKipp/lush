@@ -1,24 +1,25 @@
 mod array;
-mod test;
 mod iter_funcs;
+mod test;
 
-use lu_error::LuResult;
-use lu_interpreter_structs::{Scope, Variable};
+use log::debug;
+use lu_interpreter_structs::{ScopeFrame, UsePath, UsePathVariant, Variable};
 
 pub use array::source_array_module;
 
 /// Source the module specified by path
 /// If no such module is found, a error is raised
-pub fn source_std(path: &[&str], scope: &mut Scope<Variable>) -> LuResult<()> {
-    if path.is_empty() {
-        source_array_module(&[], scope)?;
+pub fn load_std_module(path: &UsePath) -> Vec<ScopeFrame<Variable>> {
+    assert!(path.ty == UsePathVariant::StdPath);
+    debug!("load_std_module: {}", path);
+    if path.parts.len() == 1 {
         // Source all
-
-        Ok(())
+        // source_array_module(&[], scope);
+        todo!();
     } else {
-        match path[0] {
-            "array" => source_array_module(&path[1..], scope),
-            _ => todo!("Return err here"),
+        match path.parts[1].as_ref() {
+            "array" => source_array_module(&path.parts[2..]),
+            _ => todo!(),
         }
     }
 }

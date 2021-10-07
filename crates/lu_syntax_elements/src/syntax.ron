@@ -111,7 +111,8 @@ Config(
     // === GENERIC META NODES === 
     ( name: "UsePath", is_generic: true, has_rule: false, represents_element_names: [
         "BareWord",
-        "MultSign",
+        "DoublePoint",
+        "DivSign",
         ],),
     ( name: "CmdOrValueExpr", is_generic: true, has_rule: false, represents_element_names: [
         "CmdStmt",

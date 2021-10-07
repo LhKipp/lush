@@ -11,4 +11,4 @@ mod run_external_cmd;
 pub use print::PrintCmd;
 pub use run_external_cmd::RunExternalCmd;
 
-pub use lu_std::source_std;
+pub use lu_std::load_std_module;
