@@ -7,7 +7,6 @@ use lu_error::{LuErr, LuResult, SourceCodeItem};
 use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, LuTypeNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
-use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
@@ -203,11 +202,6 @@ pub struct Function {
 
     /// Set when function is inserted into scope
     pub source_file_id: UsePath,
-    /// Workaround, as we have to impl Command for Function, but can't access
-    /// FnStmtNode::evaluate. Therefore we store a pointer to FnStmtNode::evaluate which
-    /// is once set before evaluating the current scope
-    #[educe(Debug(ignore))]
-    pub eval_fn: OnceCell<Box<fn(&Self, &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>>>,
 }
 
 impl Function {
@@ -223,7 +217,6 @@ impl Function {
             fn_node,
             captured_vars: Vec::new(),
             source_file_id,
-            eval_fn: OnceCell::new(),
         }
     }
 }
@@ -233,8 +226,22 @@ impl Command for Function {
         &self.name
     }
 
-    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
-        (self.eval_fn.get().unwrap())(self, scope)
+    fn do_run_cmd(&self, _: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+        unreachable!(
+            r#"
+            Can't have evaluate/fn_stmt here, as that would require knowledge of eval here.
+            This would lead to a circular dependency 
+            (lu_interpreter_structs -> evaluate)
+            (evaluate -> lu_interpreter_structs)
+            Therefore we hack around the interface and provide the Command::as_function interface
+            so that evaluate/cmd_stmt can react to this particular situation.
+            This is isn't optimal, but the best solution
+            "#
+        );
+    }
+
+    fn as_function(&self) -> Option<&Function> {
+        Some(self)
     }
 
     fn signature(&self) -> &Signature {

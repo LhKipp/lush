@@ -23,14 +23,14 @@ impl ArrayPushCmd {
         );
         sign_builder
             .decl(push_decl.clone())
-            .args(vec![array_arg_ty])
+            .args(vec![array_arg_ty.clone()])
             .var_arg(ArgSignature::new(
-                format!("...{}", VALUES_ARG_NAME),
+                VALUES_ARG_NAME.to_string(),
                 ValueType::Generic("T".to_string()),
                 push_decl.clone().into(),
             ))
             .in_arg(ArgSignature::void(push_decl.clone().into()))
-            .ret_arg(ArgSignature::void(push_decl.clone().into()));
+            .ret_arg(array_arg_ty);
 
         ArrayPushCmd {
             sign: sign_builder.build().unwrap(),
@@ -53,13 +53,12 @@ impl Command for ArrayPushCmd {
             .clone();
 
         if let Value::Array(array) = self.expect_mut_arg(&mut l_scope, ARRAY_ARG_NAME) {
-            let array = Rc::make_mut(array);
-            array.extend(values_to_push)
+            let array_mut = Rc::make_mut(array);
+            array_mut.extend(values_to_push);
+            Ok(Value::Array(array.clone()))
         } else {
             unreachable!("ARRAY_ARG_NAME is of array type");
         }
-
-        Ok(Value::Nil)
     }
 
     fn signature(&self) -> &Signature {

@@ -83,7 +83,7 @@ impl PartialEq for ValueType {
             (ValueType::Generic(a), ValueType::Generic(b)) => a == b,
             (a, b) => {
                 warn!("Compared two value_types which are distinct: {} {}?", a, b);
-                warn!("If these 2?", a, b);
+                warn!("If these 2 types are the same, add a match arm here");
                 false
             }
         }

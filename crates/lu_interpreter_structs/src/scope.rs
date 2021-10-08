@@ -24,6 +24,9 @@ pub enum ScopeFrameTag {
     },
 
     BlockFrame,
+    /// Frame for evaluating cmd (with command-name)
+    #[display(fmt = "CmdCallFrame {}", _0)]
+    CmdCallFrame(String),
     /// Fn Frame with name of fn
     FnFrame(String),
     ForStmtFrame,

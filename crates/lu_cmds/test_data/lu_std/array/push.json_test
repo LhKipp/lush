@@ -3,14 +3,25 @@ Array push pushes element
 use std:array
 
 fn func_1()
-    let values = []
-    push $values 1
-    ret $values
+    let ret_val = push [] 1 2 3
+    ret $ret_val
 end
 
 func_1
 ---
 {
-  "Err": []
+  "Ok": {
+    "Array": [
+      {
+        "Number": 1.0
+      },
+      {
+        "Number": 2.0
+      },
+      {
+        "Number": 3.0
+      }
+    ]
+  }
 }
 ...

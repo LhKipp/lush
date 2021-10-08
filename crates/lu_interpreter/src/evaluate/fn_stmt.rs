@@ -6,18 +6,20 @@ pub fn eval_function(
     fn_stmt: &Function,
     scope: &mut Arc<Mutex<Scope<Variable>>>,
 ) -> LuResult<Value> {
-    Evaluator::eval_result_to_lu_result(fn_stmt.fn_node.evaluate(scope))
+    let result = if let Some(block) = fn_stmt.fn_node.block_stmt() {
+        match block.evaluate(scope) {
+            Err(RetValOrErr::RetVal(v)) => Ok(v),
+            v => v,
+        }
+    } else {
+        Ok(Value::Nil)
+    };
+    Evaluator::eval_result_to_lu_result(result)
 }
 
 impl Evaluable for FnStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
-        if let Some(block) = self.block_stmt() {
-            match block.evaluate(scope) {
-                Err(RetValOrErr::RetVal(v)) => Ok(v),
-                v => v,
-            }
-        } else {
-            Ok(Value::Nil)
-        }
+    fn do_evaluate(&self, _: &[EvalArg], _: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+        // Evaluation of fn_stmt happens through the Command trait. (See Function::run)
+        Ok(Value::Nil)
     }
 }

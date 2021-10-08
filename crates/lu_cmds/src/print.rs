@@ -5,6 +5,8 @@ pub struct PrintCmd {
     sign: Signature,
 }
 
+const TO_PRINT_ARG_NAME: &str = "to_print";
+
 impl PrintCmd {
     pub fn new() -> Self {
         let print_decl = lu_source_code_item!();
@@ -12,7 +14,7 @@ impl PrintCmd {
         sign_builder
             .decl(print_decl.clone())
             .var_arg(ArgSignature::new(
-                "to_print".into(),
+                TO_PRINT_ARG_NAME.to_string(),
                 ValueType::Any,
                 print_decl.clone().into(),
             ))
@@ -34,8 +36,8 @@ impl Command for PrintCmd {
 
     fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
         let l_scope = scope.lock();
-        let args = self.expect_args(&l_scope);
-        Ok(Value::Array(args.clone()))
+        let args = self.expect_arg(&l_scope, TO_PRINT_ARG_NAME);
+        Ok(args.clone())
     }
 
     fn signature(&self) -> &Signature {

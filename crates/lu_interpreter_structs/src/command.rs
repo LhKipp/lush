@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::{fmt::Debug, sync::Arc};
 
-use crate::{Scope, Signature, Value, VarDeclNode, Variable};
+use crate::{Function, Scope, Signature, Value, VarDeclNode, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
@@ -17,6 +17,11 @@ pub trait Command: CommandClone + Debug {
 
     /// Returns SourceCodeItem into the signature/declaration of the command
     fn signature_item(&self) -> SourceCodeItem;
+
+    /// Only overwritten by Function
+    fn as_function(&self) -> Option<&Function> {
+        None
+    }
 
     /// Returns $args
     fn expect_args<'a>(&self, scope: &'a Scope<Variable>) -> &'a Rc<Vec<Value>> {
@@ -60,15 +65,7 @@ pub trait Command: CommandClone + Debug {
     fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>;
 
     fn run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
-        {
-            let l_scope = scope.lock();
-            debug!(
-                "Running command {:?}\n$in: {:?}, $args {:?}",
-                self.name(),
-                self.expect_in(&l_scope),
-                self.expect_args(&l_scope)
-            )
-        }
+        debug!("Running command {}", self.name());
         let result = self.do_run_cmd(scope);
         debug!("Result of running command {}: {:?}", self.name(), result);
 
