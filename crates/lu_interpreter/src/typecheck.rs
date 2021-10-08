@@ -551,7 +551,9 @@ impl TcFunc {
                 key
             } else if let Some(inner_arr_key) = ty_state.get_arr_inner_tc(&key).cloned() {
                 debug!("Substitute Generics: Found inner array_ty. Recursing into that");
-                subst_generic_key(inner_arr_key, seen_generics, ty_state)
+                let new_inner_arr_key = subst_generic_key(inner_arr_key, seen_generics, ty_state);
+                ty_state.tc_array_table.insert(key, new_inner_arr_key); // TODO bit of direct access here...
+                key
             } else {
                 debug!("Found non generic normal key. Not substituting");
                 key
