@@ -1,18 +1,41 @@
-use std::fmt::Display;
+use std::{
+    fmt::Display,
+    hash::{Hash, Hasher},
+    sync::Weak,
+};
 
 use enum_as_inner::EnumAsInner;
 use log::{debug, warn};
 use lu_error::{LuErr, SourceCodeItem};
 use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
+use parking_lot::RwLock;
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 
 use crate::{Signature, Strct};
 
-fn cmp_sign_types(_: &Signature, _: &Signature) -> bool {
+fn cmp_sign_types(_: &Box<Signature>, _: &Box<Signature>) -> bool {
     todo!()
     // a.in_type == b.in_type && a.ret_type == b.ret_type &&
     //     a.iter
+}
+fn cmp_strcts(_: &Weak<RwLock<Strct>>, _: &Weak<RwLock<Strct>>) -> bool {
+    todo!()
+}
+fn cmp_inner_tys(a: &Box<ValueType>, b: &Box<ValueType>) -> bool {
+    *a == *b
+}
+
+fn hash_as_ptr<H: Hasher>(strct: &Weak<RwLock<Strct>>, state: &mut H) {
+    Hash::hash(&strct.as_ptr(), state)
+}
+
+fn serialize_name_only<S>(x: &Weak<RwLock<Strct>>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    //serialze_newtype_variant
+    todo!();
 }
 // #[derive(Educe)]
 // #[educe(Hash)]
@@ -26,9 +49,8 @@ fn cmp_sign_types(_: &Signature, _: &Signature) -> bool {
 //     #[educe(Hash(ignore))]
 //     flags_ty: Vec<FlagSignature>,
 // }
-// #[derive(Educe)] // TODO educe partial eq not working
-// #[educe(PartialEq)]
-#[derive(Clone, Debug, Serialize, Deserialize, Hash, EnumAsInner, Eq)]
+#[derive(Educe, Clone, Debug, Serialize, Deserialize, EnumAsInner)]
+#[educe(Hash, PartialEq)]
 pub enum ValueType {
     /// Variant to indicate an already occured error. Error acts like any does, but
     /// further ty_checking does not generate errors based on this ValueType::Error
@@ -48,47 +70,56 @@ pub enum ValueType {
     String,
     BareWord,
     /// Struct with name (Final Strct type when)
-    Strct(Box<Strct>),
+    #[serde(skip_deserializing)]
+    #[serde(serialize_with = "serialize_name_only")]
+    // #[serde(default = "deser_not_possible")]
+    Strct(
+        #[educe(Hash(method = "hash_as_ptr"))]
+        #[educe(PartialEq(method = "cmp_strcts"))]
+        Weak<RwLock<Strct>>,
+    ),
     /// Before resolving all UsePaths, the correct strct behind a StrctName can not be determined.
     /// However we need to create a ValueType when sourcing functions etc. Therefore we introduce
     /// this temporary type
     StrctName(String),
     /// Box with inner ty and inner_ty_decl
     Array {
+        #[educe(PartialEq(method = "cmp_inner_tys"))]
         inner_ty: Box<ValueType>,
+        #[educe(PartialEq(ignore))]
         inner_ty_decl: SourceCodeItem,
     },
-    // #[educe(PartialEq(method = "cmp_sign_types"))]
-    Func(Box<Signature>),
+    Func(#[educe(PartialEq(method = "cmp_sign_types"))] Box<Signature>),
 }
 
+impl Eq for ValueType {}
 // TODO remove this method and derive PartialEq
-impl PartialEq for ValueType {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (ValueType::Error, ValueType::Error) => true,
-            (ValueType::Unspecified, ValueType::Unspecified) => true,
-            (ValueType::Any, ValueType::Any) => true,
-            (ValueType::Void, ValueType::Void) => true,
-            (ValueType::Nil, ValueType::Nil) => true,
-            (ValueType::Bool, ValueType::Bool) => true,
-            (ValueType::Number, ValueType::Number) => true,
-            (ValueType::String, ValueType::String) => true,
-            (ValueType::BareWord, ValueType::BareWord) => true,
-            (ValueType::Array { inner_ty: a_ty, .. }, ValueType::Array { inner_ty: b_ty, .. }) => {
-                a_ty == b_ty
-            }
-            (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
-            (ValueType::Strct(a), ValueType::Strct(b)) => a.name == b.name,
-            (ValueType::Generic(a), ValueType::Generic(b)) => a == b,
-            (a, b) => {
-                warn!("Compared two value_types which are distinct: {} {}?", a, b);
-                warn!("If these 2 types are the same, add a match arm here");
-                false
-            }
-        }
-    }
-}
+// impl PartialEq for ValueType {
+//     fn eq(&self, other: &Self) -> bool {
+//         match (self, other) {
+//             (ValueType::Error, ValueType::Error) => true,
+//             (ValueType::Unspecified, ValueType::Unspecified) => true,
+//             (ValueType::Any, ValueType::Any) => true,
+//             (ValueType::Void, ValueType::Void) => true,
+//             (ValueType::Nil, ValueType::Nil) => true,
+//             (ValueType::Bool, ValueType::Bool) => true,
+//             (ValueType::Number, ValueType::Number) => true,
+//             (ValueType::String, ValueType::String) => true,
+//             (ValueType::BareWord, ValueType::BareWord) => true,
+//             (ValueType::Array { inner_ty: a_ty, .. }, ValueType::Array { inner_ty: b_ty, .. }) => {
+//                 a_ty == b_ty
+//             }
+//             (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
+//             (ValueType::StrctName(a), ValueType::StrctName(b)) => a == b,
+//             (ValueType::Generic(a), ValueType::Generic(b)) => a == b,
+//             (a, b) => {
+//                 warn!("Compared two value_types which are distinct: {} {}?", a, b);
+//                 warn!("If these 2 types are the same, add a match arm here");
+//                 false
+//             }
+//         }
+//     }
+// }
 
 impl ValueType {
     pub fn new_array(inner_ty: ValueType, inner_ty_decl: SourceCodeItem) -> Self {
