@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+use std::fmt::Display;
 use serde::Serialize;
 use enum_as_inner::EnumAsInner;
 use crate::{
@@ -29,6 +30,12 @@ impl HasSyntaxKind for StrctKeywordToken{
     }
 }
 
+impl Display for StrctKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct UseKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -47,6 +54,12 @@ impl AstToken for UseKeywordToken {
 impl HasSyntaxKind for UseKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for UseKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -71,6 +84,12 @@ impl HasSyntaxKind for LetKeywordToken{
     }
 }
 
+impl Display for LetKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -89,6 +108,12 @@ impl AstToken for FnKeywordToken {
 impl HasSyntaxKind for FnKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for FnKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -113,6 +138,12 @@ impl HasSyntaxKind for ForKeywordToken{
     }
 }
 
+impl Display for ForKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElifKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -131,6 +162,12 @@ impl AstToken for ElifKeywordToken {
 impl HasSyntaxKind for ElifKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for ElifKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -155,6 +192,12 @@ impl HasSyntaxKind for ElseKeywordToken{
     }
 }
 
+impl Display for ElseKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct IfKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -173,6 +216,12 @@ impl AstToken for IfKeywordToken {
 impl HasSyntaxKind for IfKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for IfKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -197,6 +246,12 @@ impl HasSyntaxKind for WhileKeywordToken{
     }
 }
 
+impl Display for WhileKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct EndKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -215,6 +270,12 @@ impl AstToken for EndKeywordToken {
 impl HasSyntaxKind for EndKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for EndKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -239,6 +300,12 @@ impl HasSyntaxKind for BeginKeywordToken{
     }
 }
 
+impl Display for BeginKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct InKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -257,6 +324,12 @@ impl AstToken for InKeywordToken {
 impl HasSyntaxKind for InKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for InKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -281,6 +354,12 @@ impl HasSyntaxKind for AnyKeywordToken{
     }
 }
 
+impl Display for AnyKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NilKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -299,6 +378,12 @@ impl AstToken for NilKeywordToken {
 impl HasSyntaxKind for NilKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for NilKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -323,6 +408,12 @@ impl HasSyntaxKind for BoolKeywordToken{
     }
 }
 
+impl Display for BoolKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NumberKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -341,6 +432,12 @@ impl AstToken for NumberKeywordToken {
 impl HasSyntaxKind for NumberKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for NumberKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -365,6 +462,12 @@ impl HasSyntaxKind for StringKeywordToken{
     }
 }
 
+impl Display for StringKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RetKeywordToken {
     pub(crate) syntax: SyntaxToken,
@@ -386,6 +489,12 @@ impl HasSyntaxKind for RetKeywordToken{
     }
 }
 
+impl Display for RetKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct GenericTypeToken {
     pub(crate) syntax: SyntaxToken,
@@ -404,6 +513,12 @@ impl AstToken for GenericTypeToken {
 impl HasSyntaxKind for GenericTypeToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for GenericTypeToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -435,6 +550,12 @@ impl HasRule for ArrayTypeNode{
         Box::new(ArrayTypeRule{})
     }
 }
+impl Display for ArrayTypeNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnTypeNode {
     pub(crate) syntax: SyntaxNode,
@@ -463,6 +584,12 @@ impl HasRule for FnTypeNode{
         Box::new(FnTypeRule{})
     }
 }
+impl Display for FnTypeNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct OptModifierToken {
     pub(crate) syntax: SyntaxToken,
@@ -481,6 +608,12 @@ impl AstToken for OptModifierToken {
 impl HasSyntaxKind for OptModifierToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for OptModifierToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -505,6 +638,12 @@ impl HasSyntaxKind for LeftParenthesisToken{
     }
 }
 
+impl Display for LeftParenthesisToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightParenthesisToken {
     pub(crate) syntax: SyntaxToken,
@@ -523,6 +662,12 @@ impl AstToken for RightParenthesisToken {
 impl HasSyntaxKind for RightParenthesisToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for RightParenthesisToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -547,6 +692,12 @@ impl HasSyntaxKind for LeftCurlyBracketsToken{
     }
 }
 
+impl Display for LeftCurlyBracketsToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightCurlyBracketsToken {
     pub(crate) syntax: SyntaxToken,
@@ -565,6 +716,12 @@ impl AstToken for RightCurlyBracketsToken {
 impl HasSyntaxKind for RightCurlyBracketsToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for RightCurlyBracketsToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -589,6 +746,12 @@ impl HasSyntaxKind for LeftRectangularBracketsToken{
     }
 }
 
+impl Display for LeftRectangularBracketsToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightRectangularBracketsToken {
     pub(crate) syntax: SyntaxToken,
@@ -607,6 +770,12 @@ impl AstToken for RightRectangularBracketsToken {
 impl HasSyntaxKind for RightRectangularBracketsToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for RightRectangularBracketsToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -631,6 +800,12 @@ impl HasSyntaxKind for PlusSignToken{
     }
 }
 
+impl Display for PlusSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct MinusSignToken {
     pub(crate) syntax: SyntaxToken,
@@ -649,6 +824,12 @@ impl AstToken for MinusSignToken {
 impl HasSyntaxKind for MinusSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for MinusSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -673,6 +854,12 @@ impl HasSyntaxKind for MultSignToken{
     }
 }
 
+impl Display for MultSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DivSignToken {
     pub(crate) syntax: SyntaxToken,
@@ -691,6 +878,12 @@ impl AstToken for DivSignToken {
 impl HasSyntaxKind for DivSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for DivSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -715,6 +908,12 @@ impl HasSyntaxKind for LessThanSignToken{
     }
 }
 
+impl Display for LessThanSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct LessOrEqualSignToken {
     pub(crate) syntax: SyntaxToken,
@@ -733,6 +932,12 @@ impl AstToken for LessOrEqualSignToken {
 impl HasSyntaxKind for LessOrEqualSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for LessOrEqualSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -757,6 +962,12 @@ impl HasSyntaxKind for EqualitySignToken{
     }
 }
 
+impl Display for EqualitySignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct InequalitySignToken {
     pub(crate) syntax: SyntaxToken,
@@ -775,6 +986,12 @@ impl AstToken for InequalitySignToken {
 impl HasSyntaxKind for InequalitySignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for InequalitySignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -799,6 +1016,12 @@ impl HasSyntaxKind for BiggerThanSignToken{
     }
 }
 
+impl Display for BiggerThanSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BiggerOrEqualSignToken {
     pub(crate) syntax: SyntaxToken,
@@ -817,6 +1040,12 @@ impl AstToken for BiggerOrEqualSignToken {
 impl HasSyntaxKind for BiggerOrEqualSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for BiggerOrEqualSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -841,6 +1070,12 @@ impl HasSyntaxKind for AssignSignToken{
     }
 }
 
+impl Display for AssignSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightStreamToken {
     pub(crate) syntax: SyntaxToken,
@@ -859,6 +1094,12 @@ impl AstToken for RightStreamToken {
 impl HasSyntaxKind for RightStreamToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for RightStreamToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -883,6 +1124,12 @@ impl HasSyntaxKind for PipeToken{
     }
 }
 
+impl Display for PipeToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DollarToken {
     pub(crate) syntax: SyntaxToken,
@@ -901,6 +1148,12 @@ impl AstToken for DollarToken {
 impl HasSyntaxKind for DollarToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for DollarToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -925,6 +1178,12 @@ impl HasSyntaxKind for QuestionMarkToken{
     }
 }
 
+impl Display for QuestionMarkToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct PointToken {
     pub(crate) syntax: SyntaxToken,
@@ -943,6 +1202,12 @@ impl AstToken for PointToken {
 impl HasSyntaxKind for PointToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for PointToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -967,6 +1232,12 @@ impl HasSyntaxKind for DoublePointToken{
     }
 }
 
+impl Display for DoublePointToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DoubleQuoteToken {
     pub(crate) syntax: SyntaxToken,
@@ -985,6 +1256,12 @@ impl AstToken for DoubleQuoteToken {
 impl HasSyntaxKind for DoubleQuoteToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for DoubleQuoteToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1009,6 +1286,12 @@ impl HasSyntaxKind for SingleQuoteToken{
     }
 }
 
+impl Display for SingleQuoteToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ErrorToken {
     pub(crate) syntax: SyntaxToken,
@@ -1027,6 +1310,12 @@ impl AstToken for ErrorToken {
 impl HasSyntaxKind for ErrorToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for ErrorToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1051,6 +1340,12 @@ impl HasSyntaxKind for ParserInternalToken{
     }
 }
 
+impl Display for ParserInternalToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct EofNode {
     pub(crate) syntax: SyntaxNode,
@@ -1069,6 +1364,12 @@ impl AstNode for EofNode {
 impl HasSyntaxKind for EofNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for EofNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1093,6 +1394,12 @@ impl HasSyntaxKind for TombstoneNode{
     }
 }
 
+impl Display for TombstoneNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct WhitespaceToken {
     pub(crate) syntax: SyntaxToken,
@@ -1111,6 +1418,12 @@ impl AstToken for WhitespaceToken {
 impl HasSyntaxKind for WhitespaceToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for WhitespaceToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1135,6 +1448,12 @@ impl HasSyntaxKind for CommentToken{
     }
 }
 
+impl Display for CommentToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NewlineToken {
     pub(crate) syntax: SyntaxToken,
@@ -1153,6 +1472,12 @@ impl AstToken for NewlineToken {
 impl HasSyntaxKind for NewlineToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for NewlineToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1177,6 +1502,12 @@ impl HasSyntaxKind for BareWordToken{
     }
 }
 
+impl Display for BareWordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StringContentToken {
     pub(crate) syntax: SyntaxToken,
@@ -1195,6 +1526,12 @@ impl AstToken for StringContentToken {
 impl HasSyntaxKind for StringContentToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for StringContentToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1219,6 +1556,12 @@ impl HasSyntaxKind for VarDeclNameToken{
     }
 }
 
+impl Display for VarDeclNameToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnDeclNameToken {
     pub(crate) syntax: SyntaxToken,
@@ -1237,6 +1580,12 @@ impl AstToken for FnDeclNameToken {
 impl HasSyntaxKind for FnDeclNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for FnDeclNameToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1261,6 +1610,12 @@ impl HasSyntaxKind for ArgNameToken{
     }
 }
 
+impl Display for ArgNameToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct VarArgNameToken {
     pub(crate) syntax: SyntaxToken,
@@ -1279,6 +1634,12 @@ impl AstToken for VarArgNameToken {
 impl HasSyntaxKind for VarArgNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for VarArgNameToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1303,6 +1664,12 @@ impl HasSyntaxKind for LongFlagToken{
     }
 }
 
+impl Display for LongFlagToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ShortFlagToken {
     pub(crate) syntax: SyntaxToken,
@@ -1321,6 +1688,12 @@ impl AstToken for ShortFlagToken {
 impl HasSyntaxKind for ShortFlagToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for ShortFlagToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1345,6 +1718,12 @@ impl HasSyntaxKind for NumberToken{
     }
 }
 
+impl Display for NumberToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StrctNameToken {
     pub(crate) syntax: SyntaxToken,
@@ -1366,6 +1745,12 @@ impl HasSyntaxKind for StrctNameToken{
     }
 }
 
+impl Display for StrctNameToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StrctFieldNameToken {
     pub(crate) syntax: SyntaxToken,
@@ -1384,6 +1769,12 @@ impl AstToken for StrctFieldNameToken {
 impl HasSyntaxKind for StrctFieldNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for StrctFieldNameToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1415,6 +1806,12 @@ impl HasRule for SourceFileNode{
         Box::new(SourceFileRule{})
     }
 }
+impl Display for SourceFileNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StrctStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1433,6 +1830,12 @@ impl AstNode for StrctStmtNode {
 impl HasSyntaxKind for StrctStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for StrctStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1457,6 +1860,12 @@ impl HasSyntaxKind for UseStmtNode{
     }
 }
 
+impl Display for UseStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StrctFieldNode {
     pub(crate) syntax: SyntaxNode,
@@ -1475,6 +1884,12 @@ impl AstNode for StrctFieldNode {
 impl HasSyntaxKind for StrctFieldNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for StrctFieldNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1499,6 +1914,12 @@ impl HasSyntaxKind for StrctCtorExprNode{
     }
 }
 
+impl Display for StrctCtorExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct StrctFieldCtorStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1517,6 +1938,12 @@ impl AstNode for StrctFieldCtorStmtNode {
 impl HasSyntaxKind for StrctFieldCtorStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for StrctFieldCtorStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1548,6 +1975,12 @@ impl HasRule for LetStmtNode{
         Box::new(LetStmtRule{})
     }
 }
+impl Display for LetStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FnStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1576,6 +2009,12 @@ impl HasRule for FnStmtNode{
         Box::new(FnStmtRule{})
     }
 }
+impl Display for FnStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RetStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1604,6 +2043,12 @@ impl HasRule for RetStmtNode{
         Box::new(RetStmtRule{})
     }
 }
+impl Display for RetStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct IfStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1632,6 +2077,12 @@ impl HasRule for IfStmtNode{
         Box::new(IfStmtRule{})
     }
 }
+impl Display for IfStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct IfBlockNode {
     pub(crate) syntax: SyntaxNode,
@@ -1650,6 +2101,12 @@ impl AstNode for IfBlockNode {
 impl HasSyntaxKind for IfBlockNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for IfBlockNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1674,6 +2131,12 @@ impl HasSyntaxKind for ElifBlockNode{
     }
 }
 
+impl Display for ElifBlockNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElseBlockNode {
     pub(crate) syntax: SyntaxNode,
@@ -1692,6 +2155,12 @@ impl AstNode for ElseBlockNode {
 impl HasSyntaxKind for ElseBlockNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for ElseBlockNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1723,6 +2192,12 @@ impl HasRule for ForStmtNode{
         Box::new(ForStmtRule{})
     }
 }
+impl Display for ForStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct CmdStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1751,6 +2226,12 @@ impl HasRule for CmdStmtNode{
         Box::new(CmdStmtRule{})
     }
 }
+impl Display for CmdStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct PipedCmdsStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1779,6 +2260,12 @@ impl HasRule for PipedCmdsStmtNode{
         Box::new(PipedCmdsStmtRule{})
     }
 }
+impl Display for PipedCmdsStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct BlockStmtNode {
     pub(crate) syntax: SyntaxNode,
@@ -1797,6 +2284,12 @@ impl AstNode for BlockStmtNode {
 impl HasSyntaxKind for BlockStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for BlockStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1828,6 +2321,12 @@ impl HasRule for SignatureNode{
         Box::new(SignatureRule{})
     }
 }
+impl Display for SignatureNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct FlagSignatureNode {
     pub(crate) syntax: SyntaxNode,
@@ -1849,6 +2348,12 @@ impl HasSyntaxKind for FlagSignatureNode{
     }
 }
 
+impl Display for FlagSignatureNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArgSignatureNode {
     pub(crate) syntax: SyntaxNode,
@@ -1867,6 +2372,12 @@ impl AstNode for ArgSignatureNode {
 impl HasSyntaxKind for ArgSignatureNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for ArgSignatureNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1898,6 +2409,12 @@ impl HasRule for LuTypeNode{
         Box::new(LuTypeRule{})
     }
 }
+impl Display for LuTypeNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct MathExprNode {
     pub(crate) syntax: SyntaxNode,
@@ -1916,6 +2433,12 @@ impl AstNode for MathExprNode {
 impl HasSyntaxKind for MathExprNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+
+impl Display for MathExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -1947,6 +2470,12 @@ impl HasRule for StringExprNode{
         Box::new(StringExprRule{})
     }
 }
+impl Display for StringExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NumberExprNode {
     pub(crate) syntax: SyntaxNode,
@@ -1975,6 +2504,12 @@ impl HasRule for NumberExprNode{
         Box::new(NumberExprRule{})
     }
 }
+impl Display for NumberExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ValuePathExprNode {
     pub(crate) syntax: SyntaxNode,
@@ -2003,6 +2538,12 @@ impl HasRule for ValuePathExprNode{
         Box::new(ValuePathExprRule{})
     }
 }
+impl Display for ValuePathExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ArrayExprNode {
     pub(crate) syntax: SyntaxNode,
@@ -2031,6 +2572,12 @@ impl HasRule for ArrayExprNode{
         Box::new(ArrayExprRule{})
     }
 }
+impl Display for ArrayExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct TableExprNode {
     pub(crate) syntax: SyntaxNode,
@@ -2059,6 +2606,12 @@ impl HasRule for TableExprNode{
         Box::new(TableExprRule{})
     }
 }
+impl Display for TableExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum UsePathElement {
     BareWord(BareWordToken),
@@ -2115,6 +2668,12 @@ impl HasSyntaxKind for UsePathElement{
             UsePathElement::DoublePoint(it) => it.get_syntax_kind(),
             UsePathElement::DivSign(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl Display for UsePathElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -2178,6 +2737,12 @@ impl HasSyntaxKind for CmdOrValueExprElement{
             CmdOrValueExprElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
             CmdOrValueExprElement::ValueExpr(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl Display for CmdOrValueExprElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -2287,6 +2852,12 @@ impl HasRule for ValueExprElement{
         Box::new(ValueExprRule{})
     }
 }
+impl Display for ValueExprElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum StatementElement {
     RetStmt(RetStmtNode),
@@ -2390,6 +2961,12 @@ impl HasSyntaxKind for StatementElement{
     }
 }
 
+impl Display for StatementElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum ConditionElement {
     CmdStmt(CmdStmtNode),
@@ -2442,6 +3019,12 @@ impl HasSyntaxKind for ConditionElement{
             ConditionElement::CmdStmt(it) => it.get_syntax_kind(),
             ConditionElement::ValueExpr(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl Display for ConditionElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 
@@ -2576,6 +3159,12 @@ impl HasSyntaxKind for OperatorExprElement{
     }
 }
 
+impl Display for OperatorExprElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum LuTypeSpecifierElement {
     NumberKeyword(NumberKeywordToken),
@@ -2688,6 +3277,12 @@ impl HasSyntaxKind for LuTypeSpecifierElement{
             LuTypeSpecifierElement::ArrayType(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::FnType(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl Display for LuTypeSpecifierElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 

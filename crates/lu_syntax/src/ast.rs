@@ -14,7 +14,7 @@ mod struct_stmt;
 mod type_;
 mod use_stmt;
 mod value_path_expr;
-use std::{fmt::Display, marker::PhantomData};
+use std::marker::PhantomData;
 
 use lu_error::SourceCodeItem;
 use lu_parser::grammar::Rule;
@@ -125,23 +125,6 @@ pub trait AstElement {
 
     fn to_item(&self) -> SourceCodeItem {
         SourceCodeItem::new(self.syntax().text_range().into(), self.text())
-    }
-}
-
-impl Display for dyn AstNode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
-    }
-}
-
-impl Display for dyn AstToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
-    }
-}
-impl Display for dyn AstElement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
     }
 }
 

@@ -6,9 +6,12 @@ use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::ast::{CmdStmtNode, SourceFileNode};
 use lu_syntax::AstNode;
+use parking_lot::RwLock;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::collections::hash_map::Entry;
+use std::fmt::Display;
 use std::iter;
+use std::sync::Arc;
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
@@ -270,11 +273,12 @@ impl TyCheckState {
                         .insert(var.clone(), tc_func.self_key.clone());
                     Some(tc_func.self_key)
                 } else if let Some(strct) = var.val.as_strct().cloned() {
+                    let l_strct = strct.read();
                     debug!(
-                        "First time usage of strct {}. Inserting new tc_strct.",
-                        strct.name
+                        "First time usage of a strct {}. Inserting new tc_strct.",
+                        l_strct.name
                     );
-                    let tc_strct = TcStrct::from_strct(strct.as_ref().clone(), self);
+                    let tc_strct = TcStrct::from_strct(&strct, self);
                     self.tc_var_table
                         .insert(var.clone(), tc_strct.self_key.clone());
                     Some(tc_strct.self_key)
@@ -438,9 +442,10 @@ pub struct TcStrct {
 }
 
 impl TcStrct {
-    pub fn from_strct(strct: Strct, ty_state: &mut TyCheckState) -> Self {
+    pub fn from_strct(strct: &Arc<RwLock<Strct>>, ty_state: &mut TyCheckState) -> Self {
+        let l_strct = strct.read();
         debug!("Generating TcStrct for Struct: {:?}", strct);
-        let field_keys = strct
+        let field_keys = l_strct
             .fields
             .iter()
             .map(|field| {
@@ -452,8 +457,10 @@ impl TcStrct {
             .sorted_by(|a, b| Ord::cmp(&a.0, &b.0))
             .collect();
 
-        let self_key =
-            ty_state.new_term_key_concretiziesd(strct.decl.clone(), ValueType::new_strct(strct));
+        let self_key = ty_state.new_term_key_concretiziesd(
+            l_strct.decl.clone(),
+            ValueType::new_strct(Arc::downgrade(strct)),
+        );
 
         let tc_strct = Self {
             self_key,

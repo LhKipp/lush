@@ -1,7 +1,9 @@
 use enum_as_inner::EnumAsInner;
 use lu_syntax::ast::{BareWordToken, NumberExprNode, StringExprNode};
 use ordered_float::OrderedFloat;
+use parking_lot::RwLock;
 use std::hash::{Hash, Hasher};
+use std::sync::Arc;
 use std::{fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
@@ -30,7 +32,8 @@ pub enum Value {
     Command(Rc<dyn Command>),
 
     /// Not really lu values. But treating them as one, allows us to store them in variables
-    Strct(Rc<Strct>),
+    #[serde(skip)] // TODO serialize
+    Strct(Arc<RwLock<Strct>>),
 }
 
 impl PartialEq for Value {
@@ -62,7 +65,7 @@ impl Hash for Value {
             Value::BareWord(v) => v.hash(state),
             Value::Array(v) => v.hash(state),
             Value::Command(func) => Rc::as_ptr(func).hash(state),
-            Value::Strct(strct) => Rc::as_ptr(strct).hash(state),
+            Value::Strct(strct) => Arc::as_ptr(strct).hash(state),
         }
     }
 }
@@ -72,7 +75,7 @@ impl Value {
         Value::Command(func)
     }
     pub fn new_strct(strct: Strct) -> Self {
-        Value::Strct(Rc::new(strct))
+        Value::Strct(Arc::new(RwLock::new(strct)))
     }
     pub fn new_array(vals: Vec<Value>) -> Self {
         Value::Array(Rc::new(vals))
@@ -119,7 +122,7 @@ impl Display for Value {
             Value::BareWord(v) => v.fmt(f),
             Value::Array(arr) => write!(f, "{:?}", arr),
             Value::Command(v) => write!(f, "{:p}", Rc::as_ptr(v)),
-            Value::Strct(v) => write!(f, "{:p}", Rc::as_ptr(v)),
+            Value::Strct(v) => write!(f, "{:p}", Arc::as_ptr(v)),
         }
     }
 }

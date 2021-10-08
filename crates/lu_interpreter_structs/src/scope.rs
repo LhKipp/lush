@@ -4,7 +4,8 @@ use indextree::{Arena, NodeId};
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use multimap::MultiMap;
-use std::{collections::HashMap, fmt, rc::Rc};
+use parking_lot::RwLock;
+use std::{collections::HashMap, fmt, rc::Rc, sync::Arc};
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
@@ -350,18 +351,17 @@ impl Scope<Variable> {
     }
 
     #[allow(unused)]
-    pub fn find_strct(&self, name: &str) -> Option<&Strct> {
+    pub fn find_strct(&self, name: &str) -> Option<&Arc<RwLock<Strct>>> {
         debug!(
             "Finding cmd {} from {:?} on",
             name,
             self.get_cur_frame_tag()
         );
         // TODO write check that no variable shadows a func name
-        self.find_var(name)
-            .map(|var| var.val.as_strct().unwrap().as_ref())
+        self.find_var(name).map(|var| var.val.as_strct().unwrap())
     }
 
-    pub fn expect_strct(&self, name: &str, usage: SourceCodeItem) -> LuResult<&Strct> {
+    pub fn expect_strct(&self, name: &str, usage: SourceCodeItem) -> LuResult<&Arc<RwLock<Strct>>> {
         self.find_strct(name)
             .ok_or(AstErr::StrctNotInScope(usage).into())
     }

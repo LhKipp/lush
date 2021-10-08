@@ -1,26 +1,29 @@
 use std::{
     fmt::Display,
     hash::{Hash, Hasher},
-    sync::Weak,
+    sync::{Arc, Weak},
 };
 
 use enum_as_inner::EnumAsInner;
 use log::{debug, warn};
-use lu_error::{LuErr, SourceCodeItem};
-use lu_syntax::{ast::LuTypeSpecifierElement, AstNode, AstToken};
+use lu_error::{util::Outcome, LuErr, SourceCodeItem};
+use lu_syntax::{ast::LuTypeSpecifierElement, AstElement, AstNode, AstToken};
 use parking_lot::RwLock;
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize, Serializer};
 
-use crate::{Signature, Strct};
+use crate::{Scope, Signature, Strct, Variable};
 
 fn cmp_sign_types(_: &Box<Signature>, _: &Box<Signature>) -> bool {
     todo!()
     // a.in_type == b.in_type && a.ret_type == b.ret_type &&
     //     a.iter
 }
-fn cmp_strcts(_: &Weak<RwLock<Strct>>, _: &Weak<RwLock<Strct>>) -> bool {
-    todo!()
+fn cmp_strcts(a: &Weak<RwLock<Strct>>, b: &Weak<RwLock<Strct>>) -> bool {
+    // TODO also compare that they are declared in same module !!!
+    let (a, b) = (Weak::upgrade(a).unwrap(), Weak::upgrade(b).unwrap()); // TODO no unwrap
+    let (l_a, l_b) = (a.read(), b.read());
+    l_a.name == l_b.name
 }
 fn cmp_inner_tys(a: &Box<ValueType>, b: &Box<ValueType>) -> bool {
     *a == *b
@@ -30,7 +33,7 @@ fn hash_as_ptr<H: Hasher>(strct: &Weak<RwLock<Strct>>, state: &mut H) {
     Hash::hash(&strct.as_ptr(), state)
 }
 
-fn serialize_name_only<S>(x: &Weak<RwLock<Strct>>, s: S) -> Result<S::Ok, S::Error>
+fn serialize_name_only<S>(_: &Weak<RwLock<Strct>>, _: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -133,12 +136,39 @@ impl ValueType {
         ValueType::Func(Box::new(sign))
     }
 
-    pub fn new_strct(strct: Strct) -> Self {
-        ValueType::Strct(Box::new(strct))
+    pub fn new_strct(strct: Weak<RwLock<Strct>>) -> Self {
+        ValueType::Strct(strct)
     }
 
     pub fn from_node_or_err_ty(node: &LuTypeSpecifierElement) -> (ValueType, Option<LuErr>) {
         ValueType::from_node(node).map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
+    }
+
+    /// TODO this func feels like a halfway solution
+    /// Function and Strct from_node can't use it (as it happens in the resolve step)
+    /// Therefore these would neet a resolve_strct_names step after creation, called in typecheck
+    ///
+    /// A possible way around this awkward structure would be either:
+    /// Option1: Create a mapping in the resolve step: LuTypeSpecifierElement => ???
+    ///             which somehow magically gives the value_type
+    /// Option2: do the resolve_strct_names step for typecheck and keep using this func (preferred
+    /// now)
+    pub fn from_node_or_err_resolve_strct_name(
+        node: &LuTypeSpecifierElement,
+        scope: &Scope<Variable>,
+    ) -> Outcome<ValueType> {
+        let (ty, err) = Self::from_node_or_err_ty(node);
+        assert!(err.is_none()); // TODO use outcome interface in above funcs
+        if let Self::StrctName(strct_name) = ty {
+            let strct = scope
+                .expect_strct(&strct_name, node.to_item())
+                .map(|strct| Arc::downgrade(strct))
+                .map(|strct| ValueType::Strct(strct));
+
+            Outcome::from_result(strct, ValueType::Error)
+        } else {
+            Outcome::ok(ty)
+        }
     }
 
     pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
@@ -297,8 +327,10 @@ impl Display for ValueType {
             ValueType::BareWord => write!(f, "bare_word"),
             ValueType::Array { inner_ty, .. } => write!(f, "[{}]", *inner_ty),
             ValueType::Strct(strct) => {
-                write!(f, "{}{{ ", strct.name)?;
-                for field in &strct.fields {
+                let strct = Weak::upgrade(strct).unwrap();
+                let l_strct = strct.read();
+                write!(f, "{}{{ ", l_strct.name)?;
+                for field in &l_strct.fields {
                     write!(f, "{}: {}", field.name, field.ty)?;
                 }
                 write!(f, "}}")

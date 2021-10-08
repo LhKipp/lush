@@ -26,6 +26,13 @@ impl<T> Outcome<T> {
     pub fn ok(val: T) -> Self {
         Outcome::new(val, vec![])
     }
+
+    pub fn from_result(result: Result<T, LuErr>, default: T) -> Self {
+        match result {
+            Ok(v) => Outcome::ok(v),
+            Err(e) => Outcome::new(default, vec![e]),
+        }
+    }
 }
 
 impl<T> From<(T, Vec<LuErr>)> for Outcome<T> {

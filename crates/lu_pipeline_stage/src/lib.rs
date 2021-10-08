@@ -1,5 +1,5 @@
 use log::debug;
-use lu_error::LuErr;
+use lu_error::{util::Outcome, LuErr};
 
 pub trait PipelineStage {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage>;
@@ -27,6 +27,9 @@ pub trait PipelineStage {
     }
 
     fn push_errs(&mut self, e: Vec<LuErr>) {
+        if e.is_empty() {
+            return;
+        }
         debug!("Recording errors: {:?}", e);
         self.get_mut_errors().extend(e);
     }
@@ -65,6 +68,11 @@ pub trait ErrorContainer: PipelineStage {
             true
         })
         .unwrap_or(false)
+    }
+
+    fn ok_and_record<T>(&mut self, outcome: Outcome<T>) -> T {
+        self.push_errs(outcome.errs);
+        outcome.val
     }
 }
 
