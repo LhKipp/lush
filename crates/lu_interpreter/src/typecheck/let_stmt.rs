@@ -1,7 +1,6 @@
-use lu_error::TyErr;
 use lu_interpreter_structs::Value;
-use lu_pipeline_stage::{ErrorContainer, PipelineStage};
-use lu_syntax::{ast::LetStmtNode, AstElement};
+use lu_pipeline_stage::ErrorContainer;
+use lu_syntax::ast::LetStmtNode;
 use rusttyc::TcKey;
 
 use crate::{TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
@@ -19,24 +18,21 @@ impl TypeCheck for LetStmtNode {
 
             // unify key with decl
             if let Some(decl_ty) = self.decl_ty() {
-                let (ty, err) = ValueType::from_node_or_err_ty(&decl_ty.into_type());
-                ty_state.record_option(err);
+                let ty_out = ValueType::from_node_or_err_resolve_strct_name(
+                    &decl_ty.into_type(),
+                    &ty_state.scope,
+                );
+                let ty = ty_state.ok_and_record(ty_out);
                 ty_state.concretizes_key(let_stmt_key, ty);
             }
 
             // Combine key with rhs
-            let rhs = self.value();
-            match rhs.typecheck(ty_state) {
-                Some(key) => {
-                    ty_state.equate_keys(let_stmt_key, key);
-                }
-                None => {
-                    // Example of this path would be: let x = { let y = 1 }
-                    // The block does not return a type
-                    assert!(rhs.is_some(), "Option<T> always returns something for none");
-                    ty_state.push_err(TyErr::TermDoesNotReturnType(rhs.unwrap().to_item()).into())
-                }
-            };
+            if let Some(rhs_val) = self.value() {
+                let rhs_key = rhs_val
+                    .typecheck(ty_state)
+                    .expect("Rhs val always returns ty");
+                ty_state.equate_keys(let_stmt_key, rhs_key);
+            }
         } else {
             // Incomplete let stmt in parsing. This is okay
         }

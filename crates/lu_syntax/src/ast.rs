@@ -8,13 +8,13 @@ mod if_stmt;
 mod let_stmt;
 mod math_expr;
 mod piped_cmds_stmt;
+mod ret_stmt;
 mod signature;
 mod struct_stmt;
 mod type_;
-mod value_path_expr;
 mod use_stmt;
-mod ret_stmt;
-use std::marker::PhantomData;
+mod value_path_expr;
+use std::{fmt::Display, marker::PhantomData};
 
 use lu_error::SourceCodeItem;
 use lu_parser::grammar::Rule;
@@ -81,6 +81,9 @@ pub trait AstNode {
             .unwrap();
         self.syntax().text().slice(idx_range)
     }
+    fn text(&self) -> String {
+        self.syntax().text().into()
+    }
 }
 
 pub trait AstToken {
@@ -122,6 +125,23 @@ pub trait AstElement {
 
     fn to_item(&self) -> SourceCodeItem {
         SourceCodeItem::new(self.syntax().text_range().into(), self.text())
+    }
+}
+
+impl Display for dyn AstNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+impl Display for dyn AstToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+impl Display for dyn AstElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
 

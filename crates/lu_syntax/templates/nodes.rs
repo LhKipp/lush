@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+use std::fmt::Display;
 use serde::Serialize;
 use enum_as_inner::EnumAsInner;
 use crate::{
@@ -168,5 +169,11 @@ impl HasRule for {{syn_elem.struct_name}}{
 }
 {% endif -%}
 
+
+impl Display for {{syn_elem.struct_name}} {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
 
 {% endfor -%}

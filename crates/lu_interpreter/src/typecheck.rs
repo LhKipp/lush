@@ -652,7 +652,7 @@ pub enum TypeCheckArg {
     Arg(VisitArg),
 }
 
-pub trait TypeCheck: Debug {
+pub trait TypeCheck: Display {
     /// typecheck the AST-Node/Token given the ty_state.
     /// Returns if successful the infered type, () otherwise (Errors will be accumulated in the type checker
     /// itself).
@@ -669,12 +669,11 @@ pub trait TypeCheck: Debug {
         args: &[TypeCheckArg],
         ty_state: &mut TyCheckState,
     ) -> Option<TcKey> {
-        debug!("Typechecking: {:?}({:?})", self, args);
+        debug!("Typechecking: {}", self);
         let result = self.do_typecheck(args, ty_state);
         debug!(
-            "Result of Typechecking: {:?}({:?}): {:?}",
+            "Result of Typechecking: {}: {:?}",
             self,
-            args,
             // TODO better debug stmt
             result,
         );
@@ -682,22 +681,22 @@ pub trait TypeCheck: Debug {
     }
 }
 
-// TODO remove this. Its broken. Sometimes this is an error sometimes its not
-impl<T: TypeCheck> TypeCheck for Option<T> {
-    fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
-        match self {
-            Some(n) => n.typecheck_with_args(args, ty_state),
-            None => {
-                // We have an incomplete Ast here. We should not generate an error
-                let key = ty_state.checker.new_term_key();
-                // TODO check whether Error is fine here. Should be as error should not generate
-                // further erorrs
-                ty_state
-                    .checker
-                    .impose(key.concretizes_explicit(ValueType::Error))
-                    .expect("New key can always be conretizised");
-                Some(key)
-            }
-        }
-    }
-}
+// // TODO remove this. Its broken. Sometimes this is an error sometimes its not
+// impl<T: TypeCheck> TypeCheck for Option<T> {
+//     fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+//         match self {
+//             Some(n) => n.typecheck_with_args(args, ty_state),
+//             None => {
+//                 // We have an incomplete Ast here. We should not generate an error
+//                 let key = ty_state.checker.new_term_key();
+//                 // TODO check whether Error is fine here. Should be as error should not generate
+//                 // further erorrs
+//                 ty_state
+//                     .checker
+//                     .impose(key.concretizes_explicit(ValueType::Error))
+//                     .expect("New key can always be conretizised");
+//                 Some(key)
+//             }
+//         }
+//     }
+// }
