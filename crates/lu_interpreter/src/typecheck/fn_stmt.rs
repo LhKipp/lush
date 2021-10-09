@@ -17,7 +17,7 @@ impl TypeCheck for FnStmtNode {
             return None;
         };
 
-        let fn_frame = ScopeFrameTag::FnFrame(fn_name.clone());
+        let fn_frame = ScopeFrameTag::TyCFnFrame(fn_name.clone());
         ty_state.scope.push_frame(fn_frame.clone());
 
         let var_key_to_insert = {

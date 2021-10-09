@@ -16,7 +16,7 @@ impl TypeCheck for RetStmtNode {
 
         let cur_func_name = ty_state
             .scope
-            .get_cur_command()
+            .find_cur_command()
             .map(|callable| callable.name().to_string());
 
         if let Some(cur_func_name) = cur_func_name {

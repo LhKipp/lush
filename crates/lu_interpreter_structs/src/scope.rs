@@ -194,7 +194,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 
 impl Scope<Variable> {
     /// Returns the command, in which the current selected frame is.
-    pub fn get_cur_command(&self) -> Option<&Rc<dyn Command>> {
+    pub fn find_cur_command(&self) -> Option<&Rc<dyn Command>> {
         let cur_id = self.get_cur_frame_id();
         cur_id.ancestors(&self.arena).find_map(|n_id| {
             let tag = self.arena[n_id].get().get_tag();
