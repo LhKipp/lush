@@ -6,7 +6,7 @@ use std::{
 
 use enum_as_inner::EnumAsInner;
 use log::{debug, warn};
-use lu_error::{util::Outcome, LuErr, SourceCodeItem};
+use lu_error::{util::Outcome, SourceCodeItem};
 use lu_syntax::{ast::LuTypeSpecifierElement, AstElement, AstNode, AstToken};
 use parking_lot::RwLock;
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
@@ -140,10 +140,6 @@ impl ValueType {
         ValueType::Strct(strct)
     }
 
-    pub fn from_node_or_err_ty(node: &LuTypeSpecifierElement) -> (ValueType, Option<LuErr>) {
-        ValueType::from_node(node).map_or_else(|err| (ValueType::Error, Some(err)), |ty| (ty, None))
-    }
-
     /// TODO this func feels like a halfway solution
     /// Function and Strct from_node can't use it (as it happens in the resolve step)
     /// Therefore these would neet a resolve_strct_names step after creation, called in typecheck
@@ -157,8 +153,7 @@ impl ValueType {
         node: &LuTypeSpecifierElement,
         scope: &Scope<Variable>,
     ) -> Outcome<ValueType> {
-        let (ty, err) = Self::from_node_or_err_ty(node);
-        assert!(err.is_none()); // TODO use outcome interface in above funcs
+        let ty = Self::from_node(node);
         if let Self::StrctName(strct_name) = ty {
             let strct = scope
                 .expect_strct(&strct_name, node.to_item())
@@ -171,7 +166,7 @@ impl ValueType {
         }
     }
 
-    pub fn from_node(node: &LuTypeSpecifierElement) -> Result<ValueType, LuErr> {
+    pub fn from_node(node: &LuTypeSpecifierElement) -> ValueType {
         // TODO make return type (ValueType, Option<LuErr>)
         let ty = match node {
             LuTypeSpecifierElement::AnyKeyword(_) => {
@@ -187,22 +182,18 @@ impl ValueType {
             LuTypeSpecifierElement::StrctName(n) => ValueType::StrctName(n.text().to_string()),
             LuTypeSpecifierElement::ArrayType(arr) => {
                 let (inner_ty, inner_ty_decl) = if let Some(inner) = arr.inner_type() {
-                    (ValueType::from_node(&inner.into_type())?, inner.to_item())
+                    (ValueType::from_node(&inner.into_type()), inner.to_item())
                 } else {
                     (ValueType::Unspecified, arr.to_item())
                 };
                 ValueType::new_array(inner_ty, inner_ty_decl)
             }
             LuTypeSpecifierElement::FnType(fn_ty) => {
-                let (sign, errs) =
-                    Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item());
-                if !errs.is_empty() {
-                    todo!("Return (valuety, err)");
-                }
+                let sign = Signature::from_sign_and_stmt(fn_ty.signature(), fn_ty.to_item());
                 ValueType::new_func(sign)
             }
         };
-        Ok(ty)
+        ty
     }
 }
 

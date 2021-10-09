@@ -3,8 +3,8 @@ use std::sync::Arc;
 use crate::{Command, Scope, UsePath, Value, ValueType, Variable};
 use derive_builder::Builder;
 use derive_new::new;
-use lu_error::{LuErr, LuResult, SourceCodeItem};
-use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, LuTypeNode, SignatureNode};
+use lu_error::{LuResult, SourceCodeItem};
+use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use parking_lot::Mutex;
@@ -40,9 +40,9 @@ impl ArgSignature {
         n: Option<ArgSignatureNode>,
         fallback_name: &str,
         fallback_decl: ArgDecl,
-    ) -> (Self, Option<LuErr>) {
+    ) -> Self {
         let name = n.as_ref().map(|n| n.name()).unwrap_or(fallback_name.into());
-        let fallback_ty = (ValueType::Unspecified, None);
+        let fallback_ty = ValueType::Unspecified;
         let decl: ArgDecl = n
             .as_ref()
             .map(|n| n.to_item())
@@ -50,17 +50,15 @@ impl ArgSignature {
         let ty = n
             .as_ref()
             .map(|in_node| {
-                in_node
-                    .type_()
-                    .map(|ty| {
-                        // Ty should always be some
-                        ValueType::from_node_or_err_ty(&ty.into_type())
-                    })
-                    .unwrap_or(fallback_ty.clone()) // But for incomplete input we fallback
+                in_node.type_().map(|ty| {
+                    // Ty should always be some
+                    ValueType::from_node(&ty.into_type())
+                })
             })
+            .flatten()
             .unwrap_or(fallback_ty); // or if in is not specified, use fallback
 
-        (ArgSignature::new(name, ty.0, decl), ty.1)
+        ArgSignature::new(name, ty, decl)
     }
 
     pub fn to_var(&self) -> Variable {
@@ -120,41 +118,31 @@ impl Signature {
     pub fn from_sign_and_stmt(
         sign_node: Option<SignatureNode>,
         fn_signature_decl: SourceCodeItem,
-    ) -> (Signature, Vec<LuErr>) {
+    ) -> Signature {
         if let Some(sign_node) = sign_node {
             Signature::source_signature(sign_node, fn_signature_decl)
         } else {
-            (Signature::default_signature(fn_signature_decl), vec![])
+            Signature::default_signature(fn_signature_decl)
         }
     }
 
     pub fn source_signature(
         sign_node: SignatureNode,
         fallback_arg_decl: SourceCodeItem,
-    ) -> (Signature, Vec<LuErr>) {
-        let get_ty_of_node = |ty_node: &LuTypeNode| -> (ValueType, Option<LuErr>) {
-            ValueType::from_node_or_err_ty(&ty_node.into_type())
-        };
-        let mut all_errs = vec![];
-
-        let (in_ty, in_err) =
+    ) -> Signature {
+        let in_ty =
             ArgSignature::from_node(sign_node.in_arg(), IN_ARG_NAME, fallback_arg_decl.clone());
-        let (ret_ty, ret_err) =
-            ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fallback_arg_decl);
-
-        in_err.map(|e| all_errs.push(e));
-        ret_err.map(|e| all_errs.push(e));
+        let ret_ty = ArgSignature::from_node(sign_node.ret_arg(), RET_ARG_NAME, fallback_arg_decl);
 
         let args: Vec<ArgSignature> = sign_node
             .args()
             .iter()
             .map(|arg_node| -> ArgSignature {
                 let arg_name = arg_node.name();
-                let (ty, err) = arg_node
+                let ty = arg_node
                     .type_()
-                    .map(|ty_node| get_ty_of_node(&ty_node))
-                    .unwrap_or((ValueType::Unspecified, None));
-                err.map(|e| all_errs.push(e));
+                    .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
+                    .unwrap_or(ValueType::Unspecified);
                 ArgSignature::new(arg_name, ty, arg_node.to_item())
             })
             .collect();
@@ -163,27 +151,22 @@ impl Signature {
             .map(|flag_node| -> FlagSignature {
                 let long_name = flag_node.long_name();
                 let short_name = flag_node.short_name();
-                let (ty, err) = flag_node
+                let ty = flag_node
                     .type_()
-                    .map(|ty_node| get_ty_of_node(&ty_node))
-                    .unwrap_or((ValueType::Unspecified, None));
-                err.map(|e| all_errs.push(e));
+                    .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
+                    .unwrap_or(ValueType::Unspecified);
                 FlagSignature::new(long_name, short_name, ty, Some(flag_node))
             })
             .collect();
         let var_arg = sign_node.var_arg().map(|var_arg_node| {
             let name = var_arg_node.name();
-            let (ty, err) = var_arg_node
+            let ty = var_arg_node
                 .type_()
-                .map(|ty_node| get_ty_of_node(&ty_node))
-                .unwrap_or((ValueType::Any, None));
-            err.map(|e| all_errs.push(e));
+                .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
+                .unwrap_or(ValueType::Any);
             ArgSignature::new(name, ty, var_arg_node.to_item())
         });
-        (
-            Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.to_item()),
-            all_errs,
-        )
+        Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.to_item())
     }
 }
 
