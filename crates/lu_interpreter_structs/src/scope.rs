@@ -258,12 +258,23 @@ impl Scope<Variable> {
     }
 
     pub fn find_var_mut(&mut self, name: &str) -> Option<&mut Variable> {
+        let start_frame = self.get_cur_frame().get_tag().clone();
         let frames_to_check_var_for = self.frames_to_find_var_in();
         for frame in frames_to_check_var_for {
             if self.arena[frame].get_mut().get_mut(name).is_some() {
+                debug!(
+                    "Result for find_var_mut {} from start_frame {}: {:?}",
+                    name,
+                    start_frame,
+                    self.arena[frame].get_mut().get_mut(name)
+                );
                 return self.arena[frame].get_mut().get_mut(name);
             }
         }
+        debug!(
+            "Could not find var_mut {} from start_frame {}",
+            name, start_frame
+        );
         None
     }
 
