@@ -116,6 +116,11 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         self.cur_frame_id.unwrap()
     }
 
+    fn root_id(&self) -> NodeId {
+        let cur_id = self.get_cur_frame_id();
+        cur_id.ancestors(&self.arena).last().unwrap()
+    }
+
     /// Id must be valid. Panic otherwise!
     pub fn set_cur_frame_id(&mut self, id: ScopeFrameId) {
         assert!(self.arena.get(id).is_some());
@@ -131,10 +136,11 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         self.arena[id].get_mut()
     }
 
-    pub fn global_mut_frame(&mut self) -> &mut ScopeFrame<T> {
-        let ancestors: Vec<NodeId> = self.get_cur_frame_id().ancestors(&self.arena).collect();
-        let global_id = ancestors.last().unwrap();
-        self.arena[*global_id].get_mut()
+    pub fn get_global_frame_mut(&mut self) -> &mut ScopeFrame<T> {
+        let global_id = self.root_id();
+        let frame = self.arena[global_id].get_mut();
+        assert!(frame.get_tag().is_global_frame());
+        frame
     }
 
     pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut ScopeFrame<T>) {
@@ -187,12 +193,6 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         }
     }
 
-    fn root_id(&self) -> Option<NodeId> {
-        self.cur_frame_id
-            .map(|id| id.ancestors(&self.arena).last())
-            .flatten()
-    }
-
     fn tag_of(&self, id: NodeId) -> &ScopeFrameTag {
         self.arena[id].get().get_tag()
     }
@@ -204,7 +204,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 
         let mut indent = 0;
         let mut result = "\n".to_string();
-        for elem in self.root_id().unwrap().traverse(&self.arena) {
+        for elem in self.root_id().traverse(&self.arena) {
             match elem {
                 indextree::NodeEdge::Start(id) => {
                     let is_selected = if id == self.cur_frame_id.unwrap() {
@@ -395,7 +395,7 @@ impl Scope<Variable> {
 
     fn get_sf_frames_parent(&self) -> NodeId {
         // All sf_frames are below the global_frame
-        self.root_id().unwrap()
+        self.root_id()
     }
 
     pub fn push_sf_frame(&mut self, frame: ScopeFrame<Variable>) {
