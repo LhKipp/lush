@@ -161,7 +161,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
             let cur_frame_tag = cur_frame.get().get_tag();
 
             debug!(
-                "Popping frame: {:?}, Expected: {?}",
+                "Popping frame: {:?}, Expected: {:?}",
                 cur_frame_tag, expected
             );
             assert_eq!(cur_frame_tag, expected);
@@ -178,15 +178,6 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         debug!("Selecting parent frame");
         let cur_id = self.get_cur_frame_id();
         self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
-    }
-
-    pub fn get_cur_frame_tag(&self) -> ScopeFrameTag {
-        if let Some(cur_frame_id) = self.cur_frame_id {
-            let cur_frame = &self.arena[cur_frame_id];
-            cur_frame.get().get_tag().clone()
-        } else {
-            ScopeFrameTag::None
-        }
     }
 
     fn tag_of(&self, id: NodeId) -> &ScopeFrameTag {
@@ -278,7 +269,7 @@ impl Scope<Variable> {
     }
 
     pub fn find_var(&self, name: &str) -> Option<&Variable> {
-        let start_frame = self.get_cur_frame_tag();
+        let start_frame = self.get_cur_frame().get_tag();
         let frames_to_check_var_for = self.frames_to_find_var_in();
         frames_to_check_var_for
             .iter()
@@ -325,11 +316,7 @@ impl Scope<Variable> {
 
     #[allow(unused)]
     pub fn find_func(&self, name: &str) -> Option<&Rc<dyn Command>> {
-        debug!(
-            "Finding cmd {} from {:?} on",
-            name,
-            self.get_cur_frame_tag()
-        );
+        debug!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
         self.find_var(name)
             .map(|var| var.val.as_command())
@@ -338,11 +325,7 @@ impl Scope<Variable> {
 
     #[allow(unused)]
     pub fn find_strct(&self, name: &str) -> Option<&Arc<RwLock<Strct>>> {
-        debug!(
-            "Finding cmd {} from {:?} on",
-            name,
-            self.get_cur_frame_tag()
-        );
+        debug!("Finding cmd {} from {:?} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
         self.find_var(name).map(|var| var.val.as_strct().unwrap())
     }
