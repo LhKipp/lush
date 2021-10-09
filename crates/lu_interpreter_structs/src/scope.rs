@@ -5,7 +5,12 @@ use log::debug;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use multimap::MultiMap;
 use parking_lot::RwLock;
-use std::{collections::HashMap, fmt, rc::Rc, sync::Arc};
+use std::{
+    collections::HashMap,
+    fmt::{self, Formatter},
+    rc::Rc,
+    sync::Arc,
+};
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
@@ -179,38 +184,6 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         debug!("Selecting parent frame");
         let cur_id = self.get_cur_frame_id();
         self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
-    }
-
-    pub fn fmt_as_string(&self) -> String {
-        if self.is_empty() {
-            return "Empty Scope".to_string();
-        }
-
-        let mut indent = 0;
-        let mut result = "\n".to_string();
-        for elem in self.root_id().traverse(&self.arena) {
-            match elem {
-                indextree::NodeEdge::Start(id) => {
-                    let is_selected = if id == self.cur_frame_id.unwrap() {
-                        "*"
-                    } else {
-                        ""
-                    };
-                    result = result
-                        + &format!(
-                            "{:indent$}{}{}\n",
-                            "",
-                            is_selected,
-                            self.tag_of(id),
-                            indent = indent
-                        );
-                    indent = indent + 4;
-                }
-                indextree::NodeEdge::End(_) => indent = indent - 4,
-            }
-        }
-
-        result
     }
 
     pub(crate) fn is_empty(&self) -> bool {
@@ -406,7 +379,34 @@ impl Scope<Variable> {
 }
 
 impl<T: fmt::Debug + 'static> fmt::Debug for Scope<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.fmt_as_string())
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        if self.is_empty() {
+            return write!(f, "Empty Scope");
+        }
+
+        let mut indent = 0;
+        write!(f, "\n")?;
+        for elem in self.root_id().traverse(&self.arena) {
+            match elem {
+                indextree::NodeEdge::Start(id) => {
+                    let is_selected = if id == self.cur_frame_id.unwrap() {
+                        "*"
+                    } else {
+                        ""
+                    };
+                    &write!(
+                        f,
+                        "{:indent$}{}{}\n",
+                        "",
+                        is_selected,
+                        self.tag_of(id),
+                        indent = indent
+                    )?;
+                    indent = indent + 4;
+                }
+                indextree::NodeEdge::End(_) => indent = indent - 4,
+            }
+        }
+        write!(f, "\n")
     }
 }
