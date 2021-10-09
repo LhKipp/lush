@@ -10,23 +10,16 @@ impl Evaluable for CmdStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
-        let possibl_longest_name = self.possible_longest_cmd_call_name();
-        let (cmd_parts_count, cmd): (usize, Rc<dyn Command>) =
-            if let Some((cmd_parts_count, callable)) = scope
-                .lock()
-                .find_cmd_with_longest_match(&possibl_longest_name)
-            {
-                (cmd_parts_count, callable.clone())
-            } else {
-                (
-                    1,
-                    RunExternalCmd::new(self.clone(), possibl_longest_name[0].clone()).rced(),
-                )
-            };
+        let cmd_name = self.get_cmd_name();
+        let cmd: Rc<dyn Command> = if let Some(cmd) = scope.lock().find_func(&cmd_name) {
+            cmd.clone()
+        } else {
+            RunExternalCmd::new(self.clone(), cmd_name).rced()
+        };
 
         debug!("Evaluating all cmd args");
         let mut arg_vals = vec![];
-        for arg in self.name_with_args().skip(cmd_parts_count) {
+        for arg in self.args() {
             arg_vals.push(arg.evaluate(scope)?);
         }
         debug!("Found {} cmd arguments", arg_vals.len());

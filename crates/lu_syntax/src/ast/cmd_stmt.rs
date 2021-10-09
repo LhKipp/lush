@@ -1,4 +1,4 @@
-use crate::{AstElementChildren, AstNode, AstToken};
+use crate::{AstNode, AstToken};
 
 use super::{support, BareWordToken, CmdStmtNode, ValueExprElement};
 
@@ -16,7 +16,14 @@ impl CmdStmtNode {
     }
 
     /// All arguments of this command. This does include the command name parts.
-    pub fn name_with_args(&self) -> AstElementChildren<ValueExprElement> {
-        support::element_children(self.syntax())
+    pub fn args(&self) -> impl Iterator<Item = ValueExprElement> + '_ {
+        support::element_children(self.syntax()).skip(1)
+    }
+
+    pub fn get_cmd_name(&self) -> String {
+        support::token_child::<BareWordToken>(self.syntax())
+            .unwrap()
+            .text()
+            .to_string()
     }
 }

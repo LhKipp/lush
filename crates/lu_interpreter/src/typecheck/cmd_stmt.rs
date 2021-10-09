@@ -24,15 +24,11 @@ impl TypeCheck for CmdStmtNode {
         debug!("Cur Scope Frame: {:?}", ty_state.scope.get_cur_frame());
         let possibl_longest_name = self.possible_longest_cmd_call_name();
         // Finding result type here
-        let ret_ty = if let Some((name_args_split_i, called_func)) =
-            ty_state.expect_callable_with_longest_name(&possibl_longest_name, self)
-        {
-            let args = self.name_with_args().skip(name_args_split_i);
-            ty_check_cmd_args(self, args, &called_func, ty_state);
-            called_func.ret_key.clone()
+        let ret_ty = if let Some(cmd) = ty_state.get_callable_from_var(&self.get_cmd_name()) {
+            let args = self.args();
+            ty_check_cmd_args(self, args, &cmd, ty_state);
+            ty_state.new_term_key_equated(self.to_item(), cmd.ret_key.clone())
         } else {
-            // TODO this is wrong
-            // External cmds return string
             ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
         };
 

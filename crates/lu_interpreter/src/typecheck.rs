@@ -4,8 +4,7 @@ use log::{debug, warn};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::PipelineStage;
-use lu_syntax::ast::{CmdStmtNode, SourceFileNode};
-use lu_syntax::AstNode;
+use lu_syntax::ast::SourceFileNode;
 use parking_lot::RwLock;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::collections::hash_map::Entry;
@@ -15,7 +14,7 @@ use std::sync::Arc;
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
-use crate::{Command, RunExternalCmd, Signature, Strct, ValueTypeErr};
+use crate::{Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -329,19 +328,28 @@ impl TyCheckState {
         }
     }
 
+    fn get_callable_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
+        self.get_tc_func(&key.clone())
+            .cloned()
+            .map(|tc_func| tc_func.substitute_generics(self))
+    }
+
+    pub fn get_callable_from_var(&mut self, var_name: &str) -> Option<TcFunc> {
+        self.get_key_of_var(var_name)
+            .map(|key| self.get_callable_from_key(key))
+            .flatten()
+    }
+
     /// Returns the strct behind key if key is a Strct. Records an error otherwise
     /// Therefore the user does not have to handle the None case
     fn expect_callable_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
-        let tc_callabl = self
-            .get_tc_func(&key.clone())
-            .cloned()
-            .map(|tc_func| tc_func.substitute_generics(self));
-
-        if tc_callabl.is_none() {
+        if let Some(cmd) = self.get_callable_from_key(key) {
+            Some(cmd)
+        } else {
             let key_item = self.get_item_of(&key).clone();
             self.push_err(TyErr::ItemExpectedToBeFunc(key_item).into());
+            None
         }
-        tc_callabl
     }
 
     /// Some if such a callable is found. None otherwise (and an error will be generated)
@@ -354,31 +362,6 @@ impl TyCheckState {
             self.expect_callable_from_key(var_key)
         } else {
             None
-        }
-    }
-
-    /// Some for internal and external cmds
-    pub(crate) fn expect_callable_with_longest_name(
-        &mut self,
-        possibl_longest_name: &[String],
-        caller_node: &CmdStmtNode,
-    ) -> Option<(usize, TcFunc)> {
-        if let Some((name_args_split_i, _)) = self
-            .scope
-            .find_var_with_longest_match(&possibl_longest_name)
-            .map(|(i, var)| (i, var.clone()))
-        {
-            let var_name = possibl_longest_name[0..name_args_split_i].join(" ");
-            self.expect_callable_from_var(&var_name, caller_node.to_item())
-                .map(|callabl| (name_args_split_i, callabl.clone()))
-        } else {
-            // Called cmd is not found --> It's prob an external cmd
-            let cmd_node = caller_node.clone();
-            let cmd_name = possibl_longest_name[0].clone();
-            Some((
-                1,
-                TcFunc::from_signature(&RunExternalCmd::new(cmd_node, cmd_name).signature(), self),
-            ))
         }
     }
 

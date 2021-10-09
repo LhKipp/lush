@@ -135,6 +135,11 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         cur_id.ancestors(&self.arena).last().unwrap()
     }
 
+    fn get_sf_frames_parent(&self) -> NodeId {
+        // All sf_frames are below the global_frame
+        self.root_id()
+    }
+
     /// Id must be valid. Panic otherwise!
     pub fn set_cur_frame_id(&mut self, id: ScopeFrameId) {
         assert!(self.arena.get(id).is_some());
@@ -295,48 +300,6 @@ impl Scope<Variable> {
     pub fn expect_strct(&self, name: &str, usage: SourceCodeItem) -> LuResult<&Arc<RwLock<Strct>>> {
         self.find_strct(name)
             .ok_or(AstErr::StrctNotInScope(usage).into())
-    }
-
-    /// Find the command, having the longest match with name_parts (where not every part of
-    /// name_parts has to be matched)
-    /// Example:
-    /// Stored cmd name: git add
-    /// name_parts:      git add my_file
-    /// will return (2, <git-add-cmd>)
-    // The call side can not necessarily distinguish between cmd name parts and arguments.
-    // Therefore we need to do some search here
-    pub fn find_cmd_with_longest_match(
-        &self,
-        name_parts: &[String],
-    ) -> Option<(usize, &Rc<dyn Command>)> {
-        let result = self
-            .find_var_with_longest_match(name_parts)
-            .map(|(i, var)| (i, var.val.as_command()));
-        if let Some((i, Some(callable))) = result {
-            Some((i, callable))
-        } else {
-            None
-        }
-    }
-
-    /// See find_cmd_with_longest_match
-    pub fn find_var_with_longest_match(&self, name_parts: &[String]) -> Option<(usize, &Variable)> {
-        assert!(name_parts.len() > 0);
-        // We try to find the longest matching subcommand here ...  Maybe we should use a trie as
-        // the internal datastructure
-        let mut result = None;
-        for i in 0..name_parts.len() {
-            let cmd_name = name_parts[0..i + 1].join(" ");
-            if let Some(func) = self.find_var(&cmd_name) {
-                result = Some((i + 1, func))
-            }
-        }
-        result
-    }
-
-    fn get_sf_frames_parent(&self) -> NodeId {
-        // All sf_frames are below the global_frame
-        self.root_id()
     }
 
     pub fn push_sf_frame(&mut self, frame: ScopeFrame<Variable>) {
