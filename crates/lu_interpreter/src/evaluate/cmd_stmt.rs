@@ -42,7 +42,7 @@ impl Evaluable for CmdStmtNode {
         debug!("{:?}", sign);
         for arg in &sign.args {
             debug!("{:?}", arg);
-            scope.lock().cur_mut_frame().insert_var(Variable::new(
+            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
                 arg.name.clone(),
                 arg_iter
                     .next()
@@ -51,7 +51,7 @@ impl Evaluable for CmdStmtNode {
             ));
         }
         if let Some(var_arg) = &sign.var_arg {
-            scope.lock().cur_mut_frame().insert_var(Variable::new(
+            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
                 var_arg.name.clone(),
                 Value::new_array(arg_iter.collect()),
                 VarDeclNode::CatchAll(var_arg.decl.clone()),

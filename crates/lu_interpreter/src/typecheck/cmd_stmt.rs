@@ -21,7 +21,7 @@ impl TypeCheck for CmdStmtNode {
         ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         debug!("Scope: {:?}", ty_state.scope);
-        debug!("Cur Scope Frame: {:?}", ty_state.scope.cur_frame());
+        debug!("Cur Scope Frame: {:?}", ty_state.scope.get_cur_frame());
         let possibl_longest_name = self.possible_longest_cmd_call_name();
         // Finding result type here
         let ret_ty = if let Some((name_args_split_i, called_func)) =

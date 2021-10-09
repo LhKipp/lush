@@ -8,7 +8,7 @@ impl Evaluable for PipedCmdsStmtNode {
             if let Some((prev_val, prev_val_decl)) = prev_val {
                 scope
                     .lock()
-                    .cur_mut_frame()
+                    .get_cur_frame_mut()
                     .insert_var(Variable::new_in(prev_val, prev_val_decl));
             }
             prev_val = Some((cmd.evaluate(scope)?, cmd.clone().into()))

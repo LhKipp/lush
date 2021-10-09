@@ -401,7 +401,7 @@ impl TyCheckState {
 
     /// Insert var var with ty ty
     fn insert_var(&mut self, var: Variable) -> TcKey {
-        self.scope.cur_mut_frame().insert_var(var.clone());
+        self.scope.get_cur_frame_mut().insert_var(var.clone());
         let key = self.new_term_key(var.decl.to_item());
         self.tc_var_table.insert(var, key.clone());
         key

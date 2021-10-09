@@ -122,18 +122,13 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         self.cur_frame_id = Some(id);
     }
 
-    pub fn cur_frame(&self) -> &ScopeFrame<T> {
-        self.arena
-            .get(self.cur_frame_id.expect("Scope is empty"))
-            .unwrap()
-            .get()
+    pub fn get_cur_frame(&self) -> &ScopeFrame<T> {
+        self.arena[self.get_cur_frame_id()].get()
     }
 
-    pub fn cur_mut_frame(&mut self) -> &mut ScopeFrame<T> {
-        self.arena
-            .get_mut(self.get_cur_frame_id())
-            .unwrap()
-            .get_mut()
+    pub fn get_cur_frame_mut(&mut self) -> &mut ScopeFrame<T> {
+        let id = self.get_cur_frame_id();
+        self.arena[id].get_mut()
     }
 
     pub fn global_mut_frame(&mut self) -> &mut ScopeFrame<T> {
@@ -151,7 +146,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         }
         self.cur_frame_id = Some(new_frame_id);
 
-        (new_frame_id, self.cur_mut_frame())
+        (new_frame_id, self.get_cur_frame_mut())
     }
 
     pub fn pop_frame(&mut self, expected: &ScopeFrameTag) {
