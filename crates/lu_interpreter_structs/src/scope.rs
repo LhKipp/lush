@@ -15,7 +15,7 @@ use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, Strct, UsePath, Value, Variable};
+use crate::{Command, Strct, UsePath, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner, is_enum_variant, Display)]
 pub enum ScopeFrameTag {
@@ -278,25 +278,6 @@ impl Scope<Variable> {
         None
     }
 
-    #[deprecated]
-    pub fn overwrite_var_value(&mut self, name: &str, new_value: Value) -> bool {
-        for frame_id in self.frames_to_find_var_in() {
-            let frame = self.arena[frame_id].get_mut();
-            if let Some(var) = frame.get_mut(name) {
-                debug!("Overwriting var {} with value: {:?}", name, new_value);
-                var.val = new_value;
-                return true;
-            }
-        }
-
-        debug!(
-            "Not Overwriting var {} with value: {:?}. Var not found!",
-            name, new_value
-        );
-        false
-    }
-
-    #[allow(unused)]
     pub fn find_func(&self, name: &str) -> Option<&Rc<dyn Command>> {
         debug!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
@@ -305,7 +286,6 @@ impl Scope<Variable> {
             .flatten()
     }
 
-    #[allow(unused)]
     pub fn find_strct(&self, name: &str) -> Option<&Arc<RwLock<Strct>>> {
         debug!("Finding cmd {} from {:?} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
