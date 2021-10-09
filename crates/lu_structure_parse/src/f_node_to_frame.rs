@@ -13,7 +13,7 @@ pub fn source_node_to_scope_frame(
 ) -> Outcome<ScopeFrame<Variable>> {
     let sourced_file = Outcome::ok(source_structures_from(source_node, source_f_name.clone()));
     sourced_file.map(|sourced_file| {
-        let mut frame = ScopeFrame::new(ScopeFrameTag::SourceFileFrame {
+        let mut frame = ScopeFrame::new(ScopeFrameTag::SFFrame {
             id: source_f_name,
             use_paths: sourced_file.use_paths,
         });

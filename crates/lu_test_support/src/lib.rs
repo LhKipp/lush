@@ -26,14 +26,11 @@ fn make_test_scope() -> Scope<Variable> {
     let mut scope = Scope::new();
     let (_, frame) = scope.push_frame(ScopeFrameTag::GlobalFrame);
     for cmd in cmds {
-        frame.insert(
+        frame.insert_var(Variable::new(
             cmd.name().to_string(),
-            Variable::new(
-                cmd.name().to_string(),
-                Value::new_func(cmd),
-                VarDeclNode::Dummy,
-            ),
-        )
+            Value::new_func(cmd),
+            VarDeclNode::Dummy,
+        ));
     }
     scope
 }

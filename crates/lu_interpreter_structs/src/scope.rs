@@ -19,7 +19,7 @@ pub enum ScopeFrameTag {
     GlobalFrame,
     /// Source File Frame with path of the source file
     #[display(fmt = "SFFrame {}", id)]
-    SourceFileFrame {
+    SFFrame {
         id: UsePath,
         use_paths: Vec<UsePath>,
     },
@@ -36,7 +36,7 @@ pub enum ScopeFrameTag {
 
 impl ScopeFrameTag {
     pub fn new_source_file_tag(id: UsePath, use_paths: Vec<UsePath>) -> Self {
-        Self::SourceFileFrame { id, use_paths }
+        Self::SFFrame { id, use_paths }
     }
 }
 
@@ -81,11 +81,6 @@ impl<Elem: fmt::Debug> ScopeFrame<Elem> {
 
     pub fn get_mut(&mut self, name: &str) -> Option<&mut Elem> {
         self.elems.get_mut(name)
-    }
-
-    pub fn insert(&mut self, key: String, var: Elem) {
-        debug!("Inserting into Scope {:?} with name {}", var, key);
-        self.elems.insert(key, var);
     }
 }
 
@@ -264,7 +259,7 @@ impl Scope<Variable> {
         if let Some(cur_frame_id) = self.cur_frame_id {
             cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
                 let frame = self.arena[n_id].get();
-                if frame.get_tag().as_source_file_frame().is_some() {
+                if frame.get_tag().as_sf_frame().is_some() {
                     Some(n_id)
                 } else {
                     None
@@ -279,7 +274,7 @@ impl Scope<Variable> {
         let mut frames_to_find_var_in = vec![];
         for frame in self.get_cur_frame_id().ancestors(&self.arena) {
             frames_to_find_var_in.push(frame);
-            if let Some((_, use_stmts)) = self.tag_of(frame).as_source_file_frame() {
+            if let Some((_, use_stmts)) = self.tag_of(frame).as_sf_frame() {
                 // TODO obay pub use paths (if it should land)
                 frames_to_find_var_in.extend(
                     use_stmts
@@ -409,7 +404,7 @@ impl Scope<Variable> {
     }
 
     pub fn push_sf_frame(&mut self, frame: ScopeFrame<Variable>) {
-        assert!(frame.get_tag().is_source_file_frame());
+        assert!(frame.get_tag().is_sf_frame());
         let sf_frames_parent = self.get_sf_frames_parent();
         let new_frame_id = self.arena.new_node(frame);
         sf_frames_parent.append(new_frame_id, &mut self.arena);
@@ -420,11 +415,7 @@ impl Scope<Variable> {
         sf_frames_parent
             .children(&self.arena)
             .filter(|sf_id| {
-                let (id, _) = self.arena[*sf_id]
-                    .get()
-                    .get_tag()
-                    .as_source_file_frame()
-                    .unwrap();
+                let (id, _) = self.arena[*sf_id].get().get_tag().as_sf_frame().unwrap();
                 id == path
             })
             .next()

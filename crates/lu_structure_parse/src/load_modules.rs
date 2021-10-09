@@ -26,7 +26,7 @@ pub fn load_mod_paths(
     let (id, use_paths) = all_frames[0]
         .get_tag()
         .clone()
-        .into_source_file_frame()
+        .into_sf_frame()
         .expect("Arg must be SourceFileFrame");
 
     let mut sourced_modules = HashSet::new();

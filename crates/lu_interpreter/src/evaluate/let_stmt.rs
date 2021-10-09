@@ -8,10 +8,11 @@ impl Evaluable for LetStmtNode {
 
         let val = val.evaluate(scope)?;
 
-        scope.lock().cur_mut_frame().insert(
-            var_name.to_string(),
-            Variable::new(var_name, val, VarDeclNode::LetStmt(self.clone())),
-        );
+        scope.lock().cur_mut_frame().insert_var(Variable::new(
+            var_name,
+            val,
+            VarDeclNode::LetStmt(self.clone()),
+        ));
 
         Ok(Value::Nil)
     }
