@@ -161,7 +161,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
             let cur_frame_tag = cur_frame.get().get_tag();
 
             debug!(
-                "Popping frame: {:?}, Expected: {:?}",
+                "Popping frame: {:?}, Expected: {?}",
                 cur_frame_tag, expected
             );
             assert_eq!(cur_frame_tag, expected);
@@ -176,12 +176,8 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 
     pub fn select_parent_frame(&mut self) {
         debug!("Selecting parent frame");
-        self.cur_frame_id = self
-            .cur_frame_id
-            .unwrap()
-            .ancestors(&self.arena)
-            .skip(1)
-            .next();
+        let cur_id = self.get_cur_frame_id();
+        self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
     }
 
     pub fn get_cur_frame_tag(&self) -> ScopeFrameTag {
