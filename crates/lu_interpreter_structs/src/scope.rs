@@ -144,7 +144,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
     }
 
     pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut ScopeFrame<T>) {
-        debug!("Pushing frame: {:?}", tag);
+        debug!("Pushing frame: {}", tag);
         let prev_frame_id = self.cur_frame_id;
         let new_frame_id = self.arena.new_node(ScopeFrame::new(tag));
         if let Some(prev_frame_id) = prev_frame_id {
@@ -160,10 +160,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
             let cur_frame = &self.arena[cur_frame_id];
             let cur_frame_tag = cur_frame.get().get_tag();
 
-            debug!(
-                "Popping frame: {:?}, Expected: {:?}",
-                cur_frame_tag, expected
-            );
+            debug!("Popping frame: {}, Expected: {}", cur_frame_tag, expected);
             assert_eq!(cur_frame_tag, expected);
 
             let parent_id = cur_frame.parent();
@@ -201,7 +198,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
                     };
                     result = result
                         + &format!(
-                            "{:indent$}{}{:?}\n",
+                            "{:indent$}{}{}\n",
                             "",
                             is_selected,
                             self.tag_of(id),
@@ -280,7 +277,7 @@ impl Scope<Variable> {
             })
             .tap(|result| {
                 debug!(
-                    "Result for find_var {} from start_frame {:?}: {:?}",
+                    "Result for find_var {} from start_frame {}: {:?}",
                     name, start_frame, result
                 )
             })
