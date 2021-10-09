@@ -33,8 +33,9 @@ pub enum ScopeFrameTag {
     /// Frame for evaluating cmd (with command-name)
     #[display(fmt = "CmdCallFrame {}", _0)]
     CmdCallFrame(String),
-    /// Fn Frame with name of fn
-    FnFrame(String),
+    /// Fn Frame allocated during TyC
+    #[display(fmt = "TyCFnFrame {}", _0)]
+    TyCFnFrame(String),
     ForStmtFrame,
     IfStmtFrame,
 }
@@ -192,18 +193,18 @@ impl<T: fmt::Debug + 'static> Scope<T> {
 }
 
 impl Scope<Variable> {
-    /// Returns the function, in which the current selected frame is.
+    /// Returns the command, in which the current selected frame is.
     pub fn get_cur_command(&self) -> Option<&Rc<dyn Command>> {
-        self.cur_frame_id
-            .map(|cur_frame_id| {
-                cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
-                    self.tag_of(n_id)
-                        .as_fn_frame()
-                        .map(|fn_name| self.find_func(fn_name))
-                })
-            })
-            .flatten()
-            .flatten()
+        let cur_id = self.get_cur_frame_id();
+        cur_id.ancestors(&self.arena).find_map(|n_id| {
+            let tag = self.arena[n_id].get().get_tag();
+            if let Some(func_name) = tag.as_ty_c_fn_frame().or_else(|| tag.as_cmd_call_frame()) {
+                self.find_func(func_name)
+                    .tap(|func| assert!(func.is_some(), "Cmd of CmdFrame has to be always found"))
+            } else {
+                None
+            }
+        })
     }
 
     #[allow(dead_code)]
