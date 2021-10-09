@@ -112,6 +112,10 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         }
     }
 
+    fn tag_of(&self, id: NodeId) -> &ScopeFrameTag {
+        self.arena[id].get().get_tag()
+    }
+
     pub fn get_cur_frame_id(&self) -> ScopeFrameId {
         self.cur_frame_id.unwrap()
     }
@@ -175,10 +179,6 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         debug!("Selecting parent frame");
         let cur_id = self.get_cur_frame_id();
         self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
-    }
-
-    fn tag_of(&self, id: NodeId) -> &ScopeFrameTag {
-        self.arena[id].get().get_tag()
     }
 
     pub fn fmt_as_string(&self) -> String {
