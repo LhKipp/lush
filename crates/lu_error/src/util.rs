@@ -35,6 +35,7 @@ impl<T> Outcome<T> {
     }
 }
 
+// TODO  From<T> for Outcome would be better...
 impl<T> From<(T, Vec<LuErr>)> for Outcome<T> {
     fn from((val, errs): (T, Vec<LuErr>)) -> Self {
         Outcome::new(val, errs)

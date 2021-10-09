@@ -39,6 +39,11 @@ impl UsePath {
             SourceCodeItem::tmp_todo_item(),
         )
     }
+
+    pub fn as_f_path(&self) -> PathBuf {
+        assert!(self.ty == UsePathVariant::PluginPath || self.ty == UsePathVariant::FilePath);
+        self.parts.join("/").into()
+    }
 }
 
 impl Display for UsePath {
