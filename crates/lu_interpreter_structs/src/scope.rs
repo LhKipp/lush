@@ -117,6 +117,10 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         }
     }
 
+    pub(crate) fn is_empty(&self) -> bool {
+        self.cur_frame_id.is_none()
+    }
+
     fn tag_of(&self, id: NodeId) -> &ScopeFrameTag {
         self.arena[id].get().get_tag()
     }
@@ -184,10 +188,6 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         debug!("Selecting parent frame");
         let cur_id = self.get_cur_frame_id();
         self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
-    }
-
-    pub(crate) fn is_empty(&self) -> bool {
-        self.cur_frame_id.is_none()
     }
 }
 
