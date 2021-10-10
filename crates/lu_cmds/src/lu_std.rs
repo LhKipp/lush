@@ -3,14 +3,14 @@ mod iter_funcs;
 mod test;
 
 use log::debug;
-use lu_interpreter_structs::{ScopeFrame, UsePath, UsePathVariant, Variable};
+use lu_interpreter_structs::{ModPath, ModPathVariant, ScopeFrame, Variable};
 
 pub use array::source_array_module;
 
 /// Source the module specified by path
 /// If no such module is found, a error is raised
-pub fn load_std_module(path: &UsePath) -> Vec<ScopeFrame<Variable>> {
-    assert!(path.ty == UsePathVariant::StdPath);
+pub fn load_std_module(path: &ModPath) -> Vec<ScopeFrame<Variable>> {
+    assert!(path.variant == ModPathVariant::StdPath);
     debug!("load_std_module: {}", path);
     if path.parts.len() == 1 {
         // Source all

@@ -6,7 +6,7 @@ use std::{
 
 use log::debug;
 use lu_error::util::Outcome;
-use lu_interpreter_structs::{ScopeFrame, UsePath, UsePathVariant, Variable};
+use lu_interpreter_structs::{ModPath, ModPathVariant, ScopeFrame, Variable};
 use lu_parser::grammar::SourceFileRule;
 use lu_syntax::{ast::SourceFileNode, Parse};
 use lu_text_util::SourceCode;
@@ -41,9 +41,9 @@ pub fn load_mod_paths(
                 continue;
             }
             debug!("Loading module: {}", use_path);
-            match use_path.ty {
-                UsePathVariant::StdPath => all_frames.extend((cfg.load_std_module)(&use_path)),
-                UsePathVariant::PluginPath => {
+            match use_path.variant {
+                ModPathVariant::StdPath => all_frames.extend((cfg.load_std_module)(&use_path)),
+                ModPathVariant::PluginPath => {
                     let plug_f_path = use_path.as_f_path();
                     let plug_f_path = cfg.plugin_dir.join(plug_f_path);
 
@@ -70,7 +70,7 @@ pub fn load_mod_paths(
                         }
                     }
                 }
-                UsePathVariant::FilePath => {
+                ModPathVariant::FilePath => {
                     todo!("Impl sourcing of files")
                 }
             }
@@ -86,7 +86,7 @@ pub fn load_mod_paths(
 
 pub struct LoadModulesConfig<'a> {
     /// Function for loading a std module
-    pub load_std_module: fn(&UsePath) -> Vec<ScopeFrame<Variable>>,
+    pub load_std_module: fn(&ModPath) -> Vec<ScopeFrame<Variable>>,
     pub plugin_dir: &'a Path,
     pub relative_include_path_start: PathBuf,
 }

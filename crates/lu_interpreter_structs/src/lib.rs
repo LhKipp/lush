@@ -17,7 +17,7 @@ mod variable;
 
 pub use command::Command;
 pub use scope::{Scope, ScopeFrame, ScopeFrameId, ScopeFrameState, ScopeFrameTag};
-pub use use_path::{UsePath, UsePathVariant};
+pub use use_path::{ModPath, ModPathVariant};
 pub use user_def_tys::*;
 pub use value::Value;
 pub use value_type::{ValueType, ValueTypeErr};

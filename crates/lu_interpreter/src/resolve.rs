@@ -4,7 +4,7 @@ mod block_stmt;
 mod source_file;
 mod test;
 use lu_cmds::load_std_module;
-use lu_interpreter_structs::UsePath;
+use lu_interpreter_structs::ModPath;
 use lu_structure_parse::{load_mod_paths, source_node_to_scope_frame, LoadModulesConfig};
 use std::fmt::Debug;
 use std::path::PathBuf;
@@ -83,7 +83,7 @@ impl Resolver {
 
         // Parsing happens in fs-path world
         // Resolving happens in UsePath world. Therefore we convert the f_path
-        let source_f_path = UsePath::new_start_path(source_f_path);
+        let source_f_path = ModPath::new_start_path(source_f_path);
 
         // Step 1: convert given file to frame
         let (source_f_frame, errs1) =

@@ -15,7 +15,7 @@ use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, Strct, UsePath, Variable};
+use crate::{Command, ModPath, Strct, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner, is_enum_variant, Display)]
 pub enum ScopeFrameTag {
@@ -25,8 +25,8 @@ pub enum ScopeFrameTag {
     /// Source File Frame with path of the source file
     #[display(fmt = "SFFrame {}", id)]
     SFFrame {
-        id: UsePath,
-        use_paths: Vec<UsePath>,
+        id: ModPath,
+        use_paths: Vec<ModPath>,
     },
 
     BlockFrame,
@@ -41,7 +41,7 @@ pub enum ScopeFrameTag {
 }
 
 impl ScopeFrameTag {
-    pub fn new_source_file_tag(id: UsePath, use_paths: Vec<UsePath>) -> Self {
+    pub fn new_source_file_tag(id: ModPath, use_paths: Vec<ModPath>) -> Self {
         Self::SFFrame { id, use_paths }
     }
 }
@@ -309,7 +309,7 @@ impl Scope<Variable> {
         sf_frames_parent.append(new_frame_id, &mut self.arena);
     }
 
-    fn get_id_of_sf_frame(&self, path: &UsePath) -> Option<NodeId> {
+    fn get_id_of_sf_frame(&self, path: &ModPath) -> Option<NodeId> {
         let sf_frames_parent = self.get_sf_frames_parent();
         sf_frames_parent
             .children(&self.arena)
@@ -320,7 +320,7 @@ impl Scope<Variable> {
             .next()
     }
 
-    pub fn select_sf_frame(&mut self, f_to_set: &UsePath) -> LuResult<()> {
+    pub fn select_sf_frame(&mut self, f_to_set: &ModPath) -> LuResult<()> {
         if let Some(sf_to_select) = self.get_id_of_sf_frame(f_to_set) {
             self.cur_frame_id = Some(sf_to_select);
             Ok(())

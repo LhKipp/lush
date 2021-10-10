@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{Command, Scope, UsePath, Value, ValueType, Variable};
+use crate::{Command, ModPath, Scope, Value, ValueType, Variable};
 use derive_builder::Builder;
 use derive_new::new;
 use lu_error::{LuResult, SourceCodeItem};
@@ -184,7 +184,7 @@ pub struct Function {
     pub captured_vars: Vec<Variable>,
 
     /// Set when function is inserted into scope
-    pub source_file_id: UsePath,
+    pub source_file_id: ModPath,
 }
 
 impl Function {
@@ -192,7 +192,7 @@ impl Function {
         name: String,
         signature: Signature,
         fn_node: FnStmtNode,
-        source_file_id: UsePath,
+        source_file_id: ModPath,
     ) -> Self {
         Self {
             name,

@@ -9,7 +9,7 @@ use lu_syntax::{
 /// No struct-types will be resolved (they are left as ValueType::StructName)
 pub fn source_node_to_scope_frame(
     source_node: &SourceFileNode,
-    source_f_name: UsePath,
+    source_f_name: ModPath,
 ) -> Outcome<ScopeFrame<Variable>> {
     let sourced_file = Outcome::ok(source_structures_from(source_node, source_f_name.clone()));
     sourced_file.map(|sourced_file| {
@@ -31,10 +31,10 @@ pub fn source_node_to_scope_frame(
 struct SourcedFile {
     strcts: Vec<Strct>,
     funcs: Vec<Function>,
-    use_paths: Vec<UsePath>,
+    use_paths: Vec<ModPath>,
 }
 
-fn source_structures_from(source_node: &SourceFileNode, source_node_id: UsePath) -> SourcedFile {
+fn source_structures_from(source_node: &SourceFileNode, source_node_id: ModPath) -> SourcedFile {
     let block = source_node.block().unwrap();
 
     // TODO source variables
@@ -58,7 +58,7 @@ fn source_structures_from(source_node: &SourceFileNode, source_node_id: UsePath)
     }
 }
 
-fn source_fn_stmt(fn_stmt: &FnStmtNode, source_file_id: UsePath) -> Function {
+fn source_fn_stmt(fn_stmt: &FnStmtNode, source_file_id: ModPath) -> Function {
     let name = fn_stmt.name().unwrap_or("".to_string());
     // Source the signature (either user provided or default)
     let sign = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
@@ -78,14 +78,14 @@ fn source_struct_stmt(struct_stmt: &StrctStmtNode) -> Strct {
     Strct::new(name, fields, struct_stmt.to_item())
 }
 
-fn source_use_stmt(use_stmt: &UseStmtNode) -> UsePath {
+fn source_use_stmt(use_stmt: &UseStmtNode) -> ModPath {
     let ty = if use_stmt.is_std_path() {
-        UsePathVariant::StdPath
+        ModPathVariant::StdPath
     } else if use_stmt.is_plugin_path() {
-        UsePathVariant::PluginPath
+        ModPathVariant::PluginPath
     } else {
         assert!(use_stmt.is_file_path());
-        UsePathVariant::FilePath
+        ModPathVariant::FilePath
     };
-    UsePath::new(use_stmt.parts(), ty, use_stmt.to_item())
+    ModPath::new(use_stmt.parts(), ty, use_stmt.to_item())
 }
