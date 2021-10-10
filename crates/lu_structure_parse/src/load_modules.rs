@@ -6,7 +6,7 @@ use std::{
 
 use log::debug;
 use lu_error::util::Outcome;
-use lu_interpreter_structs::{ModPath, ModPathVariant, ModuleInfo, ScopeFrame, Variable};
+use lu_interpreter_structs::{ModInfo, ModPath, ModPathVariant, ScopeFrame, Variable};
 use lu_text_util::SourceCode;
 use walkdir::WalkDir;
 
@@ -55,7 +55,7 @@ pub fn load_mod_paths(
                                 errs.push(e);
                             }
                             Ok(source_code) => {
-                                let (module, new_mod_err) = ModuleInfo::module_from_src(
+                                let (module, new_mod_err) = ModInfo::module_from_src(
                                     use_path.mod_path.clone(),
                                     source_code,
                                 )

@@ -15,7 +15,7 @@ use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, ModPath, ModuleInfo, Strct, Variable};
+use crate::{Command, ModInfo, ModPath, Strct, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner, is_enum_variant, Display)]
 pub enum ScopeFrameTag {
@@ -24,7 +24,7 @@ pub enum ScopeFrameTag {
     GlobalFrame,
     /// Source File Frame with path of the source file
     #[display(fmt = "Module {}", _0)]
-    ModuleFrame(ModuleInfo),
+    ModuleFrame(ModInfo),
 
     BlockFrame,
     /// Frame for evaluating cmd (with command-name)

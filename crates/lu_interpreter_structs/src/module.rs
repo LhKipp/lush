@@ -12,7 +12,7 @@ use lu_text_util::SourceCode;
 use std::fmt::Display;
 
 #[derive(Clone, Debug, Eq)]
-pub struct ModuleInfo {
+pub struct ModInfo {
     pub id: ModPath,
     pub src: SourceCode,
     /// Some for regular modules, None for rust-std-modules
@@ -20,9 +20,9 @@ pub struct ModuleInfo {
     pub use_paths: Vec<UsePath>,
 }
 
-impl ModuleInfo {
-    pub fn new_std_module(id: ModPath, src: SourceCode, use_paths: Vec<UsePath>) -> ModuleInfo {
-        ModuleInfo {
+impl ModInfo {
+    pub fn new_std_module(id: ModPath, src: SourceCode, use_paths: Vec<UsePath>) -> ModInfo {
+        ModInfo {
             id,
             src,
             node: None,
@@ -31,19 +31,19 @@ impl ModuleInfo {
     }
 }
 
-impl Display for ModuleInfo {
+impl Display for ModInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.id)
     }
 }
 
-impl PartialEq for ModuleInfo {
+impl PartialEq for ModInfo {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
-impl ModuleInfo {
+impl ModInfo {
     /// Convert a SourceFileNode to a ScopeFrame representation.
     /// No struct-types will be resolved (they are left as ValueType::StructName)
     pub fn module_from_src(mod_path: ModPath, src: SourceCode) -> Outcome<ScopeFrame<Variable>> {

@@ -18,7 +18,7 @@ pub fn source_array_module(mod_path: &[String]) -> Vec<ScopeFrame<Variable>> {
         vec!["std".to_string(), "array".to_string()],
         ModPathVariant::StdPath,
     );
-    let modi = ModuleInfo::new_std_module(mod_path, source_code, vec![]);
+    let modi = ModInfo::new_std_module(mod_path, source_code, vec![]);
 
     let cmds: Vec<Rc<dyn Command>> = vec_rc![ArrayPushCmd::new()];
     let mut frame = ScopeFrame::new(ScopeFrameTag::ModuleFrame(modi));

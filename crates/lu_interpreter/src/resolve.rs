@@ -1,7 +1,7 @@
 mod test;
 use lu_cmds::load_std_module;
+use lu_interpreter_structs::ModInfo;
 use lu_interpreter_structs::ModPath;
-use lu_interpreter_structs::ModuleInfo;
 use lu_structure_parse::{load_mod_paths, LoadModulesConfig};
 use std::fmt::Debug;
 use std::rc::Rc;
@@ -58,7 +58,7 @@ impl Resolver {
 
         // Step 1: convert given file to frame
         let (source_f_frame, errs1) =
-            ModuleInfo::module_from_source_node(source_file, source_f_path.clone(), src).split();
+            ModInfo::module_from_source_node(source_file, source_f_path.clone(), src).split();
         // Step 2: load all modules required by a (start)-frame (recursive)
         // TODO get pwd from scope
         let pwd = std::env::var("PWD").unwrap().into();
