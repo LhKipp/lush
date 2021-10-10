@@ -11,6 +11,7 @@ pub mod util;
 
 #[macro_use]
 extern crate derive_new;
+extern crate derive_more;
 extern crate strum_macros;
 
 pub use ast_err::*;
@@ -72,6 +73,8 @@ impl From<AstErr> for LuErr {
 
 /// An item in the source code to be used in the `Error` enum.
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
+// use derive_more::Display;
+// #[display(fmt = "{}/{:?}..{:?}", content, range.start() as 32, range.end() as 32)]
 pub struct SourceCodeItem {
     pub content: String,
     pub range: TextRange,

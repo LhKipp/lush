@@ -628,6 +628,7 @@ dependencies = [
  "lu_syntax",
  "lu_syntax_elements",
  "lu_test_support",
+ "lu_text_util",
  "once_cell",
  "parking_lot",
  "pretty_env_logger",
@@ -653,6 +654,8 @@ version = "0.1.0"
 dependencies = [
  "codespan-reporting",
  "derive-new",
+ "derive_more",
+ "educe",
  "serde",
  "strum",
  "strum_macros",
@@ -874,6 +877,8 @@ dependencies = [
 name = "lu_text_util"
 version = "0.1.0"
 dependencies = [
+ "derive-new",
+ "educe",
  "lu_error",
  "lu_fs",
 ]

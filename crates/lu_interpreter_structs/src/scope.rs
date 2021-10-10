@@ -15,7 +15,7 @@ use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, ModPath, Strct, Variable};
+use crate::{Command, ModPath, ModuleInfo, Strct, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner, is_enum_variant, Display)]
 pub enum ScopeFrameTag {
@@ -23,11 +23,8 @@ pub enum ScopeFrameTag {
 
     GlobalFrame,
     /// Source File Frame with path of the source file
-    #[display(fmt = "SFFrame {}", id)]
-    SFFrame {
-        id: ModPath,
-        use_paths: Vec<ModPath>,
-    },
+    #[display(fmt = "Module {}", _0)]
+    ModuleFrame(ModuleInfo),
 
     BlockFrame,
     /// Frame for evaluating cmd (with command-name)
@@ -40,11 +37,7 @@ pub enum ScopeFrameTag {
     IfStmtFrame,
 }
 
-impl ScopeFrameTag {
-    pub fn new_source_file_tag(id: ModPath, use_paths: Vec<ModPath>) -> Self {
-        Self::SFFrame { id, use_paths }
-    }
-}
+impl ScopeFrameTag {}
 
 #[derive(Debug, Clone)]
 pub enum ScopeFrameState {
@@ -217,7 +210,7 @@ impl Scope<Variable> {
         if let Some(cur_frame_id) = self.cur_frame_id {
             cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
                 let frame = self.arena[n_id].get();
-                if frame.get_tag().as_sf_frame().is_some() {
+                if frame.get_tag().as_module_frame().is_some() {
                     Some(n_id)
                 } else {
                     None
@@ -232,12 +225,12 @@ impl Scope<Variable> {
         let mut frames_to_find_var_in = vec![];
         for frame in self.get_cur_frame_id().ancestors(&self.arena) {
             frames_to_find_var_in.push(frame);
-            if let Some((_, use_stmts)) = self.tag_of(frame).as_sf_frame() {
+            if let Some(modi) = self.tag_of(frame).as_module_frame() {
                 // TODO obay pub use paths (if it should land)
                 frames_to_find_var_in.extend(
-                    use_stmts
+                    modi.use_paths
                         .iter()
-                        .map(|path| self.get_id_of_sf_frame(path).unwrap()),
+                        .map(|path| self.get_nid_of_sf_frame(&path.mod_path).unwrap()),
                 )
             }
         }
@@ -303,25 +296,29 @@ impl Scope<Variable> {
     }
 
     pub fn push_sf_frame(&mut self, frame: ScopeFrame<Variable>) {
-        assert!(frame.get_tag().is_sf_frame());
+        assert!(frame.get_tag().is_module_frame());
         let sf_frames_parent = self.get_sf_frames_parent();
         let new_frame_id = self.arena.new_node(frame);
         sf_frames_parent.append(new_frame_id, &mut self.arena);
     }
 
-    fn get_id_of_sf_frame(&self, path: &ModPath) -> Option<NodeId> {
+    fn get_nid_of_sf_frame(&self, path: &ModPath) -> Option<NodeId> {
         let sf_frames_parent = self.get_sf_frames_parent();
         sf_frames_parent
             .children(&self.arena)
             .filter(|sf_id| {
-                let (id, _) = self.arena[*sf_id].get().get_tag().as_sf_frame().unwrap();
-                id == path
+                let modi = self.arena[*sf_id]
+                    .get()
+                    .get_tag()
+                    .as_module_frame()
+                    .unwrap();
+                modi.id == *path
             })
             .next()
     }
 
     pub fn select_sf_frame(&mut self, f_to_set: &ModPath) -> LuResult<()> {
-        if let Some(sf_to_select) = self.get_id_of_sf_frame(f_to_set) {
+        if let Some(sf_to_select) = self.get_nid_of_sf_frame(f_to_set) {
             self.cur_frame_id = Some(sf_to_select);
             Ok(())
         } else {

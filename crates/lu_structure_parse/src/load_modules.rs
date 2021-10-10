@@ -6,13 +6,9 @@ use std::{
 
 use log::debug;
 use lu_error::util::Outcome;
-use lu_interpreter_structs::{ModPath, ModPathVariant, ScopeFrame, Variable};
-use lu_parser::grammar::SourceFileRule;
-use lu_syntax::{ast::SourceFileNode, Parse};
+use lu_interpreter_structs::{ModPath, ModPathVariant, ModuleInfo, ScopeFrame, Variable};
 use lu_text_util::SourceCode;
 use walkdir::WalkDir;
-
-use crate::source_node_to_scope_frame;
 
 /// Load all modules required by the given ScopeFrame, and the modules required by the
 /// included modules, and the modules required by these, ... (recursive)
@@ -23,28 +19,30 @@ pub fn load_mod_paths(
     let mut all_frames = vec![start_frame];
     let mut errs = vec![];
 
-    let (id, use_paths) = all_frames[0]
+    let modi = all_frames[0]
         .get_tag()
         .clone()
-        .into_sf_frame()
+        .into_module_frame()
         .expect("Arg must be SourceFileFrame");
 
     let mut sourced_modules = HashSet::new();
-    sourced_modules.insert(id);
+    sourced_modules.insert(modi.id);
 
-    let mut paths_to_source = use_paths;
+    let mut paths_to_source = modi.use_paths;
 
     loop {
         // replace to mutate paths_to_source in for loop
         for use_path in replace(&mut paths_to_source, vec![]) {
-            if sourced_modules.contains(&use_path) {
+            if sourced_modules.contains(&use_path.mod_path) {
                 continue;
             }
             debug!("Loading module: {}", use_path);
-            match use_path.variant {
-                ModPathVariant::StdPath => all_frames.extend((cfg.load_std_module)(&use_path)),
+            match use_path.mod_path.variant {
+                ModPathVariant::StdPath => {
+                    all_frames.extend((cfg.load_std_module)(&use_path.mod_path))
+                }
                 ModPathVariant::PluginPath => {
-                    let plug_f_path = use_path.as_f_path();
+                    let plug_f_path = use_path.mod_path.as_f_path();
                     let plug_f_path = cfg.plugin_dir.join(plug_f_path);
 
                     debug!("Loading plug-mod: {:?}", plug_f_path);
@@ -57,11 +55,9 @@ pub fn load_mod_paths(
                                 errs.push(e);
                             }
                             Ok(source_code) => {
-                                let parse = Parse::rule(source_code, &SourceFileRule {});
-                                assert!(parse.errors.is_empty()); // TODO make it a outcome
-                                let (module, new_mod_err) = source_node_to_scope_frame(
-                                    &parse.cast::<SourceFileNode>().unwrap(),
-                                    use_path.clone(),
+                                let (module, new_mod_err) = ModuleInfo::module_from_src(
+                                    use_path.mod_path.clone(),
+                                    source_code,
                                 )
                                 .split();
                                 errs.extend(new_mod_err);
@@ -74,7 +70,7 @@ pub fn load_mod_paths(
                     todo!("Impl sourcing of files")
                 }
             }
-            sourced_modules.insert(use_path);
+            sourced_modules.insert(use_path.mod_path);
         }
         if paths_to_source.is_empty() {
             break; // No more work

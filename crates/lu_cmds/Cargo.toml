@@ -10,6 +10,7 @@ lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs"
 lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
+lu_text_util = { version = "0.1.0", path = "../lu_text_util" }
 
 vec_rc = { version = "0.1.0", path = "../vec_rc" }
 

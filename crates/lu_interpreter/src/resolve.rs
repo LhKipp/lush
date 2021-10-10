@@ -1,51 +1,21 @@
-#![allow(unused_imports)]
-
-mod block_stmt;
-mod source_file;
 mod test;
 use lu_cmds::load_std_module;
 use lu_interpreter_structs::ModPath;
-use lu_structure_parse::{load_mod_paths, source_node_to_scope_frame, LoadModulesConfig};
+use lu_interpreter_structs::ModuleInfo;
+use lu_structure_parse::{load_mod_paths, LoadModulesConfig};
 use std::fmt::Debug;
-use std::path::PathBuf;
+use std::rc::Rc;
 use std::sync::Arc;
-use std::{collections::HashMap, rc::Rc};
 
-use log::debug;
 use parking_lot::Mutex;
-use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 
-use lu_error::{LuErr, TyErr};
-use lu_pipeline_stage::ErrorContainer;
+use lu_error::LuErr;
 use lu_pipeline_stage::PipelineStage;
-use lu_syntax::ast::{CmdStmtNode, SourceFileNode, ValuePathExprNode};
+use lu_syntax::ast::SourceFileNode;
 use lu_syntax::Parse;
-use lu_syntax_elements::BlockType;
 
 use crate::visit_arg::VisitArg;
-use crate::{FlagSignature, Function, InterpreterCfg, Scope, Variable};
-use crate::{ScopeFrameTag, ValueType};
-
-pub trait Resolve: Debug {
-    fn do_resolve_dependant_names(&self, args: &[ResolveArg], resolver: &mut Resolver);
-
-    fn resolve_dependant_names(&self, resolver: &mut Resolver) {
-        self.resolve_dependant_names_with_args(&[], resolver)
-    }
-
-    fn resolve_dependant_names_with_args(&self, args: &[ResolveArg], resolver: &mut Resolver) {
-        debug!("Resolving dependant names in: {:?}({:?})", self, args);
-        let result = self.do_resolve_dependant_names(args, resolver);
-        debug!(
-            "Result of resolving dependant names: {:?}({:?}): {:?}",
-            self,
-            args,
-            // TODO better debug stmt
-            resolver
-        );
-        result
-    }
-}
+use crate::{InterpreterCfg, Scope, Variable};
 
 #[derive(Educe)]
 #[educe(Debug)]
@@ -80,6 +50,7 @@ impl Resolver {
     pub(crate) fn resolve(&mut self) {
         let source_file = self.get_start_parse().cast::<SourceFileNode>().unwrap();
         let source_f_path = &self.get_start_parse().source.path;
+        let src = self.get_start_parse().source.clone();
 
         // Parsing happens in fs-path world
         // Resolving happens in UsePath world. Therefore we convert the f_path
@@ -87,7 +58,7 @@ impl Resolver {
 
         // Step 1: convert given file to frame
         let (source_f_frame, errs1) =
-            source_node_to_scope_frame(&source_file, source_f_path.clone()).split();
+            ModuleInfo::module_from_source_node(source_file, source_f_path.clone(), src).split();
         // Step 2: load all modules required by a (start)-frame (recursive)
         // TODO get pwd from scope
         let pwd = std::env::var("PWD").unwrap().into();
