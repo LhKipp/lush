@@ -1,20 +1,18 @@
-use std::{
-    collections::HashSet,
-    mem::replace,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashSet, mem::replace};
 
 use log::debug;
 use lu_error::util::Outcome;
-use lu_interpreter_structs::{ModInfo, ModPath, ModPathVariant, ScopeFrame, Variable};
+use lu_interpreter_structs::{ModInfo, ModPathVariant, ScopeFrame, Variable};
 use lu_text_util::SourceCode;
 use walkdir::WalkDir;
+
+use crate::LoadModulesConfig;
 
 /// Load all modules required by the given ScopeFrame, and the modules required by the
 /// included modules, and the modules required by these, ... (recursive)
 pub fn load_mod_paths(
     start_frame: ScopeFrame<Variable>,
-    cfg: LoadModulesConfig,
+    cfg: &LoadModulesConfig,
 ) -> Outcome<Vec<ScopeFrame<Variable>>> {
     let mut all_frames = vec![start_frame];
     let mut errs = vec![];
@@ -39,7 +37,7 @@ pub fn load_mod_paths(
             debug!("Loading module: {}", use_path);
             match use_path.mod_path.variant {
                 ModPathVariant::StdPath => {
-                    all_frames.extend((cfg.load_std_module)(&use_path.mod_path))
+                    all_frames.extend((cfg.load_std_module_func)(&use_path.mod_path))
                 }
                 ModPathVariant::PluginPath => {
                     let plug_f_path = use_path.mod_path.as_f_path();
@@ -55,11 +53,8 @@ pub fn load_mod_paths(
                                 errs.push(e);
                             }
                             Ok(source_code) => {
-                                let (module, new_mod_err) = ModInfo::module_from_src(
-                                    use_path.mod_path.clone(),
-                                    source_code,
-                                )
-                                .split();
+                                let (module, new_mod_err) =
+                                    ModInfo::module_from_src(source_code, cfg.plugin_dir).split();
                                 errs.extend(new_mod_err);
                                 all_frames.push(module);
                             }
@@ -78,11 +73,4 @@ pub fn load_mod_paths(
     }
 
     Outcome::ok(all_frames)
-}
-
-pub struct LoadModulesConfig<'a> {
-    /// Function for loading a std module
-    pub load_std_module: fn(&ModPath) -> Vec<ScopeFrame<Variable>>,
-    pub plugin_dir: &'a Path,
-    pub relative_include_path_start: PathBuf,
 }

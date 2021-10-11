@@ -1,5 +1,9 @@
 use derive_more::Display;
-use std::{fmt::Display, path::PathBuf};
+use lu_text_util::{SourceCode, SourceCodeVariant};
+use std::{
+    fmt::Display,
+    path::{Path, PathBuf},
+};
 
 use lu_error::SourceCodeItem;
 use lu_syntax_elements::constants::MOD_PATH_FILE_SEP;
@@ -10,6 +14,16 @@ pub enum ModPathVariant {
     StdPath,
     PluginPath,
     FilePath,
+}
+
+impl From<SourceCodeVariant> for ModPathVariant {
+    fn from(v: SourceCodeVariant) -> Self {
+        match v {
+            SourceCodeVariant::StdCode => ModPathVariant::StdPath,
+            SourceCodeVariant::PluginCode => ModPathVariant::PluginPath,
+            SourceCodeVariant::FileCode => ModPathVariant::FilePath,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Hash, new, Display)]
@@ -45,6 +59,22 @@ impl ModPath {
             self.variant == ModPathVariant::PluginPath || self.variant == ModPathVariant::FilePath
         );
         self.parts.join("/").into()
+    }
+
+    pub fn from_src_code(src: &SourceCode, plugin_dir: &Path) -> Self {
+        let normalized_path = src
+            .path
+            .strip_prefix(plugin_dir) // If src is a plugin, we remove the plugin_dir prefix (works better with use paths)
+            .unwrap_or(src.path.as_ref());
+        let parts = normalized_path
+            .to_string_lossy()
+            .split("/")
+            .map(ToString::to_string)
+            .collect();
+
+        let variant = src.src_variant(plugin_dir).into();
+
+        Self::new(parts, variant)
     }
 }
 

@@ -1,7 +1,6 @@
 extern crate derive_more;
 #[macro_use]
 extern crate derive_new;
-#[macro_use]
 extern crate educe;
 
 mod evaluate;

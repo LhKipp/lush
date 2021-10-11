@@ -4,7 +4,6 @@ use log::{debug, warn};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_pipeline_stage::PipelineStage;
-use lu_syntax::ast::SourceFileNode;
 use parking_lot::RwLock;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::collections::hash_map::Entry;
@@ -13,7 +12,7 @@ use std::iter;
 use std::sync::Arc;
 use std::{collections::HashMap, fmt::Debug};
 
-use crate::{visit_arg::VisitArg, FlagSignature, Resolver, Scope, ValueType, Variable};
+use crate::{visit_arg::VisitArg, FlagSignature, Scope, ValueType, Variable};
 use crate::{Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
@@ -29,9 +28,6 @@ mod test;
 mod value_path_expr;
 
 pub struct TyCheckState {
-    /// Input from previous stage
-    pub resolve: Resolver,
-
     /// A TcKey (TermCheckKey) always refers to a node in the ast
     // We keep track of the node for error formatting reasons. Therefore a SourceCodeItem
     // is enough
@@ -50,20 +46,18 @@ pub struct TyCheckState {
     /// Final result of typechecking
     pub ty_table: HashMap<TcKey, ValueType>,
 
-    pub errors: Vec<LuErr>,
+    errors: Vec<LuErr>,
 
     /// The final result of this ty
     pub result: Option<ValueType>,
 
-    scope: Scope<Variable>,
+    pub scope: Scope<Variable>,
     checker: VarlessTypeChecker<ValueType>,
 }
 
 impl TyCheckState {
-    pub fn new(resolve: Resolver) -> Self {
-        let scope = resolve.scope.lock().clone();
+    pub fn new(scope: Scope<Variable>) -> Self {
         Self {
-            resolve,
             scope,
             checker: VarlessTypeChecker::new(),
             errors: Vec::new(),
@@ -78,18 +72,8 @@ impl TyCheckState {
         }
     }
 
-    pub fn typecheck(&mut self) {
-        let source_file = self
-            .resolve
-            .get_start_parse()
-            .cast::<SourceFileNode>()
-            .unwrap();
-        let source_f_path = self.resolve.get_start_parse().source.path.clone();
-
-        let ret_key = source_file.typecheck_with_args(
-            &[TypeCheckArg::Arg(VisitArg::SourceFilePath(source_f_path))],
-            self,
-        );
+    pub fn typecheck(&mut self, node: impl TypeCheck) {
+        let ret_key = node.typecheck(self);
 
         match self.checker.clone().type_check() {
             Ok(t) => {
@@ -246,6 +230,7 @@ impl TyCheckState {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn as_result(self) -> LuResults<TyCheckState> {
         if self.failed() {
             Err(self.collect_all_errors())
@@ -405,7 +390,7 @@ impl TyCheckState {
 
 impl PipelineStage for TyCheckState {
     fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
-        Some(&self.resolve)
+        None
     }
 
     fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {
@@ -416,6 +401,7 @@ impl PipelineStage for TyCheckState {
         &self.errors
     }
 }
+
 #[derive(Debug, Clone, new)]
 pub struct TcStrct {
     /// Key of this strct decl. (used to get SourceCodeItem from tc_expr_table)
@@ -672,23 +658,3 @@ pub trait TypeCheck: Display {
         result
     }
 }
-
-// // TODO remove this. Its broken. Sometimes this is an error sometimes its not
-// impl<T: TypeCheck> TypeCheck for Option<T> {
-//     fn do_typecheck(&self, args: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
-//         match self {
-//             Some(n) => n.typecheck_with_args(args, ty_state),
-//             None => {
-//                 // We have an incomplete Ast here. We should not generate an error
-//                 let key = ty_state.checker.new_term_key();
-//                 // TODO check whether Error is fine here. Should be as error should not generate
-//                 // further erorrs
-//                 ty_state
-//                     .checker
-//                     .impose(key.concretizes_explicit(ValueType::Error))
-//                     .expect("New key can always be conretizised");
-//                 Some(key)
-//             }
-//         }
-//     }
-// }

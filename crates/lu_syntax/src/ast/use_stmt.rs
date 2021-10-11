@@ -1,7 +1,7 @@
 use crate::ast::UsePathElement;
-use crate::{AstElement, AstElementChildren, AstNode, AstToken};
+use crate::{AstElement, AstElementChildren, AstNode};
 
-use super::{support, BareWordToken, UseStmtNode};
+use super::{support, FileNameNode, UseStmtNode};
 
 impl UseStmtNode {
     pub fn is_std_path(&self) -> bool {
@@ -22,11 +22,11 @@ impl UseStmtNode {
                 .unwrap_or(false)
     }
     pub fn parts(&self) -> Vec<String> {
-        support::token_children::<BareWordToken>(self.syntax())
-            .iter()
-            .map(|t| t.text().to_string())
+        support::node_children::<FileNameNode>(self.syntax())
+            .map(|n| n.text())
             .collect()
     }
+
     pub fn path(&self) -> AstElementChildren<UsePathElement> {
         support::element_children(self.syntax())
     }

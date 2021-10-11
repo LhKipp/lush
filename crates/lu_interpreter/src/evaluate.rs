@@ -5,7 +5,6 @@ use log::debug;
 use lu_error::{LuErr, LuResult};
 use lu_interpreter_structs::Value;
 use lu_pipeline_stage::PipelineStage;
-use lu_syntax::ast::SourceFileNode;
 use parking_lot::Mutex;
 
 use crate::{Scope, TyCheckState, Variable};
@@ -78,19 +77,28 @@ pub struct Evaluator {
 
 impl Evaluator {
     pub fn new(ty_state: TyCheckState) -> Self {
-        let scope = ty_state.resolve.scope.clone();
+        let scope = ty_state.scope.clone();
         Self {
             ty_state,
-            scope,
+            scope: Arc::new(Mutex::new(scope)),
             errors: Vec::new(),
             result: None,
         }
     }
 
     pub fn evaluate(&mut self) {
-        let node = self.ty_state.resolve.parses[0]
-            .cast::<SourceFileNode>()
+        // TODO pass node and only eval that
+        let node = self
+            .scope
+            .lock()
+            .get_cur_frame()
+            .get_tag()
+            .as_module_frame()
+            .cloned()
+            .unwrap()
+            .node
             .unwrap();
+
         let lu_result = Self::eval_result_to_lu_result(node.evaluate(&mut self.scope));
         match lu_result {
             Ok(v) => self.result = Some(v),

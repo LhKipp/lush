@@ -1779,6 +1779,33 @@ impl Display for StrctFieldNameToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct FileNameNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for FileNameNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FileName }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for FileNameNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for FileNameNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct SourceFileNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2614,7 +2641,7 @@ impl Display for TableExprNode {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum UsePathElement {
-    BareWord(BareWordToken),
+    FileName(FileNameNode),
     DoublePoint(DoublePointToken),
     DivSign(DivSignToken),
     }
@@ -2629,7 +2656,7 @@ impl AstElement for UsePathElement {
         
         
         match kind{
-            BareWord | DoublePoint | DivSign => true,
+            FileName | DoublePoint | DivSign => true,
             _ => false,
         }
     }
@@ -2639,7 +2666,7 @@ impl AstElement for UsePathElement {
         
         
         let res = match syntax.kind() {
-            BareWord => UsePathElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            FileName => UsePathElement::FileName(FileNameNode { syntax: syntax.into_node().unwrap() }),
             DoublePoint => UsePathElement::DoublePoint(DoublePointToken { syntax: syntax.into_token().unwrap() }),
             DivSign => UsePathElement::DivSign(DivSignToken { syntax: syntax.into_token().unwrap() }),
             _ => return None,
@@ -2650,7 +2677,7 @@ impl AstElement for UsePathElement {
     fn syntax(&self) -> SyntaxElement {
         match self {
             
-            UsePathElement::BareWord(it) => it.syntax.clone().into(),
+            UsePathElement::FileName(it) => it.syntax.clone().into(),
             
             
             UsePathElement::DoublePoint(it) => it.syntax.clone().into(),
@@ -2664,7 +2691,7 @@ impl AstElement for UsePathElement {
 impl HasSyntaxKind for UsePathElement{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
-            UsePathElement::BareWord(it) => it.get_syntax_kind(),
+            UsePathElement::FileName(it) => it.get_syntax_kind(),
             UsePathElement::DoublePoint(it) => it.get_syntax_kind(),
             UsePathElement::DivSign(it) => it.get_syntax_kind(),
             }

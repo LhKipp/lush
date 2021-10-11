@@ -1,6 +1,6 @@
 use std::iter::FromIterator;
 
-use crate::LuErr;
+use crate::{LuErr, LuResults};
 
 pub struct Outcome<T> {
     pub val: T,
@@ -8,6 +8,11 @@ pub struct Outcome<T> {
 }
 
 impl<T> Outcome<T> {
+    /// Map and accumulate errors
+    pub fn map_flattened<U, F: FnOnce(T) -> Outcome<U>>(self, f: F) -> Outcome<U> {
+        self.map(f).flatten()
+    }
+
     pub fn map<U, F: FnOnce(T) -> U>(self, f: F) -> Outcome<U> {
         Outcome {
             val: f(self.val),
@@ -35,10 +40,28 @@ impl<T> Outcome<T> {
     }
 }
 
+impl<T> Outcome<Outcome<T>> {
+    pub fn flatten(mut self) -> Outcome<T> {
+        let (val, inner_errs) = self.val.split();
+        self.errs.extend(inner_errs);
+        Outcome::new(val, self.errs)
+    }
+}
+
 // TODO  From<T> for Outcome would be better...
 impl<T> From<T> for Outcome<T> {
     fn from(val: T) -> Self {
         Outcome::ok(val)
+    }
+}
+
+impl<T> Into<LuResults<T>> for Outcome<T> {
+    fn into(self) -> LuResults<T> {
+        if self.errs.is_empty() {
+            Ok(self.val)
+        } else {
+            Err(self.errs)
+        }
     }
 }
 

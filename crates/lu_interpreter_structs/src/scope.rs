@@ -155,16 +155,20 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         frame
     }
 
-    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut ScopeFrame<T>) {
-        debug!("Pushing frame: {}", tag);
+    pub fn push_frame_(&mut self, frame: ScopeFrame<T>) -> (ScopeFrameId, &mut ScopeFrame<T>) {
+        debug!("Pushing frame: {}", frame.tag);
         let prev_frame_id = self.cur_frame_id;
-        let new_frame_id = self.arena.new_node(ScopeFrame::new(tag));
+        let new_frame_id = self.arena.new_node(frame);
         if let Some(prev_frame_id) = prev_frame_id {
             prev_frame_id.append(new_frame_id, &mut self.arena);
         }
         self.cur_frame_id = Some(new_frame_id);
 
         (new_frame_id, self.get_cur_frame_mut())
+    }
+
+    pub fn push_frame(&mut self, tag: ScopeFrameTag) -> (ScopeFrameId, &mut ScopeFrame<T>) {
+        self.push_frame_(ScopeFrame::new(tag))
     }
 
     pub fn pop_frame(&mut self, expected: &ScopeFrameTag) {
@@ -303,6 +307,7 @@ impl Scope<Variable> {
     }
 
     fn get_nid_of_sf_frame(&self, path: &ModPath) -> Option<NodeId> {
+        debug!("get_nid_of_sf_frame({})", path);
         let sf_frames_parent = self.get_sf_frames_parent();
         sf_frames_parent
             .children(&self.arena)

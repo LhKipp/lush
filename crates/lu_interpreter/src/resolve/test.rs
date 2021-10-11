@@ -24,7 +24,7 @@ mod tests {
         let mut itprtr = make_test_interpreter_in_playground(playground);
         let eval_result = itprtr.eval(SourceCode::new_text(
             r#"
-                use plugin1
+                use plugin1:plugin1_f1.lu
                 plugin1_f1
             "#
             .to_string(),

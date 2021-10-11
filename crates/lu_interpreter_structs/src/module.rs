@@ -9,7 +9,7 @@ use lu_syntax::{
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
-use std::fmt::Display;
+use std::{fmt::Display, path::Path};
 
 #[derive(Clone, Debug, Eq)]
 pub struct ModInfo {
@@ -46,19 +46,22 @@ impl PartialEq for ModInfo {
 impl ModInfo {
     /// Convert a SourceFileNode to a ScopeFrame representation.
     /// No struct-types will be resolved (they are left as ValueType::StructName)
-    pub fn module_from_src(mod_path: ModPath, src: SourceCode) -> Outcome<ScopeFrame<Variable>> {
-        let parse = Parse::rule(src.clone(), &SourceFileRule {});
-        let source_node = parse.cast::<SourceFileNode>().unwrap();
-        assert!(parse.errors.is_empty()); // TODO make it a outcome
+    pub fn module_from_src(src: SourceCode, plugin_dir: &Path) -> Outcome<ScopeFrame<Variable>> {
+        let parse = Parse::rule(src, &SourceFileRule {});
+        parse.map_flattened(|parse| Self::module_from_parse(parse, plugin_dir))
+    }
 
-        Self::module_from_source_node(source_node, mod_path, src)
+    pub fn module_from_parse(parse: Parse, plugin_dir: &Path) -> Outcome<ScopeFrame<Variable>> {
+        assert!(parse.is_sf_parse());
+        let self_mod_path = ModPath::from_src_code(&parse.source, plugin_dir);
+        Self::module_from_sf_node(self_mod_path, parse.source_file_node(), parse.source)
     }
 
     /// Convert a SourceFileNode to a ScopeFrame representation.
     /// No struct-types will be resolved (they are left as ValueType::StructName)
-    pub fn module_from_source_node(
-        source_node: SourceFileNode,
+    pub fn module_from_sf_node(
         mod_id: ModPath,
+        source_node: SourceFileNode,
         src: SourceCode,
     ) -> Outcome<ScopeFrame<Variable>> {
         let sourced_file = Outcome::ok(Self::source_structures_from(&source_node, mod_id.clone()));

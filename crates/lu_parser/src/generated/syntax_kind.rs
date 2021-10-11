@@ -120,11 +120,12 @@ pub enum SyntaxKind {
     LongFlag,
     #[regex("-[_a-zA-Z]+[_a-zA-Z0-9]*")]
     ShortFlag,
-    #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)")]
+    #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)", priority = 3)]
     Number,
     #[regex("[A-Z]+[_a-zA-Z0-9]")]
     StrctName,
     StrctFieldName,
+    FileName,
     SourceFile,
     StrctStmt,
     UseStmt,
@@ -230,6 +231,7 @@ impl SyntaxKind{
             SyntaxKind::Number => "Number",
             SyntaxKind::StrctName => "StrctName",
             SyntaxKind::StrctFieldName => "StrctFieldName",
+            SyntaxKind::FileName => "FileName",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::StrctStmt => "StrctStmt",
             SyntaxKind::UseStmt => "UseStmt",

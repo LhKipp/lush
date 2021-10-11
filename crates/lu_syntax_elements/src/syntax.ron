@@ -73,10 +73,12 @@ Config(
     ( name: "LongFlag"                   , regex: "--[_a-zA-Z]+[_a-zA-Z0-9]*"           , is_token: true   , ) ,
     ( name: "ShortFlag"                  , regex: "-[_a-zA-Z]+[_a-zA-Z0-9]*"            , is_token: true   , ) ,
 
-    ( name: "Number"                     , regex: "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" , is_token: true   , ) ,
+    ( name: "Number"                     , regex: "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" ,priority: Some(3) /* To beat FileName */, is_token: true   , ) ,
 
     ( name: "StrctName"                 , regex: "[A-Z]+[_a-zA-Z0-9]" , is_token: true   , ),
     ( name: "StrctFieldName"            , is_token: true                               , )                ,
+
+    ( name: "FileName"                   , is_node: true                                , has_rule: false   , ) ,
 
     // === RULES ===
     ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
@@ -110,7 +112,7 @@ Config(
     ( name: "TableExpr"                  , is_node: true                                , has_rule: true   , ) ,
     // === GENERIC META NODES === 
     ( name: "UsePath", is_generic: true, has_rule: false, represents_element_names: [
-        "BareWord",
+        "FileName",
         "DoublePoint",
         "DivSign",
         ],),
