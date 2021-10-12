@@ -1,6 +1,7 @@
 pub mod ast;
 mod build_tree;
 mod syntax_node;
+mod test;
 
 use ast::SourceFileNode;
 use build_tree::TreeBuilder;

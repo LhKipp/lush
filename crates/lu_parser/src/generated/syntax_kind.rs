@@ -79,10 +79,18 @@ pub enum SyntaxKind {
     BiggerThanSign,
     #[token(">=")]
     BiggerOrEqualSign,
-    #[token("=")]
-    AssignSign,
     #[token(">>")]
     RightStream,
+    #[token("/=")]
+    DivAssignSign,
+    #[token("*=")]
+    MulAssignSign,
+    #[token("+=")]
+    AddAssignSign,
+    #[token("-=")]
+    MinAssignSign,
+    #[token("=")]
+    AssignSign,
     #[token("|")]
     Pipe,
     #[token("$")]
@@ -204,8 +212,12 @@ impl SyntaxKind{
             SyntaxKind::InequalitySign => "InequalitySign",
             SyntaxKind::BiggerThanSign => "BiggerThanSign",
             SyntaxKind::BiggerOrEqualSign => "BiggerOrEqualSign",
-            SyntaxKind::AssignSign => "AssignSign",
             SyntaxKind::RightStream => "RightStream",
+            SyntaxKind::DivAssignSign => "DivAssignSign",
+            SyntaxKind::MulAssignSign => "MulAssignSign",
+            SyntaxKind::AddAssignSign => "AddAssignSign",
+            SyntaxKind::MinAssignSign => "MinAssignSign",
+            SyntaxKind::AssignSign => "AssignSign",
             SyntaxKind::Pipe => "Pipe",
             SyntaxKind::Dollar => "Dollar",
             SyntaxKind::QuestionMark => "QuestionMark",
@@ -308,8 +320,12 @@ macro_rules! T {
     [!=] => {$crate::SyntaxKind::InequalitySign };
     [>] => {$crate::SyntaxKind::BiggerThanSign };
     [>=] => {$crate::SyntaxKind::BiggerOrEqualSign };
-    [=] => {$crate::SyntaxKind::AssignSign };
     [>>] => {$crate::SyntaxKind::RightStream };
+    [/=] => {$crate::SyntaxKind::DivAssignSign };
+    [*=] => {$crate::SyntaxKind::MulAssignSign };
+    [+=] => {$crate::SyntaxKind::AddAssignSign };
+    [-=] => {$crate::SyntaxKind::MinAssignSign };
+    [=] => {$crate::SyntaxKind::AssignSign };
     [|] => {$crate::SyntaxKind::Pipe };
     [$] => {$crate::SyntaxKind::Dollar };
     [?] => {$crate::SyntaxKind::QuestionMark };

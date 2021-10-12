@@ -5,12 +5,6 @@ use super::{
     StringExprNode, ValueExprElement,
 };
 
-// impl MathExprNode {
-//     pub fn value(&self) -> Value {
-//         todo!()
-//     }
-// }
-
 impl NumberExprNode {
     pub fn value(&self) -> f64 {
         support::token_child::<NumberToken>(self.syntax())

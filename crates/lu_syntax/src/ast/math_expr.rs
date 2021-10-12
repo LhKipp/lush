@@ -13,9 +13,11 @@ impl MathExprNode {
 
     pub fn rhs(&self) -> Option<ValueExprElement> {
         // TODO CHECK Is this always working?
-        support::element_children(self.syntax()).skip(1).next() }
+        support::element_children(self.syntax()).skip(1).next()
+    }
 
-    pub fn operator(&self) -> Option<OperatorExprElement> {
-        support::element_child(self.syntax())
+    pub fn operator(&self) -> OperatorExprElement {
+        // Always some by parsing
+        support::element_child(self.syntax()).unwrap()
     }
 }

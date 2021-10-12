@@ -25,7 +25,7 @@ function print_yaml
 end
 
 function print_json
-    echo $argv | jq
+    echo $argv | jq | sed 's/\\\n/\n/g' | sed 's/\\\"/"/g'
 end
 
 argparse --ignore-unknown 'input' -- $argv
@@ -44,4 +44,7 @@ if string match --quiet --regex "^{" -- $val
 else if string match --quiet --regex "^-" -- $val
     print_yaml $val
     $copy_to_clip && print_yaml $val | xsel --input -b
+else if string match --quiet --regex "^tree" -- $val
+    echo $val | sed 's/\\\n/\n/g' | sed 's/\\\"/"/g'
 end
+

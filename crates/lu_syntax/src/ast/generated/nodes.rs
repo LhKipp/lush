@@ -1050,33 +1050,6 @@ impl Display for BiggerOrEqualSignToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct AssignSignToken {
-    pub(crate) syntax: SyntaxToken,
-}
-impl AstToken for AssignSignToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::AssignSign }
-    fn cast(syntax: SyntaxToken) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxToken { &self.syntax }
-}
-impl HasSyntaxKind for AssignSignToken{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        self.syntax().kind()
-    }
-}
-
-impl Display for AssignSignToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RightStreamToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -1098,6 +1071,141 @@ impl HasSyntaxKind for RightStreamToken{
 }
 
 impl Display for RightStreamToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct DivAssignSignToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for DivAssignSignToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::DivAssignSign }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for DivAssignSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for DivAssignSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct MulAssignSignToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for MulAssignSignToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MulAssignSign }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for MulAssignSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for MulAssignSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct AddAssignSignToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for AddAssignSignToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::AddAssignSign }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for AddAssignSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for AddAssignSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct MinAssignSignToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for MinAssignSignToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::MinAssignSign }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for MinAssignSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for MinAssignSignToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct AssignSignToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for AssignSignToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::AssignSign }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for AssignSignToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for AssignSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }
@@ -3067,8 +3175,12 @@ pub enum OperatorExprElement {
     InequalitySign(InequalitySignToken),
     BiggerThanSign(BiggerThanSignToken),
     BiggerOrEqualSign(BiggerOrEqualSignToken),
-    AssignSign(AssignSignToken),
     RightStream(RightStreamToken),
+    DivAssignSign(DivAssignSignToken),
+    MulAssignSign(MulAssignSignToken),
+    AddAssignSign(AddAssignSignToken),
+    MinAssignSign(MinAssignSignToken),
+    AssignSign(AssignSignToken),
     }
 
 impl OperatorExprElement {
@@ -3089,12 +3201,20 @@ impl AstElement for OperatorExprElement {
         
         
         
+        
+        
+        
+        
         match kind{
-            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | AssignSign | RightStream => true,
+            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | RightStream | DivAssignSign | MulAssignSign | AddAssignSign | MinAssignSign | AssignSign => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
         
         
         
@@ -3119,8 +3239,12 @@ impl AstElement for OperatorExprElement {
             InequalitySign => OperatorExprElement::InequalitySign(InequalitySignToken { syntax: syntax.into_token().unwrap() }),
             BiggerThanSign => OperatorExprElement::BiggerThanSign(BiggerThanSignToken { syntax: syntax.into_token().unwrap() }),
             BiggerOrEqualSign => OperatorExprElement::BiggerOrEqualSign(BiggerOrEqualSignToken { syntax: syntax.into_token().unwrap() }),
-            AssignSign => OperatorExprElement::AssignSign(AssignSignToken { syntax: syntax.into_token().unwrap() }),
             RightStream => OperatorExprElement::RightStream(RightStreamToken { syntax: syntax.into_token().unwrap() }),
+            DivAssignSign => OperatorExprElement::DivAssignSign(DivAssignSignToken { syntax: syntax.into_token().unwrap() }),
+            MulAssignSign => OperatorExprElement::MulAssignSign(MulAssignSignToken { syntax: syntax.into_token().unwrap() }),
+            AddAssignSign => OperatorExprElement::AddAssignSign(AddAssignSignToken { syntax: syntax.into_token().unwrap() }),
+            MinAssignSign => OperatorExprElement::MinAssignSign(MinAssignSignToken { syntax: syntax.into_token().unwrap() }),
+            AssignSign => OperatorExprElement::AssignSign(AssignSignToken { syntax: syntax.into_token().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -3159,10 +3283,22 @@ impl AstElement for OperatorExprElement {
             OperatorExprElement::BiggerOrEqualSign(it) => it.syntax.clone().into(),
             
             
-            OperatorExprElement::AssignSign(it) => it.syntax.clone().into(),
-            
-            
             OperatorExprElement::RightStream(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::DivAssignSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::MulAssignSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::AddAssignSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::MinAssignSign(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::AssignSign(it) => it.syntax.clone().into(),
             
             }
     }
@@ -3180,8 +3316,12 @@ impl HasSyntaxKind for OperatorExprElement{
             OperatorExprElement::InequalitySign(it) => it.get_syntax_kind(),
             OperatorExprElement::BiggerThanSign(it) => it.get_syntax_kind(),
             OperatorExprElement::BiggerOrEqualSign(it) => it.get_syntax_kind(),
-            OperatorExprElement::AssignSign(it) => it.get_syntax_kind(),
             OperatorExprElement::RightStream(it) => it.get_syntax_kind(),
+            OperatorExprElement::DivAssignSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::MulAssignSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::AddAssignSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::MinAssignSign(it) => it.get_syntax_kind(),
+            OperatorExprElement::AssignSign(it) => it.get_syntax_kind(),
             }
     }
 }

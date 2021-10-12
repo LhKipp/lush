@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
 use std::iter::FromIterator;
 
 use crate::{LuErr, LuResults};
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Outcome<T> {
     pub val: T,
     pub errs: Vec<LuErr>,
@@ -37,6 +39,11 @@ impl<T> Outcome<T> {
             Ok(v) => Outcome::ok(v),
             Err(e) => Outcome::new(default, vec![e]),
         }
+    }
+
+    pub fn unwrap(self) -> T {
+        assert!(self.errs.is_empty());
+        self.val
     }
 }
 

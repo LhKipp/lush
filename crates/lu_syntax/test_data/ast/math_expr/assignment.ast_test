@@ -1,0 +1,51 @@
+1
+===
+$var = 1
+---
+tree = """
+
+SourceFileNode {
+    syntax: SourceFile@0..8
+      BlockStmt@0..8
+        MathExpr@0..8
+          ValuePathExpr@0..4
+            Dollar@0..1 \"$\"
+            BareWord@1..4 \"var\"
+          Whitespace@4..5 \" \"
+          AssignSign@5..6 \"=\"
+          Whitespace@6..7 \" \"
+          NumberExpr@7..8
+            Number@7..8 \"1\"
+    ,
+}
+"""
+...
+Assignment to math_expr
+===
+$var = 1 + 1
+---
+tree = """
+
+SourceFileNode {
+    syntax: SourceFile@0..12
+      BlockStmt@0..12
+        MathExpr@0..12
+          ValuePathExpr@0..4
+            Dollar@0..1 "$"
+            BareWord@1..4 "var"
+          Whitespace@4..5 " "
+          AssignSign@5..6 "="
+          Whitespace@6..7 " "
+          MathExpr@7..12
+            NumberExpr@7..8
+              Number@7..8 "1"
+            Whitespace@8..9 " "
+            PlusSign@9..10 "+"
+            Whitespace@10..11 " "
+            NumberExpr@11..12
+              Number@11..12 "1"
+    ,
+}
+"""
+...
+

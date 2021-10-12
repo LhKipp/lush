@@ -35,6 +35,7 @@ fn next_op(p: &mut Parser) -> (u8, SyntaxKind) {
     const NOT_AN_OP: (u8, SyntaxKind)  = (0, Error);
     let next_token = p.next_non(CMT_NL_WS);
     let result = match next_token {
+        // Left associative
         T![>=]                        => (5,  T![>=]),
         T![>]                         => (5,  T![>]),
         T![==]                        => (5,  T![==]),
@@ -45,6 +46,13 @@ fn next_op(p: &mut Parser) -> (u8, SyntaxKind) {
         T![/]                         => (11, T![/]),
         T![*]                         => (11, T![*]),
         T![-]                         => (10, T![-]),
+        // Right associative ops
+        T![=]                         => (1, T![=]),
+        T![+=]                        => (1, T![+=]),
+        T![-=]                        => (1, T![-=]),
+        T![/=]                        => (1, T![/=]),
+        T![*=]                        => (1, T![*=]),
+
         _                             => NOT_AN_OP
     };
     if result != NOT_AN_OP{
