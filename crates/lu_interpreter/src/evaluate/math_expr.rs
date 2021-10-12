@@ -9,12 +9,10 @@ impl Evaluable for MathExprNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         let lhs = self.lhs().unwrap();
         let rhs = self.rhs().unwrap();
-        let op = self.operator().unwrap();
-
         let lhs = lhs.evaluate(scope)?;
         let rhs = rhs.evaluate(scope)?;
 
-        match op {
+        match self.operator() {
             OperatorExprElement::PlusSign(_) => return eval_plus_sign(lhs, rhs),
             OperatorExprElement::MinusSign(_) => return eval_minus_sign(lhs, rhs),
             OperatorExprElement::MultSign(_) => return eval_mult_sign(lhs, rhs),
@@ -29,6 +27,10 @@ impl Evaluable for MathExprNode {
             }
             OperatorExprElement::AssignSign(_) => return eval_assign_sign(lhs, rhs),
             OperatorExprElement::RightStream(_) => return eval_right_stream(lhs, rhs),
+            OperatorExprElement::DivAssignSign(_) => todo!(),
+            OperatorExprElement::MulAssignSign(_) => todo!(),
+            OperatorExprElement::AddAssignSign(_) => todo!(),
+            OperatorExprElement::MinAssignSign(_) => todo!(),
         }
     }
 }

@@ -30,8 +30,9 @@ impl Rule for LetStmtRule {
         if p.eat_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);
         }
-        p.expect_after(T![=], CMT_NL_WS);
-        cmd_or_value_expr_rule().parse(p);
+        if p.eat_after(T![=], CMT_NL_WS) {
+            cmd_or_value_expr_rule().parse(p);
+        }
         Some(m.complete(p, LetStmt))
     }
 }

@@ -1,0 +1,38 @@
+Assignment to same type works
+===
+let x:num
+$x = 1
+---
+{
+  "Ok": null
+}
+...
+Assignment to wrong type gives error
+===
+let x:num
+$x = "Err"
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "let x:num",
+            "range": [
+              0,
+              9
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "\"Err\"",
+            "range": [ 15, 20 ]
+          },
+          "rhs_ty": "str"
+        }
+      }
+    }
+  ]
+}
+...

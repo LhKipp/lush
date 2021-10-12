@@ -16,7 +16,7 @@ impl TypeCheck for ValueExprElement {
         match self {
             ValueExprElement::BareWord(n) => n.typecheck(state),
             ValueExprElement::NumberExpr(n) => n.typecheck(state),
-            ValueExprElement::MathExpr(_) => todo!(),
+            ValueExprElement::MathExpr(n) => n.typecheck(state),
             ValueExprElement::StringExpr(n) => n.typecheck(state),
             ValueExprElement::ValuePathExpr(n) => n.typecheck(state),
             ValueExprElement::ArrayExpr(n) => n.typecheck(state),

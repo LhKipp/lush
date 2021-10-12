@@ -20,6 +20,7 @@ mod cmd_stmt;
 mod expr;
 mod fn_stmt;
 mod let_stmt;
+mod math_expr;
 mod piped_cmds_stmt;
 mod ret_stmt;
 mod source_file;
