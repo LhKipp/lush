@@ -106,7 +106,7 @@ impl Evaluator {
         }
     }
 
-    pub fn lu_result_to_eval_result(result: LuResult<Value>) -> Result<Value, RetValOrErr> {
+    pub fn lu_result_to_eval_result<T>(result: LuResult<T>) -> Result<T, RetValOrErr> {
         result.map_err(|e| e.into())
     }
 

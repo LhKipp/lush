@@ -280,6 +280,15 @@ impl Scope<Variable> {
         None
     }
 
+    pub fn expect_var_mut(
+        &mut self,
+        var_name: &str,
+        usage: SourceCodeItem,
+    ) -> LuResult<&mut Variable> {
+        self.find_var_mut(var_name)
+            .ok_or(AstErr::VarNotInScope(usage).into())
+    }
+
     pub fn find_func(&self, name: &str) -> Option<&Rc<dyn Command>> {
         debug!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name

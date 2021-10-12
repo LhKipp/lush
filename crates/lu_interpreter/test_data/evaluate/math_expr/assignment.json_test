@@ -1,0 +1,12 @@
+Assignment updates value
+===
+let x = 1
+$x = 2
+$x
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...
