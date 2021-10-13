@@ -11,8 +11,8 @@ echo "hi" | echo 123
 - Token: "StringContent (len: 2)"
 - Token: "DoubleQuote (len: 1)"
 - Finish: ""
-- Token: "Whitespace (len: 1)"
 - Finish: ""
+- Token: "Whitespace (len: 1)"
 - Token: "Pipe (len: 1)"
 - Token: "Whitespace (len: 1)"
 - Start: CmdStmt

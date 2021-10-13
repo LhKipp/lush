@@ -48,11 +48,7 @@ use itertools::Itertools;
 use log::debug;
 use vec_box::vec_box;
 
-use crate::{
-    parser::{CompletedMarker, Parser},
-    token_set::TokenSet,
-    SyntaxKind::{self, *},
-};
+use crate::{SyntaxKind::{self, *}, parser::{CMT_NL_WS, CompletedMarker, Parser}, token_set::TokenSet};
 
 pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;
@@ -97,9 +93,17 @@ pub trait Rule {
 
     /// Parse this rule. If it doesn't match a error event will be generated
     fn parse(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        debug!("Parsing {:?}", self.name());
+        debug!(
+            "Parsing {} at token {:?}",
+            self.name(),
+            p.next_non(CMT_NL_WS)
+        );
         let result = self.parse_rule(p);
-        debug!("Finished Parsing {:?}, Result: {:?}", self.name(), result);
+        debug!(
+            "Finished Parsing {}, Now at {:?}",
+            self.name(),
+            p.next_non(CMT_NL_WS)
+        );
         result
     }
 }
@@ -143,7 +147,7 @@ impl Rule for OrRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         if let Some(rule) = self.rules.iter().find(|rule| rule.matches(p)) {
             debug!("OrRule {}: Parsing rule {}", self.name(), rule.name());
-            rule.parse_rule(p)
+            rule.parse(p)
         } else {
             p.error(format!(
                 "Expected {}, but found {:?}",

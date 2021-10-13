@@ -74,3 +74,20 @@ echo 1 + 2 * 3
 - Finish: "" 
 - Finish: "" 
 ...
+push cmd
+===
+push [] 1
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Start: ArrayExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+...

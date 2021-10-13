@@ -7,13 +7,16 @@ use super::{
 };
 
 impl MathExprNode {
-    pub fn lhs(&self) -> Option<ValueExprElement> {
-        support::element_child(self.syntax())
+    pub fn lhs(&self) -> ValueExprElement {
+        support::element_child(self.syntax()).unwrap()
     }
 
-    pub fn rhs(&self) -> Option<ValueExprElement> {
+    pub fn rhs(&self) -> ValueExprElement {
         // TODO CHECK Is this always working?
-        support::element_children(self.syntax()).skip(1).next()
+        support::element_children(self.syntax())
+            .skip(1)
+            .next()
+            .unwrap()
     }
 
     pub fn operator(&self) -> OperatorExprElement {

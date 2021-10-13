@@ -98,6 +98,7 @@ fn expr_bp(p: &mut Parser, bp: u8) -> Option<CompletedMarker> {
 }
 
 fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
+    // TODO shouldn't this be a simple parse?
     value_expr_rule().opt(p)
 }
 
@@ -109,8 +110,8 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(ValuePathExprRule {}),
             Box::new(StringExprRule {}),
             Box::new(StrctCtorExprRule {}),
-            Box::new(BareWord),
             Box::new(table_or_array_rule()),
+            Box::new(BareWord),
         ],
     }
 }

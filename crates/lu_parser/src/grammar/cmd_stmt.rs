@@ -1,3 +1,5 @@
+use log::debug;
+
 use super::{expr::ValueExprRule, Rule};
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
@@ -18,7 +20,22 @@ impl Rule for CmdStmtRule {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
         //consume all ws delimited cmd's and arguments
-        while p.eat(&[BareWord, Whitespace]) || { ValueExprRule {}.opt(p).is_some() } {}
+        let arg_rule = ValueExprRule {};
+        loop {
+            debug!("CmdStmtRule checking for arg or cmd_name");
+            let next_token = p.next_non(Whitespace);
+            if next_token == Eof || next_token == Newline {
+                break;
+            }
+            if p.eat_after(BareWord, Whitespace) {
+                continue;
+            } else if arg_rule.opt(p).is_some() {
+                continue;
+            } else {
+                debug!("Breaking cmd stmt");
+                break;
+            }
+        }
         Some(m.complete(p, CmdStmt))
     }
 }
