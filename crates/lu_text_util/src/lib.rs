@@ -52,9 +52,9 @@ impl SourceCode {
     }
 }
 
-impl From<String> for SourceCode {
-    fn from(s: String) -> Self {
-        SourceCode::new_text(s)
+impl<S: Into<String>> From<S> for SourceCode {
+    fn from(s: S) -> Self {
+        SourceCode::new_text(s.into())
     }
 }
 

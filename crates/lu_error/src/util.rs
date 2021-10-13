@@ -45,6 +45,11 @@ impl<T> Outcome<T> {
         assert!(self.errs.is_empty());
         self.val
     }
+
+    pub fn expect(self, msg: &'static str) -> T {
+        assert!(self.errs.is_empty(), "{}", msg);
+        self.val
+    }
 }
 
 impl<T> Outcome<Outcome<T>> {

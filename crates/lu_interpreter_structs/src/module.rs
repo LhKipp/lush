@@ -46,15 +46,25 @@ impl PartialEq for ModInfo {
 impl ModInfo {
     /// Convert a SourceFileNode to a ScopeFrame representation.
     /// No struct-types will be resolved (they are left as ValueType::StructName)
-    pub fn module_from_src(src: SourceCode, plugin_dir: &Path) -> Outcome<ScopeFrame<Variable>> {
+    ///
+    /// The mod_id does not necessarily have to correspond to the src.path. However if it does,
+    /// one can use module_from_file_src
+    pub fn module_from_src(src: SourceCode, mod_id: ModPath) -> Outcome<ScopeFrame<Variable>> {
         let parse = Parse::rule(src, &SourceFileRule {});
-        parse.map_flattened(|parse| Self::module_from_parse(parse, plugin_dir))
+        parse.map_flattened(|parse| Self::module_from_parse(parse, mod_id))
     }
 
-    pub fn module_from_parse(parse: Parse, plugin_dir: &Path) -> Outcome<ScopeFrame<Variable>> {
+    pub fn module_from_file_src(
+        src: SourceCode,
+        plugin_dir: &Path,
+    ) -> Outcome<ScopeFrame<Variable>> {
+        let self_mod_path = ModPath::from_src_code(&src, plugin_dir);
+        Self::module_from_src(src, self_mod_path)
+    }
+
+    pub fn module_from_parse(parse: Parse, mod_id: ModPath) -> Outcome<ScopeFrame<Variable>> {
         assert!(parse.is_sf_parse());
-        let self_mod_path = ModPath::from_src_code(&parse.source, plugin_dir);
-        Self::module_from_sf_node(self_mod_path, parse.source_file_node(), parse.source)
+        Self::module_from_sf_node(mod_id, parse.source_file_node(), parse.source)
     }
 
     /// Convert a SourceFileNode to a ScopeFrame representation.

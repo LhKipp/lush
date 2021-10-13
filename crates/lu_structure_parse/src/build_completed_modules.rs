@@ -10,14 +10,8 @@ pub fn modules_from_start_parse(
     cfg: &LoadModulesConfig,
 ) -> Outcome<(ModPath, Vec<ScopeFrame<Variable>>)> {
     // Step 1: convert given parse to frame
-    let start_mod = ModInfo::module_from_parse(start_parse, cfg.plugin_dir);
-    let start_mod_path = start_mod
-        .val
-        .get_tag()
-        .as_module_frame()
-        .unwrap()
-        .id
-        .clone();
+    let start_mod_path = ModPath::from_src_code(&start_parse.source, cfg.plugin_dir);
+    let start_mod = ModInfo::module_from_parse(start_parse, start_mod_path.clone());
 
     // Step 2: load all modules required by a (start)-frame (recursive)
     let modules = start_mod.map_flattened(|start_mod| load_mod_paths(start_mod, cfg));

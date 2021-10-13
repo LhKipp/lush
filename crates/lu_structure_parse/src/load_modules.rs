@@ -54,7 +54,8 @@ pub fn load_mod_paths(
                             }
                             Ok(source_code) => {
                                 let (module, new_mod_err) =
-                                    ModInfo::module_from_src(source_code, cfg.plugin_dir).split();
+                                    ModInfo::module_from_file_src(source_code, cfg.plugin_dir)
+                                        .split();
                                 errs.extend(new_mod_err);
                                 all_frames.push(module);
                             }
