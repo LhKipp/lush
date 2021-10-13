@@ -1,3 +1,5 @@
+use lu_interpreter_structs::ModPath;
+
 use crate::cmd_prelude::*;
 
 #[derive(Debug, Clone)]
@@ -46,5 +48,9 @@ impl Command for PrintCmd {
 
     fn signature_item(&self) -> SourceCodeItem {
         lu_source_code_item!()
+    }
+
+    fn parent_module(&self) -> Option<&ModPath> {
+        None
     }
 }

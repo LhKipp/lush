@@ -1,0 +1,26 @@
+map maps elements
+===
+use std:iter
+
+fn plus_1(arg: num ret: num)
+    ret $arg + 1
+end
+
+[1 2 3] | map $plus_1
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 2.0
+      },
+      {
+        "Number": 3.0
+      },
+      {
+        "Number": 4.0
+      }
+    ]
+  }
+}
+...

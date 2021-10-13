@@ -1,7 +1,7 @@
 use std::{ops::Deref, rc::Rc, sync::Arc};
 
 use crate::cmd_prelude::*;
-use lu_interpreter_structs::Scope;
+use lu_interpreter_structs::{ModPath, Scope};
 use parking_lot::Mutex;
 
 #[derive(Debug, Clone)]
@@ -67,5 +67,9 @@ impl Command for ArrayPushCmd {
 
     fn signature_item(&self) -> SourceCodeItem {
         lu_source_code_item!()
+    }
+
+    fn parent_module(&self) -> Option<&ModPath> {
+        Some(&super::ARRAY_MOD_PATH)
     }
 }

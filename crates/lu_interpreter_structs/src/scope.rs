@@ -1,7 +1,7 @@
 use derive_more::Display;
 use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
-use log::debug;
+use log::trace;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use multimap::MultiMap;
 use parking_lot::RwLock;
@@ -81,6 +81,9 @@ impl<Elem: fmt::Debug> ScopeFrame<Elem> {
     pub fn get_mut(&mut self, name: &str) -> Option<&mut Elem> {
         self.elems.get_mut(name)
     }
+    pub fn get_mod_tag(&self) -> &ModInfo {
+        self.tag.as_module_frame().unwrap()
+    }
 }
 
 impl ScopeFrame<Variable> {
@@ -156,7 +159,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
     }
 
     pub fn push_frame_(&mut self, frame: ScopeFrame<T>) -> (ScopeFrameId, &mut ScopeFrame<T>) {
-        debug!("Pushing frame: {}", frame.tag);
+        trace!("Pushing frame: {}", frame.tag);
         let prev_frame_id = self.cur_frame_id;
         let new_frame_id = self.arena.new_node(frame);
         if let Some(prev_frame_id) = prev_frame_id {
@@ -176,19 +179,19 @@ impl<T: fmt::Debug + 'static> Scope<T> {
             let cur_frame = &self.arena[cur_frame_id];
             let cur_frame_tag = cur_frame.get().get_tag();
 
-            debug!("Popping frame: {}, Expected: {}", cur_frame_tag, expected);
+            trace!("Popping frame: {}, Expected: {}", cur_frame_tag, expected);
             assert_eq!(cur_frame_tag, expected);
 
             let parent_id = cur_frame.parent();
             cur_frame_id.remove(&mut self.arena);
             self.cur_frame_id = parent_id;
         } else {
-            debug!("Tried to pop_frame, but scope is empty")
+            trace!("Tried to pop_frame, but scope is empty")
         }
     }
 
     pub fn select_parent_frame(&mut self) {
-        debug!("Selecting parent frame");
+        trace!("Selecting parent frame");
         let cur_id = self.get_cur_frame_id();
         self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
     }
@@ -242,29 +245,30 @@ impl Scope<Variable> {
     }
 
     pub fn find_var(&self, name: &str) -> Option<&Variable> {
+        trace!("Finding var {} in\n{:?}", name, self);
         let start_frame = self.get_cur_frame().get_tag();
         let frames_to_check_var_for = self.frames_to_find_var_in();
         frames_to_check_var_for
             .iter()
             .map(|frame_id| self.arena[*frame_id].get())
-            .find_map(|frame| {
-                debug!("Finding var: \"{}\" in frame: {}", name, frame);
-                frame.get(name)
-            })
+            .find_map(|frame| frame.get(name))
             .tap(|result| {
-                debug!(
+                trace!(
                     "Result for find_var {} from start_frame {}: {:?}",
-                    name, start_frame, result
+                    name,
+                    start_frame,
+                    result
                 )
             })
     }
 
     pub fn find_var_mut(&mut self, name: &str) -> Option<&mut Variable> {
+        trace!("Finding var {} in\n{:?}", name, self);
         let start_frame = self.get_cur_frame().get_tag().clone();
         let frames_to_check_var_for = self.frames_to_find_var_in();
         for frame in frames_to_check_var_for {
             if self.arena[frame].get_mut().get_mut(name).is_some() {
-                debug!(
+                trace!(
                     "Result for find_var_mut {} from start_frame {}: {:?}",
                     name,
                     start_frame,
@@ -273,9 +277,10 @@ impl Scope<Variable> {
                 return self.arena[frame].get_mut().get_mut(name);
             }
         }
-        debug!(
+        trace!(
             "Could not find var_mut {} from start_frame {}",
-            name, start_frame
+            name,
+            start_frame
         );
         None
     }
@@ -290,7 +295,7 @@ impl Scope<Variable> {
     }
 
     pub fn find_func(&self, name: &str) -> Option<&Rc<dyn Command>> {
-        debug!("Finding cmd {} from {} on", name, self.get_cur_frame());
+        trace!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
         self.find_var(name)
             .map(|var| var.val.as_command())
@@ -298,7 +303,7 @@ impl Scope<Variable> {
     }
 
     pub fn find_strct(&self, name: &str) -> Option<&Arc<RwLock<Strct>>> {
-        debug!("Finding cmd {} from {:?} on", name, self.get_cur_frame());
+        trace!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
         self.find_var(name).map(|var| var.val.as_strct().unwrap())
     }
@@ -316,7 +321,7 @@ impl Scope<Variable> {
     }
 
     fn get_nid_of_sf_frame(&self, path: &ModPath) -> Option<NodeId> {
-        debug!("get_nid_of_sf_frame({})", path);
+        trace!("get_nid_of_sf_frame({})", path);
         let sf_frames_parent = self.get_sf_frames_parent();
         sf_frames_parent
             .children(&self.arena)

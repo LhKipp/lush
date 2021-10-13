@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::{fmt::Debug, sync::Arc};
 
-use crate::{Function, Scope, Signature, Value, VarDeclNode, Variable};
+use crate::{Function, ModPath, Scope, Signature, Value, VarDeclNode, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
@@ -17,6 +17,10 @@ pub trait Command: CommandClone + Debug {
 
     /// Returns SourceCodeItem into the signature/declaration of the command
     fn signature_item(&self) -> SourceCodeItem;
+
+    /// Returns the module, in which the command is contained / declared
+    /// TODO this should be always Some (even for print, ...)
+    fn parent_module(&self) -> Option<&ModPath>;
 
     /// Only overwritten by Function
     fn as_function(&self) -> Option<&Function> {

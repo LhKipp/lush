@@ -14,6 +14,7 @@ pub fn load_mod_paths(
     start_frame: ScopeFrame<Variable>,
     cfg: &LoadModulesConfig,
 ) -> Outcome<Vec<ScopeFrame<Variable>>> {
+    debug!("loading all modules required by a (start)-frame (recursive)");
     let mut all_frames = vec![start_frame];
     let mut errs = vec![];
 
@@ -37,7 +38,10 @@ pub fn load_mod_paths(
             debug!("Loading module: {}", use_path);
             match use_path.mod_path.variant {
                 ModPathVariant::StdPath => {
-                    all_frames.extend((cfg.load_std_module_func)(&use_path.mod_path))
+                    let frame = (cfg.load_std_module_func)(&use_path.mod_path)[0].clone();
+                    let modi = frame.get_mod_tag();
+                    paths_to_source.extend(modi.use_paths.clone());
+                    all_frames.push(frame);
                 }
                 ModPathVariant::PluginPath => {
                     let plug_f_path = use_path.mod_path.as_f_path();
@@ -56,6 +60,8 @@ pub fn load_mod_paths(
                                 let (module, new_mod_err) =
                                     ModInfo::module_from_file_src(source_code, cfg.plugin_dir)
                                         .split();
+                                let modi = module.get_mod_tag();
+                                paths_to_source.extend(modi.use_paths.clone());
                                 errs.extend(new_mod_err);
                                 all_frames.push(module);
                             }

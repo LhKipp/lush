@@ -13,7 +13,7 @@ use crate::{Command, Strct};
 // pub const NIL_VAL: Value = Value::Nil;
 
 // TODO move this to lu_interpreter_structs
-#[derive(Clone, Debug, Serialize, Deserialize, EnumAsInner)]
+#[derive(Clone, Serialize, Deserialize, EnumAsInner)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about
     // pure functions with inputs. However, copying large structs (Array, Table, ...)
@@ -112,6 +112,11 @@ impl Value {
     }
 }
 
+impl std::fmt::Debug for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
+    }
+}
 impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -121,7 +126,7 @@ impl Display for Value {
             Value::String(v) => v.fmt(f),
             Value::BareWord(v) => v.fmt(f),
             Value::Array(arr) => write!(f, "{:?}", arr),
-            Value::Command(v) => write!(f, "{:p}", Rc::as_ptr(v)),
+            Value::Command(v) => write!(f, "Command: {} {:?}", v.name(), v.signature_item()),
             Value::Strct(v) => write!(f, "{:p}", Arc::as_ptr(v)),
         }
     }

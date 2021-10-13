@@ -1,9 +1,11 @@
 use super::{CmdStmtRule, Rule};
 use crate::{
+    grammar::{OrRule, ValueExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::*,
     T,
 };
+use vec_box::vec_box;
 
 pub struct PipedCmdsStmtRule;
 impl Rule for PipedCmdsStmtRule {
@@ -12,17 +14,26 @@ impl Rule for PipedCmdsStmtRule {
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        CmdStmtRule {}.matches(p)
+        let piped_arg_rule = OrRule {
+            kind: Some("PipedArgRule".into()),
+            rules: vec_box![CmdStmtRule {}, ValueExprRule {}],
+        };
+        piped_arg_rule.matches(p)
     }
 
-    /// If no | is being detected, this returns the CmdStmtRule marker
+    /// If no | is being detected, this returns the CmdStmtRule or ValueExprRule marker
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
         let mut pipe_detected = false;
 
+        let piped_arg_rule = OrRule {
+            kind: Some("PipedArgRule".into()),
+            rules: vec_box![CmdStmtRule {}, ValueExprRule {}],
+        };
+
         loop {
-            let result = CmdStmtRule {}.parse(p);
+            let result = piped_arg_rule.parse(p);
 
             if p.next_non(CMT_NL_WS) == T![|] {
                 pipe_detected = true;

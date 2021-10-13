@@ -24,7 +24,6 @@ impl Evaluable for CmdOrValueExprElement {
     fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         match self {
             CmdOrValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
-            CmdOrValueExprElement::PipedCmdsStmt(n) => n.evaluate_with_args(args, scope),
             CmdOrValueExprElement::ValueExpr(n) => n.evaluate_with_args(args, scope),
         }
     }

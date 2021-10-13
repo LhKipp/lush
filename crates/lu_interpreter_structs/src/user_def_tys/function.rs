@@ -23,7 +23,7 @@ pub struct ArgSignature {
 
 impl ArgSignature {
     pub fn void(decl: ArgDecl) -> ArgSignature {
-        ArgSignature::new("unused".into(), ValueType::Void, decl)
+        ArgSignature::new("unused".into(), ValueType::Nil, decl)
     }
 
     /// ArgSignature with default in name
@@ -184,7 +184,7 @@ pub struct Function {
     pub captured_vars: Vec<Variable>,
 
     /// Set when function is inserted into scope
-    pub source_file_id: ModPath,
+    pub parent_module: ModPath,
 }
 
 impl Function {
@@ -199,7 +199,7 @@ impl Function {
             signature,
             fn_node,
             captured_vars: Vec::new(),
-            source_file_id,
+            parent_module: source_file_id,
         }
     }
 }
@@ -233,5 +233,9 @@ impl Command for Function {
 
     fn signature_item(&self) -> SourceCodeItem {
         self.fn_node.decl_item()
+    }
+
+    fn parent_module(&self) -> Option<&ModPath> {
+        Some(&self.parent_module)
     }
 }

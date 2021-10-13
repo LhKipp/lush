@@ -1,5 +1,4 @@
-use log::debug;
-use lu_syntax::ast::{MathExprNode, OperatorExprElement};
+use lu_syntax::ast::{MathExprNode, OperatorExprElement, ValueExprElement};
 use rusttyc::TcKey;
 
 use crate::{TyCheckState, TypeCheck, TypeCheckArg};
@@ -7,7 +6,10 @@ use crate::{TyCheckState, TypeCheck, TypeCheckArg};
 impl TypeCheck for MathExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self.operator() {
-            OperatorExprElement::PlusSign(_) => todo!(),
+            OperatorExprElement::PlusSign(_) => {
+                let (lhs, _) = equate(&self.lhs(), &self.rhs(), state);
+                Some(lhs)
+            }
             OperatorExprElement::MinusSign(_) => todo!(),
             OperatorExprElement::MultSign(_) => todo!(),
             OperatorExprElement::DivSign(_) => todo!(),
@@ -23,16 +25,22 @@ impl TypeCheck for MathExprNode {
             OperatorExprElement::AddAssignSign(_) => todo!(),
             OperatorExprElement::MinAssignSign(_) => todo!(),
             OperatorExprElement::AssignSign(_) => {
-                debug!("TyChecking assignment");
-                let lhs = self.lhs().unwrap();
-                let rhs = self.rhs().unwrap();
-
-                let lhs_key = lhs.typecheck(state).unwrap();
-                let rhs_key = rhs.typecheck(state).unwrap();
-                state.equate_keys(lhs_key, rhs_key);
+                equate(&self.lhs(), &self.rhs(), state);
                 // Assignment does not return type
                 None
             }
         }
     }
+}
+
+/// Equates lhs with rhs and returns (LhsKey, RhsKey)
+fn equate(
+    lhs: &ValueExprElement,
+    rhs: &ValueExprElement,
+    ty_state: &mut TyCheckState,
+) -> (TcKey, TcKey) {
+    let lhs_key = lhs.typecheck(ty_state).unwrap();
+    let rhs_key = rhs.typecheck(ty_state).unwrap();
+    ty_state.equate_keys(lhs_key, rhs_key);
+    (lhs_key, rhs_key)
 }

@@ -4,7 +4,7 @@ print hi | xargs
 ---
 {
   "Ok": {
-    "BareWord": "[BareWord(hi)]\n"
+    "BareWord": "[hi]\n"
   }
 }
 ...
@@ -14,7 +14,7 @@ print hi | xargs echo "-n"
 ---
 {
   "Ok": {
-    "BareWord": "[BareWord(hi)]"
+    "BareWord": "[hi]"
   }
 }
 ...

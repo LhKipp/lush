@@ -47,7 +47,7 @@ impl<T> Outcome<T> {
     }
 
     pub fn expect(self, msg: &'static str) -> T {
-        assert!(self.errs.is_empty(), "{}", msg);
+        assert!(self.errs.is_empty(), "{}. Errors: {:?}", msg, self.errs);
         self.val
     }
 }

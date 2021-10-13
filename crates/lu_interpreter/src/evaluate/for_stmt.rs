@@ -19,8 +19,31 @@ impl Evaluable for ForStmtNode {
         // TODO this shouldt be match all
         if let Some(iterated_val) = self.iterated_value() {
             let iterated_val = iterated_val.evaluate(scope)?;
-            if let Some(_) = iterated_val.as_array() {
-                todo!();
+            if let Some(array) = iterated_val.as_array() {
+                // TODO ret error
+                assert_eq!(var_names.len(), 1);
+                debug!("Iterating over array");
+
+                for val in (**array).clone().into_iter() {
+                    // We entered the for loop. We need to push a new scope and set the vars
+                    {
+                        let var = Variable::new(
+                            var_names[0].clone(),
+                            val,
+                            VarDeclNode::ForStmt(self.clone(), 0),
+                        );
+                        scope
+                            .lock()
+                            .push_frame(ScopeFrameTag::ForStmtFrame)
+                            .1
+                            .insert_var(var);
+                    }
+                    block.evaluate(scope)?;
+                    {
+                        let mut scope = scope.lock();
+                        scope.pop_frame(&ScopeFrameTag::ForStmtFrame);
+                    }
+                }
             } else if let Some(str_to_iter) = iterated_val.as_string() {
                 // TODO ret error
                 assert_eq!(var_names.len(), 1);

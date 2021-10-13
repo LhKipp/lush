@@ -1,8 +1,12 @@
 use derive_more::From;
-use std::{fmt::Debug, sync::Arc};
+use enum_as_inner::EnumAsInner;
+use std::{
+    fmt::{Debug, Display},
+    sync::Arc,
+};
 
 use log::debug;
-use lu_error::{LuErr, LuResult};
+use lu_error::{LuErr, LuResult, SourceCodeItem};
 use lu_interpreter_structs::Value;
 use lu_pipeline_stage::PipelineStage;
 use parking_lot::Mutex;
@@ -27,9 +31,10 @@ mod test;
 
 pub use fn_stmt::eval_function;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, EnumAsInner)]
 pub enum EvalArg {
     ExternalCmdName(String),
+    CmdInVal { val: Value, decl: SourceCodeItem },
 }
 
 #[derive(Debug, From)]
@@ -46,7 +51,7 @@ impl From<RetValOrErr> for EvalResult {
     }
 }
 
-pub trait Evaluable: Debug {
+pub trait Evaluable: Display {
     /// Evaluate the AST-Node/Token given the state.
     fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult;
 
@@ -59,9 +64,9 @@ pub trait Evaluable: Debug {
         args: &[EvalArg],
         scope: &mut Arc<Mutex<Scope<Variable>>>,
     ) -> EvalResult {
-        debug!("Evaluating: {:?}({:?})", self, args);
+        debug!("Evaluating: {}", self);
         let result = self.do_evaluate(args, scope);
-        debug!("Result of Evaluating: {:?}({:?}): {:?}", self, args, result);
+        debug!("Result of Evaluating: {}: {:?}", self, result);
         result
     }
 }

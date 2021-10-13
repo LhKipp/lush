@@ -629,6 +629,7 @@ impl TcFunc {
 #[derive(Clone, Debug)]
 pub enum TypeCheckArg {
     Arg(VisitArg),
+    CmdStmt { prev_key: Option<TcKey> },
 }
 
 pub trait TypeCheck: Display {

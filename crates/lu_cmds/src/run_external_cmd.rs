@@ -84,4 +84,8 @@ impl Command for RunExternalCmd {
             Err(EvalErr::ExternalCmdFailed(self.cmd_node.to_item()).into())
         }
     }
+
+    fn parent_module(&self) -> Option<&lu_interpreter_structs::ModPath> {
+        None
+    }
 }

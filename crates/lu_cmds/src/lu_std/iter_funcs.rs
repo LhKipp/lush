@@ -8,12 +8,16 @@ impl LuNativeStdMod for IterFuncsMod {
     }
     fn src(&self) -> &str {
         r#"
-        fn map (in: [T] ret: [U] map_fn fn(in:T ret:U))
+        use std:array
+
+        fn map (in: [T] ret: [U] map_fn: fn(ret:U arg: T))
             let result = []
             for v in $in
                 let v_u = map_fn $v
-                print v_u
+                let new_arr = push $result $v_u
+                $result = $new_arr
             end
+            ret $result
         end
         "#
     }

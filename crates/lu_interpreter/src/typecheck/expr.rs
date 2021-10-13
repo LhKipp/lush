@@ -30,7 +30,6 @@ impl TypeCheck for CmdOrValueExprElement {
     fn do_typecheck(&self, args: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self {
             CmdOrValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, state),
-            CmdOrValueExprElement::PipedCmdsStmt(n) => n.typecheck_with_args(args, state),
             CmdOrValueExprElement::ValueExpr(n) => n.typecheck_with_args(args, state),
         }
     }

@@ -2,6 +2,7 @@ use crate::{
     Command, Function, ModPath, ModPathVariant, ScopeFrame, ScopeFrameTag, Signature, Strct,
     StrctField, UsePath, Variable,
 };
+use log::debug;
 use lu_error::util::Outcome;
 use lu_parser::grammar::SourceFileRule;
 use lu_syntax::{
@@ -74,6 +75,7 @@ impl ModInfo {
         source_node: SourceFileNode,
         src: SourceCode,
     ) -> Outcome<ScopeFrame<Variable>> {
+        debug!("Converting given sf_node {} to frame", mod_id);
         let sourced_file = Outcome::ok(Self::source_structures_from(&source_node, mod_id.clone()));
         sourced_file.map(|sourced_file| {
             let mut frame = ScopeFrame::new(ScopeFrameTag::ModuleFrame(Self {

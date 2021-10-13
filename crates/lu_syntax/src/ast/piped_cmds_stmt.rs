@@ -1,9 +1,9 @@
-use crate::{AstNode, AstNodeChildren};
+use crate::{AstElementChildren, AstNode};
 
-use super::{support, CmdStmtNode, PipedCmdsStmtNode};
+use super::{support, CmdOrValueExprElement, PipedCmdsStmtNode};
 
 impl PipedCmdsStmtNode {
-    pub fn cmds(&self) -> AstNodeChildren<CmdStmtNode> {
-        support::node_children(self.syntax())
+    pub fn piped_args(&self) -> AstElementChildren<CmdOrValueExprElement> {
+        support::element_children(self.syntax())
     }
 }
