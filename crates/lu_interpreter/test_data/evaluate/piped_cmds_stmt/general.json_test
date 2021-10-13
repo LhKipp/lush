@@ -1,18 +1,14 @@
 1
 ===
-print "hi" | print $in
+fn take_num_ret_num(in: num ret: num)
+    ret $in
+end
+1 | take_num_ret_num | take_num_ret_num
+
 ---
 {
   "Ok": {
-    "Array": [
-      {
-        "Array": [
-          {
-            "String": "hi"
-          }
-        ]
-      }
-    ]
+    "Number": 1.0
   }
 }
 ...

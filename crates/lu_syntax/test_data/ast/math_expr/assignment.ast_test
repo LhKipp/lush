@@ -45,7 +45,6 @@ SourceFileNode {
             NumberExpr@11..12
               Number@11..12 "1"
     ,
-
 }
 """
 ...
