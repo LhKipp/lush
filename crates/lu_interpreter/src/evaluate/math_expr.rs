@@ -35,20 +35,14 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::MinusSign(_) => return eval_minus_sign(lhs_val, rhs_val),
             OperatorExprElement::MultSign(_) => return eval_mult_sign(lhs_val, rhs_val),
             OperatorExprElement::DivSign(_) => return eval_div_sign(lhs_val, rhs_val),
-            OperatorExprElement::LessThanSign(_) => return eval_less_than_sign(lhs_val, rhs_val),
-            OperatorExprElement::LessOrEqualSign(_) => {
-                return eval_less_or_equal_sign(lhs_val, rhs_val)
-            }
-            OperatorExprElement::EqualitySign(_) => return eval_equality_sign(lhs_val, rhs_val),
-            OperatorExprElement::InequalitySign(_) => {
-                return eval_inequality_sign(lhs_val, rhs_val)
-            }
-            OperatorExprElement::BiggerThanSign(_) => {
-                return eval_bigger_than_sign(lhs_val, rhs_val)
-            }
-            OperatorExprElement::BiggerOrEqualSign(_) => {
-                return eval_bigger_or_equal_sign(lhs_val, rhs_val)
-            }
+
+            OperatorExprElement::LessThanSign(_) => Ok((lhs_val < rhs_val).into()),
+            OperatorExprElement::LessOrEqualSign(_) => Ok((lhs_val <= rhs_val).into()),
+            OperatorExprElement::EqualitySign(_) => Ok((lhs_val == rhs_val).into()),
+            OperatorExprElement::InequalitySign(_) => Ok((lhs_val == rhs_val).into()),
+            OperatorExprElement::BiggerThanSign(_) => Ok((lhs_val > rhs_val).into()),
+            OperatorExprElement::BiggerOrEqualSign(_) => Ok((lhs_val >= rhs_val).into()),
+
             OperatorExprElement::RightStream(_) => return eval_right_stream(lhs_val, rhs_val),
             OperatorExprElement::DivAssignSign(_) => todo!(),
             OperatorExprElement::MulAssignSign(_) => todo!(),
@@ -71,24 +65,6 @@ fn eval_mult_sign(_lhs: Value, _rhs: Value) -> EvalResult {
     todo!()
 }
 fn eval_div_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_less_than_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_less_or_equal_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_equality_sign(lhs: Value, rhs: Value) -> EvalResult {
-    Ok(Value::Bool(lhs == rhs))
-}
-fn eval_inequality_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_bigger_than_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_bigger_or_equal_sign(_lhs: Value, _rhs: Value) -> EvalResult {
     todo!()
 }
 fn eval_right_stream(_lhs: Value, _rhs: Value) -> EvalResult {

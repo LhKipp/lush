@@ -19,6 +19,17 @@ impl LuNativeStdMod for IterFuncsMod {
             end
             ret $result
         end
+
+        fn filter (in: [T] ret: [T] filter_fn: fn(ret: bool arg: T))
+            let result = []
+            for v in $in
+                if filter_fn $v
+                    let new_arr = push $result $v
+                    $result = $new_arr
+                end
+            end
+            ret $result
+        end
         "#
     }
 }

@@ -1,0 +1,20 @@
+filter filters elems
+===
+use std:iter
+
+fn less_than_2(ret: bool arg: num)
+    ret $arg < 2
+end
+
+[1 2 3] | filter $less_than_2
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 1.0
+      }
+    ]
+  }
+}
+...

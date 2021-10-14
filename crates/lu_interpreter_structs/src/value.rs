@@ -2,6 +2,7 @@ use enum_as_inner::EnumAsInner;
 use lu_syntax::ast::{BareWordToken, NumberExprNode, StringExprNode};
 use ordered_float::OrderedFloat;
 use parking_lot::RwLock;
+use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 use std::{fmt::Display, rc::Rc};
@@ -51,6 +52,24 @@ impl PartialEq for Value {
     }
 }
 impl Eq for Value {}
+
+impl PartialOrd for Value {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (Value::Nil, Value::Nil) => Some(Ordering::Equal),
+            (Value::Bool(l), Value::Bool(r)) => l.partial_cmp(r),
+            (Value::Number(l), Value::Number(r)) => l.partial_cmp(r),
+            (Value::String(l), Value::String(r)) => l.partial_cmp(r),
+            (Value::BareWord(l), Value::BareWord(r)) => l.partial_cmp(r),
+            (Value::Array(_), Value::Array(_)) => None,
+            (Value::Command(_), Value::Command(_)) => None,
+            (Value::Strct(_), Value::Strct(_)) => None,
+            _ => {
+                unreachable!("Caught by ty checker");
+            }
+        }
+    }
+}
 
 impl Hash for Value {
     fn hash<H: Hasher>(&self, state: &mut H) {

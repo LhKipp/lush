@@ -1,4 +1,8 @@
-use lu_syntax::ast::{MathExprNode, OperatorExprElement, ValueExprElement};
+use lu_interpreter_structs::ValueType;
+use lu_syntax::{
+    ast::{MathExprNode, OperatorExprElement, ValueExprElement},
+    AstNode,
+};
 use rusttyc::TcKey;
 
 use crate::{TyCheckState, TypeCheck, TypeCheckArg};
@@ -13,12 +17,15 @@ impl TypeCheck for MathExprNode {
             OperatorExprElement::MinusSign(_) => todo!(),
             OperatorExprElement::MultSign(_) => todo!(),
             OperatorExprElement::DivSign(_) => todo!(),
-            OperatorExprElement::LessThanSign(_) => todo!(),
-            OperatorExprElement::LessOrEqualSign(_) => todo!(),
-            OperatorExprElement::EqualitySign(_) => todo!(),
-            OperatorExprElement::InequalitySign(_) => todo!(),
-            OperatorExprElement::BiggerThanSign(_) => todo!(),
-            OperatorExprElement::BiggerOrEqualSign(_) => todo!(),
+            OperatorExprElement::LessThanSign(_)
+            | OperatorExprElement::LessOrEqualSign(_)
+            | OperatorExprElement::BiggerThanSign(_)
+            | OperatorExprElement::BiggerOrEqualSign(_)
+            | OperatorExprElement::InequalitySign(_)
+            | OperatorExprElement::EqualitySign(_) => {
+                equate(&self.lhs(), &self.rhs(), state);
+                Some(state.new_term_key_concretiziesd(self.to_item(), ValueType::Bool))
+            }
             OperatorExprElement::RightStream(_) => todo!(),
             OperatorExprElement::DivAssignSign(_) => todo!(),
             OperatorExprElement::MulAssignSign(_) => todo!(),
