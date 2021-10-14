@@ -29,9 +29,10 @@ pub enum Value {
 
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
+    // Strcts fields
+    Strct(String, Rc<Vec<(String, Value)>>),
     #[serde(skip)]
     Command(Rc<dyn Command>),
-
     /// Not really lu values. But treating them as one, allows us to store them in variables
     #[serde(skip)] // TODO serialize
     StrctDecl(Arc<RwLock<Strct>>),
@@ -83,6 +84,10 @@ impl Hash for Value {
             Value::String(v) => v.hash(state),
             Value::BareWord(v) => v.hash(state),
             Value::Array(v) => v.hash(state),
+            Value::Strct(name, v) => {
+                name.hash(state);
+                v.hash(state);
+            }
             Value::Command(func) => Rc::as_ptr(func).hash(state),
             Value::StrctDecl(strct) => Arc::as_ptr(strct).hash(state),
         }
@@ -98,6 +103,9 @@ impl Value {
     }
     pub fn new_array(vals: Vec<Value>) -> Self {
         Value::Array(Rc::new(vals))
+    }
+    pub fn new_strct(name: String, vals: Vec<(String, Value)>) -> Self {
+        Value::Strct(name, Rc::new(vals))
     }
 
     pub fn expect_array(&mut self) -> &mut Vec<Value> {
@@ -127,6 +135,7 @@ impl Value {
             Value::Array(arr) => Some(!arr.is_empty()),
             Value::Command(_) => None,
             Value::StrctDecl(_) => None,
+            Value::Strct(_, _) => None,
         }
     }
 }
@@ -147,6 +156,7 @@ impl Display for Value {
             Value::Array(arr) => write!(f, "{:?}", arr),
             Value::Command(v) => write!(f, "Command: {} {:?}", v.name(), v.signature_item()),
             Value::StrctDecl(v) => write!(f, "{:p}", Arc::as_ptr(v)),
+            Value::Strct(name, fields) => write!(f, "{}{:?}", name, fields),
         }
     }
 }

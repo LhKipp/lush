@@ -15,7 +15,7 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::ValuePathExpr(n) => n.evaluate(scope),
             ValueExprElement::ArrayExpr(n) => n.evaluate(scope),
             ValueExprElement::TableExpr(n) => n.evaluate(scope),
-            ValueExprElement::StrctCtorExpr(_) => todo!(),
+            ValueExprElement::StrctCtorExpr(n) => n.evaluate(scope),
         }
     }
 }

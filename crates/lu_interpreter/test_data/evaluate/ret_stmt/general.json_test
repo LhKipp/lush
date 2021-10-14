@@ -1,4 +1,4 @@
-Value of ret stmt is returned
+V alue of ret stmt is returned
 ===
 fn func_1(ret: str)
     ret "func_1"

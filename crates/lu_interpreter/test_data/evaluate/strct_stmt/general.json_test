@@ -1,0 +1,21 @@
+Strct ctor generates strct
+===
+struct Ip{ v: num}
+Ip { v: 1 }
+---
+{
+  "Ok": {
+    "Strct": [
+      "Ip",
+      [
+        [
+          "v",
+          {
+            "Number": 1.0
+          }
+        ]
+      ]
+    ]
+  }
+}
+...
