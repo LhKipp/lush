@@ -16,6 +16,7 @@ use crate::{Scope, TyCheckState, Variable};
 mod block_stmt;
 mod cmd_stmt;
 mod condition;
+mod ctor_expr;
 mod eval_prelude;
 mod expr;
 mod fn_stmt;

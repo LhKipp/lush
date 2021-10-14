@@ -257,7 +257,7 @@ impl TyCheckState {
                     self.tc_var_table
                         .insert(var.clone(), tc_func.self_key.clone());
                     Some(tc_func.self_key)
-                } else if let Some(strct) = var.val.as_strct().cloned() {
+                } else if let Some(strct) = var.val.as_strct_decl().cloned() {
                     let l_strct = strct.read();
                     debug!(
                         "First time usage of a strct {}. Inserting new tc_strct.",

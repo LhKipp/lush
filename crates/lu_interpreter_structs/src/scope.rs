@@ -305,7 +305,8 @@ impl Scope<Variable> {
     pub fn find_strct(&self, name: &str) -> Option<&Arc<RwLock<Strct>>> {
         trace!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
-        self.find_var(name).map(|var| var.val.as_strct().unwrap())
+        self.find_var(name)
+            .map(|var| var.val.as_strct_decl().unwrap())
     }
 
     pub fn expect_strct(&self, name: &str, usage: SourceCodeItem) -> LuResult<&Arc<RwLock<Strct>>> {

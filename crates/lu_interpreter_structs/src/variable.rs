@@ -63,11 +63,11 @@ impl Variable {
         )
     }
 
-    pub fn new_strct(strct: Strct) -> Variable {
+    pub fn new_strct_decl(strct: Strct) -> Variable {
         let decl = strct.decl.clone();
         Variable::new(
             strct.name.clone(),
-            Value::new_strct(strct),
+            Value::new_strct_decl(strct),
             VarDeclNode::CatchAll(decl),
         )
     }

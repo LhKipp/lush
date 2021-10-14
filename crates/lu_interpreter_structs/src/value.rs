@@ -34,7 +34,7 @@ pub enum Value {
 
     /// Not really lu values. But treating them as one, allows us to store them in variables
     #[serde(skip)] // TODO serialize
-    Strct(Arc<RwLock<Strct>>),
+    StrctDecl(Arc<RwLock<Strct>>),
 }
 
 impl PartialEq for Value {
@@ -63,7 +63,7 @@ impl PartialOrd for Value {
             (Value::BareWord(l), Value::BareWord(r)) => l.partial_cmp(r),
             (Value::Array(_), Value::Array(_)) => None,
             (Value::Command(_), Value::Command(_)) => None,
-            (Value::Strct(_), Value::Strct(_)) => None,
+            (Value::StrctDecl(_), Value::StrctDecl(_)) => None,
             _ => {
                 unreachable!("Caught by ty checker");
             }
@@ -84,7 +84,7 @@ impl Hash for Value {
             Value::BareWord(v) => v.hash(state),
             Value::Array(v) => v.hash(state),
             Value::Command(func) => Rc::as_ptr(func).hash(state),
-            Value::Strct(strct) => Arc::as_ptr(strct).hash(state),
+            Value::StrctDecl(strct) => Arc::as_ptr(strct).hash(state),
         }
     }
 }
@@ -93,8 +93,8 @@ impl Value {
     pub fn new_func(func: Rc<dyn Command>) -> Self {
         Value::Command(func)
     }
-    pub fn new_strct(strct: Strct) -> Self {
-        Value::Strct(Arc::new(RwLock::new(strct)))
+    pub fn new_strct_decl(strct: Strct) -> Self {
+        Value::StrctDecl(Arc::new(RwLock::new(strct)))
     }
     pub fn new_array(vals: Vec<Value>) -> Self {
         Value::Array(Rc::new(vals))
@@ -126,7 +126,7 @@ impl Value {
             Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
             Value::Array(arr) => Some(!arr.is_empty()),
             Value::Command(_) => None,
-            Value::Strct(_) => None,
+            Value::StrctDecl(_) => None,
         }
     }
 }
@@ -146,7 +146,7 @@ impl Display for Value {
             Value::BareWord(v) => v.fmt(f),
             Value::Array(arr) => write!(f, "{:?}", arr),
             Value::Command(v) => write!(f, "Command: {} {:?}", v.name(), v.signature_item()),
-            Value::Strct(v) => write!(f, "{:p}", Arc::as_ptr(v)),
+            Value::StrctDecl(v) => write!(f, "{:p}", Arc::as_ptr(v)),
         }
     }
 }

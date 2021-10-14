@@ -7,7 +7,7 @@ fn resolve_strct_tys(modules: &mut Vec<ScopeFrame<Variable>>) {
 
     for frame in modules {
         for (_, var) in frame.elems.iter_mut() {
-            if let Value::Strct(strct) = &var.val {
+            if let Value::StrctDecl(strct) = &var.val {
                 strcts_to_resolve.push(strct.clone());
             } else if let Value::Command(func) = &var.val {
                 funcs_to_resolve.push(func.clone());

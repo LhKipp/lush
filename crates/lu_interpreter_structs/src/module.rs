@@ -89,7 +89,7 @@ impl ModInfo {
                 frame.insert_var(Variable::new_func(func.rced()));
             }
             for strct in sourced_file.strcts {
-                frame.insert_var(Variable::new_strct(strct));
+                frame.insert_var(Variable::new_strct_decl(strct));
             }
             frame
         })
