@@ -22,7 +22,6 @@ impl TypeCheck for CmdStmtNode {
     ) -> Option<TcKey> {
         debug!("Cur Scope Frame: {}", ty_state.scope.get_cur_frame());
 
-        let possibl_longest_name = self.possible_longest_cmd_call_name();
         // Finding result type here
         let ret_ty = if let Some(cmd) = ty_state.get_callable_from_var(&self.get_cmd_name()) {
             let args = self.args();
