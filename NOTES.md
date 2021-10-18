@@ -106,6 +106,18 @@ IDEA: Maybe have a tag `verbose` for functions who use stdout? So that they coul
 ## Dry run
 - Functions error out when they try to do an unpure operation in an pure context
     - This is necessary as e.G. `git branch --list` is pure, but `git branch <arg>` is not. Whether a function is pure or not depends on the args/flags
+- Marking a function as pure, means it can always be run in a pure context
+
+- A dry run does not print out all commands being run (that would be a "verbose" run)
+- Whether a function is pure or not depends on all args + flags and on the combination
+- Dry run is a stupid idea
+
+```lu
+pure fn foo()
+end
+
+git branch 
+```
  
 ## HOF Funcs
 ```lu
