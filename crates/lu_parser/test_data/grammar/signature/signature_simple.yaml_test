@@ -32,21 +32,6 @@ Multiple Args
 - Token: "RightParenthesis (len: 1)"
 - Finish: ""
 ...
-Long and shortflag
-===
-( --long_flag -l)
----
-- Start: Signature
-- Token: "LeftParenthesis (len: 1)"
-- Start: FlagSignature
-- Token: "Whitespace (len: 1)"
-- Token: "LongFlag (len: 11)"
-- Token: "Whitespace (len: 1)"
-- Token: "ShortFlag (len: 2)"
-- Finish: ""
-- Token: "RightParenthesis (len: 1)"
-- Finish: ""
-...
 Arg with type
 ===
 (arg1: num)

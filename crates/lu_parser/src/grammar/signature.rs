@@ -29,7 +29,7 @@ impl Rule for FlagSignatureRule {
             p.eat_after(ShortFlag, CMT_WS); // shortflag belongs to longflag, must be on same line
         } else {
             // no long_flag, expect shortflag then (otherwise FlagSignatureRule wouldn't match)
-            if !p.expect_after(CMT_NL_WS, ShortFlag) {
+            if !p.expect_after(ShortFlag, CMT_NL_WS) {
                 m.abandon(p);
                 return None;
             }
@@ -116,6 +116,11 @@ mod tests {
 
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/signature/signature_simple.yaml_test")]
     fn parse_cmds(s: &str) -> Vec<Event> {
+        let _ = env_logger::builder().is_test(true).try_init();
+        parse_as(s, &SignatureRule {})
+    }
+    #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/signature/signature_with_flags.yaml_test")]
+    fn parse_flag_grammar(s: &str) -> Vec<Event> {
         let _ = env_logger::builder().is_test(true).try_init();
         parse_as(s, &SignatureRule {})
     }

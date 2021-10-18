@@ -1,0 +1,101 @@
+Long name only
+===
+( --flag )
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "Whitespace (len: 1)"
+- Token: "LongFlag (len: 6)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Short name only
+===
+( -f )
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ShortFlag (len: 2)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Long and short flag
+===
+( --long_flag -l)
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "Whitespace (len: 1)"
+- Token: "LongFlag (len: 11)"
+- Token: "Whitespace (len: 1)"
+- Token: "ShortFlag (len: 2)"
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Typed flag
+===
+(--flag: bool)
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "LongFlag (len: 6)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "BoolKeyword (len: 4)"
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Typed long and shortflag
+===
+( --flag -f : bool )
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "Whitespace (len: 1)"
+- Token: "LongFlag (len: 6)"
+- Token: "Whitespace (len: 1)"
+- Token: "ShortFlag (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "BoolKeyword (len: 4)"
+- Finish: ""
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
+Flag with generic
+===
+(--flag : T1 )
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "LongFlag (len: 6)"
+- Token: "Whitespace (len: 1)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "GenericType (len: 2)"
+- Finish: ""
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...
