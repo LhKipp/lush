@@ -1,3 +1,4 @@
+use lu_interpreter_structs::FlagVariant;
 use lu_syntax::ast::FnStmtNode;
 use rusttyc::TcKey;
 
@@ -16,17 +17,26 @@ impl TypeCheck for FnStmtNode {
         } else {
             return None;
         };
+        let required_flags = self
+            .signature()
+            .map(|sign| {
+                sign.flags()
+                    .filter(|flag_node| flag_node.is_required())
+                    .map(|flag_node| FlagVariant::from_sign_node(&flag_node))
+                    .collect()
+            })
+            .unwrap_or(vec![]);
 
-        let fn_frame = ScopeFrameTag::TyCFnFrame(fn_name.clone());
+        let fn_frame = ScopeFrameTag::TyCFnFrame(fn_name.clone(), required_flags.clone());
         ty_state.scope.push_frame(fn_frame.clone());
 
         let var_key_to_insert = {
             let own_tc_func = ty_state
-                .expect_callable_from_var(&fn_name, self.decl_item())
+                .expect_callable_from_var(&fn_name,&required_flags, self.decl_item())
                 .expect("Always works");
             let own_signature = ty_state
                 .scope
-                .find_func(&fn_name)
+                .find_func(&fn_name, &required_flags)
                 .expect("FnNode will be sourced")
                 .signature();
             let mut var_ty_to_insert = Vec::new();

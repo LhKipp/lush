@@ -15,7 +15,7 @@ use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
 
-use crate::{Command, ModInfo, ModPath, Strct, Variable};
+use crate::{Command, FlagVariant, ModInfo, ModPath, Strct, Variable};
 
 #[derive(Clone, Debug, PartialEq, Eq, EnumAsInner, is_enum_variant, Display)]
 pub enum ScopeFrameTag {
@@ -27,12 +27,12 @@ pub enum ScopeFrameTag {
     ModuleFrame(ModInfo),
 
     BlockFrame,
-    /// Frame for evaluating cmd (with command-name)
-    #[display(fmt = "CmdCallFrame {}", _0)]
-    CmdCallFrame(String),
-    /// Fn Frame allocated during TyC
+    /// Frame for evaluating cmd (with command-name and required flags)
+    #[display(fmt = "CmdCallFrame {} {:?}", _0, _1)]
+    CmdCallFrame(String, Vec<FlagVariant>),
+    /// Fn Frame allocated during TyC (with fn-name and required flags)
     #[display(fmt = "TyCFnFrame {}", _0)]
-    TyCFnFrame(String),
+    TyCFnFrame(String, Vec<FlagVariant>),
     ForStmtFrame,
     IfStmtFrame,
 }
@@ -203,8 +203,10 @@ impl Scope<Variable> {
         let cur_id = self.get_cur_frame_id();
         cur_id.ancestors(&self.arena).find_map(|n_id| {
             let tag = self.arena[n_id].get().get_tag();
-            if let Some(func_name) = tag.as_ty_c_fn_frame().or_else(|| tag.as_cmd_call_frame()) {
-                self.find_func(func_name)
+            if let Some((func_name, req_flags)) =
+                tag.as_ty_c_fn_frame().or_else(|| tag.as_cmd_call_frame())
+            {
+                self.find_func(func_name, req_flags)
                     .tap(|func| assert!(func.is_some(), "Cmd of CmdFrame has to be always found"))
             } else {
                 None
@@ -294,12 +296,50 @@ impl Scope<Variable> {
             .ok_or(AstErr::VarNotInScope(usage).into())
     }
 
-    pub fn find_func(&self, name: &str) -> Option<&Rc<dyn Command>> {
+    /// Find func with name name, that could be called by flags
+    pub fn find_func(&self, name: &str, flags: &[FlagVariant]) -> Option<&Rc<dyn Command>> {
         trace!("Finding cmd {} from {} on", name, self.get_cur_frame());
         // TODO write check that no variable shadows a func name
-        self.find_var(name)
-            .map(|var| var.val.as_command())
-            .flatten()
+        let start_frame = self.get_cur_frame().get_tag();
+        let frames_to_check_var_for = self.frames_to_find_var_in();
+        frames_to_check_var_for
+            .iter()
+            .map(|frame_id| self.arena[*frame_id].get())
+            .find_map(|frame| {
+                if let Some(var) = frame.get(name) {
+                    if let Some(func) = var.val.as_command() {
+                        Some(func)
+                    } else if let Some(cmd_collect) = var.val.as_command_collection() {
+                        cmd_collect
+                            .cmds
+                            .iter()
+                            .filter(|cmd| cmd.is_called_by(name, flags))
+                            .next()
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            })
+            .tap(|result| {
+                trace!(
+                    "Result for find_var {} from start_frame {}: {:?}",
+                    name,
+                    start_frame,
+                    result
+                )
+            })
+    }
+
+    pub fn expect_func(
+        &self,
+        name: &str,
+        flags: &[FlagVariant],
+        usage: SourceCodeItem,
+    ) -> LuResult<&Rc<dyn Command>> {
+        self.find_func(name, flags)
+            .ok_or(AstErr::CmdNotInScope(usage).into())
     }
 
     pub fn find_strct(&self, name: &str) -> Option<&Arc<RwLock<Strct>>> {

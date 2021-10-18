@@ -7,6 +7,7 @@ extern crate derive_new;
 extern crate educe;
 
 mod command;
+mod command_collection;
 mod module;
 pub mod prelude;
 mod scope;
@@ -15,8 +16,11 @@ mod user_def_tys;
 mod value;
 mod value_type;
 mod variable;
+mod flag;
 
+pub use flag::*;
 pub use command::Command;
+pub use command_collection::CommandCollection;
 pub use module::ModInfo;
 pub use scope::{Scope, ScopeFrame, ScopeFrameId, ScopeFrameState, ScopeFrameTag};
 pub use use_path::{ModPath, ModPathVariant, UsePath};

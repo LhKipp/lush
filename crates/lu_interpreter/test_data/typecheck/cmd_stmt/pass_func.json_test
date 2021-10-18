@@ -28,21 +28,21 @@ take_ret_num_fn $ret_str_fn
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
-            "content": "ret: str",
-            "range": [
-              14,
-              22
-            ]
-          },
-          "lhs_ty": "str",
-          "rhs_decl": {
             "content": "ret: num",
             "range": [
               57,
               65
             ]
           },
-          "rhs_ty": "num"
+          "lhs_ty": "num",
+          "rhs_decl": {
+            "content": "ret: str",
+            "range": [
+              14,
+              22
+            ]
+          },
+          "rhs_ty": "str"
         }
       }
     }

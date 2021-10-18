@@ -4,10 +4,10 @@ use std::iter;
 
 use log::{debug, warn};
 use lu_error::{SourceCodeItem, TyErr};
-use lu_interpreter_structs::Value;
+use lu_interpreter_structs::{FlagVariant, Value};
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
-    ast::{CmdStmtNode, LetStmtNode, ValueExprElement},
+    ast::{CmdArgElement, CmdStmtNode, LetStmtNode, ValueExprElement},
     AstElement, AstNode,
 };
 use rusttyc::TcKey;
@@ -23,10 +23,19 @@ impl TypeCheck for CmdStmtNode {
         debug!("Cur Scope Frame: {}", ty_state.scope.get_cur_frame());
 
         // Finding result type here
-        let ret_ty = if let Some(cmd) = ty_state.get_callable_from_var(&self.get_cmd_name()) {
+        let passed_flags = FlagVariant::convert(self.get_passed_flags());
+        let called_cmd = ty_state
+            .scope
+            .find_func(&self.get_cmd_name(), &passed_flags)
+            .cloned();
+
+        let ret_ty = if let Some(cmd) = called_cmd {
+            let cmd_keys = ty_state
+                .get_callable_from_cmd(&cmd)
+                .expect("If cmd is found in scope it must be found in ty_state");
             let args = self.args();
-            ty_check_cmd_args(self, args, &cmd, ty_state);
-            ty_state.new_term_key_equated(self.to_item(), cmd.ret_key.clone())
+            ty_check_cmd_args(self, args, &cmd_keys, ty_state);
+            ty_state.new_term_key_equated(self.to_item(), cmd_keys.ret_key.clone())
         } else {
             ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
         };
@@ -35,7 +44,7 @@ impl TypeCheck for CmdStmtNode {
     }
 }
 
-fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
+fn ty_check_cmd_args<ArgIter: Iterator<Item = CmdArgElement>>(
     cmd_node: &CmdStmtNode,
     args: ArgIter,
     called_func: &TcFunc,
@@ -44,6 +53,11 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = ValueExprElement>>(
     let mut called_func_arg_tc_iter = called_func.args_keys.iter();
 
     for arg in args {
+        let arg = if let CmdArgElement::ValueExpr(n) = arg {
+            n
+        } else {
+            unreachable!("TODO ty check cmd flags")
+        };
         match called_func_arg_tc_iter.next() {
             Some(called_func_arg_tc) => {
                 ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);

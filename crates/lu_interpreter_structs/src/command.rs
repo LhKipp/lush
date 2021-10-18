@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::{fmt::Debug, sync::Arc};
 
-use crate::{Function, ModPath, Scope, Signature, Value, VarDeclNode, Variable};
+use crate::{FlagVariant, Function, ModPath, Scope, Signature, Value, VarDeclNode, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
@@ -88,6 +88,28 @@ pub trait Command: CommandClone + Debug {
         Self: Sized + 'static,
     {
         Rc::new(self)
+    }
+
+    /// A command is called if the cmd.name() and at least all required flags are passed
+    fn is_called_by(&self, called_cmd_name: &str, passed_flags: &[FlagVariant]) -> bool {
+        self.name() == called_cmd_name
+            && passed_flags.iter().all(|passed_flag| {
+                self.signature().flags.iter().any(|flag_decl| {
+                    flag_decl.is_required()
+                        && match passed_flag {
+                            FlagVariant::LongFlag(name) => flag_decl
+                                .long_name
+                                .as_ref()
+                                .map(|flag_decl_name| flag_decl_name == name)
+                                .unwrap_or(false),
+                            FlagVariant::ShortFlag(name) => flag_decl
+                                .short_name
+                                .as_ref()
+                                .map(|flag_decl_name| flag_decl_name == name)
+                                .unwrap_or(false),
+                        }
+                })
+            })
     }
 }
 

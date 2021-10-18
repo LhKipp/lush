@@ -168,6 +168,8 @@ pub enum SyntaxKind {
     Condition,
     OperatorExpr,
     LuTypeSpecifier,
+    CmdArg,
+    Flag,
     __LAST,
 }
 
@@ -278,6 +280,8 @@ impl SyntaxKind{
             SyntaxKind::Condition => "Condition",
             SyntaxKind::OperatorExpr => "OperatorExpr",
             SyntaxKind::LuTypeSpecifier => "LuTypeSpecifier",
+            SyntaxKind::CmdArg => "CmdArg",
+            SyntaxKind::Flag => "Flag",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }

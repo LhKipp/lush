@@ -14,15 +14,19 @@ impl TypeCheck for RetStmtNode {
     ) -> Option<TcKey> {
         let self_item = self.ret_kw().to_item();
 
-        let cur_func_name = ty_state
-            .scope
-            .find_cur_command()
-            .map(|callable| callable.name().to_string());
+        let cmd_id = ty_state.scope.find_cur_command().map(|callable| {
+            (
+                callable.name().to_string(),
+                callable.signature().req_flags(),
+            )
+        });
 
-        if let Some(cur_func_name) = cur_func_name {
-            if let Some(tc_func) =
-                ty_state.expect_callable_from_var(&cur_func_name, self_item.clone())
-            {
+        if let Some((cur_cmd_name, cur_cmd_req_flags)) = cmd_id {
+            if let Some(tc_func) = ty_state.expect_callable_from_var(
+                &cur_cmd_name,
+                &cur_cmd_req_flags,
+                self_item.clone(),
+            ) {
                 let ret_stmt_key =
                     ty_state.new_term_key_equated(self_item, tc_func.ret_key.clone());
                 if let Some(ret_value) = self.returned_val() {

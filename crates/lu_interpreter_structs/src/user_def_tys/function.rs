@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{Command, ModPath, Scope, Value, ValueType, Variable};
+use crate::{Command, FlagVariant, ModPath, Scope, Value, ValueType, Variable};
 use derive_builder::Builder;
 use derive_new::new;
 use lu_error::{LuResult, SourceCodeItem};
@@ -77,6 +77,12 @@ pub struct FlagSignature {
     pub decl: Option<FlagSignatureNode>,
 }
 
+impl FlagSignature {
+    pub fn is_required(&self) -> bool {
+        !self.is_opt
+    }
+}
+
 #[derive(Clone, Debug, new, Builder, Serialize, Deserialize, Hash, PartialEq, Eq)]
 pub struct Signature {
     #[builder(default)]
@@ -92,6 +98,22 @@ pub struct Signature {
 }
 
 impl Signature {
+    pub fn req_flags(&self) -> Vec<FlagVariant> {
+        self.flags
+            .iter()
+            .filter(|flag_sign| flag_sign.is_required())
+            .map(|flag_sign| {
+                if let Some(long_flag_name) = &flag_sign.long_name {
+                    FlagVariant::LongFlag(long_flag_name.clone())
+                } else if let Some(short_flag_name) = flag_sign.short_name {
+                    FlagVariant::ShortFlag(short_flag_name)
+                } else {
+                    unreachable!()
+                }
+            })
+            .collect()
+    }
+
     pub fn default_signature(fn_sign_node_decl: SourceCodeItem) -> Signature {
         Signature::new(
             Vec::new(),

@@ -71,4 +71,8 @@ impl FlagSignatureNode {
     pub fn type_(&self) -> Option<LuTypeNode> {
         support::node_child(self.syntax())
     }
+
+    pub fn is_required(&self) -> bool {
+        todo!()
+    }
 }

@@ -2,6 +2,7 @@ use crate::{
     Command, Function, ModPath, ModPathVariant, ScopeFrame, ScopeFrameTag, Signature, Strct,
     StrctField, UsePath, Variable,
 };
+use itertools::Itertools;
 use log::debug;
 use lu_error::util::Outcome;
 use lu_parser::grammar::SourceFileRule;
@@ -85,8 +86,17 @@ impl ModInfo {
                 use_paths: sourced_file.use_paths,
             }));
 
-            for func in sourced_file.funcs {
-                frame.insert_var(Variable::new_func(func.rced()));
+            for (_, funcs) in &sourced_file
+                .funcs
+                .into_iter()
+                .group_by(|func| func.name.clone())
+            {
+                let funcs: Vec<_> = funcs.map(|f| f.rced()).collect();
+                if funcs.len() == 1 {
+                    frame.insert_var(Variable::new_func(funcs.into_iter().next().unwrap()));
+                } else {
+                    frame.insert_var(Variable::new_func_collection(funcs));
+                }
             }
             for strct in sourced_file.strcts {
                 frame.insert_var(Variable::new_strct_decl(strct));

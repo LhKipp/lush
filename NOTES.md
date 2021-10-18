@@ -170,3 +170,16 @@ echo [[name, size]; [file1, 1kb]] | filter fn[arg: {name, size}] $arg.size > 1kb
 
 
 ## Evaluation of partial programs
+
+
+## Cmd overloading
+fn git_branch( --list -l
+            branchname: str
+            start_point?: str )
+end
+
+fn git_branch ( --delete -D
+                ...to_delete: str)
+end
+
+<!-- fn generic_opts git_branch (--verbose -v) -->

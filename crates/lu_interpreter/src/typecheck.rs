@@ -3,12 +3,14 @@ use itertools::Itertools;
 use log::{debug, warn};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
+use lu_interpreter_structs::{Command, FlagVariant};
 use lu_pipeline_stage::PipelineStage;
 use parking_lot::RwLock;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::collections::hash_map::Entry;
 use std::fmt::Display;
 use std::iter;
+use std::rc::Rc;
 use std::sync::Arc;
 use std::{collections::HashMap, fmt::Debug};
 
@@ -33,8 +35,12 @@ pub struct TyCheckState {
     // We keep track of the node for error formatting reasons. Therefore a SourceCodeItem
     // is enough
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
+
     /// Variable to tckey (for simple variables)
     tc_var_table: BiHashMap<Variable, TcKey>,
+    /// Command to tckey
+    tc_var_cmd_table: Vec<(Rc<dyn Command>, TcKey)>,
+
     /// TcKey to TcFunc
     tc_func_table: HashMap<TcKey, TcFunc>,
     /// TcKey to TcStrct
@@ -70,6 +76,7 @@ impl TyCheckState {
             tc_array_table: HashMap::new(),
             ty_table: HashMap::new(),
             result: None,
+            tc_var_cmd_table: Vec::new(),
         }
     }
 
@@ -240,6 +247,34 @@ impl TyCheckState {
         }
     }
 
+    fn get_key_of_func(&mut self, func_name: &str, passed_flags: &[FlagVariant]) -> Option<TcKey> {
+        if let Some(func) = self.scope.find_func(func_name, &passed_flags).cloned() {
+            let already_inserted_key = self.tc_var_cmd_table.iter().find_map(|(cmd, key)| {
+                if Rc::ptr_eq(&func, cmd) {
+                    Some(key)
+                } else {
+                    None
+                }
+            });
+            if let Some(key) = already_inserted_key {
+                Some(key.clone())
+            } else {
+                // Func is in scope, but doesn't have a tc_key yet ( first time usage of the func )
+                debug!(
+                    "Found cmd {}, which has no tc_key yet. Inserting new tc_func",
+                    func_name
+                );
+                let tc_func = TcFunc::from_signature(func.signature(), self);
+                let tc_func_self_key = tc_func.self_key.clone();
+                self.tc_var_cmd_table
+                    .push((func.clone(), tc_func.self_key.clone()));
+                self.tc_func_table.insert(tc_func.self_key.clone(), tc_func);
+                Some(tc_func_self_key)
+            }
+        } else {
+            None
+        }
+    }
     /// Returns the key of the var (if present, (or still has to be inserted))
     fn get_key_of_var(&mut self, var_name: &str) -> Option<TcKey> {
         if let Some(var) = self.scope.find_var(var_name).cloned() {
@@ -272,6 +307,20 @@ impl TyCheckState {
                 }
             }
         } else {
+            None
+        }
+    }
+
+    pub fn expect_key_from_func(
+        &mut self,
+        cmd_name: &str,
+        required_flags: &[FlagVariant],
+        usage: SourceCodeItem,
+    ) -> Option<TcKey> {
+        if let Some(cmd_key) = self.get_key_of_func(cmd_name, required_flags) {
+            Some(cmd_key)
+        } else {
+            self.push_err(AstErr::CmdNotInScope(usage.clone()).into());
             None
         }
     }
@@ -320,8 +369,18 @@ impl TyCheckState {
             .map(|tc_func| tc_func.substitute_generics(self))
     }
 
-    pub fn get_callable_from_var(&mut self, var_name: &str) -> Option<TcFunc> {
-        self.get_key_of_var(var_name)
+    pub fn get_callable_from_var(
+        &mut self,
+        var_name: &str,
+        passed_flags: &[FlagVariant],
+    ) -> Option<TcFunc> {
+        self.get_key_of_func(var_name, passed_flags)
+            .map(|key| self.get_callable_from_key(key))
+            .flatten()
+    }
+
+    pub fn get_callable_from_cmd(&mut self, cmd: &Rc<dyn Command>) -> Option<TcFunc> {
+        self.get_key_of_func(cmd.name(), &cmd.signature().req_flags())
             .map(|key| self.get_callable_from_key(key))
             .flatten()
     }
@@ -342,10 +401,12 @@ impl TyCheckState {
     fn expect_callable_from_var(
         &mut self,
         cllbl_name: &str,
+        required_flags: &[FlagVariant],
         cllbl_usage: SourceCodeItem,
     ) -> Option<TcFunc> {
-        if let Some(var_key) = self.expect_key_from_var(&cllbl_name, cllbl_usage) {
-            self.expect_callable_from_key(var_key)
+        if let Some(func_key) = self.expect_key_from_func(&cllbl_name, required_flags, cllbl_usage)
+        {
+            self.expect_callable_from_key(func_key)
         } else {
             None
         }

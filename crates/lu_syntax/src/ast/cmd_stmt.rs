@@ -1,6 +1,6 @@
-use crate::{AstNode, AstToken};
+use crate::{ast::CmdArgElement, AstElementChildren, AstNode, AstToken};
 
-use super::{support, BareWordToken, CmdStmtNode, ValueExprElement};
+use super::{support, BareWordToken, CmdStmtNode, FlagElement};
 
 impl CmdStmtNode {
     /// Returns the longest possible name of the called command
@@ -17,8 +17,11 @@ impl CmdStmtNode {
     }
 
     /// All arguments of this command. This does include the command name parts.
-    pub fn args(&self) -> impl Iterator<Item = ValueExprElement> + '_ {
+    pub fn args(&self) -> impl Iterator<Item = CmdArgElement> + '_ {
         support::element_children(self.syntax()).skip(1)
+    }
+    pub fn get_passed_flags(&self) -> AstElementChildren<FlagElement> {
+        support::element_children(self.syntax())
     }
 
     pub fn get_cmd_name(&self) -> String {

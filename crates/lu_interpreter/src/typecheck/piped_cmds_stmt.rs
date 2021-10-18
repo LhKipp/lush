@@ -1,5 +1,5 @@
 use log::warn;
-use lu_interpreter_structs::ValueType;
+use lu_interpreter_structs::{FlagVariant, ValueType};
 use lu_syntax::{
     ast::{CmdOrValueExprElement, PipedCmdsStmtNode},
     AstElement,
@@ -22,7 +22,9 @@ impl TypeCheck for PipedCmdsStmtNode {
         let mut ret_key = first_in_key;
         for cmd in self.piped_args() {
             if let CmdOrValueExprElement::CmdStmt(cmd) = &cmd {
-                if let Some(cmd_keys) = ty_state.get_callable_from_var(&cmd.get_cmd_name()) {
+                let cmd_name = cmd.get_cmd_name();
+                let passed_flags = FlagVariant::convert(cmd.get_passed_flags());
+                if let Some(cmd_keys) = ty_state.get_callable_from_var(&cmd_name, &passed_flags) {
                     ty_state.equate_keys(ret_key, cmd_keys.in_key);
                 } // else its an external cmd, no equating of in_keys necessary
             } else {

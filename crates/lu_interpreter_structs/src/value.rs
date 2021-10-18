@@ -9,7 +9,7 @@ use std::{fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Command, Strct};
+use crate::{Command, CommandCollection, Strct};
 
 // pub const NIL_VAL: Value = Value::Nil;
 
@@ -33,6 +33,7 @@ pub enum Value {
     Strct(String, Rc<Vec<(String, Value)>>),
     #[serde(skip)]
     Command(Rc<dyn Command>),
+    CommandCollection(CommandCollection),
     /// Not really lu values. But treating them as one, allows us to store them in variables
     #[serde(skip)] // TODO serialize
     StrctDecl(Arc<RwLock<Strct>>),
@@ -89,6 +90,7 @@ impl Hash for Value {
                 v.hash(state);
             }
             Value::Command(func) => Rc::as_ptr(func).hash(state),
+            Value::CommandCollection(col) => col.hash(state),
             Value::StrctDecl(strct) => Arc::as_ptr(strct).hash(state),
         }
     }
@@ -136,6 +138,7 @@ impl Value {
             Value::Command(_) => None,
             Value::StrctDecl(_) => None,
             Value::Strct(_, _) => None,
+            Value::CommandCollection(_) => None,
         }
     }
 }
@@ -157,6 +160,8 @@ impl Display for Value {
             Value::Command(v) => write!(f, "Command: {} {:?}", v.name(), v.signature_item()),
             Value::StrctDecl(v) => write!(f, "{:p}", Arc::as_ptr(v)),
             Value::Strct(name, fields) => write!(f, "{}{:?}", name, fields),
+            // TODO nice display here
+            Value::CommandCollection(col) => write!(f, "{:?}", col),
         }
     }
 }

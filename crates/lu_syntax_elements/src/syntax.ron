@@ -180,5 +180,16 @@ Config(
             "ArrayType",
             "FnType",
         ],),
+    (name: "CmdArg", is_generic: true,
+        represents_element_names: [
+            "ValueExpr",
+            "ShortFlag",
+            "LongFlag"
+        ],),
+    (name: "Flag", is_generic: true,
+        represents_element_names: [
+            "ShortFlag",
+            "LongFlag"
+        ],),
     ]
 )

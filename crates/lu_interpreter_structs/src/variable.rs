@@ -9,7 +9,7 @@ use lu_syntax::{
 use lu_syntax_elements::constants::IN_ARG_NAME;
 use serde::{Deserialize, Serialize};
 
-use crate::{Command, Strct, Value};
+use crate::{Command, CommandCollection, Strct, Value};
 
 #[derive(Educe)]
 #[educe(Default)]
@@ -59,6 +59,18 @@ impl Variable {
         Variable::new(
             func.name().to_string(),
             Value::new_func(func),
+            VarDeclNode::CatchAll(decl),
+        )
+    }
+
+    pub fn new_func_collection(funcs: Vec<Rc<dyn Command>>) -> Variable {
+        // TODO better decl here
+        let collection = CommandCollection::new(funcs);
+        let name = collection.name();
+        let decl = collection.pseudo_decl();
+        Variable::new(
+            name.to_string(),
+            Value::CommandCollection(collection),
             VarDeclNode::CatchAll(decl),
         )
     }

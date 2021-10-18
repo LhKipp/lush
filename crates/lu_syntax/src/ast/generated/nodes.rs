@@ -3445,3 +3445,129 @@ impl Display for LuTypeSpecifierElement {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum CmdArgElement {
+    ShortFlag(ShortFlagToken),
+    LongFlag(LongFlagToken),
+    ValueExpr(ValueExprElement),
+    }
+
+impl CmdArgElement {
+}
+
+impl AstElement for CmdArgElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
+        match kind{
+            ShortFlag | LongFlag | ValueExpr => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
+        let res = match syntax.kind() {
+            ShortFlag => CmdArgElement::ShortFlag(ShortFlagToken { syntax: syntax.into_token().unwrap() }),
+            LongFlag => CmdArgElement::LongFlag(LongFlagToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            CmdArgElement::ShortFlag(it) => it.syntax.clone().into(),
+            
+            
+            CmdArgElement::LongFlag(it) => it.syntax.clone().into(),
+            
+            
+            CmdArgElement::ValueExpr(it) => it.syntax().clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for CmdArgElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            CmdArgElement::ShortFlag(it) => it.get_syntax_kind(),
+            CmdArgElement::LongFlag(it) => it.get_syntax_kind(),
+            CmdArgElement::ValueExpr(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl Display for CmdArgElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum FlagElement {
+    ShortFlag(ShortFlagToken),
+    LongFlag(LongFlagToken),
+    }
+
+impl FlagElement {
+}
+
+impl AstElement for FlagElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        match kind{
+            ShortFlag | LongFlag => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        let res = match syntax.kind() {
+            ShortFlag => FlagElement::ShortFlag(ShortFlagToken { syntax: syntax.into_token().unwrap() }),
+            LongFlag => FlagElement::LongFlag(LongFlagToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            FlagElement::ShortFlag(it) => it.syntax.clone().into(),
+            
+            
+            FlagElement::LongFlag(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for FlagElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            FlagElement::ShortFlag(it) => it.get_syntax_kind(),
+            FlagElement::LongFlag(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl Display for FlagElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
