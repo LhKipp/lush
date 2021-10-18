@@ -27,12 +27,11 @@ impl Rule for CmdStmtRule {
             if next_token == Eof || next_token == Newline {
                 break;
             }
-            if p.eat_after(BareWord, Whitespace) {
-                continue;
-            } else if arg_rule.opt(p).is_some() {
-                continue;
-            } else {
-                debug!("Breaking cmd stmt");
+            if !p.eat_after(ShortFlag, Whitespace)
+                && !p.eat_after(LongFlag, Whitespace)
+                && !p.eat_after(BareWord, Whitespace)
+                && !arg_rule.opt(p).is_some()
+            {
                 break;
             }
         }

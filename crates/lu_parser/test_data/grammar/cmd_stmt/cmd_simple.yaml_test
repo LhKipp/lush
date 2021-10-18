@@ -91,3 +91,35 @@ push [] 1
 - Finish: ""
 - Finish: ""
 ...
+cmd with flag
+===
+echo --loud "Hello"
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Token: "LongFlag (len: 6)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 5)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Finish: ""
+...
+cmd with shortflag
+===
+echo -l "Hello"
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Token: "ShortFlag (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 5)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Finish: ""
+...
