@@ -11,10 +11,7 @@ impl Evaluable for CmdStmtNode {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let cmd_name = self.get_cmd_name();
-        let passed_flags = self
-            .get_passed_flags()
-            .map(|elem| FlagVariant::from_node(&elem))
-            .collect::<Vec<_>>();
+        let passed_flags = FlagVariant::convert(self.get_passed_flags());
         let cmd: Rc<dyn Command> =
             if let Some(cmd) = scope.lock().find_func(&cmd_name, &passed_flags) {
                 cmd.clone()
@@ -22,25 +19,48 @@ impl Evaluable for CmdStmtNode {
                 RunExternalCmd::new(self.clone(), cmd_name).rced()
             };
 
-        debug!("Evaluating all cmd args");
-        // let cmd_sign = cmd.signature();
-
+        let cmd_flags = &cmd.signature().flags;
         let mut arg_vals = vec![];
-        // let mut flags = HashMap::new();
-        // let mut last_seen_flag = None;
+        // Flag name with value
+        let mut flag_vals: Vec<(String, Value)> = vec![];
+        let mut last_seen_flag = None;
+        debug!("Evaluating all cmd args");
+
         for arg in self.args() {
             match arg {
-                CmdArgElement::LongFlag(_) => {
-                    todo!();
-                    // if let Some(last_flag) = last_seen_flag {
-                    // }
-                    // last_seen_flag = Some(FlagElement::LongFlag(f));
+                CmdArgElement::LongFlag(long_flag) => {
+                    let flag_name = long_flag.flag_name();
+                    match flag_usage_to_flag_arg(&cmd_flags, |flag_sign| {
+                        if flag_sign.long_name.as_ref() == Some(&flag_name) {
+                            Some((flag_name.clone(), flag_sign.ty.clone()))
+                        } else {
+                            None
+                        }
+                    }) {
+                        Ok(flag_arg) => flag_vals.push(flag_arg),
+                        Err(flag_name) => last_seen_flag = Some(flag_name),
+                    }
                 }
-                CmdArgElement::ShortFlag(_) => {
-                    todo!();
+                CmdArgElement::ShortFlag(short_flag) => {
+                    let flag_name = short_flag.flag_name();
+                    match flag_usage_to_flag_arg(&cmd_flags, |flag_sign| {
+                        if flag_sign.short_name == Some(flag_name) {
+                            Some((flag_name.to_string(), flag_sign.ty.clone()))
+                        } else {
+                            None
+                        }
+                    }) {
+                        Ok(flag_arg) => flag_vals.push(flag_arg),
+                        Err(flag_name) => last_seen_flag = Some(flag_name),
+                    }
                 }
                 CmdArgElement::ValueExpr(n) => {
-                    arg_vals.push(n.evaluate(scope)?);
+                    let val = n.evaluate(scope)?;
+                    if let Some(last_seen_flag) = last_seen_flag.take() {
+                        flag_vals.push((last_seen_flag, val));
+                    } else {
+                        arg_vals.push(val);
+                    }
                 }
             }
         }
@@ -123,5 +143,24 @@ impl Evaluable for CmdStmtNode {
         }
 
         Evaluator::lu_result_to_eval_result(cmd_result)
+    }
+}
+
+/// Ok if flag is simple toggle and can be converted to a flag_arg, otherwise Err with flag_name
+fn flag_usage_to_flag_arg<FindMapFn>(
+    cmd_flags: &Vec<FlagSignature>,
+    flag_sign_matches_passed_flag: FindMapFn,
+) -> Result<(String, Value), String>
+where
+    FindMapFn: FnMut(&FlagSignature) -> Option<(String, ValueType)>,
+{
+    let (flag_name, flag_ty) = cmd_flags
+        .iter()
+        .find_map(flag_sign_matches_passed_flag)
+        .expect("Flag will always be found");
+    if flag_ty == ValueType::Bool {
+        Ok((flag_name, true.into()))
+    } else {
+        Err(flag_name)
     }
 }
