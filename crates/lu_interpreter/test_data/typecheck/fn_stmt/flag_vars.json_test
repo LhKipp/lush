@@ -1,0 +1,12 @@
+flag var is inserted when passed
+===
+fn f1(ret: num req --flag: num)
+    let x: num = $flag
+    ret $x
+end
+f1 --flag 1
+---
+{
+  "Ok": "Number"
+}
+...

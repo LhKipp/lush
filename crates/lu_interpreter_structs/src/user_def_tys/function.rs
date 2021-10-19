@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{Command, FlagVariant, ModPath, Scope, Value, ValueType, Variable};
+use crate::{Command, FlagVariant, ModPath, Scope, Value, ValueType, VarDeclNode, Variable};
 use derive_builder::Builder;
 use derive_new::new;
 use log::trace;
@@ -80,6 +80,14 @@ pub struct FlagSignature {
 impl FlagSignature {
     pub fn is_required(&self) -> bool {
         !self.is_opt
+    }
+    pub fn to_var(&self) -> Variable {
+        let name = self
+            .long_name
+            .clone()
+            .or(self.short_name.map(|c| c.to_string()))
+            .expect("Either long or shortname set");
+        Variable::new(name, Value::Nil, VarDeclNode::CatchAll(self.decl.clone()))
     }
 }
 

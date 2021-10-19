@@ -22,7 +22,7 @@ impl Evaluable for CmdStmtNode {
         let cmd_flags = &cmd.signature().flags;
         let mut arg_vals = vec![];
         // Flag name with value
-        let mut flag_vals: Vec<(String, Value)> = vec![];
+        let mut flag_vals: Vec<(String, Value, SourceCodeItem)> = vec![];
         let mut last_seen_flag = None;
         debug!("Evaluating all cmd args");
 
@@ -37,8 +37,10 @@ impl Evaluable for CmdStmtNode {
                             None
                         }
                     }) {
-                        Ok(flag_arg) => flag_vals.push(flag_arg),
-                        Err(flag_name) => last_seen_flag = Some(flag_name),
+                        Ok((flag_name, val)) => {
+                            flag_vals.push((flag_name, val, long_flag.to_item()))
+                        }
+                        Err(flag_name) => last_seen_flag = Some((flag_name, long_flag.to_item())),
                     }
                 }
                 CmdArgElement::ShortFlag(short_flag) => {
@@ -50,14 +52,16 @@ impl Evaluable for CmdStmtNode {
                             None
                         }
                     }) {
-                        Ok(flag_arg) => flag_vals.push(flag_arg),
-                        Err(flag_name) => last_seen_flag = Some(flag_name),
+                        Ok((flag_name, val)) => {
+                            flag_vals.push((flag_name, val, short_flag.to_item()))
+                        }
+                        Err(flag_name) => last_seen_flag = Some((flag_name, short_flag.to_item())),
                     }
                 }
                 CmdArgElement::ValueExpr(n) => {
                     let val = n.evaluate(scope)?;
-                    if let Some(last_seen_flag) = last_seen_flag.take() {
-                        flag_vals.push((last_seen_flag, val));
+                    if let Some((flag_name, usage_item)) = last_seen_flag.take() {
+                        flag_vals.push((flag_name, val, usage_item));
                     } else {
                         arg_vals.push(val);
                     }
@@ -125,6 +129,14 @@ impl Evaluable for CmdStmtNode {
                 arg_iter.next().is_none(),
                 "TyChecking does not work. Should be nothing left"
             );
+        }
+        // Insert flags
+        for (flag_name, val, usage_item) in flag_vals {
+            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
+                flag_name,
+                val,
+                VarDeclNode::CatchAll(usage_item),
+            ));
         }
 
         // And now we can finally run the cmd
