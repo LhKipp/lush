@@ -1,0 +1,32 @@
+Overloaded fn is treatet differently 1
+===
+fn f1(ret: num
+    req --flag1)
+    ret 1
+end
+fn f2(ret: str
+    req --flag2)
+    ret "hi"
+end
+f1 --flag1
+---
+{
+  "Ok": "Number"
+}
+...
+Overloaded fn is treatet differently 2
+===
+fn f1(ret: num
+    req --flag1)
+    ret 1
+end
+fn f2(ret: str
+    req --flag2)
+    ret "hi"
+end
+f2 --flag2
+---
+{
+  "Ok": "String"
+}
+...

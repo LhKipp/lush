@@ -56,17 +56,10 @@ impl ArgSignatureNode {
 
 impl FlagSignatureNode {
     pub fn long_name(&self) -> Option<String> {
-        support::token_child::<LongFlagToken>(self.syntax()).map(|flag| flag.text().to_string())
+        support::token_child::<LongFlagToken>(self.syntax()).map(|flag| flag.flag_name())
     }
     pub fn short_name(&self) -> Option<char> {
-        let short_name = support::token_child::<ShortFlagToken>(self.syntax())
-            .map(|flag| flag.text().to_string());
-        if let Some(mut name) = short_name {
-            assert!(name.chars().count() == 1);
-            name.pop()
-        } else {
-            None
-        }
+        support::token_child::<ShortFlagToken>(self.syntax()).map(|flag| flag.flag_name())
     }
     pub fn type_(&self) -> Option<LuTypeNode> {
         support::node_child(self.syntax())
@@ -74,5 +67,21 @@ impl FlagSignatureNode {
 
     pub fn is_required(&self) -> bool {
         support::token_child::<ReqKeywordToken>(self.syntax()).is_some()
+    }
+}
+
+impl ShortFlagToken {
+    pub fn flag_name(&self) -> char {
+        assert!(
+            self.text().len() == 2,
+            "TODO handle short flags containing multiple flags"
+        );
+        self.text().chars().nth(1).unwrap()
+    }
+}
+
+impl LongFlagToken {
+    pub fn flag_name(&self) -> String {
+        self.text()[2..].to_string()
     }
 }

@@ -522,7 +522,7 @@ pub struct TcFunc {
     ret_key: TcKey,
     args_keys: Vec<TcKey>,
     var_arg_key: Option<TcKey>,
-    flags_keys: HashMap<FlagSignature, TcKey>,
+    flags_keys: Vec<(FlagSignature, TcKey)>,
 }
 
 impl TcFunc {
@@ -632,14 +632,23 @@ impl TcFunc {
             })
             .collect();
 
+        let flags_keys = sign
+            .flags
+            .iter()
+            .map(|flag| {
+                let flag_key =
+                    ty_state.new_term_key_concretiziesd(flag.decl.clone(), flag.ty.clone());
+                (flag.clone(), flag_key)
+            })
+            .collect();
+
         let ty_func = Self {
             self_key,
             in_key,
             ret_key,
             args_keys,
             var_arg_key,
-            // TODO gen flags tc keys
-            flags_keys: HashMap::new(),
+            flags_keys,
         };
 
         ty_state

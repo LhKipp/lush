@@ -1,14 +1,14 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use std::iter;
+use std::{collections::HashMap, iter};
 
 use log::{debug, warn};
 use lu_error::{SourceCodeItem, TyErr};
-use lu_interpreter_structs::{FlagVariant, Value};
+use lu_interpreter_structs::{FlagSignature, FlagVariant, Value};
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{CmdArgElement, CmdStmtNode, LetStmtNode, ValueExprElement},
-    AstElement, AstNode,
+    AstElement, AstNode, AstToken,
 };
 use rusttyc::TcKey;
 
@@ -34,7 +34,7 @@ impl TypeCheck for CmdStmtNode {
                 .get_tc_cmd_from_rc_cmd(&cmd)
                 .expect("If cmd is found in scope it must be found in ty_state");
             let args = self.args();
-            ty_check_cmd_args(self, args, &cmd_keys, ty_state);
+            ty_check_cmd_args_and_flags(self, args, &cmd_keys, ty_state);
             ty_state.new_term_key_equated(self.to_item(), cmd_keys.ret_key.clone())
         } else {
             ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
@@ -44,37 +44,60 @@ impl TypeCheck for CmdStmtNode {
     }
 }
 
-fn ty_check_cmd_args<ArgIter: Iterator<Item = CmdArgElement>>(
+fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
     cmd_node: &CmdStmtNode,
-    args: ArgIter,
+    mut args: ArgIter,
     called_func: &TcFunc,
     ty_state: &mut TyCheckState,
 ) {
     let mut called_func_arg_tc_iter = called_func.args_keys.iter();
+    // Flags that are required but not passed
+    let mut missing_called_func_req_flags: Vec<_> = called_func
+        .flags_keys
+        .iter()
+        .filter(|(flag, _)| flag.is_required())
+        .map(|(flag, _)| flag.clone())
+        .collect();
 
-    for arg in args {
-        let arg = if let CmdArgElement::ValueExpr(n) = arg {
-            n
-        } else {
-            unreachable!("TODO ty check cmd flags")
-        };
-        match called_func_arg_tc_iter.next() {
-            Some(called_func_arg_tc) => {
-                ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);
-            }
-            None => {
-                if let Some(var_arg_ty) = called_func.var_arg_key {
-                    ty_state.new_term_key_equated(arg.to_item(), var_arg_ty);
-                } else {
-                    // Found unexpected argument
-                    let called_func_decl = ty_state.get_item_of(&called_func.self_key).clone();
-                    ty_state.push_err(
-                        TyErr::UnexpectedArg {
-                            arg: arg.to_item(),
-                            fn_decl: called_func_decl.clone(),
+    while let Some(next_arg) = args.next() {
+        match next_arg {
+            CmdArgElement::ShortFlag(n) => ty_check_flag(
+                &mut args,
+                |flag_sign| flag_sign.short_name == Some(n.flag_name()),
+                called_func,
+                n.to_item(),
+                &mut missing_called_func_req_flags,
+                ty_state,
+            ),
+            CmdArgElement::LongFlag(n) => ty_check_flag(
+                &mut args,
+                |flag_sign| flag_sign.long_name == Some(n.flag_name()),
+                called_func,
+                n.to_item(),
+                &mut missing_called_func_req_flags,
+                ty_state,
+            ),
+            CmdArgElement::ValueExpr(arg) => {
+                match called_func_arg_tc_iter.next() {
+                    Some(called_func_arg_tc) => {
+                        ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);
+                    }
+                    None => {
+                        if let Some(var_arg_ty) = called_func.var_arg_key {
+                            ty_state.new_term_key_equated(arg.to_item(), var_arg_ty);
+                        } else {
+                            // Found unexpected argument
+                            let called_func_decl =
+                                ty_state.get_item_of(&called_func.self_key).clone();
+                            ty_state.push_err(
+                                TyErr::UnexpectedArg {
+                                    arg: arg.to_item(),
+                                    fn_decl: called_func_decl.clone(),
+                                }
+                                .into(),
+                            )
                         }
-                        .into(),
-                    )
+                    }
                 }
             }
         }
@@ -89,6 +112,60 @@ fn ty_check_cmd_args<ArgIter: Iterator<Item = CmdArgElement>>(
             }
             .into(),
         )
+    }
+
+    for non_passed_flag in missing_called_func_req_flags {
+        ty_state.push_err(
+            TyErr::NotPassedRequiredFlag {
+                flag_decl: non_passed_flag.decl.clone(),
+                cmd_stmt: cmd_node.to_item(),
+            }
+            .into(),
+        );
+    }
+}
+
+fn ty_check_flag<ArgIter: Iterator<Item = CmdArgElement>, P>(
+    args: &mut ArgIter,
+    mut flag_sign_matches_usage: P,
+    called_func: &TcFunc,
+    flag_usage: SourceCodeItem,
+    missing_called_func_req_flags: &mut Vec<FlagSignature>,
+    ty_state: &mut TyCheckState,
+) where
+    P: FnMut(&FlagSignature) -> bool,
+{
+    if let Some((flag, key)) = called_func.flags_keys.iter().find_map(|(flag, key)| {
+        if flag_sign_matches_usage(flag) {
+            Some((flag, key))
+        } else {
+            None
+        }
+    }) {
+        // Found passed flag.
+        if flag.is_required() {
+            if let Some(flag_pos) = missing_called_func_req_flags
+                .iter()
+                .position(|missing_flag| missing_flag == flag)
+            {
+                missing_called_func_req_flags.remove(flag_pos);
+            }
+        }
+
+        if flag.ty != ValueType::Bool {
+            // next arg must be argument to flag
+            match args.next() {
+                Some(CmdArgElement::ValueExpr(arg_val)) => {
+                    let arg_val_key = arg_val.typecheck(ty_state).unwrap();
+                    ty_state.concretizes_key(arg_val_key, flag.ty.clone());
+                }
+                _ => {
+                    ty_state.push_err(TyErr::FlagWithoutArgument(flag_usage).into());
+                }
+            }
+        }
+    } else {
+        ty_state.push_err(TyErr::PassingOfNotDeclaredFlag(flag_usage).into());
     }
 }
 

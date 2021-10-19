@@ -3,8 +3,9 @@ use std::sync::Arc;
 use crate::{Command, FlagVariant, ModPath, Scope, Value, ValueType, Variable};
 use derive_builder::Builder;
 use derive_new::new;
+use log::trace;
 use lu_error::{LuResult, SourceCodeItem};
-use lu_syntax::ast::{ArgSignatureNode, FlagSignatureNode, FnStmtNode, SignatureNode};
+use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use parking_lot::Mutex;
@@ -73,8 +74,7 @@ pub struct FlagSignature {
     pub ty: ValueType,
     #[new(default)] // TODO this default should be false, making every flag necessary
     pub is_opt: bool,
-    #[serde(skip)]
-    pub decl: Option<FlagSignatureNode>,
+    pub decl: SourceCodeItem,
 }
 
 impl FlagSignature {
@@ -176,8 +176,8 @@ impl Signature {
                 let ty = flag_node
                     .type_()
                     .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
-                    .unwrap_or(ValueType::Unspecified);
-                FlagSignature::new(long_name, short_name, ty, Some(flag_node))
+                    .unwrap_or(ValueType::Bool); // Flags have a default ty of bool.
+                FlagSignature::new(long_name, short_name, ty, flag_node.to_item())
             })
             .collect();
         let var_arg = sign_node.var_arg().map(|var_arg_node| {
@@ -188,7 +188,9 @@ impl Signature {
                 .unwrap_or(ValueType::Any);
             ArgSignature::new(name, ty, var_arg_node.to_item())
         });
-        Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.to_item())
+        let sign = Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.to_item());
+        trace!("Generated Signature: {:#?}", sign);
+        sign
     }
 }
 

@@ -41,6 +41,12 @@ pub enum TyErr {
         strct_decl: SourceCodeItem,
         usage: SourceCodeItem,
     },
+    FlagWithoutArgument(SourceCodeItem),
+    PassingOfNotDeclaredFlag(SourceCodeItem),
+    NotPassedRequiredFlag {
+        flag_decl: SourceCodeItem,
+        cmd_stmt: SourceCodeItem,
+    },
 }
 
 impl TyErr {
@@ -66,6 +72,12 @@ impl TyErr {
             } => todo!(),
             TyErr::ItemExpectedToBeFunc(_) => todo!(),
             TyErr::ItemExpectedToBeArray(_) => todo!(),
+            TyErr::FlagWithoutArgument(_) => todo!(),
+            TyErr::PassingOfNotDeclaredFlag(_) => todo!(),
+            TyErr::NotPassedRequiredFlag {
+                flag_decl,
+                cmd_stmt,
+            } => todo!(),
         }
     }
 }
