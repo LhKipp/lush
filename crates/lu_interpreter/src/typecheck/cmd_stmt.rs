@@ -31,7 +31,7 @@ impl TypeCheck for CmdStmtNode {
 
         let ret_ty = if let Some(cmd) = called_cmd {
             let cmd_keys = ty_state
-                .get_callable_from_cmd(&cmd)
+                .get_tc_cmd_from_rc_cmd(&cmd)
                 .expect("If cmd is found in scope it must be found in ty_state");
             let args = self.args();
             ty_check_cmd_args(self, args, &cmd_keys, ty_state);

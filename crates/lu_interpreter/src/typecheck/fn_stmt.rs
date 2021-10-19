@@ -32,7 +32,7 @@ impl TypeCheck for FnStmtNode {
 
         let var_key_to_insert = {
             let own_tc_func = ty_state
-                .expect_callable_from_var(&fn_name,&required_flags, self.decl_item())
+                .expect_tc_cmd_from_cmd_usage(&fn_name, &required_flags, self.decl_item())
                 .expect("Always works");
             let own_signature = ty_state
                 .scope

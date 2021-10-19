@@ -22,7 +22,7 @@ impl TypeCheck for RetStmtNode {
         });
 
         if let Some((cur_cmd_name, cur_cmd_req_flags)) = cmd_id {
-            if let Some(tc_func) = ty_state.expect_callable_from_var(
+            if let Some(tc_func) = ty_state.expect_tc_cmd_from_cmd_usage(
                 &cur_cmd_name,
                 &cur_cmd_req_flags,
                 self_item.clone(),

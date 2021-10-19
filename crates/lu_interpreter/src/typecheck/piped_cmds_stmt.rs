@@ -24,7 +24,8 @@ impl TypeCheck for PipedCmdsStmtNode {
             if let CmdOrValueExprElement::CmdStmt(cmd) = &cmd {
                 let cmd_name = cmd.get_cmd_name();
                 let passed_flags = FlagVariant::convert(cmd.get_passed_flags());
-                if let Some(cmd_keys) = ty_state.get_callable_from_var(&cmd_name, &passed_flags) {
+                if let Some(cmd_keys) = ty_state.get_tc_cmd_from_cmd_usage(&cmd_name, &passed_flags)
+                {
                     ty_state.equate_keys(ret_key, cmd_keys.in_key);
                 } // else its an external cmd, no equating of in_keys necessary
             } else {

@@ -36,7 +36,7 @@ pub struct TyCheckState {
     // is enough
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
 
-    /// Variable to tckey (for simple variables)
+    /// Variable to tckey (for simple variables + strcts)
     tc_var_table: BiHashMap<Variable, TcKey>,
     /// Command to tckey
     tc_var_cmd_table: Vec<(Rc<dyn Command>, TcKey)>,
@@ -247,7 +247,9 @@ impl TyCheckState {
         }
     }
 
-    fn get_key_of_func(&mut self, func_name: &str, passed_flags: &[FlagVariant]) -> Option<TcKey> {
+    /// Gets or inserts a key + tc_func for cmd with name `cmd_name`, that could be called with
+    /// the `passed_flags`
+    fn get_key_of_cmd(&mut self, func_name: &str, passed_flags: &[FlagVariant]) -> Option<TcKey> {
         if let Some(func) = self.scope.find_func(func_name, &passed_flags).cloned() {
             let already_inserted_key = self.tc_var_cmd_table.iter().find_map(|(cmd, key)| {
                 if Rc::ptr_eq(&func, cmd) {
@@ -311,13 +313,13 @@ impl TyCheckState {
         }
     }
 
-    pub fn expect_key_from_func(
+    pub fn expect_key_from_cmd(
         &mut self,
         cmd_name: &str,
         required_flags: &[FlagVariant],
         usage: SourceCodeItem,
     ) -> Option<TcKey> {
-        if let Some(cmd_key) = self.get_key_of_func(cmd_name, required_flags) {
+        if let Some(cmd_key) = self.get_key_of_cmd(cmd_name, required_flags) {
             Some(cmd_key)
         } else {
             self.push_err(AstErr::CmdNotInScope(usage.clone()).into());
@@ -363,32 +365,32 @@ impl TyCheckState {
         }
     }
 
-    fn get_callable_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
+    fn get_tc_cmd_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
         self.get_tc_func(&key.clone())
             .cloned()
             .map(|tc_func| tc_func.substitute_generics(self))
     }
 
-    pub fn get_callable_from_var(
+    pub fn get_tc_cmd_from_cmd_usage(
         &mut self,
         var_name: &str,
         passed_flags: &[FlagVariant],
     ) -> Option<TcFunc> {
-        self.get_key_of_func(var_name, passed_flags)
-            .map(|key| self.get_callable_from_key(key))
+        self.get_key_of_cmd(var_name, passed_flags)
+            .map(|key| self.get_tc_cmd_from_key(key))
             .flatten()
     }
 
-    pub fn get_callable_from_cmd(&mut self, cmd: &Rc<dyn Command>) -> Option<TcFunc> {
-        self.get_key_of_func(cmd.name(), &cmd.signature().req_flags())
-            .map(|key| self.get_callable_from_key(key))
+    pub fn get_tc_cmd_from_rc_cmd(&mut self, cmd: &Rc<dyn Command>) -> Option<TcFunc> {
+        self.get_key_of_cmd(cmd.name(), &cmd.signature().req_flags())
+            .map(|key| self.get_tc_cmd_from_key(key))
             .flatten()
     }
 
     /// Returns the strct behind key if key is a Strct. Records an error otherwise
     /// Therefore the user does not have to handle the None case
-    fn expect_callable_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
-        if let Some(cmd) = self.get_callable_from_key(key) {
+    fn expect_tc_cmd_from_key(&mut self, key: TcKey) -> Option<TcFunc> {
+        if let Some(cmd) = self.get_tc_cmd_from_key(key) {
             Some(cmd)
         } else {
             let key_item = self.get_item_of(&key).clone();
@@ -398,15 +400,14 @@ impl TyCheckState {
     }
 
     /// Some if such a callable is found. None otherwise (and an error will be generated)
-    fn expect_callable_from_var(
+    fn expect_tc_cmd_from_cmd_usage(
         &mut self,
         cllbl_name: &str,
         required_flags: &[FlagVariant],
         cllbl_usage: SourceCodeItem,
     ) -> Option<TcFunc> {
-        if let Some(func_key) = self.expect_key_from_func(&cllbl_name, required_flags, cllbl_usage)
-        {
-            self.expect_callable_from_key(func_key)
+        if let Some(func_key) = self.expect_key_from_cmd(&cllbl_name, required_flags, cllbl_usage) {
+            self.expect_tc_cmd_from_key(func_key)
         } else {
             None
         }
