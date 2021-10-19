@@ -1,7 +1,8 @@
 Config(
     syntax_elements: [
     // === KEYWORDS ===
-    ( name: "StrctKeyword"              , token_text: "struct"                         , is_token: true   , ) ,
+    ( name: "StrctKeyword"               , token_text: "struct"                         , is_token: true   , ) ,
+    ( name: "ReqKeyword"                 , token_text: "req"                            , is_token: true   , ) ,
     ( name: "UseKeyword"                 , token_text: "use"                            , is_token: true   , ) ,
     ( name: "LetKeyword"                 , token_text: "let"                            , is_token: true   , ) ,
     ( name: "FnKeyword"                  , token_text: "fn"                             , is_token: true   , ) ,

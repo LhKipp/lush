@@ -99,3 +99,18 @@ Flag with generic
 - Token: "RightParenthesis (len: 1)"
 - Finish: ""
 ...
+Required Flag
+===
+(req --flag )
+---
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: FlagSignature
+- Token: "ReqKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Token: "LongFlag (len: 6)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+...

@@ -16,15 +16,16 @@ impl Rule for FlagSignatureRule {
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        let flag_kinds: TokenSet = [LongFlag, ShortFlag].into();
+        let flag_kinds: TokenSet = [LongFlag, ShortFlag, ReqKeyword].into();
         flag_kinds.contains(p.next_non(CMT_NL_WS))
     }
 
-    ///    --long_flag (-short_flag)? (<:> type)?
+    ///    req? --long_flag (-short_flag)? (<:> type)?
     ///    or
-    ///    -short_flag (<:> type)?
+    ///    req? -short_flag (<:> type)?
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
+        p.eat_after(ReqKeyword, CMT_NL_WS);
         if p.eat_after(LongFlag, CMT_NL_WS) {
             p.eat_after(ShortFlag, CMT_WS); // shortflag belongs to longflag, must be on same line
         } else {

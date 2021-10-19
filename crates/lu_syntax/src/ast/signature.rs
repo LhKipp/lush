@@ -3,7 +3,7 @@ use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARG_START};
 
 use super::{
     support, ArgNameToken, ArgSignatureNode, FlagSignatureNode, LongFlagToken, LuTypeNode,
-    ShortFlagToken, SignatureNode,
+    ReqKeywordToken, ShortFlagToken, SignatureNode,
 };
 
 impl SignatureNode {
@@ -73,6 +73,6 @@ impl FlagSignatureNode {
     }
 
     pub fn is_required(&self) -> bool {
-        todo!()
+        support::token_child::<ReqKeywordToken>(self.syntax()).is_some()
     }
 }
