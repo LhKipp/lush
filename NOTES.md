@@ -112,6 +112,15 @@ IDEA: Maybe have a tag `verbose` for functions who use stdout? So that they coul
 - Whether a function is pure or not depends on all args + flags and on the combination
 - Dry run is a stupid idea
 
+- Anyways I have to do something
+- External cmds are not evaluated, but printed
+- assert does not error out in dry run, but instead prints
+- functions not marked pure are not evaluated
+
+```lu
+
+```
+
 ```lu
 pure fn foo()
 end

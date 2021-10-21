@@ -36,8 +36,18 @@ pub trait Command: CommandClone + Debug {
     }
 
     /// Returns $in
+    fn get_in<'a>(&self, scope: &'a Scope<Variable>) -> Option<&'a Value> {
+        self.get_arg(scope, IN_VAR_NAME)
+    }
+
+    /// Returns $in
     fn expect_in<'a>(&self, scope: &'a Scope<Variable>) -> &'a Value {
         self.expect_arg(scope, IN_VAR_NAME)
+    }
+
+    /// Returns $<arg_name>
+    fn get_arg<'a>(&self, scope: &'a Scope<Variable>, arg_name: &str) -> Option<&'a Value> {
+        scope.find_var(arg_name).map(|var| &var.val)
     }
 
     /// Returns $<arg_name>

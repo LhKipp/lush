@@ -24,10 +24,14 @@ pub enum SourceCodeVariant {
 }
 
 impl SourceCode {
+    pub fn unnamed_text_name() -> &'static str {
+        "__TMP_TEXT__"
+    }
+
     pub fn new_text(text: String) -> SourceCode {
         SourceCode {
             text,
-            path: "__TMP_TEXT__".into(),
+            path: Self::unnamed_text_name().into(),
         }
     }
 

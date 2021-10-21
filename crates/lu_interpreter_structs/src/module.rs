@@ -18,6 +18,7 @@ pub struct ModInfo {
     pub id: ModPath,
     pub src: SourceCode,
     /// Some for regular modules, None for rust-std-modules
+    /// None for Cli module (must be recomputed if needed)
     pub node: Option<SourceFileNode>,
     pub use_paths: Vec<UsePath>,
 }
@@ -30,6 +31,13 @@ impl ModInfo {
             node: None,
             use_paths,
         }
+    }
+
+    pub fn update_cli_module_info(&mut self, mut other: ModInfo) {
+        assert!(self.node.is_none());
+        assert!(self.id == other.id);
+        self.src.text.push_str(&other.src.text);
+        self.use_paths.append(&mut other.use_paths);
     }
 }
 

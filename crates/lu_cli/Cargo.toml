@@ -1,0 +1,12 @@
+[package]
+name = "lu_cli"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rustyline = "9.0.0"
+lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
+lu_interpreter = { version = "0.1.0", path = "../lu_interpreter" }
+lu_error = { version = "0.1.0", path = "../lu_error" }

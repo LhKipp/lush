@@ -90,6 +90,21 @@ impl ScopeFrame<Variable> {
     pub fn insert_var(&mut self, var: Variable) -> Option<Variable> {
         self.elems.insert(var.name.clone(), var)
     }
+
+    pub fn update_cli_module_frame(&mut self, other: ScopeFrame<Variable>) {
+        assert!(self.tag.is_module_frame() && other.tag.is_module_frame());
+
+        for (key, val) in other.elems {
+            self.elems.insert(key, val);
+        }
+
+        match (&mut self.tag, other.tag) {
+            (ScopeFrameTag::ModuleFrame(self_modi), ScopeFrameTag::ModuleFrame(other_modi)) => {
+                self_modi.update_cli_module_info(other_modi);
+            }
+            _ => unreachable!(),
+        }
+    }
 }
 
 #[derive(Clone)]

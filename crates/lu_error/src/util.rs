@@ -50,6 +50,13 @@ impl<T> Outcome<T> {
         assert!(self.errs.is_empty(), "{}. Errors: {:?}", msg, self.errs);
         self.val
     }
+    pub fn as_results(self) -> LuResults<T> {
+        if self.errs.is_empty() {
+            Ok(self.val)
+        } else {
+            Err(self.errs)
+        }
+    }
 }
 
 impl<T> Outcome<Outcome<T>> {
@@ -69,11 +76,7 @@ impl<T> From<T> for Outcome<T> {
 
 impl<T> Into<LuResults<T>> for Outcome<T> {
     fn into(self) -> LuResults<T> {
-        if self.errs.is_empty() {
-            Ok(self.val)
-        } else {
-            Err(self.errs)
-        }
+        self.as_results()
     }
 }
 

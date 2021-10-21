@@ -51,7 +51,7 @@ impl Command for RunExternalCmd {
 
         let args = self.expect_args(&l_scope);
         let args: Vec<String> = args.iter().map(Value::to_string).collect();
-        let stdin = self.expect_in(&l_scope);
+        let stdin = self.get_in(&l_scope).cloned().unwrap_or(Value::Nil);
 
         let mut child = std::process::Command::new(self.cmd_name.clone())
             .args(args)

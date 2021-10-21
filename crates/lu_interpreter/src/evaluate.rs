@@ -8,10 +8,9 @@ use std::{
 use log::debug;
 use lu_error::{LuErr, LuResult, SourceCodeItem};
 use lu_interpreter_structs::Value;
-use lu_pipeline_stage::PipelineStage;
 use parking_lot::Mutex;
 
-use crate::{Scope, TyCheckState, Variable};
+use crate::{Scope, Variable};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -73,8 +72,6 @@ pub trait Evaluable: Display {
 }
 
 pub struct Evaluator {
-    pub ty_state: TyCheckState,
-
     pub scope: Arc<Mutex<Scope<Variable>>>,
     pub errors: Vec<LuErr>,
     /// The final result of this evaluator
@@ -82,11 +79,9 @@ pub struct Evaluator {
 }
 
 impl Evaluator {
-    pub fn new(ty_state: TyCheckState) -> Self {
-        let scope = ty_state.scope.clone();
+    pub fn new(scope: Arc<Mutex<Scope<Variable>>>) -> Self {
         Self {
-            ty_state,
-            scope: Arc::new(Mutex::new(scope)),
+            scope,
             errors: Vec::new(),
             result: None,
         }
@@ -108,7 +103,7 @@ impl Evaluator {
         let lu_result = Self::eval_result_to_lu_result(node.evaluate(&mut self.scope));
         match lu_result {
             Ok(v) => self.result = Some(v),
-            Err(e) => self.push_err(e),
+            Err(e) => self.errors.push(e),
         }
     }
 
@@ -137,24 +132,10 @@ impl Evaluator {
     // }
 
     pub(crate) fn as_result(self) -> Result<Value, Vec<LuErr>> {
-        if self.failed() {
-            Err(self.collect_all_errors())
+        if !self.errors.is_empty() {
+            Err(self.errors)
         } else {
             Ok(self.result.unwrap())
         }
-    }
-}
-
-impl PipelineStage for Evaluator {
-    fn get_prev_stage(&self) -> Option<&dyn PipelineStage> {
-        Some(&self.ty_state)
-    }
-
-    fn get_mut_errors(&mut self) -> &mut Vec<LuErr> {
-        &mut self.errors
-    }
-
-    fn get_errors(&self) -> &Vec<LuErr> {
-        &self.errors
     }
 }

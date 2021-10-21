@@ -24,6 +24,18 @@ pub struct InterpreterCfg {
     pub plugin_dir: PathBuf,
 }
 
+impl InterpreterCfg {
+    pub fn build_load_modules_config(&self) -> LoadModulesConfig {
+        // TODO relative_include_path_start
+        let relative_include_path_start: PathBuf = std::env::var("PWD").unwrap().into();
+        LoadModulesConfig {
+            load_std_module_func: load_std_module,
+            plugin_dir: &self.plugin_dir,
+            relative_include_path_start,
+        }
+    }
+}
+
 impl Default for InterpreterCfg {
     fn default() -> Self {
         InterpreterCfg {
@@ -95,7 +107,7 @@ impl Interpreter {
         // We don't allow evaluation if errors happend.
         assert!(ty_state.succeeded());
 
-        let mut evaluator = Evaluator::new(ty_state);
+        let mut evaluator = Evaluator::new(Arc::new(Mutex::new(ty_state.scope.clone())));
         evaluator.evaluate();
         Some(evaluator)
     }
