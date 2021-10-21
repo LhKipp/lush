@@ -31,10 +31,11 @@ mod test;
 
 pub use fn_stmt::eval_function;
 
-#[derive(Clone, Debug, EnumAsInner)]
+#[derive(Clone, Debug, EnumAsInner, PartialEq, Eq)]
 pub enum EvalArg {
     ExternalCmdName(String),
     CmdInVal { val: Value, decl: SourceCodeItem },
+    BlockNoPushFrame,
 }
 
 #[derive(Debug, From)]

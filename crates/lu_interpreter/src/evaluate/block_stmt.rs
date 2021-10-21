@@ -7,23 +7,11 @@ use lu_syntax::{
 };
 
 impl Evaluable for BlockStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
-        // We need to bring all funcs into scope, before running any stmts
-        // consider the following program
-        // ```lu
-        // func_1 arg_1 # func_1 called from below
-        //
-        // fn func_1 []
-        //     ...
-        // end
-        // ```
-        // TODO bringing func decls into scope is only needed for source_file_blocks..., for all
-        // others this is a noop
-        scope.lock().push_frame(ScopeFrameTag::BlockFrame);
-        {
-            for fn_stmt in self.fn_stmts() {
-                fn_stmt.evaluate(scope)?;
-            }
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+        let should_push_frame = !args.contains(&EvalArg::BlockNoPushFrame);
+
+        if should_push_frame {
+            scope.lock().push_frame(ScopeFrameTag::BlockFrame);
         }
 
         let mut result = Value::Nil;
@@ -35,12 +23,16 @@ impl Evaluable for BlockStmtNode {
             match stmt.evaluate(scope) {
                 Ok(v) => result = v,
                 Err(e) => {
-                    scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
+                    if should_push_frame {
+                        scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
+                    }
                     return Err(e);
                 }
             }
         }
-        scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
+        if should_push_frame {
+            scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
+        }
         Ok(result)
     }
 }
