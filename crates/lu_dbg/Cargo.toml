@@ -1,0 +1,16 @@
+[package]
+name = "lu_dbg"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lu_error = { version = "0.1.0", path = "../lu_error" }
+lu_text_util = { version = "0.1.0", path = "../lu_text_util" }
+lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
+lu_cfg_home = { version = "0.1.0", path = "../lu_cfg_home" }
+lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
+lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
+rustyline = "9.0.0"
+parking_lot = "0.11.2"

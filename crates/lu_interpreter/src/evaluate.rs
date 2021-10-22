@@ -1,4 +1,3 @@
-use derive_more::From;
 use enum_as_inner::EnumAsInner;
 use std::{
     fmt::{Debug, Display},
@@ -7,7 +6,7 @@ use std::{
 
 use log::debug;
 use lu_error::{LuErr, LuResult, SourceCodeItem};
-use lu_interpreter_structs::Value;
+use lu_interpreter_structs::{is_dbg_session, EvalResult, RetValOrErr, Value};
 use parking_lot::Mutex;
 
 use crate::{Scope, Variable};
@@ -38,21 +37,19 @@ pub enum EvalArg {
     BlockNoPushFrame,
 }
 
-#[derive(Debug, From)]
-pub enum RetValOrErr {
-    RetVal(Value),
-    Err(LuErr),
-}
-
-pub type EvalResult = Result<Value, RetValOrErr>;
-
-impl From<RetValOrErr> for EvalResult {
-    fn from(e: RetValOrErr) -> Self {
-        Err(e)
-    }
+/// The settings a Evaluable node can have
+#[derive(Debug, PartialEq, Eq)]
+pub enum DbgSetting {
+    StopDbgBeforeEval,
+    StopDbgAfterEval,
 }
 
 pub trait Evaluable: Display {
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        // TODO impl for statements
+        &[]
+    }
+
     /// Evaluate the AST-Node/Token given the state.
     fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult;
 
@@ -66,7 +63,20 @@ pub trait Evaluable: Display {
         scope: &mut Arc<Mutex<Scope<Variable>>>,
     ) -> EvalResult {
         debug!("Evaluating: {}", self);
+
+        let is_dbg_session = is_dbg_session(&scope.lock());
+
+        if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
+            lu_dbg::dbg_before_eval(&self, scope);
+        }
+
         let result = self.do_evaluate(args, scope);
+
+        if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
+            // TODO pass eval_result
+            lu_dbg::dbg_after_eval(&self, scope, &result);
+        }
+
         debug!("Result of Evaluating: {}: {:?}", self, result);
         result
     }

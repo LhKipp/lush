@@ -8,21 +8,25 @@ extern crate educe;
 
 mod command;
 mod command_collection;
+mod evaluate;
+mod flag;
 mod module;
 pub mod prelude;
 mod scope;
+mod special_scope_vars;
 mod use_path;
 mod user_def_tys;
 mod value;
 mod value_type;
 mod variable;
-mod flag;
 
-pub use flag::*;
 pub use command::Command;
 pub use command_collection::CommandCollection;
+pub use evaluate::*;
+pub use flag::*;
 pub use module::ModInfo;
 pub use scope::{Scope, ScopeFrame, ScopeFrameId, ScopeFrameState, ScopeFrameTag};
+pub use special_scope_vars::*;
 pub use use_path::{ModPath, ModPathVariant, UsePath};
 pub use user_def_tys::*;
 pub use value::Value;
