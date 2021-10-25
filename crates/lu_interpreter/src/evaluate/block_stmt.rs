@@ -1,9 +1,7 @@
-#![allow(unused_imports)]
 use crate::evaluate::eval_prelude::*;
-use contracts::ensures;
 use lu_syntax::{
-    ast::{BlockStmtNode, ConditionElement, IfBlockNode},
-    ast::{IfStmtNode, StatementElement, StrctStmtNode},
+    ast::BlockStmtNode,
+    ast::{StatementElement},
 };
 
 impl Evaluable for BlockStmtNode {
@@ -34,5 +32,9 @@ impl Evaluable for BlockStmtNode {
             scope.lock().pop_frame(&ScopeFrameTag::BlockFrame);
         }
         Ok(result)
+    }
+
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        &[]
     }
 }

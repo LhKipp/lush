@@ -16,4 +16,8 @@ impl Evaluable for LetStmtNode {
 
         Ok(Value::Nil)
     }
+
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
+    }
 }

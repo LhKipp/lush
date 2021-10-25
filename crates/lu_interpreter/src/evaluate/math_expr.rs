@@ -7,6 +7,9 @@ use lu_syntax::ast::{
 };
 
 impl Evaluable for MathExprNode {
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
+    }
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         let lhs = self.lhs();
         let rhs = self.rhs();

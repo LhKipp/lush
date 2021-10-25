@@ -46,7 +46,6 @@ pub enum DbgSetting {
 
 pub trait Evaluable: Display {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
-        // TODO impl for statements
         &[]
     }
 

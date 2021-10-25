@@ -156,6 +156,10 @@ impl Evaluable for CmdStmtNode {
 
         Evaluator::lu_result_to_eval_result(cmd_result)
     }
+
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
+    }
 }
 
 /// Ok if flag is simple toggle and can be converted to a flag_arg, otherwise Err with flag_name
