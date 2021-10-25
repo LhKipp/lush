@@ -67,14 +67,14 @@ pub trait Evaluable: Display {
         let is_dbg_session = is_dbg_session(&scope.lock());
 
         if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
-            lu_dbg::dbg_before_eval(&self, scope);
+            lu_dbg::before_eval(&self, scope);
         }
 
         let result = self.do_evaluate(args, scope);
 
         if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
             // TODO pass eval_result
-            lu_dbg::dbg_after_eval(&self, scope, &result);
+            lu_dbg::after_eval(&self, scope, &result);
         }
 
         debug!("Result of Evaluating: {}: {:?}", self, result);

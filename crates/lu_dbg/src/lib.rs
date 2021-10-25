@@ -40,14 +40,14 @@ pub fn dbg_loop() {
     rl.save_history("history.txt").unwrap();
 }
 
-pub fn dbg_before_eval<N>(node: &N, scope: &mut Arc<Mutex<Scope<Variable>>>)
+pub fn before_eval<N>(node: &N, scope: &mut Arc<Mutex<Scope<Variable>>>)
 where
     N: Display,
 {
     println!("Next statement: {}", node);
 }
 
-pub fn dbg_after_eval<N>(node: &N, scope: &mut Arc<Mutex<Scope<Variable>>>, result: &EvalResult)
+pub fn after_eval<N>(node: &N, scope: &mut Arc<Mutex<Scope<Variable>>>, result: &EvalResult)
 where
     N: Display,
 {
