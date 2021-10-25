@@ -5,14 +5,13 @@ use rustyline::Editor;
 
 const HIST_FILE: &str = "/home/leo/.config/lu/history.txt";
 const PLUGIN_DIR: &str = "/home/leo/.config/lu/plugins";
-pub fn start_cli() {
+pub fn start_cli(global_frame: ScopeFrame<Variable>) {
     // `()` can be used when no completer is required
     let mut rl = Editor::<()>::new();
     if rl.load_history(HIST_FILE).is_err() {
         println!("No previous history.");
     }
 
-    let global_frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
     let mut intprt = InteractiveInterpreter::new(
         global_frame,
         InterpreterCfg {

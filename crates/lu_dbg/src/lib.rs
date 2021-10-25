@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 use parking_lot::Mutex;
 use std::{fmt::Display, sync::Arc};
 
@@ -7,11 +6,11 @@ use lu_interpreter_structs::{EvalResult, Scope, Variable};
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
-pub fn dbg_loop() {
+pub fn dbg_loop(_: &Arc<Mutex<Scope<Variable>>>) {
     let mut rl = Editor::<()>::new();
 
-    if let Ok(cfg_home) = lu_cfg_home::cfg_home() {
-        if rl.load_history(&cfg_home).is_err() {
+    if let Ok(dbg_hist) = lu_cfg_home::dbg_history() {
+        if rl.load_history(&dbg_hist).is_err() {
             println!("No previous history.");
         }
     }
@@ -37,7 +36,12 @@ pub fn dbg_loop() {
             }
         }
     }
-    rl.save_history("history.txt").unwrap();
+
+    if let Ok(dbg_hist) = lu_cfg_home::dbg_history() {
+        if let Err(e) = rl.save_history(&dbg_hist) {
+            println!("Could not save history. Error was: {}", e);
+        }
+    }
 }
 
 pub fn before_eval<N>(node: &N, scope: &mut Arc<Mutex<Scope<Variable>>>)
@@ -45,11 +49,13 @@ where
     N: Display,
 {
     println!("Next statement: {}", node);
+    dbg_loop(scope);
 }
 
-pub fn after_eval<N>(node: &N, scope: &mut Arc<Mutex<Scope<Variable>>>, result: &EvalResult)
+pub fn after_eval<N>(_: &N, scope: &mut Arc<Mutex<Scope<Variable>>>, result: &EvalResult)
 where
     N: Display,
 {
     println!("Result: {:#?}", result);
+    dbg_loop(scope);
 }
