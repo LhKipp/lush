@@ -6,7 +6,7 @@ use lu_syntax::ast::{
 use crate::evaluate::eval_prelude::*;
 
 impl Evaluable for ValueExprElement {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
             ValueExprElement::BareWord(n) => n.evaluate(scope),
             ValueExprElement::NumberExpr(n) => n.evaluate(scope),
@@ -21,7 +21,7 @@ impl Evaluable for ValueExprElement {
 }
 
 impl Evaluable for CmdOrValueExprElement {
-    fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
             CmdOrValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
             CmdOrValueExprElement::ValueExpr(n) => n.evaluate_with_args(args, scope),
@@ -30,25 +30,25 @@ impl Evaluable for CmdOrValueExprElement {
 }
 
 impl Evaluable for BareWordToken {
-    fn do_evaluate(&self, _: &[EvalArg], _: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], _: &mut SyScope) -> EvalResult {
         Ok(Value::BareWord(self.text().to_string()))
     }
 }
 
 impl Evaluable for NumberExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut SyScope) -> EvalResult {
         Ok(self.into())
     }
 }
 
 impl Evaluable for StringExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut SyScope) -> EvalResult {
         Ok(Value::String(self.text().to_string()))
     }
 }
 
 impl Evaluable for ValuePathExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let name_parts = self.var_name_parts();
         assert_eq!(name_parts.len(), 1); // TODO handle indexing into table
         if let Some(var) = scope.lock().find_var(&name_parts[0]) {
@@ -65,7 +65,7 @@ impl Evaluable for ValuePathExprNode {
 }
 
 impl Evaluable for ArrayExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let mut values = Vec::new();
         for val in self.values() {
             values.push(val.evaluate(scope)?);
@@ -75,7 +75,7 @@ impl Evaluable for ArrayExprNode {
 }
 
 impl Evaluable for TableExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut SyScope) -> EvalResult {
         todo!()
     }
 }

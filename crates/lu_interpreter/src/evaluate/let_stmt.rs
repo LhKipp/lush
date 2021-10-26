@@ -2,7 +2,7 @@ use crate::evaluate::eval_prelude::*;
 use lu_syntax::ast::LetStmtNode;
 
 impl Evaluable for LetStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let var_name = self.var_name().unwrap();
         let val = self.value().unwrap();
 

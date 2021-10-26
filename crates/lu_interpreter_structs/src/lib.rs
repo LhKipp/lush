@@ -25,7 +25,7 @@ pub use command_collection::CommandCollection;
 pub use evaluate::*;
 pub use flag::*;
 pub use module::ModInfo;
-pub use scope::{Scope, ScopeFrame, ScopeFrameId, ScopeFrameState, ScopeFrameTag};
+pub use scope::{Scope, ScopeFrame, ScopeFrameId, ScopeFrameState, ScopeFrameTag, SyScope};
 pub use special_scope_vars::*;
 pub use use_path::{ModPath, ModPathVariant, UsePath};
 pub use user_def_tys::*;

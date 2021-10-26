@@ -1,11 +1,8 @@
 use crate::evaluate::eval_prelude::*;
-use lu_syntax::{
-    ast::BlockStmtNode,
-    ast::{StatementElement},
-};
+use lu_syntax::{ast::BlockStmtNode, ast::StatementElement};
 
 impl Evaluable for BlockStmtNode {
-    fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let should_push_frame = !args.contains(&EvalArg::BlockNoPushFrame);
 
         if should_push_frame {

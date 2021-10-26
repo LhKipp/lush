@@ -7,7 +7,7 @@ use lu_syntax::ast::{CmdArgElement, CmdStmtNode};
 use crate::{Command, EvalArg, EvalResult, Evaluable, Evaluator, RunExternalCmd, Variable};
 
 impl Evaluable for CmdStmtNode {
-    fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         // TODO add proper parsing of command args based on cmd signature here.
         // Fill those into CommandArgs struct and pass to cmd. For now we do something simple here
         let cmd_name = self.get_cmd_name();

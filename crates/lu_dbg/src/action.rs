@@ -3,11 +3,8 @@ mod next;
 mod print;
 mod scope;
 mod step;
-use std::sync::Arc;
-
-use lu_interpreter_structs::{Scope, Variable};
+use lu_interpreter_structs::SyScope;
 pub(crate) use next::DbgNextAction;
-use parking_lot::Mutex;
 pub(crate) use print::DbgPrintAction;
 pub(crate) use scope::DbgScopeAction;
 pub(crate) use step::DbgStepAction;
@@ -34,8 +31,8 @@ pub(crate) trait DbgAction {
         }
     }
 
-    fn do_exec(&self, args: &str, scope: &mut Arc<Mutex<Scope<Variable>>>) -> DbgActionResult;
-    fn exec(&self, line: &str, scope: &mut Arc<Mutex<Scope<Variable>>>) -> DbgActionResult {
+    fn do_exec(&self, args: &str, scope: &mut SyScope) -> DbgActionResult;
+    fn exec(&self, line: &str, scope: &mut SyScope) -> DbgActionResult {
         assert!(self.matches(line));
         // We can't do
         // let line = line.strip_prefix(long_name);

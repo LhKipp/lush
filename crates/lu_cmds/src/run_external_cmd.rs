@@ -1,5 +1,5 @@
 use crate::cmd_prelude::*;
-use std::{io::Write, process::Stdio, sync::Arc};
+use std::{io::Write, process::Stdio};
 
 use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
 use lu_interpreter_structs::{ArgSignature, ValueType};
@@ -46,7 +46,7 @@ impl Command for RunExternalCmd {
         })
     }
 
-    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let l_scope = scope.lock();
 
         let args = self.expect_args(&l_scope);

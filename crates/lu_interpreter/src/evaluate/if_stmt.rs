@@ -5,7 +5,7 @@ use lu_syntax::{
 };
 
 impl Evaluable for IfStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
 
@@ -43,7 +43,7 @@ impl Evaluable for IfStmtNode {
 fn eval_block_if_true(
     cond: &ConditionElement,
     block: &BlockStmtNode,
-    scope: &mut Arc<Mutex<Scope<Variable>>>,
+    scope: &mut SyScope,
 ) -> (bool, EvalResult) {
     let cond_val = match cond.evaluate(scope) {
         Ok(v) => v,
@@ -73,7 +73,7 @@ fn eval_block_if_true(
     }
 }
 
-fn eval_block(block: &BlockStmtNode, scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+fn eval_block(block: &BlockStmtNode, scope: &mut SyScope) -> EvalResult {
     scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
     let result = block.evaluate(scope);
     scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);

@@ -2,21 +2,18 @@ mod action;
 mod dbg_repl;
 
 use lu_error::LuResult;
-use parking_lot::Mutex;
-use std::sync::Arc;
-
-use lu_interpreter_structs::{Scope, Variable};
+use lu_interpreter_structs::SyScope;
 
 use crate::dbg_repl::dbg_loop;
 
-pub fn before_eval(stmt: &str, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<()> {
+pub fn before_eval(stmt: &str, scope: &mut SyScope) -> LuResult<()> {
     println!("Next statement: {}", stmt);
     dbg_loop(scope)
 }
 
 // pub fn after_eval<N>(
 //     _: &N,
-//     scope: &mut Arc<Mutex<Scope<Variable>>>,
+//     scope: &mut SyScope,
 //     result: &EvalResult,
 // ) -> LuResult<()>
 // where

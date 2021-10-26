@@ -1,11 +1,12 @@
+use std::fmt::Debug;
 use std::rc::Rc;
-use std::{fmt::Debug, sync::Arc};
 
-use crate::{FlagVariant, Function, ModPath, Scope, Signature, Value, VarDeclNode, Variable};
+use crate::{
+    FlagVariant, Function, ModPath, Scope, Signature, SyScope, Value, VarDeclNode, Variable,
+};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
-use parking_lot::Mutex;
 
 pub const IN_VAR_NAME: &str = "in";
 pub const ARGS_VAR_NAME: &str = "args";
@@ -76,9 +77,9 @@ pub trait Command: CommandClone + Debug {
     //     assert!(&scope.overwrite_var_value(var_name, new_val))
     // }
 
-    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value>;
+    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value>;
 
-    fn run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+    fn run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         debug!("Running command {}", self.name());
         let result = self.do_run_cmd(scope);
         debug!("Result of running command {}: {:?}", self.name(), result);

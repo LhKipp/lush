@@ -18,7 +18,7 @@ impl DbgAction for DbgStepAction {
         "step to the next evaluated statement"
     }
 
-    fn do_exec(&self, _: &str, _: &mut Arc<Mutex<Scope<Variable>>>) -> DbgActionResult {
+    fn do_exec(&self, _: &str, _: &mut SyScope) -> DbgActionResult {
         DbgActionResult::StopDbgLoop
     }
 }

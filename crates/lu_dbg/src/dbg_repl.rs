@@ -1,13 +1,11 @@
 use crate::action::*;
 use lu_error::{EvalErr, LuResult};
-use lu_interpreter_structs::{Scope, Variable};
-use parking_lot::Mutex;
+use lu_interpreter_structs::SyScope;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
-use std::sync::Arc;
 use vec_box::vec_box;
 
-pub fn dbg_loop(scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<()> {
+pub fn dbg_loop(scope: &mut SyScope) -> LuResult<()> {
     let mut rl = Editor::<()>::new();
 
     if let Ok(dbg_hist) = lu_cfg_home::dbg_history() {

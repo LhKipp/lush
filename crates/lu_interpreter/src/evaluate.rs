@@ -1,15 +1,9 @@
 use enum_as_inner::EnumAsInner;
-use std::{
-    fmt::{Debug, Display},
-    sync::Arc,
-};
+use std::fmt::{Debug, Display};
 
 use log::debug;
 use lu_error::{LuErr, LuResult, SourceCodeItem};
-use lu_interpreter_structs::{is_dbg_session, EvalResult, RetValOrErr, Value};
-use parking_lot::Mutex;
-
-use crate::{Scope, Variable};
+use lu_interpreter_structs::{is_dbg_session, EvalResult, RetValOrErr, SyScope, Value};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -50,17 +44,13 @@ pub trait Evaluable: Display {
     }
 
     /// Evaluate the AST-Node/Token given the state.
-    fn do_evaluate(&self, args: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult;
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult;
 
-    fn evaluate(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn evaluate(&self, scope: &mut SyScope) -> EvalResult {
         self.evaluate_with_args(&[], scope)
     }
 
-    fn evaluate_with_args(
-        &self,
-        args: &[EvalArg],
-        scope: &mut Arc<Mutex<Scope<Variable>>>,
-    ) -> EvalResult {
+    fn evaluate_with_args(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         debug!("Evaluating: {}", self);
 
         let is_dbg_session = is_dbg_session(&scope.lock());
@@ -82,14 +72,14 @@ pub trait Evaluable: Display {
 }
 
 pub struct Evaluator {
-    pub scope: Arc<Mutex<Scope<Variable>>>,
+    pub scope: SyScope,
     pub errors: Vec<LuErr>,
     /// The final result of this evaluator
     pub result: Option<Value>,
 }
 
 impl Evaluator {
-    pub fn new(scope: Arc<Mutex<Scope<Variable>>>) -> Self {
+    pub fn new(scope: SyScope) -> Self {
         Self {
             scope,
             errors: Vec::new(),

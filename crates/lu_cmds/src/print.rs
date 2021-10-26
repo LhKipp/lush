@@ -36,7 +36,7 @@ impl Command for PrintCmd {
         "print"
     }
 
-    fn do_run_cmd(&self, scope: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let l_scope = scope.lock();
         let args = self.expect_arg(&l_scope, TO_PRINT_ARG_NAME);
         Ok(args.clone())

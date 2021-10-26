@@ -1,6 +1,4 @@
-use std::sync::Arc;
-
-use crate::{Command, FlagVariant, ModPath, Scope, Value, ValueType, VarDeclNode, Variable};
+use crate::{Command, FlagVariant, ModPath, SyScope, Value, ValueType, VarDeclNode, Variable};
 use derive_builder::Builder;
 use derive_new::new;
 use log::trace;
@@ -8,7 +6,6 @@ use lu_error::{LuResult, SourceCodeItem};
 use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, SignatureNode};
 use lu_syntax::AstNode;
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
-use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
 pub type ArgDecl = SourceCodeItem;
@@ -241,7 +238,7 @@ impl Command for Function {
         &self.name
     }
 
-    fn do_run_cmd(&self, _: &mut Arc<Mutex<Scope<Variable>>>) -> LuResult<Value> {
+    fn do_run_cmd(&self, _: &mut SyScope) -> LuResult<Value> {
         unreachable!(
             r#"
             Can't have evaluate/fn_stmt here, as that would require knowledge of eval here.

@@ -2,7 +2,7 @@ use crate::evaluate::eval_prelude::*;
 use lu_syntax::ast::ForStmtNode;
 
 impl Evaluable for ForStmtNode {
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let block = self.block().unwrap();
         if block.is_empty() {
             debug!("Empty for stmt");

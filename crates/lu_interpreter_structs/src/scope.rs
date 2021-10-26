@@ -4,6 +4,7 @@ use indextree::{Arena, NodeId};
 use log::trace;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use multimap::MultiMap;
+use parking_lot::Mutex;
 use parking_lot::RwLock;
 use std::{
     collections::HashMap,
@@ -119,6 +120,8 @@ where
     /// From NodeId of SourceFile to [NodeId of SourceFile]
     pub use_stmts: MultiMap<NodeId, NodeId>,
 }
+
+pub type SyScope = Arc<Mutex<Scope<Variable>>>;
 
 impl<T: fmt::Debug + 'static> Scope<T> {
     pub fn new() -> Self {

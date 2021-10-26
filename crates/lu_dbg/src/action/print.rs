@@ -3,11 +3,7 @@ use super::dbg_action_prelude::*;
 pub(crate) struct DbgPrintAction {}
 
 impl DbgAction for DbgPrintAction {
-    fn do_exec(
-        &self,
-        args: &str,
-        scope: &mut Arc<Mutex<Scope<Variable>>>,
-    ) -> super::DbgActionResult {
+    fn do_exec(&self, args: &str, scope: &mut SyScope) -> super::DbgActionResult {
         let args = args.split_whitespace();
         let l_scope = scope.lock();
         for arg in args {

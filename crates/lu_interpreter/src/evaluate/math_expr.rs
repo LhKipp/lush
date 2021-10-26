@@ -10,7 +10,7 @@ impl Evaluable for MathExprNode {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
         &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
     }
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let lhs = self.lhs();
         let rhs = self.rhs();
         let lhs_val = lhs.evaluate(scope)?;
