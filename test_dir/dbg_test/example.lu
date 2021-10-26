@@ -1,3 +1,17 @@
 #!/bin/lush
 
-echo 1
+fn echo_wrapped ( arg )
+    echo $arg
+    ret 1
+end
+
+let x = 1
+
+if $x == 1
+    echo $x
+else
+    echo "ERROR"
+    ret 1
+end
+
+echo_wrapped $x

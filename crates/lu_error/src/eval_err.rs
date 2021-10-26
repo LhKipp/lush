@@ -22,6 +22,9 @@ pub enum EvalErr {
     ExternalCmdStdinWriteErr(SourceCodeItem, String),
     ExternalCmdStdoutReadErr(SourceCodeItem, String),
     ExternalCmdFailed(SourceCodeItem),
+
+    // Pseudo err to conveniently return execution. Does not print anything
+    DbgAbort,
 }
 
 impl EvalErr {
@@ -65,6 +68,7 @@ impl EvalErr {
             EvalErr::ExternalCmdFailed(cond) => Diagnostic::error()
                 .with_code("E00008")
                 .with_message(format!("{:?}, cond {}", cond.range, cond.content)),
+            EvalErr::DbgAbort => todo!(),
         }
     }
 }

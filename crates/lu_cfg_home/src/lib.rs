@@ -2,6 +2,20 @@ use lu_error::LuResult;
 use std::path::PathBuf;
 use xdg::BaseDirectories;
 
+pub fn init_home_dir() -> LuResult<()> {
+    let home = cfg_home()?;
+    if !home.exists() {
+        fs_err::create_dir(cfg_home()?)?;
+    }
+    let files = vec![dbg_history()?];
+    for f in files {
+        if !f.exists() {
+            fs_err::File::create(f)?;
+        }
+    }
+    Ok(())
+}
+
 pub fn get_xdg_base_dir() -> LuResult<BaseDirectories> {
     BaseDirectories::with_prefix("lush").map_err(|_| todo!())
 }

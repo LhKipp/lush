@@ -14,3 +14,4 @@ lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
 rustyline = "9.0.0"
 parking_lot = "0.11.2"
+vec_box = "1.0.0"

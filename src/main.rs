@@ -15,6 +15,13 @@ fn ret_code_main() -> i32 {
         .try_init()
         .unwrap();
 
+    // Create a home for the homeless :)
+    if let Err(e) = lu_cfg_home::init_home_dir() {
+        println!("{:?}", e);
+        println!("Aborting because of error");
+        return 1;
+    }
+
     let arg_matches = App::new("lush")
         .version("0.1")
         .author("Leonhard Kipp. <leonhard.kipp@alumni.fh-aachen.de>")

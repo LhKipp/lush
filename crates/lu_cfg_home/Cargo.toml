@@ -8,3 +8,5 @@ edition = "2018"
 [dependencies]
 xdg = "2.4.0"
 lu_error = { version = "0.1.0", path = "../lu_error" }
+fs-err = "2.6.0"
+log = "0.4.14"

@@ -501,6 +501,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
+name = "fs-err"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ebd3504ad6116843b8375ad70df74e7bfe83cac77a1f3fe73200c844d43bfe0"
+
+[[package]]
 name = "fs_extra"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -754,6 +760,8 @@ dependencies = [
 name = "lu_cfg_home"
 version = "0.1.0"
 dependencies = [
+ "fs-err",
+ "log",
  "lu_error",
  "xdg",
 ]
@@ -816,6 +824,7 @@ dependencies = [
  "lu_text_util",
  "parking_lot",
  "rustyline",
+ "vec_box",
 ]
 
 [[package]]
@@ -1066,6 +1075,7 @@ dependencies = [
  "clap",
  "env_logger 0.9.0",
  "log",
+ "lu_cfg_home",
  "lu_cli",
  "lu_error",
  "lu_interpreter",

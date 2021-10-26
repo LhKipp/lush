@@ -33,8 +33,4 @@ impl Evaluable for BlockStmtNode {
         }
         Ok(result)
     }
-
-    fn dbg_settings(&self) -> &'static [DbgSetting] {
-        &[]
-    }
 }
