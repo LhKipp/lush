@@ -1,20 +1,20 @@
 External takes stdin
 ===
-print hi | xargs
+"hi" | xargs
 ---
 {
   "Ok": {
-    "BareWord": "[hi]\n"
+    "BareWord": "hi\n"
   }
 }
 ...
 External takes arguments
 ===
-print hi | xargs echo "-n"
+"hi" | xargs echo "-n"
 ---
 {
   "Ok": {
-    "BareWord": "[hi]"
+    "BareWord": "hi"
   }
 }
 ...

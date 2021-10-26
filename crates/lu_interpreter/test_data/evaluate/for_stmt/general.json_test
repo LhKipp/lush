@@ -1,10 +1,26 @@
 1
 ===
+use std:array
+let vals = []
 for x in "123"
-    print $x
+    let new_arry = push $vals $x
+    $vals = $new_arry
 end
+$vals
 ---
 {
-  "Ok": "Nil"
+  "Ok": {
+    "Array": [
+      {
+        "String": "1"
+      },
+      {
+        "String": "2"
+      },
+      {
+        "String": "3"
+      }
+    ]
+  }
 }
 ...

@@ -1,60 +1,48 @@
 if_executed
 ===
 if 1 == 1
-    print if_
+    ret "if_"
 elif 1 == 1
-    print elif_
+    ret "elif_"
 else
-    print else_
+    ret "else_"
 end
 ---
 {
   "Ok": {
-    "Array": [
-      {
-        "BareWord": "if_"
-      }
-    ]
+    "String": "if_"
   }
 }
 ...
 else_executed
 ===
 if 1 == 2
-    print if_
+    ret "if_"
 elif 1 == 2
-    print elif_
+    ret "elif_"
 else
-    print else_
+    ret "else_"
 end
 ---
 {
   "Ok": {
-    "Array": [
-      {
-        "BareWord": "else_"
-      }
-    ]
+    "String": "else_"
   }
 }
 ...
 elif_executed
 ===
 if 1 == 2
-    print if_
+    ret "if_"
 elif 1 == 1
-    print elif_
+    ret "elif_"
 else
-    print else_
+    ret "else_"
 end
 ---
 {
   "Ok": {
-    "Array": [
-      {
-        "BareWord": "elif_"
-      }
-    ]
+    "String": "elif_"
   }
 }
 ...

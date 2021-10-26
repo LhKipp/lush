@@ -1,18 +1,14 @@
 1
 ===
 fn func_1()
-    print "func_1"
+    ret "func_1"
 end
 
 func_1
 ---
 {
   "Ok": {
-    "Array": [
-      {
-        "String": "func_1"
-      }
-    ]
+    "String": "func_1"
   }
 }
 ...
