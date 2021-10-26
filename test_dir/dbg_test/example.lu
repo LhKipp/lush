@@ -2,16 +2,16 @@
 
 fn echo_wrapped ( arg )
     echo $arg
-    ret 1
+    ret nil
 end
 
-let x = 1
+let x = "hello"
 
-if $x == 1
+if $x == "hello"
     echo $x
 else
     echo "ERROR"
     ret 1
 end
 
-echo_wrapped $x
+echo_wrapped "world"

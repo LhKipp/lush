@@ -8,8 +8,4 @@ impl Evaluable for ConditionElement {
             ConditionElement::ValueExpr(n) => n.evaluate(scope),
         }
     }
-
-    fn dbg_settings(&self) -> &'static [DbgSetting] {
-        &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
-    }
 }

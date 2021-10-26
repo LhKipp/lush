@@ -84,6 +84,9 @@ pub trait AstNode {
     fn text(&self) -> String {
         self.syntax().text().into()
     }
+    fn text_trimmed(&self) -> String {
+        self.text().trim().to_string()
+    }
 }
 
 pub trait AstToken {
@@ -98,6 +101,9 @@ pub trait AstToken {
     fn syntax(&self) -> &SyntaxToken;
     fn text(&self) -> &str {
         self.syntax().text()
+    }
+    fn text_trimmed(&self) -> String {
+        self.text().trim().to_string()
     }
 
     fn to_item(&self) -> SourceCodeItem {
@@ -121,6 +127,9 @@ pub trait AstElement {
             rowan::NodeOrToken::Node(n) => n.text().to_string(),
             rowan::NodeOrToken::Token(t) => t.text().to_string(),
         }
+    }
+    fn text_trimmed(&self) -> String {
+        self.text().trim().to_string()
     }
 
     fn to_item(&self) -> SourceCodeItem {

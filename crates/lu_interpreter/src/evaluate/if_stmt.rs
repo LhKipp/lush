@@ -1,14 +1,18 @@
-#![allow(unused_imports)]
 use crate::evaluate::eval_prelude::*;
 use lu_syntax::{
+    ast::ConditionElement,
     ast::{BlockStmtNode, IfStmtNode},
-    ast::{ConditionElement, IfBlockNode},
 };
 
 impl Evaluable for IfStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut Arc<Mutex<Scope<Variable>>>) -> EvalResult {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
+
+        if is_dbg_session(&scope.lock()) {
+            lu_dbg::before_eval(&format!("if {}", if_cond.to_string().trim()), scope)?;
+        }
+
         let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, scope);
         if evaluated || result.is_err() {
             return result;
