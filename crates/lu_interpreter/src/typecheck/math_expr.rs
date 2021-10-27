@@ -26,7 +26,6 @@ impl TypeCheck for MathExprNode {
                 equate(&self.lhs(), &self.rhs(), state);
                 Some(state.new_term_key_concretiziesd(self.to_item(), ValueType::Bool))
             }
-            OperatorExprElement::RightStream(_) => todo!(),
             OperatorExprElement::DivAssignSign(_) => todo!(),
             OperatorExprElement::MulAssignSign(_) => todo!(),
             OperatorExprElement::AddAssignSign(_) => todo!(),

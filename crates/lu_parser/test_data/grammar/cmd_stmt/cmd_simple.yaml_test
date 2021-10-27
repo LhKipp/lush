@@ -123,3 +123,22 @@ echo -l "Hello"
 - Finish: ""
 - Finish: ""
 ...
+cmd with redirect
+===
+echo hi >> $var
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 2)"
+- Start: RedirStmt
+- Token: "Whitespace (len: 1)"
+- Token: "RightStream (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Start: ValuePathExpr
+- Token: "Dollar (len: 1)"
+- Token: "BareWord (len: 3)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...

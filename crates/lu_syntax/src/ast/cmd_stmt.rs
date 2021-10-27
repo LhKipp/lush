@@ -1,4 +1,7 @@
-use crate::{ast::CmdArgElement, AstElementChildren, AstNode, AstToken};
+use crate::{
+    ast::{CmdArgElement, RedirStmtNode, RedirToValueElement},
+    AstElementChildren, AstNode, AstToken,
+};
 
 use super::{support, BareWordToken, CmdStmtNode, FlagElement};
 
@@ -29,5 +32,14 @@ impl CmdStmtNode {
             .unwrap()
             .text()
             .to_string()
+    }
+    pub fn redir_stmt(&self) -> Option<RedirStmtNode> {
+        support::node_child(self.syntax())
+    }
+}
+
+impl RedirStmtNode {
+    pub fn get_redir_to(&self) -> Option<RedirToValueElement> {
+        support::element_child(self.syntax())
     }
 }

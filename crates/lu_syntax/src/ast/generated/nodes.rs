@@ -2002,6 +2002,33 @@ impl Display for StrctStmtNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct RedirStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for RedirStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::RedirStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for RedirStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+
+impl Display for RedirStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct UseStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3194,7 +3221,6 @@ pub enum OperatorExprElement {
     InequalitySign(InequalitySignToken),
     BiggerThanSign(BiggerThanSignToken),
     BiggerOrEqualSign(BiggerOrEqualSignToken),
-    RightStream(RightStreamToken),
     DivAssignSign(DivAssignSignToken),
     MulAssignSign(MulAssignSignToken),
     AddAssignSign(AddAssignSignToken),
@@ -3223,14 +3249,12 @@ impl AstElement for OperatorExprElement {
         
         
         
-        
         match kind{
-            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | RightStream | DivAssignSign | MulAssignSign | AddAssignSign | MinAssignSign | AssignSign => true,
+            PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | DivAssignSign | MulAssignSign | AddAssignSign | MinAssignSign | AssignSign => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
-        
         
         
         
@@ -3258,7 +3282,6 @@ impl AstElement for OperatorExprElement {
             InequalitySign => OperatorExprElement::InequalitySign(InequalitySignToken { syntax: syntax.into_token().unwrap() }),
             BiggerThanSign => OperatorExprElement::BiggerThanSign(BiggerThanSignToken { syntax: syntax.into_token().unwrap() }),
             BiggerOrEqualSign => OperatorExprElement::BiggerOrEqualSign(BiggerOrEqualSignToken { syntax: syntax.into_token().unwrap() }),
-            RightStream => OperatorExprElement::RightStream(RightStreamToken { syntax: syntax.into_token().unwrap() }),
             DivAssignSign => OperatorExprElement::DivAssignSign(DivAssignSignToken { syntax: syntax.into_token().unwrap() }),
             MulAssignSign => OperatorExprElement::MulAssignSign(MulAssignSignToken { syntax: syntax.into_token().unwrap() }),
             AddAssignSign => OperatorExprElement::AddAssignSign(AddAssignSignToken { syntax: syntax.into_token().unwrap() }),
@@ -3302,9 +3325,6 @@ impl AstElement for OperatorExprElement {
             OperatorExprElement::BiggerOrEqualSign(it) => it.syntax.clone().into(),
             
             
-            OperatorExprElement::RightStream(it) => it.syntax.clone().into(),
-            
-            
             OperatorExprElement::DivAssignSign(it) => it.syntax.clone().into(),
             
             
@@ -3335,7 +3355,6 @@ impl HasSyntaxKind for OperatorExprElement{
             OperatorExprElement::InequalitySign(it) => it.get_syntax_kind(),
             OperatorExprElement::BiggerThanSign(it) => it.get_syntax_kind(),
             OperatorExprElement::BiggerOrEqualSign(it) => it.get_syntax_kind(),
-            OperatorExprElement::RightStream(it) => it.get_syntax_kind(),
             OperatorExprElement::DivAssignSign(it) => it.get_syntax_kind(),
             OperatorExprElement::MulAssignSign(it) => it.get_syntax_kind(),
             OperatorExprElement::AddAssignSign(it) => it.get_syntax_kind(),
@@ -3593,6 +3612,63 @@ impl HasSyntaxKind for FlagElement{
 }
 
 impl Display for FlagElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum RedirToValueElement {
+    ValuePathExpr(ValuePathExprNode),
+    BareWord(BareWordToken),
+    }
+
+impl RedirToValueElement {
+}
+
+impl AstElement for RedirToValueElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        match kind{
+            ValuePathExpr | BareWord => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        let res = match syntax.kind() {
+            ValuePathExpr => RedirToValueElement::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
+            BareWord => RedirToValueElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            RedirToValueElement::ValuePathExpr(it) => it.syntax.clone().into(),
+            
+            
+            RedirToValueElement::BareWord(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for RedirToValueElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            RedirToValueElement::ValuePathExpr(it) => it.get_syntax_kind(),
+            RedirToValueElement::BareWord(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl Display for RedirToValueElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

@@ -39,6 +39,8 @@ impl TypeCheck for CmdStmtNode {
         } else {
             ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
         };
+        
+        // TODO ty check redir stmt
 
         Some(ty_state.new_term_key_equated(self.to_item(), ret_ty))
     }

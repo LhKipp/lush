@@ -46,7 +46,6 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::BiggerThanSign(_) => Ok((lhs_val > rhs_val).into()),
             OperatorExprElement::BiggerOrEqualSign(_) => Ok((lhs_val >= rhs_val).into()),
 
-            OperatorExprElement::RightStream(_) => return eval_right_stream(lhs_val, rhs_val),
             OperatorExprElement::DivAssignSign(_) => todo!(),
             OperatorExprElement::MulAssignSign(_) => todo!(),
             OperatorExprElement::AddAssignSign(_) => todo!(),
@@ -68,8 +67,5 @@ fn eval_mult_sign(_lhs: Value, _rhs: Value) -> EvalResult {
     todo!()
 }
 fn eval_div_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_right_stream(_lhs: Value, _rhs: Value) -> EvalResult {
     todo!()
 }

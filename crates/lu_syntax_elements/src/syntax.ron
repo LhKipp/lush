@@ -88,6 +88,7 @@ Config(
     // === RULES ===
     ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "StrctStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
+    ( name: "RedirStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "UseStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "StrctField"                , is_node: true                                , has_rule: false   , ) , // TODO has rule but not needed
     ( name: "StrctCtorExpr"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
@@ -161,7 +162,6 @@ Config(
             "InequalitySign",
             "BiggerThanSign",
             "BiggerOrEqualSign",
-            "RightStream",
             "DivAssignSign",
             "MulAssignSign",
             "AddAssignSign",
@@ -191,6 +191,11 @@ Config(
         represents_element_names: [
             "ShortFlag",
             "LongFlag"
+        ],),
+    (name: "RedirToValue", is_generic: true,
+        represents_element_names: [
+            "ValuePathExpr",
+            "BareWord"
         ],),
     ]
 )

@@ -2,9 +2,37 @@ use log::debug;
 
 use super::{expr::ValueExprRule, Rule};
 use crate::{
+    grammar::{OrRule, ValuePathExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::*,
+    T,
 };
+use vec_box::vec_box;
+
+pub struct RedirStmt {}
+impl Rule for RedirStmt {
+    fn name(&self) -> String {
+        "RedirStmt".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == T![>>]
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
+        if !p.expect_after(T![>>], CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
+        let redir_to = OrRule {
+            kind: Some("RedirToValue".to_string()),
+            rules: vec_box![ValuePathExprRule {}, BareWord],
+        };
+        redir_to.parse(p);
+        Some(m.complete(p, RedirStmt))
+    }
+}
 
 pub struct CmdStmtRule;
 impl Rule for CmdStmtRule {
@@ -35,6 +63,9 @@ impl Rule for CmdStmtRule {
                 break;
             }
         }
+
+        RedirStmt {}.opt(p);
+
         Some(m.complete(p, CmdStmt))
     }
 }

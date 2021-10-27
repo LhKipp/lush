@@ -138,6 +138,7 @@ pub enum SyntaxKind {
     FileName,
     SourceFile,
     StrctStmt,
+    RedirStmt,
     UseStmt,
     StrctField,
     StrctCtorExpr,
@@ -172,6 +173,7 @@ pub enum SyntaxKind {
     LuTypeSpecifier,
     CmdArg,
     Flag,
+    RedirToValue,
     __LAST,
 }
 
@@ -251,6 +253,7 @@ impl SyntaxKind{
             SyntaxKind::FileName => "FileName",
             SyntaxKind::SourceFile => "SourceFile",
             SyntaxKind::StrctStmt => "StrctStmt",
+            SyntaxKind::RedirStmt => "RedirStmt",
             SyntaxKind::UseStmt => "UseStmt",
             SyntaxKind::StrctField => "StrctField",
             SyntaxKind::StrctCtorExpr => "StrctCtorExpr",
@@ -285,6 +288,7 @@ impl SyntaxKind{
             SyntaxKind::LuTypeSpecifier => "LuTypeSpecifier",
             SyntaxKind::CmdArg => "CmdArg",
             SyntaxKind::Flag => "Flag",
+            SyntaxKind::RedirToValue => "RedirToValue",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }
