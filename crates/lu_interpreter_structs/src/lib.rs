@@ -20,7 +20,7 @@ mod value;
 mod value_type;
 mod variable;
 
-pub use command::Command;
+pub use command::{CmdAttribute, CmdAttributeVariant, Command};
 pub use command_collection::CommandCollection;
 pub use evaluate::*;
 pub use flag::*;

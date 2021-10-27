@@ -7,6 +7,7 @@ mod cmd_prelude;
 mod lu_std;
 mod print;
 mod run_external_cmd;
+mod external_cmds_attr;
 
 pub use print::PrintCmd;
 pub use run_external_cmd::RunExternalCmd;

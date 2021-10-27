@@ -7,9 +7,27 @@ use crate::{
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
+use serde::{Deserialize, Serialize};
 
 pub const IN_VAR_NAME: &str = "in";
 pub const ARGS_VAR_NAME: &str = "args";
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum CmdAttributeVariant {
+    Pure,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, new)]
+pub struct CmdAttribute {
+    attr: CmdAttributeVariant,
+    decl: SourceCodeItem,
+}
+
+impl From<(CmdAttributeVariant, SourceCodeItem)> for CmdAttribute {
+    fn from((attr, decl): (CmdAttributeVariant, SourceCodeItem)) -> Self {
+        CmdAttribute::new(attr, decl)
+    }
+}
 
 pub trait Command: CommandClone + Debug {
     fn name(&self) -> &str;
