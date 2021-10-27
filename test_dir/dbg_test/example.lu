@@ -2,16 +2,17 @@
 
 fn echo_wrapped ( arg )
     echo $arg
-    ret nil
 end
 
-let x = "hello"
+let text = ["lush" "greets" "the world"]
 
-if $x == "hello"
-    echo $x
-else
-    echo "ERROR"
-    ret 1
+for txt in $text
+    let x = $txt
+    if $x == "hello"
+        echo $x
+    elif $x == "world"
+        echo_wrapped $x
+    else
+        echo $x
+    end
 end
-
-echo_wrapped "world"

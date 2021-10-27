@@ -5,7 +5,8 @@ use lu_syntax::ast::FnStmtNode;
 pub fn eval_function(fn_stmt: &Function, scope: &mut SyScope) -> LuResult<Value> {
     let result = if let Some(block) = fn_stmt.fn_node.block_stmt() {
         match block.evaluate(scope) {
-            Err(RetValOrErr::RetVal(v)) => Ok(v),
+            Err(RetValOrErr::RetVal(v)) => Ok(v), // Only retvals are returned
+            Ok(_) => Ok(Value::Nil), // Returned val of block is not returned
             v => v,
         }
     } else {

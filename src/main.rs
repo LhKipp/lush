@@ -51,7 +51,10 @@ fn ret_code_main() -> i32 {
 
         let intprt_config = InterpreterCfg::default();
         match Interpreter::new(global_frame, intprt_config).eval(code) {
-            Ok(v) => println!("{}", v),
+            Ok(_) => {
+                // TODO v should be deserialized and passed to the parent lu-shell (if any)
+                // maybe pass via flag?
+            }
             Err(errs) => {
                 for err in errs {
                     eprintln!("{:?}", err)
