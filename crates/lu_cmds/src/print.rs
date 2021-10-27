@@ -21,10 +21,7 @@ impl PrintCmd {
                 print_decl.clone().into(),
             ))
             .in_arg(ArgSignature::void(print_decl.clone().into()))
-            .ret_arg(ArgSignature::ret(
-                ValueType::new_array(ValueType::Any, print_decl.clone()),
-                print_decl.into(),
-            ));
+            .ret_arg(ArgSignature::ret(ValueType::Nil, print_decl.into()));
         PrintCmd {
             sign: sign_builder.build().unwrap(),
         }
@@ -37,9 +34,29 @@ impl Command for PrintCmd {
     }
 
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
-        let l_scope = scope.lock();
-        let args = self.expect_arg(&l_scope, TO_PRINT_ARG_NAME);
-        Ok(args.clone())
+        let mut l_scope = scope.lock();
+        let args = self.take_var_arg(&mut l_scope, TO_PRINT_ARG_NAME).clone();
+
+        if let Some(redir_to) = l_scope.find_var_mut(REDIR0) {
+            let new_val = match std::mem::replace(&mut redir_to.val, Value::Nil) {
+                Value::Array(arr) => {
+                    let mut inner_arr = (*arr).clone();
+                    inner_arr.extend(args);
+                    Value::new_array(inner_arr)
+                }
+                Value::String(_) => todo!(),
+                Value::Command(_) => todo!(),
+                _ => unreachable!(),
+            };
+            redir_to.val = new_val;
+        } else {
+            // Simple print
+            for arg in args {
+                print!("{}", arg.to_string())
+            }
+            println!("");
+        }
+        Ok(Value::Nil)
     }
 
     fn signature(&self) -> &Signature {
@@ -54,3 +71,5 @@ impl Command for PrintCmd {
         None
     }
 }
+
+const REDIR0: &str = "REDIR0";

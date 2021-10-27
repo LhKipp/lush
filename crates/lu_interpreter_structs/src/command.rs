@@ -67,7 +67,25 @@ pub trait Command: CommandClone + Debug {
             .val
     }
 
-    // /// Returns $<arg_name>
+    /// Takes the contents of the vararg
+    /// TODO I was overeager optimizing. In case someone passes an array to the vararg this doesn't
+    /// work (not possible currently)
+    /// print $my_array..
+    fn take_var_arg<'a>(&self, scope: &'a mut Scope<Variable>, var_arg_name: &str) -> Vec<Value> {
+        scope
+            .find_var_mut(var_arg_name)
+            .map(|var| std::mem::replace(&mut var.val, Value::Nil))
+            .map(|val| {
+                if let Value::Array(arr) = val {
+                    Rc::try_unwrap(arr).expect("Must work")
+                } else {
+                    unreachable!("Var arg is always an array");
+                }
+            })
+            .expect("Variable always present")
+    }
+
+    /// Returns $<arg_name>
     // fn expect_overwrite_var<'a>(
     //     &self,
     //     scope: &'a mut Scope<Variable>,
