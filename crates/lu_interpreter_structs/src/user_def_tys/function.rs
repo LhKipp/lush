@@ -1,4 +1,6 @@
-use crate::{Command, FlagVariant, ModPath, SyScope, Value, ValueType, VarDeclNode, Variable};
+use crate::{
+    CmdAttribute, Command, FlagVariant, ModPath, SyScope, Value, ValueType, VarDeclNode, Variable,
+};
 use derive_builder::Builder;
 use derive_new::new;
 use log::trace;
@@ -212,6 +214,9 @@ pub struct Function {
     // For closures only
     pub captured_vars: Vec<Variable>,
 
+    // TODO make pure setable by keyword
+    pub attributes: Vec<CmdAttribute>,
+
     /// Set when function is inserted into scope
     pub parent_module: ModPath,
 }
@@ -229,6 +234,7 @@ impl Function {
             fn_node,
             captured_vars: Vec::new(),
             parent_module: source_file_id,
+            attributes: Vec::new(),
         }
     }
 }
@@ -266,5 +272,9 @@ impl Command for Function {
 
     fn parent_module(&self) -> Option<&ModPath> {
         Some(&self.parent_module)
+    }
+
+    fn attributes(&self) -> &[crate::CmdAttribute] {
+        &self.attributes
     }
 }

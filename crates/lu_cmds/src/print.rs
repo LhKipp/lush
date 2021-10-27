@@ -8,6 +8,8 @@ pub struct PrintCmd {
 }
 
 const TO_PRINT_ARG_NAME: &str = "to_print";
+static PRINT_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
+    Lazy::new(|| vec![CmdAttribute::new(Pure, lu_source_code_item!())]);
 
 impl PrintCmd {
     pub fn new() -> Self {
@@ -31,6 +33,18 @@ impl PrintCmd {
 impl Command for PrintCmd {
     fn name(&self) -> &str {
         "print"
+    }
+
+    fn signature(&self) -> &Signature {
+        &self.sign
+    }
+
+    fn signature_item(&self) -> SourceCodeItem {
+        lu_source_code_item!()
+    }
+
+    fn parent_module(&self) -> Option<&ModPath> {
+        None
     }
 
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
@@ -59,16 +73,8 @@ impl Command for PrintCmd {
         Ok(Value::Nil)
     }
 
-    fn signature(&self) -> &Signature {
-        &self.sign
-    }
-
-    fn signature_item(&self) -> SourceCodeItem {
-        lu_source_code_item!()
-    }
-
-    fn parent_module(&self) -> Option<&ModPath> {
-        None
+    fn attributes(&self) -> &[CmdAttribute] {
+        &*PRINT_CMD_ATTRS
     }
 }
 

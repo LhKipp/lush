@@ -1,4 +1,5 @@
 use crate::cmd_prelude::*;
+use crate::external_cmds_attr::EXT_CMDS_ATTRIBUTES;
 use std::{io::Write, process::Stdio};
 
 use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
@@ -19,10 +20,6 @@ pub struct RunExternalCmd {
 }
 
 impl Command for RunExternalCmd {
-    fn signature_item(&self) -> SourceCodeItem {
-        lu_source_code_item!() // TODO fixup line number
-    }
-
     fn name(&self) -> &str {
         &self.cmd_name
     }
@@ -44,6 +41,21 @@ impl Command for RunExternalCmd {
             );
             sign
         })
+    }
+
+    fn signature_item(&self) -> SourceCodeItem {
+        lu_source_code_item!() // TODO fixup line number
+    }
+
+    fn parent_module(&self) -> Option<&lu_interpreter_structs::ModPath> {
+        None
+    }
+
+    fn attributes(&self) -> &[CmdAttribute] {
+        EXT_CMDS_ATTRIBUTES
+            .get(self.name())
+            .map(|attrs| attrs.as_ref())
+            .unwrap_or(&[])
     }
 
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
@@ -83,9 +95,5 @@ impl Command for RunExternalCmd {
         } else {
             Err(EvalErr::ExternalCmdFailed(self.cmd_node.to_item()).into())
         }
-    }
-
-    fn parent_module(&self) -> Option<&lu_interpreter_structs::ModPath> {
-        None
     }
 }

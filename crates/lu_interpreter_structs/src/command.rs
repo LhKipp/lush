@@ -41,7 +41,14 @@ pub trait Command: CommandClone + Debug {
     /// TODO this should be always Some (even for print, ...)
     fn parent_module(&self) -> Option<&ModPath>;
 
-    /// Only overwritten by Function
+    /// Get all attributes of this command. 
+    /// There might be no attributes returned for external cmds. Therefore the absence
+    /// of an attribute, does not necessarily imply, that the command does not have the guarantees
+    /// an attribute implies.
+    fn attributes(&self) -> &[CmdAttribute];
+
+    /// Only overwritten by Function. Overwritting this func for anything else than Function is an
+    /// error
     fn as_function(&self) -> Option<&Function> {
         None
     }

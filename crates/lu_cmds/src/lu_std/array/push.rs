@@ -2,6 +2,7 @@ use std::{ops::Deref, rc::Rc};
 
 use crate::cmd_prelude::*;
 use lu_interpreter_structs::{ModPath, SyScope};
+use once_cell::sync::Lazy;
 
 #[derive(Debug, Clone)]
 pub struct ArrayPushCmd {
@@ -10,6 +11,8 @@ pub struct ArrayPushCmd {
 
 const ARRAY_ARG_NAME: &str = "array";
 const VALUES_ARG_NAME: &str = "to_push";
+static PUSH_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
+    Lazy::new(|| vec![CmdAttribute::new(Pure, lu_source_code_item!())]);
 
 impl ArrayPushCmd {
     pub fn new() -> Self {
@@ -42,6 +45,22 @@ impl Command for ArrayPushCmd {
         "push"
     }
 
+    fn signature(&self) -> &Signature {
+        &self.sign
+    }
+
+    fn signature_item(&self) -> SourceCodeItem {
+        lu_source_code_item!()
+    }
+
+    fn parent_module(&self) -> Option<&ModPath> {
+        Some(&super::ARRAY_MOD_PATH)
+    }
+
+    fn attributes(&self) -> &[CmdAttribute] {
+        &*PUSH_CMD_ATTRS
+    }
+
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let mut l_scope = scope.lock();
         let values_to_push = self
@@ -58,17 +77,5 @@ impl Command for ArrayPushCmd {
         } else {
             unreachable!("ARRAY_ARG_NAME is of array type");
         }
-    }
-
-    fn signature(&self) -> &Signature {
-        &self.sign
-    }
-
-    fn signature_item(&self) -> SourceCodeItem {
-        lu_source_code_item!()
-    }
-
-    fn parent_module(&self) -> Option<&ModPath> {
-        Some(&super::ARRAY_MOD_PATH)
     }
 }

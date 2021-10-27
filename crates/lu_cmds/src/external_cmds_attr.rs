@@ -3,9 +3,8 @@ use std::collections::HashMap;
 use lu_error::{lu_source_code_item, SourceCodeItem};
 use lu_interpreter_structs::{CmdAttribute, CmdAttributeVariant::Pure};
 use once_cell::sync::Lazy;
-use parking_lot::Mutex;
 
-static EXT_CMDS_ATTRIBUTES: Lazy<Mutex<HashMap<&str, Vec<CmdAttribute>>>> = Lazy::new(|| {
+pub(crate) static EXT_CMDS_ATTRIBUTES: Lazy<HashMap<&str, Vec<CmdAttribute>>> = Lazy::new(|| {
     let mut m = HashMap::new();
     m.insert("awk", vec![(Pure, lu_source_code_item!()).into()]);
     m.insert("bc", vec![(Pure, lu_source_code_item!()).into()]);
@@ -42,5 +41,5 @@ static EXT_CMDS_ATTRIBUTES: Lazy<Mutex<HashMap<&str, Vec<CmdAttribute>>>> = Lazy
     m.insert("uniq", vec![(Pure, lu_source_code_item!()).into()]);
     m.insert("wc", vec![(Pure, lu_source_code_item!()).into()]);
     m.insert("xargs", vec![(Pure, lu_source_code_item!()).into()]);
-    Mutex::new(m)
+    m
 });
