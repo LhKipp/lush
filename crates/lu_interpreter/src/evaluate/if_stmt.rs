@@ -21,6 +21,11 @@ impl Evaluable for IfStmtNode {
         for (elif_cond, elif_block) in self.elif_blocks() {
             let elif_cond = elif_cond.unwrap();
             let elif_block = elif_block.unwrap();
+
+            if is_dbg_session(&scope.lock()) {
+                lu_dbg::before_eval(&format!("elif {}", elif_cond.text_trimmed()), scope)?;
+            }
+
             let (evaluated, result) = eval_block_if_true(&elif_cond, &elif_block, scope);
             if evaluated || result.is_err() {
                 return result;
@@ -28,6 +33,9 @@ impl Evaluable for IfStmtNode {
         }
 
         if let Some(else_block) = self.else_block() {
+            if is_dbg_session(&scope.lock()) {
+                lu_dbg::before_eval("else", scope)?;
+            }
             return eval_block(&else_block, scope);
         }
 
@@ -75,7 +83,7 @@ fn eval_block_if_true(
 
 fn eval_block(block: &BlockStmtNode, scope: &mut SyScope) -> EvalResult {
     scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
-    let result = block.evaluate(scope);
+    let result = block.evaluate_with_args(&[EvalArg::BlockNoPushFrame], scope);
     scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);
     result
 }

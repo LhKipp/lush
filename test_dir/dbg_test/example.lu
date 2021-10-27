@@ -8,9 +8,9 @@ let text = ["lush" "greets" "the world"]
 
 for txt in $text
     let x = $txt
-    if $x == "hello"
+    if $x == "lush"
         echo $x
-    elif $x == "world"
+    elif $x == "greets"
         echo_wrapped $x
     else
         echo $x

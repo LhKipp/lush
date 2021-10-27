@@ -14,6 +14,7 @@ mod strct_stmt;
 mod type_;
 mod use_stmt;
 mod value_path_expr;
+mod for_stmt;
 use std::marker::PhantomData;
 
 use lu_error::SourceCodeItem;
