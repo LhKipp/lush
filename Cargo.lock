@@ -822,6 +822,7 @@ dependencies = [
  "lu_syntax",
  "lu_syntax_elements",
  "lu_text_util",
+ "once_cell",
  "parking_lot",
  "rustyline",
  "vec_box",

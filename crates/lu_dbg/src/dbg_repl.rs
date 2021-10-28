@@ -1,3 +1,4 @@
+use crate::action::ALL_DBG_ACTIONS;
 use crate::{action::*, DbgIntervention};
 use lu_error::{EvalErr, LuResult};
 use lu_interpreter_structs::dbg_state::DbgState;
@@ -5,7 +6,6 @@ use lu_interpreter_structs::SyScope;
 use lu_syntax::AstId;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
-use vec_box::vec_box;
 
 pub fn dbg_loop(
     _: &mut DbgState,
@@ -20,27 +20,15 @@ pub fn dbg_loop(
         }
     }
 
-    let cmds: Vec<Box<dyn DbgAction>> = vec_box![
-        DbgStepAction {},
-        DbgNextAction {},
-        DbgSkipAction {},
-        DbgPrintAction {},
-        DbgScopeAction {}
-    ];
     let ret_val = loop {
         let readline = rl.readline(">> ");
         match readline {
             Ok(line) => {
                 let line = line.trim();
                 rl.add_history_entry(line);
-                // Handle help a little special.
-                if line.starts_with("help") {
-                    print_help(&cmds);
-                    continue;
-                }
 
                 let mut cmd_exec_action = None;
-                for cmd in &cmds {
+                for cmd in &*ALL_DBG_ACTIONS {
                     if cmd.matches(&line) {
                         cmd_exec_action = Some(cmd.exec(&line, scope));
                         break;
@@ -50,7 +38,7 @@ pub fn dbg_loop(
                 match cmd_exec_action {
                     Some(DbgActionResult::StopDbgLoop) => break Ok(()),
                     None => {
-                        print_help(&cmds);
+                        DbgHelpAction {}.exec(&line, scope);
                     }
                     _ => {} // keep going
                 }
@@ -77,25 +65,4 @@ pub fn dbg_loop(
 
     // TODO return proper DbgIntervention
     ret_val.map(|_| None)
-}
-
-fn print_help(cmds: &Vec<Box<dyn DbgAction>>) {
-    println!(
-        r#"Commands: 
-  help - show this help"#
-    );
-    for cmd in cmds {
-        let args = if !cmd.args().is_empty() {
-            format!(", {}", cmd.args().join(" "))
-        } else {
-            "".to_string()
-        };
-        println!(
-            "  {}, {}{} - {}",
-            cmd.long_name(),
-            cmd.short_name(),
-            args,
-            cmd.description()
-        );
-    }
 }

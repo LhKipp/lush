@@ -1,22 +1,37 @@
 pub(crate) mod dbg_action_prelude;
+mod help;
 mod next;
 mod print;
 mod scope;
-mod step;
 mod skip;
+mod step;
+pub(crate) use help::DbgHelpAction;
 use lu_interpreter_structs::SyScope;
 pub(crate) use next::DbgNextAction;
+use once_cell::sync::Lazy;
 pub(crate) use print::DbgPrintAction;
 pub(crate) use scope::DbgScopeAction;
-pub(crate) use step::DbgStepAction;
 pub(crate) use skip::DbgSkipAction;
+pub(crate) use step::DbgStepAction;
+use vec_box::vec_box;
 
 pub(crate) enum DbgActionResult {
     StopDbgLoop,
     None,
 }
 
-pub(crate) trait DbgAction {
+pub(crate) static ALL_DBG_ACTIONS: Lazy<Vec<Box<dyn DbgAction>>> = Lazy::new(|| {
+    vec_box![
+        DbgHelpAction {},
+        DbgStepAction {},
+        DbgNextAction {},
+        DbgSkipAction {},
+        DbgPrintAction {},
+        DbgScopeAction {}
+    ]
+});
+
+pub(crate) trait DbgAction: Sync + Send {
     fn matches(&self, line: &str) -> bool {
         if line == self.long_name() || line == self.short_name() {
             true
