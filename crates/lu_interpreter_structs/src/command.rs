@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 pub const IN_VAR_NAME: &str = "in";
 pub const ARGS_VAR_NAME: &str = "args";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, is_enum_variant, PartialEq, Eq)]
 pub enum CmdAttributeVariant {
     Pure,
 }
@@ -30,6 +30,9 @@ impl From<(CmdAttributeVariant, SourceCodeItem)> for CmdAttribute {
 }
 
 pub trait Command: CommandClone + Debug {
+    // Methods to be overwritten by a cmd
+
+    /// The name of the cmd
     fn name(&self) -> &str;
 
     fn signature(&self) -> &Signature;
@@ -41,11 +44,21 @@ pub trait Command: CommandClone + Debug {
     /// TODO this should be always Some (even for print, ...)
     fn parent_module(&self) -> Option<&ModPath>;
 
-    /// Get all attributes of this command. 
+    /// Get all attributes of this command.
     /// There might be no attributes returned for external cmds. Therefore the absence
     /// of an attribute, does not necessarily imply, that the command does not have the guarantees
     /// an attribute implies.
     fn attributes(&self) -> &[CmdAttribute];
+
+    /// Run the cmd
+    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value>;
+
+    // End of methods to overwrite
+
+    /// Convenience func for users
+    fn find_attr(&self, var: CmdAttributeVariant) -> Option<&CmdAttribute> {
+        self.attributes().iter().find(|attr| attr.attr == var)
+    }
 
     /// Only overwritten by Function. Overwritting this func for anything else than Function is an
     /// error
@@ -120,8 +133,6 @@ pub trait Command: CommandClone + Debug {
     //     assert!(&scope.overwrite_var_value(var_name, new_val))
     // }
 
-    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value>;
-
     fn run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         debug!("Running command {}", self.name());
         let result = self.do_run_cmd(scope);
@@ -146,6 +157,7 @@ pub trait Command: CommandClone + Debug {
 
     /// A command is called if the cmd.name() and at least all required flags are passed
     fn is_called_by(&self, called_cmd_name: &str, passed_flags: &[FlagVariant]) -> bool {
+        // TODO is this logic correct?
         self.name() == called_cmd_name
             && passed_flags.iter().all(|passed_flag| {
                 self.signature().flags.iter().any(|flag_decl| {

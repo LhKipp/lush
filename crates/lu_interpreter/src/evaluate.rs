@@ -1,4 +1,5 @@
 use enum_as_inner::EnumAsInner;
+use lu_dbg::DbgIntervention;
 use std::fmt::{Debug, Display};
 
 use log::debug;
@@ -56,15 +57,13 @@ pub trait Evaluable: Display {
         let is_dbg_session = is_dbg_session(&scope.lock());
 
         if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
-            lu_dbg::before_eval(&self.to_string().trim(), scope)?
+            match lu_dbg::before_eval(&self.to_string().trim(), scope)? {
+                Some(DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
+                None => {} // Nothing to do :)
+            };
         }
 
         let result = self.do_evaluate(args, scope);
-
-        // if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
-        //     // TODO pass eval_result
-        //     lu_dbg::after_eval(&self, scope, &result)?
-        // }
 
         debug!("Result of Evaluating: {}: {:?}", self, result);
         result
