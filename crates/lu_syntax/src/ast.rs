@@ -3,6 +3,7 @@ mod block_stmt;
 mod cmd_stmt;
 mod expr;
 mod fn_stmt;
+mod for_stmt;
 mod generated;
 mod if_stmt;
 mod let_stmt;
@@ -14,7 +15,6 @@ mod strct_stmt;
 mod type_;
 mod use_stmt;
 mod value_path_expr;
-mod for_stmt;
 use std::marker::PhantomData;
 
 use lu_error::SourceCodeItem;

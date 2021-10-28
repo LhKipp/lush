@@ -9,7 +9,7 @@ use lu_parser::grammar::SourceFileRule;
 use lu_pipeline_stage::PipelineStage;
 use lu_structure_parse::{modules_from_start_parse, LoadModulesConfig};
 use lu_syntax::{
-    ast::{HasRule, SourceFileNode},
+    ast::{SourceFileNode},
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
