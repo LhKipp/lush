@@ -6,7 +6,8 @@ mod scope;
 mod skip;
 mod step;
 pub(crate) use help::DbgHelpAction;
-use lu_interpreter_structs::SyScope;
+use lu_interpreter_structs::{dbg_state::DbgState, SyScope};
+use lu_syntax::AstId;
 pub(crate) use next::DbgNextAction;
 use once_cell::sync::Lazy;
 pub(crate) use print::DbgPrintAction;
@@ -48,8 +49,21 @@ pub(crate) trait DbgAction: Sync + Send {
         }
     }
 
-    fn do_exec(&self, args: &str, scope: &mut SyScope) -> DbgActionResult;
-    fn exec(&self, line: &str, scope: &mut SyScope) -> DbgActionResult {
+    fn do_exec(
+        &self,
+        args: &str,
+        stmt_id: &AstId,
+        dbg_state: &mut DbgState,
+        scope: &mut SyScope,
+    ) -> DbgActionResult;
+
+    fn exec(
+        &self,
+        line: &str,
+        stmt_id: &AstId,
+        dbg_state: &mut DbgState,
+        scope: &mut SyScope,
+    ) -> DbgActionResult {
         assert!(self.matches(line));
         // We can't do
         // let line = line.strip_prefix(long_name);
@@ -62,7 +76,7 @@ pub(crate) trait DbgAction: Sync + Send {
         } else {
             unreachable!("Line maches")
         };
-        self.do_exec(args, scope)
+        self.do_exec(args, stmt_id, dbg_state, scope)
     }
     fn long_name(&self) -> &'static str;
     fn short_name(&self) -> &'static str;

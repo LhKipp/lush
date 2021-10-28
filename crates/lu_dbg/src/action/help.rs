@@ -1,9 +1,12 @@
+use lu_interpreter_structs::dbg_state::DbgState;
+use lu_syntax::AstId;
+
 use crate::action::{dbg_action_prelude::*, ALL_DBG_ACTIONS};
 
 pub(crate) struct DbgHelpAction {}
 
 impl DbgAction for DbgHelpAction {
-    fn do_exec(&self, _: &str, _: &mut SyScope) -> DbgActionResult {
+    fn do_exec(&self, _: &str, _: &AstId, _: &mut DbgState, _: &mut SyScope) -> DbgActionResult {
         println!(r#"Commands:"#);
         for cmd in &*ALL_DBG_ACTIONS {
             let args = if !cmd.args().is_empty() {

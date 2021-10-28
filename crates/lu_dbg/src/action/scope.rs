@@ -18,7 +18,13 @@ impl DbgAction for DbgScopeAction {
         "Print the current scope"
     }
 
-    fn do_exec(&self, args: &str, scope: &mut SyScope) -> DbgActionResult {
+    fn do_exec(
+        &self,
+        args: &str,
+        _: &AstId,
+        _: &mut DbgState,
+        scope: &mut SyScope,
+    ) -> DbgActionResult {
         if !args.is_empty() {
             println!("This command does not take arguments");
             return DbgActionResult::None;

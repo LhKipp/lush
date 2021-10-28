@@ -8,8 +8,8 @@ use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
 pub fn dbg_loop(
-    _: &mut DbgState,
-    _: AstId,
+    dbg_state: &mut DbgState,
+    stmt_id: AstId,
     scope: &mut SyScope,
 ) -> LuResult<Option<DbgIntervention>> {
     let mut rl = Editor::<()>::new();
@@ -30,7 +30,7 @@ pub fn dbg_loop(
                 let mut cmd_exec_action = None;
                 for cmd in &*ALL_DBG_ACTIONS {
                     if cmd.matches(&line) {
-                        cmd_exec_action = Some(cmd.exec(&line, scope));
+                        cmd_exec_action = Some(cmd.exec(&line, &stmt_id, dbg_state, scope));
                         break;
                     }
                 }
@@ -38,7 +38,7 @@ pub fn dbg_loop(
                 match cmd_exec_action {
                     Some(DbgActionResult::StopDbgLoop) => break Ok(()),
                     None => {
-                        DbgHelpAction {}.exec(&line, scope);
+                        DbgHelpAction {}.exec(&line, &stmt_id, dbg_state, scope);
                     }
                     _ => {} // keep going
                 }

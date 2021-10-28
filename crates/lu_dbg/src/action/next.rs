@@ -3,7 +3,7 @@ use crate::action::dbg_action_prelude::*;
 pub(crate) struct DbgNextAction {}
 
 impl DbgAction for DbgNextAction {
-    fn do_exec(&self, _: &str, _: &mut SyScope) -> DbgActionResult {
+    fn do_exec(&self, _: &str, _: &AstId, _: &mut DbgState, _: &mut SyScope) -> DbgActionResult {
         todo!()
     }
 
