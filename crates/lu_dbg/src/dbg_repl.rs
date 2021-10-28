@@ -17,6 +17,7 @@ pub fn dbg_loop(scope: &mut SyScope) -> LuResult<Option<DbgIntervention>> {
     let cmds: Vec<Box<dyn DbgAction>> = vec_box![
         DbgStepAction {},
         DbgNextAction {},
+        DbgSkipAction {},
         DbgPrintAction {},
         DbgScopeAction {}
     ];

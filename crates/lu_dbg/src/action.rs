@@ -3,11 +3,13 @@ mod next;
 mod print;
 mod scope;
 mod step;
+mod skip;
 use lu_interpreter_structs::SyScope;
 pub(crate) use next::DbgNextAction;
 pub(crate) use print::DbgPrintAction;
 pub(crate) use scope::DbgScopeAction;
 pub(crate) use step::DbgStepAction;
+pub(crate) use skip::DbgSkipAction;
 
 pub(crate) enum DbgActionResult {
     StopDbgLoop,
