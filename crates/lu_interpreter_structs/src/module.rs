@@ -1,13 +1,13 @@
 use crate::{
-    Command, Function, ModPath, ModPathVariant, ScopeFrame, ScopeFrameTag, Signature, Strct,
-    StrctField, UsePath, Variable,
+    Command, Function, ModPath, ModPathVariant, ScopeFrame, ScopeFrameTag, Strct, StrctField,
+    UsePath, Variable,
 };
 use itertools::Itertools;
 use log::debug;
 use lu_error::util::Outcome;
 use lu_parser::grammar::SourceFileRule;
 use lu_syntax::{
-    ast::{FnStmtNode, SourceFileNode, StrctStmtNode, UseStmtNode},
+    ast::{SourceFileNode, StrctStmtNode, UseStmtNode},
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
@@ -126,7 +126,7 @@ impl ModInfo {
             .collect();
         let funcs = block
             .fn_stmts()
-            .map(|fn_stmt| Self::source_fn_stmt(&fn_stmt, source_node_id.clone()))
+            .map(|fn_stmt| Function::from_node(&fn_stmt, source_node_id.clone()))
             .collect();
         let strcts = block
             .struct_stmts()
@@ -138,14 +138,6 @@ impl ModInfo {
             funcs,
             use_paths,
         }
-    }
-
-    fn source_fn_stmt(fn_stmt: &FnStmtNode, source_file_id: ModPath) -> Function {
-        let name = fn_stmt.name().unwrap_or("".to_string());
-        // Source the signature (either user provided or default)
-        let sign = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
-
-        Function::new(name, sign, fn_stmt.clone(), source_file_id)
     }
 
     fn source_struct_stmt(struct_stmt: &StrctStmtNode) -> Strct {

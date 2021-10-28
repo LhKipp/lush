@@ -1,9 +1,12 @@
 use lu_error::SourceCodeItem;
 use rowan::TextRange;
 
-use crate::{ast::FnDeclNameToken, AstNode, AstToken};
+use crate::{AstNode, AstToken};
 
-use super::{support, BlockStmtNode, FnKeywordToken, FnStmtNode, SignatureNode};
+use super::{
+    support, BlockStmtNode, FnDeclNameToken, FnKeywordToken, FnStmtNode, ImpureKeywordToken,
+    SignatureNode,
+};
 
 impl FnStmtNode {
     pub fn name(&self) -> Option<String> {
@@ -19,6 +22,10 @@ impl FnStmtNode {
                     .join(" "),
             )
         }
+    }
+
+    pub fn impure_attr(&self) -> Option<ImpureKeywordToken> {
+        support::token_child(self.syntax())
     }
 
     pub fn name_nodes(&self) -> Vec<FnDeclNameToken> {

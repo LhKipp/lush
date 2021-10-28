@@ -1,12 +1,13 @@
 use crate::{
-    CmdAttribute, Command, FlagVariant, ModPath, SyScope, Value, ValueType, VarDeclNode, Variable,
+    CmdAttribute, CmdAttributeVariant, Command, FlagVariant, ModPath, SyScope, Value, ValueType,
+    VarDeclNode, Variable,
 };
 use derive_builder::Builder;
 use derive_new::new;
 use log::trace;
-use lu_error::{LuResult, SourceCodeItem};
+use lu_error::{LuResult, SourceCodeItem, lu_source_code_item};
 use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, SignatureNode};
-use lu_syntax::AstNode;
+use lu_syntax::{AstNode, AstToken};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use serde::{Deserialize, Serialize};
 
@@ -202,7 +203,7 @@ impl Signature {
 }
 
 /// Function is a struct containing all needed information for a function/closure
-/// This should allow for less lookup in the ast later on
+/// This should allow for less lookup in the ast later on (and easier handling of funcs)
 #[derive(Educe)]
 #[educe(Debug)]
 #[derive(Clone)]
@@ -214,7 +215,6 @@ pub struct Function {
     // For closures only
     pub captured_vars: Vec<Variable>,
 
-    // TODO make pure setable by keyword
     pub attributes: Vec<CmdAttribute>,
 
     /// Set when function is inserted into scope
@@ -225,6 +225,7 @@ impl Function {
     pub fn new(
         name: String,
         signature: Signature,
+        attributes: Vec<CmdAttribute>,
         fn_node: FnStmtNode,
         source_file_id: ModPath,
     ) -> Self {
@@ -234,8 +235,35 @@ impl Function {
             fn_node,
             captured_vars: Vec::new(),
             parent_module: source_file_id,
-            attributes: Vec::new(),
+            attributes,
         }
+    }
+
+    pub fn from_node(fn_stmt: &FnStmtNode, source_file_id: ModPath) -> Function {
+        let name = fn_stmt.name().unwrap_or("".to_string());
+        // Source the signature (either user provided or default)
+        let sign = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
+        let attrs = Self::attrs_from_node(fn_stmt);
+
+        Function::new(name, sign, attrs, fn_stmt.clone(), source_file_id)
+    }
+
+    fn attrs_from_node(fn_stmt: &FnStmtNode) -> Vec<CmdAttribute> {
+        let mut attrs = vec![];
+        if let Some(impure_token) = fn_stmt.impure_attr() {
+            attrs.push(CmdAttribute::new(
+                CmdAttributeVariant::Impure,
+                impure_token.to_item(),
+            ));
+        } else {
+            // By default all lu-functions are pure :)
+            // This is okay, as there will be a warning for all impure function calls
+            attrs.push(CmdAttribute::new(
+                CmdAttributeVariant::Impure,
+                lu_source_code_item!(),
+            ));
+        }
+        attrs
     }
 }
 

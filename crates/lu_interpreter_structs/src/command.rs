@@ -15,6 +15,8 @@ pub const ARGS_VAR_NAME: &str = "args";
 #[derive(Debug, Clone, Serialize, Deserialize, is_enum_variant, PartialEq, Eq)]
 pub enum CmdAttributeVariant {
     Pure,
+    Impure,
+    PurityUnknown,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, new)]

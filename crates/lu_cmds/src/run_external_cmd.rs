@@ -1,5 +1,5 @@
-use crate::cmd_prelude::*;
 use crate::external_cmds_attr::EXT_CMDS_ATTRIBUTES;
+use crate::{cmd_prelude::*, external_cmds_attr::EXT_CMDS_DEF_ATTRIBUTES};
 use std::{io::Write, process::Stdio};
 
 use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
@@ -55,7 +55,7 @@ impl Command for RunExternalCmd {
         EXT_CMDS_ATTRIBUTES
             .get(self.name())
             .map(|attrs| attrs.as_ref())
-            .unwrap_or(&[])
+            .unwrap_or(&EXT_CMDS_DEF_ATTRIBUTES)
     }
 
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {

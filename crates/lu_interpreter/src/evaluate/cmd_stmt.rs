@@ -21,7 +21,10 @@ impl Evaluable for CmdStmtNode {
 
         // FROM HERE ONLY EVALUATION OF CMD FOLLOWS
         // REASON: Otherwise the following dbg_stmt may return this func to early
-        if is_dbg_session(&scope.lock()) && !cmd.find_attr(CmdAttributeVariant::Pure).is_some() {
+        if is_dbg_session(&scope.lock())
+            && (cmd.find_attr(CmdAttributeVariant::Impure).is_some()
+                || cmd.find_attr(CmdAttributeVariant::PurityUnknown).is_some())
+        {
             match lu_dbg::warn_unpure_cmd_call(&cmd, scope)? {
                 Some(DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
                 None => {} // Okay nothing to do
