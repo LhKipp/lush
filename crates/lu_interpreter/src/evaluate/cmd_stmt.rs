@@ -25,7 +25,7 @@ impl Evaluable for CmdStmtNode {
             && (cmd.find_attr(CmdAttributeVariant::Impure).is_some()
                 || cmd.find_attr(CmdAttributeVariant::PurityUnknown).is_some())
         {
-            match lu_dbg::warn_unpure_cmd_call(&cmd, scope)? {
+            match lu_dbg::warn_unpure_cmd_call(&cmd, self.ast_id(), scope)? {
                 Some(DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
                 None => {} // Okay nothing to do
             }
@@ -64,7 +64,7 @@ impl Evaluable for CmdStmtNode {
     }
 
     fn dbg_settings(&self) -> &'static [DbgSetting] {
-        &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
+        &[DbgSetting::StopDbgBeforeEval]
     }
 }
 

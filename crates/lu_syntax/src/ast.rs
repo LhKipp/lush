@@ -32,8 +32,23 @@ pub trait HasRule {
     fn get_belonging_rule() -> Box<dyn Rule>;
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub struct AstId(SyntaxKind, TextRange);
+
 pub trait HasSyntaxKind {
     fn get_syntax_kind(&self) -> SyntaxKind;
+}
+pub trait HasTextRange {
+    fn get_text_range(&self) -> TextRange;
+}
+pub trait HasAstId {
+    fn get_ast_id(&self) -> AstId;
+}
+
+impl<T: HasSyntaxKind + HasTextRange> HasAstId for T {
+    fn get_ast_id(&self) -> AstId {
+        AstId(self.get_syntax_kind(), self.get_text_range())
+    }
 }
 
 /// The main trait to go from untyped `SyntaxNode` to a typed ast. The

@@ -8,7 +8,7 @@ use lu_syntax::ast::{
 
 impl Evaluable for MathExprNode {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
-        &[DbgSetting::StopDbgBeforeEval, DbgSetting::StopDbgAfterEval]
+        &[DbgSetting::StopDbgBeforeEval]
     }
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let lhs = self.lhs();

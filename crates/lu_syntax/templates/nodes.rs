@@ -1,10 +1,11 @@
 #![allow(unused_imports)]
 use std::fmt::Display;
 use serde::Serialize;
+use crate::TextRange;
 use enum_as_inner::EnumAsInner;
 use crate::{
     Rule,
-    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
+    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind, HasTextRange},
     SyntaxKind::{self, *},
     SyntaxNode, SyntaxToken, SyntaxElement
 };
@@ -32,6 +33,11 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
         self.syntax().kind()
     }
 }
+impl HasTextRange for {{ syn_elem.struct_name }}{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 {% elif syn_elem.is_node -%}
 
@@ -53,6 +59,11 @@ impl AstNode for {{ syn_elem.struct_name }} {
 impl HasSyntaxKind for {{ syn_elem.struct_name }}{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for {{ syn_elem.struct_name }}{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -154,6 +165,12 @@ impl HasSyntaxKind for {{ syn_elem.struct_name }}{
             {{syn_elem.struct_name}}::{{represented.name}}(it) => it.get_syntax_kind(),
             {% endfor -%}
         }
+    }
+}
+
+impl HasTextRange for {{ syn_elem.struct_name }}{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 

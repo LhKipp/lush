@@ -1,5 +1,6 @@
 use enum_as_inner::EnumAsInner;
 use lu_dbg::DbgIntervention;
+use lu_syntax::ast::HasAstId;
 use std::fmt::{Debug, Display};
 
 use log::debug;
@@ -36,10 +37,9 @@ pub enum EvalArg {
 #[derive(Debug, PartialEq, Eq)]
 pub enum DbgSetting {
     StopDbgBeforeEval,
-    StopDbgAfterEval,
 }
 
-pub trait Evaluable: Display {
+pub trait Evaluable: Display + HasAstId {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
         &[]
     }
@@ -56,8 +56,9 @@ pub trait Evaluable: Display {
 
         let is_dbg_session = is_dbg_session(&scope.lock());
 
-        if is_dbg_session && self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval) {
-            match lu_dbg::before_eval(&self.to_string().trim(), scope)? {
+        let should_stop_for_dbg = self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval);
+        if is_dbg_session && should_stop_for_dbg {
+            match lu_dbg::before_eval(&self.to_string().trim(), self.get_ast_id(), scope)? {
                 Some(DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
                 None => {} // Nothing to do :)
             };
@@ -65,10 +66,24 @@ pub trait Evaluable: Display {
 
         let result = self.do_evaluate(args, scope);
 
+        if is_dbg_session && should_stop_for_dbg {
+            lu_dbg::after_eval(&self.to_string().trim(), self.get_ast_id(), scope);
+        }
+
         debug!("Result of Evaluating: {}: {:?}", self, result);
         result
     }
 }
+
+// pub macro_rules! handle_dbg_intervention_before {
+//     ($dbg_result: ident, $scope: ident) => {{
+//         if let Some(DbgIntervention::ContinueAsIfStmtRet(val)) = dbg_result {
+//             return Ok(val);
+//         } else {
+//             handle_dbg_intervention_($dbg_result, $scope)
+//         }
+//     }};
+// }
 
 pub struct Evaluator {
     pub scope: SyScope,

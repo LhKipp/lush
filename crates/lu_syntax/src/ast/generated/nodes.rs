@@ -1,10 +1,11 @@
 #![allow(unused_imports)]
 use std::fmt::Display;
 use serde::Serialize;
+use crate::TextRange;
 use enum_as_inner::EnumAsInner;
 use crate::{
     Rule,
-    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind},
+    ast::{self, support, AstNodeChildren, AstElementChildren, AstNode, AstToken, AstElement, HasRule, HasSyntaxKind, HasTextRange},
     SyntaxKind::{self, *},
     SyntaxNode, SyntaxToken, SyntaxElement
 };
@@ -27,6 +28,11 @@ impl AstToken for ImpureKeywordToken {
 impl HasSyntaxKind for ImpureKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ImpureKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -56,6 +62,11 @@ impl HasSyntaxKind for StrctKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for StrctKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for StrctKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -81,6 +92,11 @@ impl AstToken for ReqKeywordToken {
 impl HasSyntaxKind for ReqKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ReqKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -110,6 +126,11 @@ impl HasSyntaxKind for UseKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for UseKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for UseKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -135,6 +156,11 @@ impl AstToken for LetKeywordToken {
 impl HasSyntaxKind for LetKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LetKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -164,6 +190,11 @@ impl HasSyntaxKind for FnKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for FnKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for FnKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -189,6 +220,11 @@ impl AstToken for ForKeywordToken {
 impl HasSyntaxKind for ForKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ForKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -218,6 +254,11 @@ impl HasSyntaxKind for ElifKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for ElifKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for ElifKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -243,6 +284,11 @@ impl AstToken for ElseKeywordToken {
 impl HasSyntaxKind for ElseKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ElseKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -272,6 +318,11 @@ impl HasSyntaxKind for IfKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for IfKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for IfKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -297,6 +348,11 @@ impl AstToken for WhileKeywordToken {
 impl HasSyntaxKind for WhileKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for WhileKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -326,6 +382,11 @@ impl HasSyntaxKind for EndKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for EndKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for EndKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -351,6 +412,11 @@ impl AstToken for BeginKeywordToken {
 impl HasSyntaxKind for BeginKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for BeginKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -380,6 +446,11 @@ impl HasSyntaxKind for InKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for InKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for InKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -405,6 +476,11 @@ impl AstToken for AnyKeywordToken {
 impl HasSyntaxKind for AnyKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for AnyKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -434,6 +510,11 @@ impl HasSyntaxKind for NilKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for NilKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for NilKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -459,6 +540,11 @@ impl AstToken for BoolKeywordToken {
 impl HasSyntaxKind for BoolKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for BoolKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -488,6 +574,11 @@ impl HasSyntaxKind for NumberKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for NumberKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for NumberKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -513,6 +604,11 @@ impl AstToken for StringKeywordToken {
 impl HasSyntaxKind for StringKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for StringKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -542,6 +638,11 @@ impl HasSyntaxKind for RetKeywordToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for RetKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for RetKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -569,6 +670,11 @@ impl HasSyntaxKind for GenericTypeToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for GenericTypeToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for GenericTypeToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -594,6 +700,11 @@ impl AstNode for ArrayTypeNode {
 impl HasSyntaxKind for ArrayTypeNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ArrayTypeNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -630,6 +741,11 @@ impl HasSyntaxKind for FnTypeNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for FnTypeNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 
 use lu_parser::grammar::FnTypeRule;
@@ -664,6 +780,11 @@ impl HasSyntaxKind for OptModifierToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for OptModifierToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for OptModifierToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -689,6 +810,11 @@ impl AstToken for LeftParenthesisToken {
 impl HasSyntaxKind for LeftParenthesisToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LeftParenthesisToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -718,6 +844,11 @@ impl HasSyntaxKind for RightParenthesisToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for RightParenthesisToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for RightParenthesisToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -743,6 +874,11 @@ impl AstToken for LeftCurlyBracketsToken {
 impl HasSyntaxKind for LeftCurlyBracketsToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LeftCurlyBracketsToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -772,6 +908,11 @@ impl HasSyntaxKind for RightCurlyBracketsToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for RightCurlyBracketsToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for RightCurlyBracketsToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -797,6 +938,11 @@ impl AstToken for LeftRectangularBracketsToken {
 impl HasSyntaxKind for LeftRectangularBracketsToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LeftRectangularBracketsToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -826,6 +972,11 @@ impl HasSyntaxKind for RightRectangularBracketsToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for RightRectangularBracketsToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for RightRectangularBracketsToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -851,6 +1002,11 @@ impl AstToken for PlusSignToken {
 impl HasSyntaxKind for PlusSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for PlusSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -880,6 +1036,11 @@ impl HasSyntaxKind for MinusSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for MinusSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for MinusSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -905,6 +1066,11 @@ impl AstToken for MultSignToken {
 impl HasSyntaxKind for MultSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for MultSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -934,6 +1100,11 @@ impl HasSyntaxKind for DivSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for DivSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for DivSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -959,6 +1130,11 @@ impl AstToken for LessThanSignToken {
 impl HasSyntaxKind for LessThanSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LessThanSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -988,6 +1164,11 @@ impl HasSyntaxKind for LessOrEqualSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for LessOrEqualSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for LessOrEqualSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1013,6 +1194,11 @@ impl AstToken for EqualitySignToken {
 impl HasSyntaxKind for EqualitySignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for EqualitySignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1042,6 +1228,11 @@ impl HasSyntaxKind for InequalitySignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for InequalitySignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for InequalitySignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1067,6 +1258,11 @@ impl AstToken for BiggerThanSignToken {
 impl HasSyntaxKind for BiggerThanSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for BiggerThanSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1096,6 +1292,11 @@ impl HasSyntaxKind for BiggerOrEqualSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for BiggerOrEqualSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for BiggerOrEqualSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1121,6 +1322,11 @@ impl AstToken for RightStreamToken {
 impl HasSyntaxKind for RightStreamToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for RightStreamToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1150,6 +1356,11 @@ impl HasSyntaxKind for DivAssignSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for DivAssignSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for DivAssignSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1175,6 +1386,11 @@ impl AstToken for MulAssignSignToken {
 impl HasSyntaxKind for MulAssignSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for MulAssignSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1204,6 +1420,11 @@ impl HasSyntaxKind for AddAssignSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for AddAssignSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for AddAssignSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1229,6 +1450,11 @@ impl AstToken for MinAssignSignToken {
 impl HasSyntaxKind for MinAssignSignToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for MinAssignSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1258,6 +1484,11 @@ impl HasSyntaxKind for AssignSignToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for AssignSignToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for AssignSignToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1283,6 +1514,11 @@ impl AstToken for PipeToken {
 impl HasSyntaxKind for PipeToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for PipeToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1312,6 +1548,11 @@ impl HasSyntaxKind for DollarToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for DollarToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for DollarToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1337,6 +1578,11 @@ impl AstToken for QuestionMarkToken {
 impl HasSyntaxKind for QuestionMarkToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for QuestionMarkToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1366,6 +1612,11 @@ impl HasSyntaxKind for PointToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for PointToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for PointToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1391,6 +1642,11 @@ impl AstToken for DoublePointToken {
 impl HasSyntaxKind for DoublePointToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for DoublePointToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1420,6 +1676,11 @@ impl HasSyntaxKind for DoubleQuoteToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for DoubleQuoteToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for DoubleQuoteToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1445,6 +1706,11 @@ impl AstToken for SingleQuoteToken {
 impl HasSyntaxKind for SingleQuoteToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for SingleQuoteToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1474,6 +1740,11 @@ impl HasSyntaxKind for ErrorToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for ErrorToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for ErrorToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1499,6 +1770,11 @@ impl AstToken for ParserInternalToken {
 impl HasSyntaxKind for ParserInternalToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ParserInternalToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1528,6 +1804,11 @@ impl HasSyntaxKind for EofNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for EofNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for EofNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1553,6 +1834,11 @@ impl AstNode for TombstoneNode {
 impl HasSyntaxKind for TombstoneNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for TombstoneNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1582,6 +1868,11 @@ impl HasSyntaxKind for WhitespaceToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for WhitespaceToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for WhitespaceToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1607,6 +1898,11 @@ impl AstToken for CommentToken {
 impl HasSyntaxKind for CommentToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for CommentToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1636,6 +1932,11 @@ impl HasSyntaxKind for NewlineToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for NewlineToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for NewlineToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1661,6 +1962,11 @@ impl AstToken for BareWordToken {
 impl HasSyntaxKind for BareWordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for BareWordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1690,6 +1996,11 @@ impl HasSyntaxKind for StringContentToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for StringContentToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for StringContentToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1715,6 +2026,11 @@ impl AstToken for VarDeclNameToken {
 impl HasSyntaxKind for VarDeclNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for VarDeclNameToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1744,6 +2060,11 @@ impl HasSyntaxKind for FnDeclNameToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for FnDeclNameToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for FnDeclNameToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1769,6 +2090,11 @@ impl AstToken for ArgNameToken {
 impl HasSyntaxKind for ArgNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ArgNameToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1798,6 +2124,11 @@ impl HasSyntaxKind for VarArgNameToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for VarArgNameToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for VarArgNameToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1823,6 +2154,11 @@ impl AstToken for LongFlagToken {
 impl HasSyntaxKind for LongFlagToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LongFlagToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1852,6 +2188,11 @@ impl HasSyntaxKind for ShortFlagToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for ShortFlagToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for ShortFlagToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1877,6 +2218,11 @@ impl AstToken for NumberToken {
 impl HasSyntaxKind for NumberToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for NumberToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1906,6 +2252,11 @@ impl HasSyntaxKind for StrctNameToken{
         self.syntax().kind()
     }
 }
+impl HasTextRange for StrctNameToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for StrctNameToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1931,6 +2282,11 @@ impl AstToken for StrctFieldNameToken {
 impl HasSyntaxKind for StrctFieldNameToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for StrctFieldNameToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -1960,6 +2316,11 @@ impl HasSyntaxKind for FileNameNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for FileNameNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for FileNameNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -1985,6 +2346,11 @@ impl AstNode for SourceFileNode {
 impl HasSyntaxKind for SourceFileNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for SourceFileNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2021,6 +2387,11 @@ impl HasSyntaxKind for StrctStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for StrctStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for StrctStmtNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2046,6 +2417,11 @@ impl AstNode for RedirStmtNode {
 impl HasSyntaxKind for RedirStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for RedirStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2075,6 +2451,11 @@ impl HasSyntaxKind for UseStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for UseStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for UseStmtNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2100,6 +2481,11 @@ impl AstNode for StrctFieldNode {
 impl HasSyntaxKind for StrctFieldNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for StrctFieldNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2129,6 +2515,11 @@ impl HasSyntaxKind for StrctCtorExprNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for StrctCtorExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for StrctCtorExprNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2156,6 +2547,11 @@ impl HasSyntaxKind for StrctFieldCtorStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for StrctFieldCtorStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for StrctFieldCtorStmtNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2181,6 +2577,11 @@ impl AstNode for LetStmtNode {
 impl HasSyntaxKind for LetStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LetStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2217,6 +2618,11 @@ impl HasSyntaxKind for FnStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for FnStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 
 use lu_parser::grammar::FnStmtRule;
@@ -2249,6 +2655,11 @@ impl AstNode for RetStmtNode {
 impl HasSyntaxKind for RetStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for RetStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2285,6 +2696,11 @@ impl HasSyntaxKind for IfStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for IfStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 
 use lu_parser::grammar::IfStmtRule;
@@ -2319,6 +2735,11 @@ impl HasSyntaxKind for IfBlockNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for IfBlockNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for IfBlockNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2344,6 +2765,11 @@ impl AstNode for ElifBlockNode {
 impl HasSyntaxKind for ElifBlockNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ElifBlockNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2373,6 +2799,11 @@ impl HasSyntaxKind for ElseBlockNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for ElseBlockNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for ElseBlockNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2398,6 +2829,11 @@ impl AstNode for ForStmtNode {
 impl HasSyntaxKind for ForStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ForStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2434,6 +2870,11 @@ impl HasSyntaxKind for CmdStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for CmdStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 
 use lu_parser::grammar::CmdStmtRule;
@@ -2466,6 +2907,11 @@ impl AstNode for PipedCmdsStmtNode {
 impl HasSyntaxKind for PipedCmdsStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for PipedCmdsStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2502,6 +2948,11 @@ impl HasSyntaxKind for BlockStmtNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for BlockStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for BlockStmtNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2527,6 +2978,11 @@ impl AstNode for SignatureNode {
 impl HasSyntaxKind for SignatureNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for SignatureNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2563,6 +3019,11 @@ impl HasSyntaxKind for FlagSignatureNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for FlagSignatureNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for FlagSignatureNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2590,6 +3051,11 @@ impl HasSyntaxKind for ArgSignatureNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for ArgSignatureNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for ArgSignatureNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2615,6 +3081,11 @@ impl AstNode for LuTypeNode {
 impl HasSyntaxKind for LuTypeNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for LuTypeNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2651,6 +3122,11 @@ impl HasSyntaxKind for MathExprNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for MathExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 impl Display for MathExprNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -2676,6 +3152,11 @@ impl AstNode for StringExprNode {
 impl HasSyntaxKind for StringExprNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for StringExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2712,6 +3193,11 @@ impl HasSyntaxKind for NumberExprNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for NumberExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 
 use lu_parser::grammar::NumberExprRule;
@@ -2744,6 +3230,11 @@ impl AstNode for ValuePathExprNode {
 impl HasSyntaxKind for ValuePathExprNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for ValuePathExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2780,6 +3271,11 @@ impl HasSyntaxKind for ArrayExprNode{
         self.syntax().kind()
     }
 }
+impl HasTextRange for ArrayExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
 
 
 use lu_parser::grammar::ArrayExprRule;
@@ -2812,6 +3308,11 @@ impl AstNode for TableExprNode {
 impl HasSyntaxKind for TableExprNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
+    }
+}
+impl HasTextRange for TableExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -2887,6 +3388,12 @@ impl HasSyntaxKind for UsePathElement{
     }
 }
 
+impl HasTextRange for UsePathElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
 impl Display for UsePathElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -2945,6 +3452,12 @@ impl HasSyntaxKind for CmdOrValueExprElement{
             CmdOrValueExprElement::CmdStmt(it) => it.get_syntax_kind(),
             CmdOrValueExprElement::ValueExpr(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl HasTextRange for CmdOrValueExprElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -3050,6 +3563,12 @@ impl HasSyntaxKind for ValueExprElement{
             ValueExprElement::ArrayExpr(it) => it.get_syntax_kind(),
             ValueExprElement::TableExpr(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl HasTextRange for ValueExprElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -3169,6 +3688,12 @@ impl HasSyntaxKind for StatementElement{
     }
 }
 
+impl HasTextRange for StatementElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
 impl Display for StatementElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -3227,6 +3752,12 @@ impl HasSyntaxKind for ConditionElement{
             ConditionElement::CmdStmt(it) => it.get_syntax_kind(),
             ConditionElement::ValueExpr(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl HasTextRange for ConditionElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 
@@ -3391,6 +3922,12 @@ impl HasSyntaxKind for OperatorExprElement{
     }
 }
 
+impl HasTextRange for OperatorExprElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
 impl Display for OperatorExprElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -3512,6 +4049,12 @@ impl HasSyntaxKind for LuTypeSpecifierElement{
     }
 }
 
+impl HasTextRange for LuTypeSpecifierElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
 impl Display for LuTypeSpecifierElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -3581,6 +4124,12 @@ impl HasSyntaxKind for CmdArgElement{
     }
 }
 
+impl HasTextRange for CmdArgElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
 impl Display for CmdArgElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -3638,6 +4187,12 @@ impl HasSyntaxKind for FlagElement{
     }
 }
 
+impl HasTextRange for FlagElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
 impl Display for FlagElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -3692,6 +4247,12 @@ impl HasSyntaxKind for RedirToValueElement{
             RedirToValueElement::ValuePathExpr(it) => it.get_syntax_kind(),
             RedirToValueElement::BareWord(it) => it.get_syntax_kind(),
             }
+    }
+}
+
+impl HasTextRange for RedirToValueElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
     }
 }
 

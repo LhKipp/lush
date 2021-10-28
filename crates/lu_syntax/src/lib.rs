@@ -10,7 +10,7 @@ use lu_error::{util::Outcome, LuErr};
 use lu_parser::grammar::Rule;
 use lu_text_util::SourceCode;
 
-pub use ast::{AstElement, AstElementChildren, AstNode, AstNodeChildren, AstToken};
+pub use ast::{AstElement, AstElementChildren, AstId, AstNode, AstNodeChildren, AstToken};
 pub use syntax_node::{
     SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
 };
