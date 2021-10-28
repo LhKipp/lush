@@ -917,6 +917,7 @@ dependencies = [
  "lu_fs",
  "lu_parser",
  "lu_pipeline_stage",
+ "lu_stdx",
  "lu_syntax",
  "lu_syntax_elements",
  "lu_text_util",
@@ -965,6 +966,13 @@ version = "0.1.0"
 dependencies = [
  "log",
  "lu_error",
+]
+
+[[package]]
+name = "lu_stdx"
+version = "0.1.0"
+dependencies = [
+ "parking_lot",
 ]
 
 [[package]]

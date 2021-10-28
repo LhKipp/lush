@@ -6,6 +6,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+lu_stdx = { version = "0.1.0", path = "../lu_stdx" }
 lu_parser = { version = "0.1.0", path = "../lu_parser" }
 lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_fs = { version = "0.1.0", path = "../lu_fs" }

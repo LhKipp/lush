@@ -32,7 +32,7 @@ pub trait HasRule {
     fn get_belonging_rule() -> Box<dyn Rule>;
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct AstId(SyntaxKind, TextRange);
 
 pub trait HasSyntaxKind {

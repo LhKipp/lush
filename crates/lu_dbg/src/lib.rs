@@ -18,12 +18,18 @@ pub fn before_eval(
     stmt_id: AstId,
     scope: &mut SyScope,
 ) -> LuResult<Option<DbgIntervention>> {
-    println!("Next statement: {}", stmt);
-    dbg_loop(stmt_id, scope)
+    if let Some(dbg_state) = get_dbg_session(&scope.clone().lock()).cloned() {
+        // To provide "concurrent" debugging of parallel programs, we lock early here
+        let dbg_state_l = &mut dbg_state.lock();
+        println!("Next statement: {}", stmt);
+        dbg_loop(dbg_state_l, stmt_id, scope)
+    } else {
+        Ok(None)
+    }
 }
 
-pub fn after_eval(stmt: &str, stmt_id: &AstId, scope: &mut SyScope) {
-    todo!()
+pub fn after_eval(_: &str, _: &AstId, _: &mut SyScope) {
+    // TODO
 }
 
 pub fn warn_unpure_cmd_call(
@@ -31,16 +37,21 @@ pub fn warn_unpure_cmd_call(
     ast_id: AstId,
     scope: &mut SyScope,
 ) -> LuResult<Option<DbgIntervention>> {
-    // TODO required flags are also necessary
-    let cmd_id_str = cmd.name();
-    dbg_print(&format!(
-        r#"Warning: Running {cmd_name} might have side effects.
+    if let Some(dbg_state) = get_dbg_session(&scope.clone().lock()).cloned() {
+        let dbg_state_l = &mut dbg_state.lock();
+        // TODO required flags are also necessary
+        let cmd_id_str = cmd.name();
+        dbg_print(&format!(
+            r#"Warning: Running {cmd_name} might have side effects.
 Type "skip <Value>" to skip running {cmd_name} and continue as if the the cmd returned <Value>
 Type "next" or "step" to run the cmd
 Type "help" for further help"#,
-        cmd_name = cmd_id_str
-    ));
-    dbg_loop(ast_id, scope)
+            cmd_name = cmd_id_str
+        ));
+        dbg_loop(dbg_state_l, ast_id, scope)
+    } else {
+        Ok(None)
+    }
 }
 
 pub fn dbg_print(msg: &str) {

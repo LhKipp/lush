@@ -1,5 +1,5 @@
 use crate::evaluate::eval_prelude::*;
-use lu_syntax::ast::ForStmtNode;
+use lu_syntax::ast::{ForStmtNode, HasAstId};
 
 impl Evaluable for ForStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
@@ -18,9 +18,8 @@ impl Evaluable for ForStmtNode {
         assert!(var_names.len() > 0);
         let iterated_val = self.iterated_value().unwrap();
 
-        if is_dbg_session(&scope.lock()) {
-            lu_dbg::before_eval(&format!("{}", text_till_block), scope)?;
-        }
+        lu_dbg::before_eval(&format!("{}", text_till_block), self.get_ast_id(), scope)?;
+
         let iterated_val = iterated_val.evaluate(scope)?;
         let vals_to_iterate = if let Some(array) = iterated_val.as_array() {
             assert_eq!(var_names.len(), 1);
@@ -44,8 +43,8 @@ impl Evaluable for ForStmtNode {
         for (i, val) in vals_to_iterate.into_iter().enumerate() {
             // We have to do before eval, before evaluating the iterated_val once. Therefore
             // the first iteration does not need before_eval
-            if i != 0 && is_dbg_session(&scope.lock()) {
-                lu_dbg::before_eval(&text_till_block, scope)?;
+            if i != 0 {
+                lu_dbg::before_eval(&text_till_block, self.get_ast_id(), scope)?;
             }
             {
                 let var = Variable::new(

@@ -1,12 +1,17 @@
 use crate::{action::*, DbgIntervention};
 use lu_error::{EvalErr, LuResult};
+use lu_interpreter_structs::dbg_state::DbgState;
 use lu_interpreter_structs::SyScope;
 use lu_syntax::AstId;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use vec_box::vec_box;
 
-pub fn dbg_loop(ast_id: AstId, scope: &mut SyScope) -> LuResult<Option<DbgIntervention>> {
+pub fn dbg_loop(
+    _: &mut DbgState,
+    _: AstId,
+    scope: &mut SyScope,
+) -> LuResult<Option<DbgIntervention>> {
     let mut rl = Editor::<()>::new();
 
     if let Ok(dbg_hist) = lu_cfg_home::dbg_history() {

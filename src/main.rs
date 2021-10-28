@@ -36,7 +36,7 @@ fn ret_code_main() -> i32 {
 
     if arg_matches.is_present("debug") {
         // It is a debug session
-        set_dbg_session(&mut global_frame);
+        set_new_dbg_session(&mut global_frame);
     }
 
     if let Some(file_to_run) = arg_matches.value_of("FILE") {

@@ -1,7 +1,7 @@
+use super::handle_dbg_intervention_before;
 use crate::{eval_function, evaluate::eval_prelude::*};
 use crate::{Command, RunExternalCmd};
-use lu_dbg::DbgIntervention;
-use lu_syntax::ast::{CmdArgElement, CmdStmtNode};
+use lu_syntax::ast::{CmdArgElement, CmdStmtNode, HasAstId};
 use std::rc::Rc;
 
 impl Evaluable for CmdStmtNode {
@@ -21,14 +21,11 @@ impl Evaluable for CmdStmtNode {
 
         // FROM HERE ONLY EVALUATION OF CMD FOLLOWS
         // REASON: Otherwise the following dbg_stmt may return this func to early
-        if is_dbg_session(&scope.lock())
-            && (cmd.find_attr(CmdAttributeVariant::Impure).is_some()
-                || cmd.find_attr(CmdAttributeVariant::PurityUnknown).is_some())
+        if cmd.find_attr(CmdAttributeVariant::Impure).is_some()
+            || cmd.find_attr(CmdAttributeVariant::PurityUnknown).is_some()
         {
-            match lu_dbg::warn_unpure_cmd_call(&cmd, self.ast_id(), scope)? {
-                Some(DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
-                None => {} // Okay nothing to do
-            }
+            let dbg_result = lu_dbg::warn_unpure_cmd_call(&cmd, self.get_ast_id(), scope)?;
+            handle_dbg_intervention_before!(dbg_result, scope);
         }
 
         // We need to prepare everything for the command to run properly.

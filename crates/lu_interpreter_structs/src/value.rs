@@ -1,4 +1,5 @@
 use enum_as_inner::EnumAsInner;
+use lu_stdx::AMtx;
 use lu_syntax::ast::{BareWordToken, NumberExprNode, StringExprNode};
 use ordered_float::OrderedFloat;
 use parking_lot::RwLock;
@@ -9,6 +10,7 @@ use std::{fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
+use crate::dbg_state::DbgState;
 use crate::{Command, CommandCollection, Strct};
 
 // pub const NIL_VAL: Value = Value::Nil;
@@ -37,6 +39,8 @@ pub enum Value {
     /// Not really lu values. But treating them as one, allows us to store them in variables
     #[serde(skip)] // TODO serialize
     StrctDecl(Arc<RwLock<Strct>>),
+    #[serde(skip)] // TODO serialize
+    DbgState(AMtx<DbgState>),
 }
 
 impl PartialEq for Value {
@@ -92,6 +96,7 @@ impl Hash for Value {
             Value::Command(func) => Rc::as_ptr(func).hash(state),
             Value::CommandCollection(col) => col.hash(state),
             Value::StrctDecl(strct) => Arc::as_ptr(strct).hash(state),
+            Value::DbgState(v) => Arc::as_ptr(v).hash(state),
         }
     }
 }
@@ -139,6 +144,7 @@ impl Value {
             Value::StrctDecl(_) => None,
             Value::Strct(_, _) => None,
             Value::CommandCollection(_) => None,
+            Value::DbgState(_) => None,
         }
     }
 }
@@ -162,6 +168,7 @@ impl Display for Value {
             Value::Strct(name, fields) => write!(f, "{}{:?}", name, fields),
             // TODO nice display here
             Value::CommandCollection(col) => write!(f, "{:?}", col),
+            Value::DbgState(dbg_state) => write!(f, "{:?}", dbg_state),
         }
     }
 }

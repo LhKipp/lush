@@ -19,6 +19,7 @@ mod user_def_tys;
 mod value;
 mod value_type;
 mod variable;
+pub mod dbg_state;
 
 pub use command::{CmdAttribute, CmdAttributeVariant, Command};
 pub use command_collection::CommandCollection;

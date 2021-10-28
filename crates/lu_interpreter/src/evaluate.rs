@@ -1,11 +1,10 @@
 use enum_as_inner::EnumAsInner;
-use lu_dbg::DbgIntervention;
 use lu_syntax::ast::HasAstId;
 use std::fmt::{Debug, Display};
 
 use log::debug;
 use lu_error::{LuErr, LuResult, SourceCodeItem};
-use lu_interpreter_structs::{is_dbg_session, EvalResult, RetValOrErr, SyScope, Value};
+use lu_interpreter_structs::{EvalResult, RetValOrErr, SyScope, Value};
 
 mod block_stmt;
 mod cmd_stmt;
@@ -23,6 +22,16 @@ mod source_file;
 mod statement;
 mod strct_stmt;
 mod test;
+
+macro_rules! handle_dbg_intervention_before {
+    ($dbg_result: ident, $scope: ident) => {{
+        match $dbg_result {
+            Some(lu_dbg::DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
+            None => {} // ok
+        }
+    }};
+}
+pub(crate) use handle_dbg_intervention_before;
 
 pub use fn_stmt::eval_function;
 
@@ -54,36 +63,23 @@ pub trait Evaluable: Display + HasAstId {
     fn evaluate_with_args(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         debug!("Evaluating: {}", self);
 
-        let is_dbg_session = is_dbg_session(&scope.lock());
-
         let should_stop_for_dbg = self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval);
-        if is_dbg_session && should_stop_for_dbg {
-            match lu_dbg::before_eval(&self.to_string().trim(), self.get_ast_id(), scope)? {
-                Some(DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
-                None => {} // Nothing to do :)
-            };
+        if should_stop_for_dbg {
+            let dbg_result =
+                lu_dbg::before_eval(&self.to_string().trim(), self.get_ast_id(), scope)?;
+            handle_dbg_intervention_before!(dbg_result, scope);
         }
 
         let result = self.do_evaluate(args, scope);
 
-        if is_dbg_session && should_stop_for_dbg {
-            lu_dbg::after_eval(&self.to_string().trim(), self.get_ast_id(), scope);
+        if should_stop_for_dbg {
+            lu_dbg::after_eval(&self.to_string().trim(), &self.get_ast_id(), scope);
         }
 
         debug!("Result of Evaluating: {}: {:?}", self, result);
         result
     }
 }
-
-// pub macro_rules! handle_dbg_intervention_before {
-//     ($dbg_result: ident, $scope: ident) => {{
-//         if let Some(DbgIntervention::ContinueAsIfStmtRet(val)) = dbg_result {
-//             return Ok(val);
-//         } else {
-//             handle_dbg_intervention_($dbg_result, $scope)
-//         }
-//     }};
-// }
 
 pub struct Evaluator {
     pub scope: SyScope,
