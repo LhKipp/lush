@@ -8,7 +8,8 @@ use crate::{
 pub struct FnStmtRule;
 impl Rule for FnStmtRule {
     fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == FnKeyword
+        let next_token = p.next_non(CMT_NL_WS);
+        next_token == FnKeyword || next_token == PureKeyword
     }
 
     fn name(&self) -> String {
@@ -17,9 +18,8 @@ impl Rule for FnStmtRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        p.eat_while(CMT_NL_WS);
-
-        p.expect(FnKeyword);
+        p.eat_after(PureKeyword, CMT_NL_WS);
+        p.expect_after(FnKeyword, CMT_NL_WS);
         p.eat_while(CMT_NL_WS);
 
         // eat the name
