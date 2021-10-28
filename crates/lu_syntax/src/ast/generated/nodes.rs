@@ -10,11 +10,11 @@ use crate::{
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct PureKeywordToken {
+pub struct ImpureKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
-impl AstToken for PureKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::PureKeyword }
+impl AstToken for ImpureKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ImpureKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -24,13 +24,13 @@ impl AstToken for PureKeywordToken {
     }
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for PureKeywordToken{
+impl HasSyntaxKind for ImpureKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
 
-impl Display for PureKeywordToken {
+impl Display for ImpureKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

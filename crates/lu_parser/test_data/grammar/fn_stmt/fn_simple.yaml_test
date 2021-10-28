@@ -70,11 +70,11 @@ end
 ...
 pure fn
 ===
-pure fn func()
+impure fn func()
 end
 ---
 - Start: FnStmt
-- Token: "PureKeyword (len: 4)"
+- Token: "ImpureKeyword (len: 6)"
 - Token: "Whitespace (len: 1)"
 - Token: "FnKeyword (len: 2)"
 - Token: "Whitespace (len: 1)"

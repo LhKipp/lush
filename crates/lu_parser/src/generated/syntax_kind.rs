@@ -6,8 +6,8 @@ use ::serde::{Deserialize, Serialize};
 #[repr(u16)]
 pub enum SyntaxKind {
     
-    #[token("pure")]
-    PureKeyword,
+    #[token("impure")]
+    ImpureKeyword,
     #[token("struct")]
     StrctKeyword,
     #[token("req")]
@@ -182,7 +182,7 @@ pub enum SyntaxKind {
 impl SyntaxKind{
     pub const fn name(self) -> &'static str {
         match self {
-            SyntaxKind::PureKeyword => "PureKeyword",
+            SyntaxKind::ImpureKeyword => "ImpureKeyword",
             SyntaxKind::StrctKeyword => "StrctKeyword",
             SyntaxKind::ReqKeyword => "ReqKeyword",
             SyntaxKind::UseKeyword => "UseKeyword",
@@ -300,7 +300,7 @@ impl SyntaxKind{
 
 #[macro_export]
 macro_rules! T {
-    [pure] => {$crate::SyntaxKind::PureKeyword };
+    [impure] => {$crate::SyntaxKind::ImpureKeyword };
     [struct] => {$crate::SyntaxKind::StrctKeyword };
     [req] => {$crate::SyntaxKind::ReqKeyword };
     [use] => {$crate::SyntaxKind::UseKeyword };
