@@ -7,7 +7,7 @@ mod skip;
 mod step;
 pub(crate) use help::DbgHelpAction;
 use lu_interpreter_structs::{dbg_state::DbgState, SyScope};
-use lu_syntax::AstId;
+use lu_syntax::{AstId, Parse};
 pub(crate) use next::DbgNextAction;
 use once_cell::sync::Lazy;
 pub(crate) use print::DbgPrintAction;
@@ -17,8 +17,10 @@ pub(crate) use step::DbgStepAction;
 use vec_box::vec_box;
 
 pub(crate) enum DbgActionResult {
-    StopDbgLoop,
     None,
+    StopDbgLoop,
+    /// Parse is a ValueExprElement parse
+    StopDbgLoopAndContinueAsIfRetStmt(Parse),
 }
 
 pub(crate) static ALL_DBG_ACTIONS: Lazy<Vec<Box<dyn DbgAction>>> = Lazy::new(|| {

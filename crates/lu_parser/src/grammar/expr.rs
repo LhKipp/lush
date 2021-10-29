@@ -111,6 +111,8 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(StringExprRule {}),
             Box::new(StrctCtorExprRule {}),
             Box::new(table_or_array_rule()),
+            // TODO BareWord is to ambigous here. Better remove it completly
+            // At least make it a node, so it is coherent to other rules of this OrRule
             Box::new(BareWord),
         ],
     }

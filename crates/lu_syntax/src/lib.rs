@@ -59,4 +59,7 @@ impl Parse {
     pub fn cast<T: AstNode>(&self) -> Option<T> {
         T::cast(self.syntax_node())
     }
+    pub fn cast_elem<T: AstElement>(&self) -> Option<T> {
+        T::cast(self.syntax_node().into())
+    }
 }

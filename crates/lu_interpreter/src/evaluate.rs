@@ -26,7 +26,17 @@ mod test;
 macro_rules! handle_dbg_intervention_before {
     ($dbg_result: ident, $scope: ident) => {{
         match $dbg_result {
-            Some(lu_dbg::DbgIntervention::ContinueAsIfStmtRet(val)) => return Ok(val),
+            Some(lu_dbg::DbgIntervention::ContinueAsIfStmtRet(val_parse)) => {
+                let node = val_parse
+                    .cast_elem::<lu_syntax::ast::ValueExprElement>()
+                    .expect("The parse of ContinueAsIfStmtRet always castable to ValueExprElement");
+                match node.evaluate($scope) {
+                    Ok(val) => return Ok(val),
+                    Err(e) => {
+                        todo!("Dbger should only accept correct values: {:?}", e)
+                    }
+                }
+            }
             None => {} // ok
         }
     }};

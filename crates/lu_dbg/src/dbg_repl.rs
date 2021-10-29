@@ -36,7 +36,10 @@ pub fn dbg_loop(
                 }
 
                 match cmd_exec_action {
-                    Some(DbgActionResult::StopDbgLoop) => break Ok(()),
+                    Some(DbgActionResult::StopDbgLoop) => break Ok(None),
+                    Some(DbgActionResult::StopDbgLoopAndContinueAsIfRetStmt(val)) => {
+                        break Ok(Some(DbgIntervention::ContinueAsIfStmtRet(val)))
+                    }
                     None => {
                         DbgHelpAction {}.exec(&line, &stmt_id, dbg_state, scope);
                     }
@@ -64,5 +67,5 @@ pub fn dbg_loop(
     }
 
     // TODO return proper DbgIntervention
-    ret_val.map(|_| None)
+    ret_val
 }

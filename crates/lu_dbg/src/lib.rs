@@ -5,12 +5,12 @@ use std::rc::Rc;
 
 use lu_error::LuResult;
 use lu_interpreter_structs::*;
-use lu_syntax::AstId;
+use lu_syntax::{AstId, Parse};
 
 use crate::dbg_repl::dbg_loop;
 
 pub enum DbgIntervention {
-    ContinueAsIfStmtRet(Value),
+    ContinueAsIfStmtRet(Parse),
 }
 
 pub fn before_eval(

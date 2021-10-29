@@ -4,7 +4,10 @@ extern crate derive_new;
 
 use derive_new::new;
 use lu_error::LuResult;
-use std::path::{Path, PathBuf};
+use std::{
+    fmt::Display,
+    path::{Path, PathBuf},
+};
 
 #[derive(Debug, Clone, Educe, Eq, new)]
 #[educe(PartialEq)]
@@ -73,4 +76,10 @@ macro_rules! lu_source_code {
             lu_text_util::SourceCode::new(text.to_string(), path.into())
         }
     }};
+}
+
+impl Display for SourceCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text)
+    }
 }

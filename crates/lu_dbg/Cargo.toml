@@ -9,6 +9,7 @@ edition = "2018"
 lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_text_util = { version = "0.1.0", path = "../lu_text_util" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
+lu_parser = { version = "0.1.0", path = "../lu_parser" }
 lu_cfg_home = { version = "0.1.0", path = "../lu_cfg_home" }
 lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
