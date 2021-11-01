@@ -72,13 +72,7 @@ fn eval_block_if_true(
         None => {
             return (
                 false,
-                Err(
-                    LuErr::Eval(EvalErr::NotConvertibleToBool(SourceCodeItem::new(
-                        cond.syntax().text_range().into(),
-                        cond.text(),
-                    )))
-                    .into(),
-                ),
+                Err(LuErr::Eval(EvalErr::NotConvertibleToBool(cond.to_item())).into()),
             )
         }
         Some(v) => v,

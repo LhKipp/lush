@@ -59,11 +59,7 @@ impl Evaluable for ValuePathExprNode {
         if let Some(var) = scope.lock().find_var(&name_parts[0]) {
             Ok(var.val.clone())
         } else {
-            let e: RetValOrErr = LuErr::Eval(EvalErr::VarNotFound(SourceCodeItem::new(
-                self.syntax().text_range().into(),
-                self.syntax().text().to_string(),
-            )))
-            .into();
+            let e: RetValOrErr = LuErr::Eval(EvalErr::VarNotFound(self.to_item())).into();
             Err(e)
         }
     }

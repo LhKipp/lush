@@ -12,6 +12,8 @@ pub mod util;
 #[macro_use]
 extern crate derive_new;
 extern crate derive_more;
+// #[macro_use]
+// extern crate educe;
 extern crate strum_macros;
 
 pub use ast_err::*;
@@ -71,17 +73,25 @@ impl From<AstErr> for LuErr {
 // }
 
 /// An item in the source code to be used in the `Error` enum.
-#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
+// #[educe(Debug)]
 // use derive_more::Display;
 // #[display(fmt = "{}/{:?}..{:?}", content, range.start() as 32, range.end() as 32)]
 pub struct SourceCodeItem {
     pub content: String,
     pub range: TextRange,
+    // #[educe(Debug(ignore))]
+    #[serde(skip)]
+    pub sf_node_addr: usize,
 }
 
 impl SourceCodeItem {
     // TODO adapt ctor and users
-    pub fn new(range: Range<usize>, content: impl Into<String>) -> SourceCodeItem {
+    pub fn new(
+        range: Range<usize>,
+        content: impl Into<String>,
+        sf_node_addr: impl Into<usize>,
+    ) -> SourceCodeItem {
         let content = content.into();
         SourceCodeItem {
             range: TextRange::new(
@@ -89,11 +99,12 @@ impl SourceCodeItem {
                 range.end.try_into().unwrap(),
             ),
             content,
+            sf_node_addr: sf_node_addr.into(),
         }
     }
 
     pub fn tmp_todo_item() -> SourceCodeItem {
-        SourceCodeItem::new(999..999, "TMP_ITEM")
+        SourceCodeItem::new(999..999, "TMP_ITEM", 1337 as usize)
     }
 }
 
@@ -105,7 +116,7 @@ macro_rules! lu_source_code_item {
             let f_name = file!();
             let line = line!();
             // TODO better source code item
-            SourceCodeItem::new(0..line as usize, f_name.clone())
+            SourceCodeItem::new(0..line as usize, f_name.clone(), 0 as usize)
         }
     }};
 }

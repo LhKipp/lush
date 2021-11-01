@@ -4,8 +4,8 @@ use rowan::TextRange;
 use crate::{AstNode, AstToken};
 
 use super::{
-    support, BlockStmtNode, FnDeclNameToken, FnKeywordToken, FnStmtNode, ImpureKeywordToken,
-    SignatureNode,
+    addr_of_ancestor_sf_node, support, BlockStmtNode, FnDeclNameToken, FnKeywordToken, FnStmtNode,
+    ImpureKeywordToken, SignatureNode,
 };
 
 impl FnStmtNode {
@@ -69,7 +69,11 @@ impl FnStmtNode {
         let text_range = TextRange::new(fn_kw_range.start(), end);
         let text = self.text_at(&text_range);
 
-        SourceCodeItem::new(text_range.into(), text.to_string())
+        SourceCodeItem::new(
+            text_range.into(),
+            text.to_string(),
+            addr_of_ancestor_sf_node(self.syntax().clone()),
+        )
     }
 
     pub fn signature(&self) -> Option<SignatureNode> {

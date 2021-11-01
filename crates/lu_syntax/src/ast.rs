@@ -19,7 +19,7 @@ use std::marker::PhantomData;
 
 use lu_error::SourceCodeItem;
 use lu_parser::grammar::Rule;
-use rowan::{SyntaxText, TextRange};
+use rowan::{GreenNode, SyntaxText, TextRange};
 
 use crate::{
     syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken},
@@ -87,7 +87,12 @@ pub trait AstNode {
     }
 
     fn to_item(&self) -> SourceCodeItem {
-        SourceCodeItem::new(self.syntax().text_range().into(), self.syntax().text())
+        let sf_addr = addr_of_ancestor_sf_node(self.syntax().clone());
+        SourceCodeItem::new(
+            self.syntax().text_range().into(),
+            self.syntax().text(),
+            sf_addr,
+        )
     }
 
     fn text_at(&self, range: &TextRange) -> SyntaxText {
@@ -123,7 +128,12 @@ pub trait AstToken {
     }
 
     fn to_item(&self) -> SourceCodeItem {
-        SourceCodeItem::new(self.syntax().text_range().into(), self.text().to_string())
+        let sf_addr = addr_of_ancestor_sf_node(self.syntax().parent());
+        SourceCodeItem::new(
+            self.syntax().text_range().into(),
+            self.text().to_string(),
+            sf_addr,
+        )
     }
 }
 
@@ -149,8 +159,36 @@ pub trait AstElement {
     }
 
     fn to_item(&self) -> SourceCodeItem {
-        SourceCodeItem::new(self.syntax().text_range().into(), self.text())
+        let sf_addr = match self.syntax() {
+            rowan::NodeOrToken::Node(n) => addr_of_ancestor_sf_node(n),
+            rowan::NodeOrToken::Token(t) => addr_of_ancestor_sf_node(t.parent()),
+        };
+        SourceCodeItem::new(self.syntax().text_range().into(), self.text(), sf_addr)
     }
+}
+
+pub fn nodes_sf_parent(node: SyntaxNode) -> SyntaxNode {
+    // Find sf_node addr
+    let mut parent = Some(node.clone());
+    while let Some(par) = &parent {
+        if par.kind() == SyntaxKind::SourceFile {
+            break;
+        }
+        parent = par.parent();
+    }
+    assert_eq!(
+        parent.as_ref().expect("Always Some").kind(),
+        SyntaxKind::SourceFile,
+        "All nodes are below a sf node"
+    );
+    parent.unwrap()
+}
+pub fn addr_of_sf_node(sf_node: SyntaxNode) -> usize {
+    assert_eq!(sf_node.kind(), SyntaxKind::SourceFile);
+    sf_node.green() as *const GreenNode as usize
+}
+pub fn addr_of_ancestor_sf_node(node: SyntaxNode) -> usize {
+    addr_of_sf_node(nodes_sf_parent(node))
 }
 
 /// An iterator over `SyntaxNode` children of a particular AST type.
