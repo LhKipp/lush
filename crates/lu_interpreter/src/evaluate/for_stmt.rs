@@ -58,7 +58,8 @@ impl Evaluable for ForStmtNode {
                     .1
                     .insert_var(var);
             }
-            block.evaluate(scope)?;
+            // We pushed ForStmtFrame, block doesn't need to push additional frame
+            block.evaluate_with_args(&[EvalArg::BlockNoPushFrame], scope)?;
             {
                 let mut scope = scope.lock();
                 scope.pop_frame(&ScopeFrameTag::ForStmtFrame);
