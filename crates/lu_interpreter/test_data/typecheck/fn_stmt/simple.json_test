@@ -41,3 +41,51 @@ func 1 "text"
   ]
 }
 ...
+Fn without signature wrong ret_ty
+===
+fn func_1
+    ret "func_1"
+end
+
+let x: num = func_1
+$x
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "fn func_1",
+            "range": [
+              0,
+              9
+            ]
+          },
+          "lhs_ty": "str",
+          "rhs_decl": {
+            "content": "let x: num",
+            "range": [
+              32,
+              42
+            ]
+          },
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...
+Fn without signature different args
+===
+fn func_1 # VarArg will be of ty Any. Therefore any kind of arg is possible
+    ret "func_1"
+end
+func_1 42
+func_1 "42"
+---
+{
+  "Ok": "String"
+}
+...

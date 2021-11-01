@@ -24,10 +24,10 @@ impl Rule for FnStmtRule {
 
         // eat the name
         p.eat_delimited_as(BareWord, FnDeclName, Whitespace, true);
-        p.eat_while(CMT_NL_WS);
-
+        debug!("Testing for optional signature");
         SignatureRule {}.opt(p);
         p.expect_after(Newline, CMT_WS);
+        debug!("Parsing fn_block");
         BlockStmtRule::fn_for_block().parse(p);
         Some(m.complete(p, FnStmt))
     }

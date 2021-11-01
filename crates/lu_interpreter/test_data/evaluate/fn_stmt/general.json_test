@@ -12,3 +12,18 @@ func_1
   }
 }
 ...
+Fn without signature
+===
+fn func_1
+    ret "func_1"
+end
+
+let x = func_1
+$x
+---
+{
+  "Ok": {
+    "String": "func_1"
+  }
+}
+...

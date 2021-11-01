@@ -67,7 +67,7 @@ Config(
     ( name: "Tombstone"                  , is_node: true                                , )                ,
     // === TOKENS ===
     ( name: "Whitespace"                 , regex: "[ ]+"                                , is_token: true   , ) ,
-    ( name: "Comment"                    , regex: "#.*\\n"                              , is_token: true   , ) ,
+    ( name: "Comment"                    , regex: "#[^\\n]*"                              , is_token: true   , ) ,
     ( name: "Newline"                    , regex: "\\n"                                 , is_token: true   , ) ,
 
     // Bareword and bareword like tokens

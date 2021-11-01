@@ -30,3 +30,24 @@ fn | |
 - Whitespace: 1
 - Pipe: 1
 ...
+3
+===
+fn ls # Comment
+  echo "hi"
+end
+---
+- FnKeyword: 2
+- Whitespace: 1
+- BareWord: 2
+- Whitespace: 1
+- Comment: 9
+- Newline: 1
+- Whitespace: 2
+- BareWord: 4
+- Whitespace: 1
+- DoubleQuote: 1
+- BareWord: 2
+- DoubleQuote: 1
+- Newline: 1
+- EndKeyword: 3
+...

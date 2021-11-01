@@ -1,0 +1,21 @@
+1
+===
+fn ls # My ls command
+end
+---
+- Start: SourceFile
+- Start: BlockStmt
+- Start: FnStmt
+- Token: "FnKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Token: "FnDeclName (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Token: "Comment (len: 15)"
+- Token: "Newline (len: 1)"
+- Start: BlockStmt
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...

@@ -120,7 +120,7 @@ pub enum SyntaxKind {
     Tombstone,
     #[regex("[ ]+")]
     Whitespace,
-    #[regex("#.*\n")]
+    #[regex("#[^\n]*")]
     Comment,
     #[regex("\n")]
     Newline,

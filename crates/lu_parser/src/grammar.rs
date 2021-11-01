@@ -43,6 +43,7 @@ mod struct_stmt;
 mod type_;
 mod use_stmt;
 mod value_path_expr;
+mod comments;
 
 use itertools::Itertools;
 use log::debug;
