@@ -1,13 +1,18 @@
 use lu_syntax::ast::{
-    ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StringExprNode,
-    TableExprNode, ValueExprElement, ValuePathExprNode,
+    ArrayExprNode, BareWordToken, BooleanExprNode, CmdOrValueExprElement, NumberExprNode,
+    StringExprNode, TableExprNode, ValueExprElement, ValuePathExprNode,
 };
 
 use crate::evaluate::eval_prelude::*;
 
 impl Evaluable for ValueExprElement {
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        &[]
+    }
+
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
+            ValueExprElement::BooleanExpr(n) => n.evaluate(scope),
             ValueExprElement::BareWord(n) => n.evaluate(scope),
             ValueExprElement::NumberExpr(n) => n.evaluate(scope),
             ValueExprElement::MathExpr(n) => n.evaluate(scope),
@@ -77,5 +82,11 @@ impl Evaluable for ArrayExprNode {
 impl Evaluable for TableExprNode {
     fn do_evaluate(&self, _: &[EvalArg], _scope: &mut SyScope) -> EvalResult {
         todo!()
+    }
+}
+
+impl Evaluable for BooleanExprNode {
+    fn do_evaluate(&self, _: &[EvalArg], _: &mut SyScope) -> EvalResult {
+        Ok(self.value().into())
     }
 }

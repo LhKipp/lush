@@ -212,7 +212,7 @@ impl Parser {
     }
 
     /// Expect `and_then` after `before`
-    /// Example: p.expect_after(CMT_WS, Newline) // Expect a nl (with optional ws before)
+    /// Example: p.expect_after(Newline, CMT_WS) // Expect a nl (with optional ws before)
     pub(crate) fn expect_after<TS1: Into<TokenSet> + Copy, TS2: Into<TokenSet>>(
         &mut self,
         kinds: TS1,

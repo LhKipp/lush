@@ -18,6 +18,8 @@ Config(
     ( name: "AnyKeyword"                 , token_text: "any"                            , is_token: true   , ) ,
     ( name: "NilKeyword"                 , token_text: "nil"                            , is_token: true   , ) ,
     ( name: "BoolKeyword"                , token_text: "bool"                           , is_token: true   , ) ,
+    ( name: "TrueKeyword"                , token_text: "true"                           , is_token: true   , ) ,
+    ( name: "FalseKeyword"               , token_text: "false"                           , is_token: true   , ) ,
     ( name: "NumberKeyword"              , token_text: "num"                            , is_token: true   , ) ,
     ( name: "StringKeyword"              , token_text: "str"                            , is_token: true   , ) ,
     ( name: "RetKeyword"              , token_text: "ret"                            , is_token: true   , ) ,
@@ -117,6 +119,7 @@ Config(
     ( name: "ValuePathExpr"              , is_node: true                                , has_rule: true   , ) ,
     ( name: "ArrayExpr"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "TableExpr"                  , is_node: true                                , has_rule: true   , ) ,
+    ( name: "BooleanExpr"                  , is_node: true                                , has_rule: false   , ) ,//TODO
     // === GENERIC META NODES === 
     ( name: "UsePath", is_generic: true, has_rule: false, represents_element_names: [
         "FileName",
@@ -130,6 +133,7 @@ Config(
     ( name: "ValueExpr", is_generic: true, has_rule: true, represents_element_names: [
         "BareWord",
         "NumberExpr",
+        "BooleanExpr",
         "MathExpr",
         "StringExpr",
         "ValuePathExpr",

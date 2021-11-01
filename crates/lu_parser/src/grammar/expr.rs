@@ -109,6 +109,7 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(NumberExprRule {}),
             Box::new(ValuePathExprRule {}),
             Box::new(StringExprRule {}),
+            Box::new(BooleanExprRule {}),
             Box::new(StrctCtorExprRule {}),
             Box::new(table_or_array_rule()),
             // TODO BareWord is to ambigous here. Better remove it completly
@@ -223,5 +224,26 @@ impl Rule for StringExprRule {
 
         p.eat(quote_type);
         Some(m.complete(p, StringExpr))
+    }
+}
+
+pub struct BooleanExprRule;
+impl Rule for BooleanExprRule {
+    fn name(&self) -> String {
+        "BooleanExprRule".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        let next = p.next_non(CMT_NL_WS);
+        next == TrueKeyword || next == FalseKeyword
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
+        if !p.expect_after([TrueKeyword, FalseKeyword], CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
+        Some(m.complete(p, BooleanExpr))
     }
 }

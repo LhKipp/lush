@@ -2,8 +2,8 @@ use itertools::{EitherOrBoth, Itertools};
 use log::warn;
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, CmdOrValueExprElement, NumberExprNode, StrctCtorExprNode,
-        StringExprNode, TableExprNode, ValueExprElement,
+        ArrayExprNode, BareWordToken, BooleanExprNode, CmdOrValueExprElement, NumberExprNode,
+        StrctCtorExprNode, StringExprNode, TableExprNode, ValueExprElement,
     },
     AstNode, AstToken,
 };
@@ -14,6 +14,7 @@ use crate::{TyCheckState, TypeCheck, TypeCheckArg, ValueType};
 impl TypeCheck for ValueExprElement {
     fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self {
+            ValueExprElement::BooleanExpr(n) => n.typecheck(state),
             ValueExprElement::BareWord(n) => n.typecheck(state),
             ValueExprElement::NumberExpr(n) => n.typecheck(state),
             ValueExprElement::MathExpr(n) => n.typecheck(state),
@@ -131,5 +132,10 @@ impl TypeCheck for StrctCtorExprNode {
             warn!("StructCtor with name {} not found", self.name());
             None
         }
+    }
+}
+impl TypeCheck for BooleanExprNode {
+    fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::Bool))
     }
 }

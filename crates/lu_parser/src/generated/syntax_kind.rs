@@ -40,6 +40,10 @@ pub enum SyntaxKind {
     NilKeyword,
     #[token("bool")]
     BoolKeyword,
+    #[token("true")]
+    TrueKeyword,
+    #[token("false")]
+    FalseKeyword,
     #[token("num")]
     NumberKeyword,
     #[token("str")]
@@ -166,6 +170,7 @@ pub enum SyntaxKind {
     ValuePathExpr,
     ArrayExpr,
     TableExpr,
+    BooleanExpr,
     UsePath,
     CmdOrValueExpr,
     ValueExpr,
@@ -199,6 +204,8 @@ impl SyntaxKind{
             SyntaxKind::AnyKeyword => "AnyKeyword",
             SyntaxKind::NilKeyword => "NilKeyword",
             SyntaxKind::BoolKeyword => "BoolKeyword",
+            SyntaxKind::TrueKeyword => "TrueKeyword",
+            SyntaxKind::FalseKeyword => "FalseKeyword",
             SyntaxKind::NumberKeyword => "NumberKeyword",
             SyntaxKind::StringKeyword => "StringKeyword",
             SyntaxKind::RetKeyword => "RetKeyword",
@@ -282,6 +289,7 @@ impl SyntaxKind{
             SyntaxKind::ValuePathExpr => "ValuePathExpr",
             SyntaxKind::ArrayExpr => "ArrayExpr",
             SyntaxKind::TableExpr => "TableExpr",
+            SyntaxKind::BooleanExpr => "BooleanExpr",
             SyntaxKind::UsePath => "UsePath",
             SyntaxKind::CmdOrValueExpr => "CmdOrValueExpr",
             SyntaxKind::ValueExpr => "ValueExpr",
@@ -317,6 +325,8 @@ macro_rules! T {
     [any] => {$crate::SyntaxKind::AnyKeyword };
     [nil] => {$crate::SyntaxKind::NilKeyword };
     [bool] => {$crate::SyntaxKind::BoolKeyword };
+    [true] => {$crate::SyntaxKind::TrueKeyword };
+    [false] => {$crate::SyntaxKind::FalseKeyword };
     [num] => {$crate::SyntaxKind::NumberKeyword };
     [str] => {$crate::SyntaxKind::StringKeyword };
     [ret] => {$crate::SyntaxKind::RetKeyword };

@@ -1,9 +1,6 @@
 use crate::{AstElementChildren, AstNode, AstToken};
 
-use super::{
-    support, ArrayExprNode, BareWordToken, NumberExprNode, NumberToken, StringContentToken,
-    StringExprNode, ValueExprElement,
-};
+use super::{ArrayExprNode, BareWordToken, BooleanExprNode, FalseKeywordToken, NumberExprNode, NumberToken, StringContentToken, StringExprNode, ValueExprElement, support};
 
 impl NumberExprNode {
     pub fn value(&self) -> f64 {
@@ -55,5 +52,16 @@ impl StringExprNode {
             .unwrap()
             .text()
             .to_string()
+    }
+}
+
+impl BooleanExprNode {
+    pub fn value(&self) -> bool {
+        if support::token_child::<FalseKeywordToken>(self.syntax()).is_some() {
+            false
+        } else {
+            // if has TrueKeywordToken
+            true
+        }
     }
 }

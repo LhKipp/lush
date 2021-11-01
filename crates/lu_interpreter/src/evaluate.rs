@@ -31,9 +31,8 @@ macro_rules! handle_dbg_intervention_before {
                 let node = val_parse
                     .cast::<lu_syntax::ast::SourceFileNode>()
                     .expect("The parse of ContinueAsIfStmtRet always castable to SourceFileNode");
-                let silenced_before = lu_interpreter_structs::special_scope_vars::get_silence_stmt_returns(&$scope.lock())
-                    .unwrap_or(false)
                 // Don't print out evaluated parse
+                // TODO save state from before
                 lu_interpreter_structs::special_scope_vars::set_silence_stmt_returns(
                     true,
                     $scope.lock().get_cur_frame_mut(),
