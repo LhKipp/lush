@@ -1,3 +1,7 @@
+use std::fmt::Display;
+
+use itertools::Itertools;
+
 use crate::SyntaxKind::{self, ParserInternal};
 
 /// A bit-set of `SyntaxKind`s
@@ -67,5 +71,19 @@ impl<const N: usize> From<[SyntaxKind; N]> for TokenSet {
 impl From<SyntaxKind> for TokenSet {
     fn from(elem: SyntaxKind) -> Self {
         TokenSet::new([elem, ParserInternal, ParserInternal, ParserInternal])
+    }
+}
+
+impl Display for TokenSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let kinds = &self.1;
+        write!(
+            f,
+            "{}",
+            kinds
+                .iter()
+                .filter(|kind| *kind != &ParserInternal)
+                .format(" or ")
+        )
     }
 }

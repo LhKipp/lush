@@ -13,7 +13,7 @@ strum = "0.21"
 strum_macros = "0.21"
 derive-new = "0.5"
 drop_bomb = "0.1.4"
-itertools = "0.10.0"
+itertools = "0.10.1"
 log = "0.4.14"
 logos = "0.12.0"
 serde = "1.0.126"
@@ -21,9 +21,11 @@ text-size = "1.1.0"
 lazy_static = "1.4.0"
 tap = "1.0.1"
 vec_box = "1.0.0"
+derive_more = "0.99.16"
 
 [dev-dependencies]
 lu_test_support = { version = "0.1.0", path = "../lu_test_support" }
+lu_conformance = { version = "0.1.0", path = "../lu_conformance" }
 
 conformance = "0.2.0"
 pretty_env_logger = "0.4.0"

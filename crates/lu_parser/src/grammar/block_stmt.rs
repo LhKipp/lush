@@ -83,7 +83,11 @@ impl Rule for BlockStmtRule {
             p.expect(BeginKeyword);
         }
 
-        while !self.end_kinds.contains(p.next_non(CMT_NL_WS)) {
+        while {
+            // While not eof and not end keyword reached
+            let next_non = p.next_non(CMT_NL_WS);
+            next_non != Eof && !self.end_kinds.contains(next_non)
+        } {
             self.statement_rule.parse(p);
         }
 

@@ -30,11 +30,13 @@
 
 mod block_stmt;
 mod cmd_stmt;
+mod comments;
 mod condition;
 mod expr;
 mod fn_stmt;
 mod for_stmt;
 mod if_stmt;
+mod incomplete_input;
 mod let_stmt;
 mod piped_cmds_stmt;
 mod ret_stmt;
@@ -43,13 +45,16 @@ mod struct_stmt;
 mod type_;
 mod use_stmt;
 mod value_path_expr;
-mod comments;
 
 use itertools::Itertools;
 use log::debug;
 use vec_box::vec_box;
 
-use crate::{SyntaxKind::{self, *}, parser::{CMT_NL_WS, CompletedMarker, Parser}, token_set::TokenSet};
+use crate::{
+    parser::{CompletedMarker, Parser, CMT_NL_WS},
+    token_set::TokenSet,
+    SyntaxKind::{self, *},
+};
 
 pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;

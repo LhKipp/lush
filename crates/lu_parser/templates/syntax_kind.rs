@@ -1,8 +1,9 @@
 use logos::Logos;
+use derive_more::Display;
 use ::serde::{Deserialize, Serialize};
 
 #[allow(bad_style, missing_docs, unreachable_pub)]
-#[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
+#[derive(Logos, Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize, Display)]
 #[repr(u16)]
 pub enum SyntaxKind {
     {# Error and BareWord are a little special rest is normal #}

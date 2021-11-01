@@ -940,6 +940,7 @@ version = "0.1.0"
 dependencies = [
  "conformance",
  "derive-new",
+ "derive_more",
  "drop_bomb",
  "glob",
  "heck",
@@ -947,6 +948,7 @@ dependencies = [
  "lazy_static",
  "log",
  "logos",
+ "lu_conformance",
  "lu_error",
  "lu_syntax_elements",
  "lu_test_support",
