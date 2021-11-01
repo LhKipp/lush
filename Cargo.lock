@@ -952,6 +952,7 @@ dependencies = [
  "lu_error",
  "lu_syntax_elements",
  "lu_test_support",
+ "once_cell",
  "pretty_env_logger",
  "serde 1.0.129",
  "serde_json",

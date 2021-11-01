@@ -27,6 +27,16 @@ impl BlockStmtRule {
         }
     }
 
+    // New but with second_level_stmt rule as lazy
+    pub fn new_lazy_rule() -> BlockStmtRule {
+        BlockStmtRule {
+            parse_begin: true,
+            eat_end: true,
+            end_kinds: [EndKeyword].into(),
+            statement_rule: Box::new(Lazy::<OrRule>::new(|| second_level_stmt())),
+        }
+    }
+
     /// Source file block
     pub fn source_file_block() -> Self {
         Self {

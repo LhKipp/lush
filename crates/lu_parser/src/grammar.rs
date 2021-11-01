@@ -48,6 +48,7 @@ mod value_path_expr;
 
 use itertools::Itertools;
 use log::debug;
+use once_cell::unsync::Lazy;
 use vec_box::vec_box;
 
 use crate::{
@@ -165,6 +166,23 @@ impl Rule for OrRule {
     }
 }
 
+impl<T> Rule for Lazy<T>
+where
+    T: Rule,
+{
+    fn name(&self) -> String {
+        format!("Lazy({})", (&*self as &dyn Rule).name())
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        (&*self as &dyn Rule).matches(p)
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        (&*self as &dyn Rule).parse_rule(p)
+    }
+}
+
 pub struct SourceFileRule;
 impl Rule for SourceFileRule {
     fn name(&self) -> String {
@@ -192,6 +210,7 @@ fn second_level_stmt() -> OrRule {
             ForStmtRule {},
             IfStmtRule {},
             ValueExprRule {},
+            BlockStmtRule::new_lazy_rule(),
         ],
     }
 }
