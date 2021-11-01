@@ -1,10 +1,15 @@
 #!/bin/lush
 
+impure fn echo_impure (arg)
+    echo $arg
+end
+
 fn echo_wrapped ( arg )
     echo $arg
 end
 
 let text = ["lush" "greets" "the world"]
+echo_impure "LETS GO"
 
 for txt in $text
     let x = $txt

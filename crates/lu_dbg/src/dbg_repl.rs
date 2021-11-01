@@ -40,6 +40,9 @@ pub fn dbg_loop(
                     Some(DbgActionResult::StopDbgLoopAndContinueAsIfRetStmt(val)) => {
                         break Ok(Some(DbgIntervention::ContinueAsIfStmtRet(val)))
                     }
+                    Some(DbgActionResult::StopDbgLoopAndContinueAsIfStmtRetsNil) => {
+                        break Ok(Some(DbgIntervention::ContinueAsIfStmtRetsNil))
+                    }
                     None => {
                         DbgHelpAction {}.exec(&line, &stmt_id, dbg_state, scope);
                     }

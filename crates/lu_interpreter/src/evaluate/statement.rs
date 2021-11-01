@@ -19,6 +19,11 @@ impl Evaluable for StatementElement {
                     StatementElement::ValueExpr(n) => n.evaluate(scope)?,
                     _ => unreachable!(),
                 };
+                if let Some(silence) = get_silence_stmt_returns(&scope.lock()) {
+                    if silence {
+                        return Ok(value); // Early return if no printing of statement returns is asked
+                    }
+                }
                 // Nil does not get printed
                 if value == Value::Nil {
                     return Ok(value);

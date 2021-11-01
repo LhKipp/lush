@@ -1,4 +1,4 @@
-use lu_parser::grammar::ValueExprRule;
+use lu_parser::grammar::SourceFileRule;
 use lu_syntax::Parse;
 
 use crate::action::dbg_action_prelude::*;
@@ -7,7 +7,11 @@ pub(crate) struct DbgSkipAction {}
 
 impl DbgAction for DbgSkipAction {
     fn do_exec(&self, arg: &str, _: &AstId, _: &mut DbgState, _: &mut SyScope) -> DbgActionResult {
-        match Parse::rule(arg.into(), &ValueExprRule {}).as_results() {
+        if arg.is_empty() {
+            return DbgActionResult::StopDbgLoopAndContinueAsIfStmtRetsNil;
+        }
+        // TODO use ValueExprRule
+        match Parse::rule(arg.into(), &SourceFileRule {}).as_results() {
             Err(errs) => {
                 println!("Error parsing {} as a lu-value", arg);
                 for err in errs {
@@ -32,6 +36,7 @@ impl DbgAction for DbgSkipAction {
     }
 
     fn description(&self) -> &'static str {
-        "step over to the next evaluated statement (not recursing into function calls)"
+        r#"Skip the next statement and continue as if the statement returned [Value].
+Providing no value will return Value::Nil"#
     }
 }

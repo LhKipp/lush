@@ -21,6 +21,7 @@ pub(crate) enum DbgActionResult {
     StopDbgLoop,
     /// Parse is a ValueExprElement parse
     StopDbgLoopAndContinueAsIfRetStmt(Parse),
+    StopDbgLoopAndContinueAsIfStmtRetsNil,
 }
 
 pub(crate) static ALL_DBG_ACTIONS: Lazy<Vec<Box<dyn DbgAction>>> = Lazy::new(|| {
@@ -33,6 +34,8 @@ pub(crate) static ALL_DBG_ACTIONS: Lazy<Vec<Box<dyn DbgAction>>> = Lazy::new(|| 
         DbgScopeAction {}
     ]
 });
+pub(crate) static ALL_DBG_ACTIONS_WITH_AFTER_EVAL: Lazy<Vec<Box<dyn DbgActionAfterEval>>> =
+    Lazy::new(|| vec_box![DbgNextAction {},]);
 
 pub(crate) trait DbgAction: Sync + Send {
     fn matches(&self, line: &str) -> bool {
@@ -84,4 +87,8 @@ pub(crate) trait DbgAction: Sync + Send {
     fn short_name(&self) -> &'static str;
     fn args(&self) -> &[&'static str];
     fn description(&self) -> &'static str;
+}
+
+pub(crate) trait DbgActionAfterEval: DbgAction {
+    fn exec_after_eval(&self, stmt_id: &AstId, dbg_state: &mut DbgState, scope: &mut SyScope);
 }

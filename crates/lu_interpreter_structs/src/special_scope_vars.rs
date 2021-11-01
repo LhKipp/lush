@@ -26,3 +26,20 @@ pub fn set_new_dbg_session(frame: &mut ScopeFrame<Variable>) {
         lu_source_code_item!().into(),
     ));
 }
+
+const SILENCE_VAR_NAME: &str = "SILENCE_STMT_RETURNS";
+pub fn set_silence_stmt_returns(silence: bool, frame: &mut ScopeFrame<Variable>) {
+    frame.insert_var(Variable::new(
+        SILENCE_VAR_NAME.to_string(),
+        Value::Bool(silence),
+        lu_source_code_item!().into(),
+    ));
+}
+
+pub fn get_silence_stmt_returns(scope: &Scope<Variable>) -> Option<bool> {
+    scope
+        .find_var(SILENCE_VAR_NAME)
+        .map(|var| var.val.as_bool())
+        .flatten()
+        .cloned()
+}

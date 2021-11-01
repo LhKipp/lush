@@ -25,17 +25,33 @@ mod test;
 
 macro_rules! handle_dbg_intervention_before {
     ($dbg_result: ident, $scope: ident) => {{
+        log::debug!("Handling dbg intervention {:?}", $dbg_result);
         match $dbg_result {
             Some(lu_dbg::DbgIntervention::ContinueAsIfStmtRet(val_parse)) => {
                 let node = val_parse
-                    .cast_elem::<lu_syntax::ast::ValueExprElement>()
-                    .expect("The parse of ContinueAsIfStmtRet always castable to ValueExprElement");
-                match node.evaluate($scope) {
-                    Ok(val) => return Ok(val),
+                    .cast::<lu_syntax::ast::SourceFileNode>()
+                    .expect("The parse of ContinueAsIfStmtRet always castable to SourceFileNode");
+                let silenced_before = lu_interpreter_structs::special_scope_vars::get_silence_stmt_returns(&$scope.lock())
+                    .unwrap_or(false)
+                // Don't print out evaluated parse
+                lu_interpreter_structs::special_scope_vars::set_silence_stmt_returns(
+                    true,
+                    $scope.lock().get_cur_frame_mut(),
+                );
+                let result = match node.evaluate($scope) {
+                    Ok(val) => Ok(val),
                     Err(e) => {
                         todo!("Dbger should only accept correct values: {:?}", e)
                     }
-                }
+                };
+                lu_interpreter_structs::special_scope_vars::set_silence_stmt_returns(
+                    false,
+                    $scope.lock().get_cur_frame_mut(),
+                );
+                return result;
+            }
+            Some(lu_dbg::DbgIntervention::ContinueAsIfStmtRetsNil) => {
+                return Ok(lu_interpreter_structs::Value::Nil)
             }
             None => {} // ok
         }
@@ -83,7 +99,7 @@ pub trait Evaluable: Display + HasAstId {
         let result = self.do_evaluate(args, scope);
 
         if should_stop_for_dbg {
-            lu_dbg::after_eval(&self.to_string().trim(), &self.get_ast_id(), scope);
+            lu_dbg::after_eval(&self.get_ast_id(), scope);
         }
 
         debug!("Result of Evaluating: {}: {:?}", self, result);

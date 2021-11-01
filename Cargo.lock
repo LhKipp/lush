@@ -820,6 +820,7 @@ dependencies = [
  "lu_error",
  "lu_interpreter_structs",
  "lu_parser",
+ "lu_stdx",
  "lu_syntax",
  "lu_syntax_elements",
  "lu_text_util",

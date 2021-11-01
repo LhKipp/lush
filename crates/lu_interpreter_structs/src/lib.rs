@@ -8,18 +8,18 @@ extern crate educe;
 
 mod command;
 mod command_collection;
+pub mod dbg_state;
 mod evaluate;
 mod flag;
 mod module;
 pub mod prelude;
 mod scope;
-mod special_scope_vars;
+pub mod special_scope_vars;
 mod use_path;
 mod user_def_tys;
 mod value;
 mod value_type;
 mod variable;
-pub mod dbg_state;
 
 pub use command::{CmdAttribute, CmdAttributeVariant, Command};
 pub use command_collection::CommandCollection;

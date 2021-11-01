@@ -1,4 +1,4 @@
-pub(crate) use crate::action::{DbgAction, DbgActionResult};
+pub(crate) use crate::action::{DbgAction, DbgActionAfterEval, DbgActionResult};
 
 pub(crate) use lu_interpreter_structs::dbg_state::DbgState;
 pub(crate) use lu_interpreter_structs::SyScope;
