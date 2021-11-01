@@ -1,4 +1,4 @@
-use crate::evaluate::eval_prelude::*;
+use crate::{evaluate::eval_prelude::*, handle_dbg_intervention_before};
 use lu_syntax::{
     ast::ConditionElement,
     ast::{BlockStmtNode, HasAstId, IfStmtNode},
@@ -9,11 +9,17 @@ impl Evaluable for IfStmtNode {
         let if_cond = self.if_condition().unwrap();
         let if_block = self.if_block().unwrap();
 
-        lu_dbg::before_eval(
+        let dbg_result = lu_dbg::before_eval(
             &format!("if {}", if_cond.to_string().trim()),
             self.get_ast_id(),
             scope,
         )?;
+        // TODO no handle_dbg_intervention_before would be necessary if "if_stmt" gets parsed as
+        // IfElifElseStmt -- Has dbg_before not set
+        //   IfStmt -- Has dbg_before set
+        //   ElifStmt -- Has dbg_before set
+        //   ElseStmt -- Has dbg_before set
+        handle_dbg_intervention_before!(dbg_result, scope);
 
         let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, scope);
         if evaluated || result.is_err() {
@@ -24,11 +30,12 @@ impl Evaluable for IfStmtNode {
             let elif_cond = elif_cond.unwrap();
             let elif_block = elif_block.unwrap();
 
-            lu_dbg::before_eval(
+            let dbg_result = lu_dbg::before_eval(
                 &format!("elif {}", elif_cond.text_trimmed()),
                 self.get_ast_id(),
                 scope,
             )?;
+            handle_dbg_intervention_before!(dbg_result, scope);
 
             let (evaluated, result) = eval_block_if_true(&elif_cond, &elif_block, scope);
             if evaluated || result.is_err() {
@@ -37,7 +44,8 @@ impl Evaluable for IfStmtNode {
         }
 
         if let Some(else_block) = self.else_block() {
-            lu_dbg::before_eval("else", self.get_ast_id(), scope)?;
+            let dbg_result = lu_dbg::before_eval("else", self.get_ast_id(), scope)?;
+            handle_dbg_intervention_before!(dbg_result, scope);
             return eval_block(&else_block, scope);
         }
 

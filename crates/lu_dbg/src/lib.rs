@@ -65,7 +65,7 @@ pub fn warn_unpure_cmd_call(
         let cmd_id_str = cmd.name();
         dbg_print(&format!(
             r#"Warning: Running {cmd_name} might have side effects.
-Type "skip <Value>" to skip running {cmd_name} and continue as if the the cmd returned <Value>
+Type "skip [Value]" to skip running {cmd_name} and continue as if the the cmd returned [Value]
 Type "next" or "step" to run the cmd
 Type "help" for further help"#,
             cmd_name = cmd_id_str
