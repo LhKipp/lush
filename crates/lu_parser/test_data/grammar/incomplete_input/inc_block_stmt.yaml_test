@@ -1,0 +1,25 @@
+1
+===
+begin
+    echo 1
+---
+- Start: SourceFile
+- Start: BlockStmt
+- Start: BlockStmt
+- Token: "BeginKeyword (len: 5)"
+- Token: "Newline (len: 1)"
+- Token: "Whitespace (len: 4)"
+- Start: Tombstone
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+- Error: "Message(\"expected EndKeyword\")"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...
+

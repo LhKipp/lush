@@ -171,15 +171,15 @@ where
     T: Rule,
 {
     fn name(&self) -> String {
-        format!("Lazy({})", (&*self as &dyn Rule).name())
+        format!("Lazy({})", (**self).name())
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        (&*self as &dyn Rule).matches(p)
+        (**self).matches(p)
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        (&*self as &dyn Rule).parse_rule(p)
+        (**self).parse_rule(p)
     }
 }
 
