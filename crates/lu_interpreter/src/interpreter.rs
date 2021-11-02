@@ -8,10 +8,7 @@ use lu_interpreter_structs::*;
 use lu_parser::grammar::SourceFileRule;
 use lu_pipeline_stage::PipelineStage;
 use lu_structure_parse::{modules_from_start_parse, LoadModulesConfig};
-use lu_syntax::{
-    ast::{SourceFileNode},
-    AstNode, Parse,
-};
+use lu_syntax::{ast::SourceFileNode, AstNode, Parse};
 use lu_text_util::SourceCode;
 
 use parking_lot::Mutex;
@@ -47,6 +44,9 @@ impl Default for InterpreterCfg {
 pub struct Interpreter {
     pub global_frame: ScopeFrame<Variable>,
     pub config: Rc<InterpreterCfg>,
+    // TODO rework this whole shitty interpreter construction. Its a pile of crab
+    // Scope is set by evaluate. None before :)
+    pub scope: Option<SyScope>,
 }
 
 impl Interpreter {
@@ -54,6 +54,7 @@ impl Interpreter {
         Interpreter {
             config: Rc::new(config),
             global_frame,
+            scope: None,
         }
     }
 
@@ -109,6 +110,7 @@ impl Interpreter {
 
         let mut evaluator = Evaluator::new(Arc::new(Mutex::new(ty_state.scope.clone())));
         evaluator.evaluate();
+        self.scope = Some(evaluator.scope.clone());
         Some(evaluator)
     }
 

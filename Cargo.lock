@@ -1102,6 +1102,7 @@ dependencies = [
  "lu_cfg_home",
  "lu_cli",
  "lu_error",
+ "lu_error_reporting",
  "lu_interpreter",
  "lu_interpreter_structs",
  "lu_text_util",
