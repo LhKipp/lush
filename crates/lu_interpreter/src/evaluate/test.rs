@@ -4,8 +4,7 @@ mod test {
 
     #[lu_conformance::tests(exact, serde=serde_json, file="test_data/evaluate/")]
     fn general_interpreter_tests(s: &str) -> LuResults<Value> {
-        let mut itprtr = make_test_interpreter();
-
-        itprtr.eval(s.to_string().into())
+        let (global_frame, itprt_cfg) = make_test_interpreter();
+        Interpreter::eval_for_tests(s.to_string().into(), global_frame, &itprt_cfg)
     }
 }

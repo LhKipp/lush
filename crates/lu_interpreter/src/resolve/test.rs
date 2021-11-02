@@ -3,6 +3,7 @@ mod tests {
     use std::path::PathBuf;
 
     use fs_extra::dir::{copy, CopyOptions};
+    use lu_test_support::test_prelude::*;
     use lu_test_support::{make_test_interpreter_in_playground, Playground};
     use lu_text_util::SourceCode;
     const MANIFEST: &str = env!("CARGO_MANIFEST_DIR");
@@ -21,14 +22,18 @@ mod tests {
         cp_opts.content_only = true;
         copy(example_playground, playground.root(), &cp_opts).expect("Must work");
 
-        let mut itprtr = make_test_interpreter_in_playground(playground);
-        let eval_result = itprtr.eval(SourceCode::new_text(
-            r#"
+        let (global_frame, itprt_cfg) = make_test_interpreter_in_playground(playground);
+        let eval_result = Interpreter::eval_for_tests(
+            SourceCode::new_text(
+                r#"
                 use plugin1:plugin1_f1.lu
                 plugin1_f1
             "#
-            .to_string(),
-        ));
+                .to_string(),
+            ),
+            global_frame,
+            &itprt_cfg,
+        );
         assert!(eval_result.is_ok(), "{:?}", eval_result);
     }
 }

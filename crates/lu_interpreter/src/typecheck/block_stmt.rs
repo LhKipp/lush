@@ -12,7 +12,7 @@ use lu_syntax::{
 use rusttyc::TcKey;
 
 use crate::{
-    visit_arg::VisitArg, EvalArg, Evaluable, Function, Interpreter, ScopeFrameTag, TcFunc,
+    visit_arg::VisitArg, EvalArg, Evaluable, Function, ScopeFrameTag, TcFunc,
     TyCheckState, TypeCheckArg, Variable,
 };
 

@@ -4,10 +4,7 @@ mod test {
 
     #[lu_conformance::tests(exact, serde=serde_json, file="test_data/typecheck")]
     fn general_interpreter_tests(s: &str) -> LuResults<Option<ValueType>> {
-        let mut itprtr = make_test_interpreter();
-
-        itprtr
-            .ty_check(s.to_string().into())
-            .map(|ty_state| ty_state.result)
+        let (global_frame, itprt_cfg) = make_test_interpreter();
+        Interpreter::ty_check_for_tests(s.to_string().into(), global_frame, &itprt_cfg)
     }
 }

@@ -2,6 +2,7 @@ use clap::App;
 use lu_cli::start_cli;
 use lu_interpreter::{Interpreter, InterpreterCfg};
 use lu_interpreter_structs::*;
+use lu_stdx::new_amtx;
 use lu_text_util::SourceCode;
 
 fn main() {
@@ -58,16 +59,21 @@ fn ret_code_main() -> i32 {
             }
         };
 
-        let mut intprtr = Interpreter::new(global_frame, intprt_config);
-        match intprtr.eval(code) {
+        let (scope, errs) = Interpreter::ty_check(code, global_frame, &intprt_config).split();
+        if !errs.is_empty() {
+            if let Err(e) = lu_error_reporting::report_to_term(&errs, &scope) {
+                eprintln!("Ups: An error happend, while printing errors: {}", e)
+            }
+            return 1;
+        }
+        let mut scope = new_amtx(scope);
+        match Interpreter::eval(&mut scope) {
             Ok(_) => {
                 // TODO v should be deserialized and passed to the parent lu-shell (if any)
                 // maybe pass via flag?
             }
-            Err(errs) => {
-                if let Err(e) =
-                    lu_error_reporting::report_to_term(&errs, &intprtr.scope.unwrap().lock())
-                {
+            Err(err) => {
+                if let Err(e) = lu_error_reporting::report_to_term(&[err], &scope.lock()) {
                     eprintln!("Ups: An error happend, while printing errors: {}", e)
                 }
                 return 2;

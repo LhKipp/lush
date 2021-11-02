@@ -41,41 +41,84 @@ impl InterpreterCfg {
     }
 }
 
-pub struct Interpreter {
-    pub global_frame: ScopeFrame<Variable>,
-    pub config: Rc<InterpreterCfg>,
-    // TODO rework this whole shitty interpreter construction. Its a pile of crab
-    // Scope is set by evaluate. None before :)
-    pub scope: Option<SyScope>,
-}
+pub struct Interpreter {}
 
 impl Interpreter {
-    pub fn new(global_frame: ScopeFrame<Variable>, config: InterpreterCfg) -> Self {
-        Interpreter {
-            config: Rc::new(config),
-            global_frame,
-            scope: None,
+    pub fn eval(scope: &mut SyScope) -> LuResult<Value> {
+        // TODO pass node and only eval that
+        let node = scope
+            .lock()
+            .get_cur_frame()
+            .get_tag()
+            .as_module_frame()
+            .cloned()
+            .unwrap()
+            .node
+            .unwrap();
+
+        Evaluator::eval_result_to_lu_result(node.evaluate(scope))
+    }
+
+    pub fn ty_check(
+        code: SourceCode,
+        global_frame: ScopeFrame<Variable>,
+        cfg: &InterpreterCfg,
+    ) -> Outcome<Scope<Variable>> {
+        let parse = Interpreter::parse(code);
+        let scope = parse.map_flattened(|parse| Interpreter::build_scope(parse, global_frame, cfg));
+        let ty_check = scope.map(|scope| Interpreter::typecheck(scope));
+
+        let mut ty_errs = ty_check.val.get_errors().clone();
+        ty_errs.extend(ty_check.errs);
+
+        Outcome::new(ty_check.val.scope, ty_errs)
+    }
+
+    pub fn eval_for_tests(
+        code: SourceCode,
+        global_frame: ScopeFrame<Variable>,
+        cfg: &InterpreterCfg,
+    ) -> LuResults<Value> {
+        let (scope, ty_errs) = Self::ty_check(code, global_frame, cfg).split();
+        if !ty_errs.is_empty() {
+            return Err(ty_errs);
+        }
+        match Self::eval(&mut Arc::new(Mutex::new(scope))) {
+            Ok(v) => Ok(v),
+            Err(e) => Err(vec![e]),
         }
     }
 
-    pub fn parse(&mut self, code: SourceCode) -> Outcome<Parse> {
+    pub fn ty_check_for_tests(
+        code: SourceCode,
+        global_frame: ScopeFrame<Variable>,
+        cfg: &InterpreterCfg,
+    ) -> LuResults<Option<ValueType>> {
+        let parse = Interpreter::parse(code);
+        let scope = parse.map_flattened(|parse| Interpreter::build_scope(parse, global_frame, cfg));
+        let ty_check = scope.map(|scope| Interpreter::typecheck(scope));
+
+        let mut ty_errs = ty_check.val.get_errors().clone();
+        ty_errs.extend(ty_check.errs);
+
+        if ty_errs.is_empty() {
+            Ok(ty_check.val.result)
+        } else {
+            Err(ty_errs)
+        }
+    }
+
+    fn parse(code: SourceCode) -> Outcome<Parse> {
         Parse::rule(code, &SourceFileRule {})
     }
 
-    pub fn build_scope(
-        &mut self,
+    fn build_scope(
         parse: Parse,
         global_frame: ScopeFrame<Variable>,
+        cfg: &InterpreterCfg,
     ) -> Outcome<Scope<Variable>> {
-        let relative_include_path_start: PathBuf = std::env::var("PWD").unwrap().into();
-        let modules = modules_from_start_parse(
-            parse,
-            &LoadModulesConfig {
-                load_std_module_func: load_std_module,
-                plugin_dir: &self.config.plugin_dir,
-                relative_include_path_start,
-            },
-        );
+        let load_modules_config = cfg.build_load_modules_config();
+        let modules = modules_from_start_parse(parse, &load_modules_config);
 
         modules.map(move |(start_mod, modules)| {
             let mut scope = Scope::new();
@@ -89,7 +132,8 @@ impl Interpreter {
         })
     }
 
-    pub fn typecheck(&mut self, scope: Scope<Variable>) -> TyCheckState {
+    /// Typecheck starting at the currently selected mod frame
+    fn typecheck(scope: Scope<Variable>) -> TyCheckState {
         let mut ty_state = TyCheckState::new(scope);
         let sf_node = ty_state
             .scope
@@ -102,31 +146,5 @@ impl Interpreter {
             .unwrap();
         ty_state.typecheck(sf_node);
         ty_state
-    }
-
-    pub fn evaluate(&mut self, ty_state: TyCheckState) -> Option<Evaluator> {
-        // We don't allow evaluation if errors happend.
-        assert!(ty_state.succeeded());
-
-        let mut evaluator = Evaluator::new(Arc::new(Mutex::new(ty_state.scope.clone())));
-        evaluator.evaluate();
-        self.scope = Some(evaluator.scope.clone());
-        Some(evaluator)
-    }
-
-    pub fn eval(&mut self, code: SourceCode) -> LuResults<Value> {
-        let ty_check = self.ty_check(code)?;
-        self.evaluate(ty_check).unwrap().as_result()
-    }
-
-    pub fn ty_check(&mut self, code: SourceCode) -> LuResults<TyCheckState> {
-        let parse = self.parse(code);
-        let scope = parse.map_flattened(|parse| self.build_scope(parse, self.global_frame.clone()));
-        let mut ty_check = scope.map(|scope| self.typecheck(scope));
-
-        let ty_errs = ty_check.val.get_errors().clone();
-        ty_check.errs.extend(ty_errs);
-
-        ty_check.into()
     }
 }

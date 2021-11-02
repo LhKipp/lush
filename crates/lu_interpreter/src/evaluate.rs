@@ -122,26 +122,6 @@ impl Evaluator {
         }
     }
 
-    pub fn evaluate(&mut self) {
-        // TODO pass node and only eval that
-        let node = self
-            .scope
-            .lock()
-            .get_cur_frame()
-            .get_tag()
-            .as_module_frame()
-            .cloned()
-            .unwrap()
-            .node
-            .unwrap();
-
-        let lu_result = Self::eval_result_to_lu_result(node.evaluate(&mut self.scope));
-        match lu_result {
-            Ok(v) => self.result = Some(v),
-            Err(e) => self.errors.push(e),
-        }
-    }
-
     pub fn lu_result_to_eval_result<T>(result: LuResult<T>) -> Result<T, RetValOrErr> {
         result.map_err(|e| e.into())
     }
@@ -165,12 +145,4 @@ impl Evaluator {
     //     let source_file = parse_result.ok::<T>()?;
     //     source_file.evaluate(self)
     // }
-
-    pub(crate) fn as_result(self) -> Result<Value, Vec<LuErr>> {
-        if !self.errors.is_empty() {
-            Err(self.errors)
-        } else {
-            Ok(self.result.unwrap())
-        }
-    }
 }

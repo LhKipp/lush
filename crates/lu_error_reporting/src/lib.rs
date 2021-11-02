@@ -23,7 +23,7 @@ use crate::{
 // use codespan_reporting::SimpleFiles;
 
 pub(crate) type SFAddrToFileMap = HashMap<usize, usize>;
-pub fn report_to_term(errors: &Vec<LuErr>, scope: &Scope<Variable>) -> Result<(), String> {
+pub fn report_to_term(errors: &[LuErr], scope: &Scope<Variable>) -> Result<(), String> {
     let mut files = SimpleFiles::new();
     let mut sf_node_addr_to_file_id = HashMap::new();
 

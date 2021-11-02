@@ -3,8 +3,8 @@ use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
 use log::trace;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
+use lu_stdx::AMtx;
 use multimap::MultiMap;
-use parking_lot::Mutex;
 use parking_lot::RwLock;
 use std::{
     collections::HashMap,
@@ -121,7 +121,7 @@ where
     pub use_stmts: MultiMap<NodeId, NodeId>,
 }
 
-pub type SyScope = Arc<Mutex<Scope<Variable>>>;
+pub type SyScope = AMtx<Scope<Variable>>;
 
 impl<T: fmt::Debug + 'static> Scope<T> {
     pub fn new() -> Self {
