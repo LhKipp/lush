@@ -1,4 +1,3 @@
-use lu_parser::grammar::SourceFileRule;
 use lu_syntax::Parse;
 
 use crate::action::dbg_action_prelude::*;
@@ -11,7 +10,7 @@ impl DbgAction for DbgSkipAction {
             return DbgActionResult::StopDbgLoopAndContinueAsIfStmtRetsNil;
         }
         // TODO use ValueExprRule
-        match Parse::rule(arg.into(), &SourceFileRule {}).as_results() {
+        match Parse::source_file(arg.into()).as_results() {
             Err(errs) => {
                 println!("Error parsing {} as a lu-value", arg);
                 for err in errs {

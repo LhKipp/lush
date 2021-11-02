@@ -1,6 +1,5 @@
 use lu_error::LuResults;
 use lu_interpreter_structs::*;
-use lu_parser::grammar::SourceFileRule;
 use lu_structure_parse::{modules_from_start_parse, LoadModulesConfig};
 use lu_syntax::Parse;
 use lu_text_util::SourceCode;
@@ -31,7 +30,7 @@ impl InteractiveInterpreter {
 
     pub fn eval_line(&mut self, code: &str) -> LuResults<Value> {
         let code: SourceCode = code.into();
-        let parse = Parse::rule(code, &SourceFileRule {}).as_results()?;
+        let parse = Parse::source_file(code).as_results()?;
         let parsed_node = parse.source_file_node();
         let (line_mod_path, mut modules) =
             modules_from_start_parse(parse, &self.config.build_load_modules_config())
@@ -70,7 +69,7 @@ impl InteractiveInterpreter {
         load_modules_config: &LoadModulesConfig,
     ) -> Scope<Variable> {
         let code: SourceCode = "".into();
-        let parse = Parse::rule(code, &SourceFileRule {});
+        let parse = Parse::source_file(code);
         let parse = parse.as_results().expect("Empty code never errs");
 
         let mods = modules_from_start_parse(parse, load_modules_config);

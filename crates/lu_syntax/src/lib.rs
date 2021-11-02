@@ -7,7 +7,7 @@ use ast::SourceFileNode;
 use build_tree::TreeBuilder;
 use derive_new::new;
 use lu_error::{util::Outcome, LuErr};
-use lu_parser::grammar::Rule;
+use lu_parser::grammar::{Rule, SourceFileRule};
 use lu_text_util::SourceCode;
 
 pub use ast::{AstElement, AstElementChildren, AstId, AstNode, AstNodeChildren, AstToken};
@@ -34,8 +34,8 @@ pub struct Parse {
 }
 
 impl Parse {
-    pub fn rule(code: SourceCode, rule: &dyn Rule) -> Outcome<Self> {
-        let (green, errors) = TreeBuilder::build(&code.text, rule);
+    pub fn source_file(code: SourceCode) -> Outcome<Self> {
+        let (green, errors) = TreeBuilder::build(&code.text, &SourceFileRule {});
         let errors: Vec<LuErr> = errors.into_iter().map(|e| e.into()).collect();
 
         // TODO add validation here

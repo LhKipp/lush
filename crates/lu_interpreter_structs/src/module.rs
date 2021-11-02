@@ -5,7 +5,6 @@ use crate::{
 use itertools::Itertools;
 use log::debug;
 use lu_error::util::Outcome;
-use lu_parser::grammar::SourceFileRule;
 use lu_syntax::{
     ast::{SourceFileNode, StrctStmtNode, UseStmtNode},
     AstNode, Parse,
@@ -19,7 +18,7 @@ pub struct ModInfo {
     pub src: SourceCode,
     /// Some for regular modules, None for rust-std-modules
     /// None for Cli module (must be recomputed if needed)
-    pub node: Option<SourceFileNode>, // TODO 
+    pub node: Option<SourceFileNode>, // TODO
     pub use_paths: Vec<UsePath>,
 }
 
@@ -60,7 +59,7 @@ impl ModInfo {
     /// The mod_id does not necessarily have to correspond to the src.path. However if it does,
     /// one can use module_from_file_src
     pub fn module_from_src(src: SourceCode, mod_id: ModPath) -> Outcome<ScopeFrame<Variable>> {
-        let parse = Parse::rule(src, &SourceFileRule {});
+        let parse = Parse::source_file(src);
         parse.map_flattened(|parse| Self::module_from_parse(parse, mod_id))
     }
 

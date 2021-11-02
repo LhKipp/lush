@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use log::debug;
-    use lu_parser::grammar::SourceFileRule;
     use lu_test_support::init_logger;
     use lu_text_util::SourceCode;
 
@@ -18,7 +17,7 @@ mod tests {
     fn parse_cmds(s: &str) -> Tree {
         init_logger();
         let src = SourceCode::new_text(s.to_string());
-        let parse = Parse::rule(src, &SourceFileRule {});
+        let parse = Parse::source_file(src);
         let tree = parse
             .map(|parse| {
                 let s = format!("\n{:#?}\n", parse.source_file_node());

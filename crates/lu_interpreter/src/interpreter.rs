@@ -109,7 +109,7 @@ impl Interpreter {
     }
 
     fn parse(code: SourceCode) -> Outcome<Parse> {
-        Parse::rule(code, &SourceFileRule {})
+        Parse::source_file(code)
     }
 
     fn build_scope(
