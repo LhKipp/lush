@@ -1,0 +1,40 @@
+1
+===
+$not_found
+---
+{
+  "Err": [
+    {
+      "Ast": {
+        "VarNotInScope": {
+          "content": "not_found",
+          "range": [
+            1,
+            10
+          ]
+        }
+      }
+    }
+  ]
+}
+...
+2
+===
+echo $not_found
+---
+{
+  "Err": [
+    {
+      "Ast": {
+        "VarNotInScope": {
+          "content": "not_found",
+          "range": [
+            6,
+            15
+          ]
+        }
+      }
+    }
+  ]
+}
+...

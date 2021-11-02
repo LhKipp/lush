@@ -3,9 +3,8 @@ use crate::{cmd_prelude::*, external_cmds_attr::EXT_CMDS_DEF_ATTRIBUTES};
 use std::{io::Write, process::Stdio};
 
 use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
-use lu_interpreter_structs::{ArgSignature, ValueType};
+use lu_interpreter_structs::external_cmd;
 use lu_syntax::{ast::CmdStmtNode, AstNode};
-use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use once_cell::unsync::OnceCell;
 
 #[derive(Debug, Clone, new)]
@@ -25,22 +24,8 @@ impl Command for RunExternalCmd {
     }
 
     fn signature(&self) -> &Signature {
-        self.signature.get_or_init(|| {
-            let lu_item = lu_source_code_item!();
-            let sign = Signature::new(
-                Vec::new(),
-                Some(ArgSignature::new(
-                    VAR_ARGS_DEF_NAME.into(),
-                    ValueType::Any,
-                    lu_item.clone(),
-                )),
-                Vec::new(),
-                ArgSignature::new(IN_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
-                ArgSignature::new(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
-                lu_item,
-            );
-            sign
-        })
+        self.signature
+            .get_or_init(|| external_cmd::external_cmd_signature())
     }
 
     fn signature_item(&self) -> SourceCodeItem {

@@ -4,7 +4,7 @@ use std::{collections::HashMap, iter};
 
 use log::{debug, warn};
 use lu_error::{SourceCodeItem, TyErr};
-use lu_interpreter_structs::{FlagSignature, FlagVariant, Value};
+use lu_interpreter_structs::{external_cmd, FlagSignature, FlagVariant, Value};
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{CmdArgElement, CmdStmtNode, LetStmtNode, ValueExprElement},
@@ -28,21 +28,19 @@ impl TypeCheck for CmdStmtNode {
             .scope
             .find_func(&self.get_cmd_name(), &passed_flags)
             .cloned();
-
-        let ret_ty = if let Some(cmd) = called_cmd {
-            let cmd_keys = ty_state
+        let cmd_keys = if let Some(cmd) = called_cmd {
+            ty_state
                 .get_tc_cmd_from_rc_cmd(&cmd)
-                .expect("If cmd is found in scope it must be found in ty_state");
-            let args = self.args();
-            ty_check_cmd_args_and_flags(self, args, &cmd_keys, ty_state);
-            ty_state.new_term_key_equated(self.to_item(), cmd_keys.ret_key.clone())
+                .expect("If cmd is found in scope it must be found in ty_state")
         } else {
-            ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::String)
+            TcFunc::from_signature(&external_cmd::external_cmd_signature(), ty_state)
         };
-        
-        // TODO ty check redir stmt
 
-        Some(ty_state.new_term_key_equated(self.to_item(), ret_ty))
+        // Ty check args
+        ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);
+
+        // TODO ty check redir stmt
+        Some(ty_state.new_term_key_equated(self.to_item(), cmd_keys.ret_key))
     }
 }
 
@@ -86,7 +84,7 @@ fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
                     }
                     None => {
                         if let Some(var_arg_ty) = called_func.var_arg_key {
-                            ty_state.new_term_key_equated(arg.to_item(), var_arg_ty);
+                            ty_check_cmd_arg(arg, &var_arg_ty, cmd_node, ty_state);
                         } else {
                             // Found unexpected argument
                             let called_func_decl =

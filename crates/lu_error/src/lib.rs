@@ -115,7 +115,7 @@ macro_rules! lu_source_code_item {
             let f_name = file!();
             let line = line!();
             // TODO better source code item
-            SourceCodeItem::new(0..line as usize, f_name.clone(), 0 as usize)
+            lu_error::SourceCodeItem::new(0..line as usize, f_name.clone(), 0 as usize)
         }
     }};
 }

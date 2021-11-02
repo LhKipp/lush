@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use lu_error::{lu_source_code_item, SourceCodeItem};
+use lu_error::lu_source_code_item;
 use lu_interpreter_structs::{CmdAttribute, CmdAttributeVariant::*};
 use once_cell::sync::Lazy;
 
