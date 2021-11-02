@@ -33,11 +33,11 @@ impl InterpreterCfg {
     }
 }
 
-impl Default for InterpreterCfg {
-    fn default() -> Self {
-        InterpreterCfg {
-            plugin_dir: "/home/leo/.config/lu/plugins".into(),
-        }
+impl InterpreterCfg {
+    pub fn try_default() -> LuResult<Self> {
+        Ok(InterpreterCfg {
+            plugin_dir: lu_cfg_home::plugin_dir()?,
+        })
     }
 }
 

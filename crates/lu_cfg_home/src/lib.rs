@@ -24,9 +24,23 @@ pub fn cfg_home() -> LuResult<PathBuf> {
     get_xdg_base_dir().map(|base_dir| base_dir.get_config_home())
 }
 
+pub fn cli_history() -> LuResult<PathBuf> {
+    cfg_home().map(|mut home| {
+        home.push("cli_history.txt");
+        home
+    })
+}
+
 pub fn dbg_history() -> LuResult<PathBuf> {
     cfg_home().map(|mut home| {
         home.push("dbg_history");
+        home
+    })
+}
+
+pub fn plugin_dir() -> LuResult<PathBuf> {
+    cfg_home().map(|mut home| {
+        home.push("plugins");
         home
     })
 }

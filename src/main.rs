@@ -50,7 +50,15 @@ fn ret_code_main() -> i32 {
             }
         };
 
-        let intprt_config = InterpreterCfg::default();
+        let intprt_config = match InterpreterCfg::try_default() {
+            Ok(cfg) => cfg,
+            Err(e) => {
+                // TODO better formating of e. But its so unusual
+                println!("Error while generating default interpreter: {:?}", e);
+                return 1;
+            }
+        };
+
         let mut intprtr = Interpreter::new(global_frame, intprt_config);
         match intprtr.eval(code) {
             Ok(_) => {

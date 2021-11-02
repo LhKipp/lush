@@ -770,6 +770,7 @@ dependencies = [
 name = "lu_cli"
 version = "0.1.0"
 dependencies = [
+ "lu_cfg_home",
  "lu_error",
  "lu_interpreter",
  "lu_interpreter_structs",
@@ -882,6 +883,7 @@ dependencies = [
  "itertools",
  "lazy_static",
  "log",
+ "lu_cfg_home",
  "lu_cmds",
  "lu_conformance",
  "lu_dbg",

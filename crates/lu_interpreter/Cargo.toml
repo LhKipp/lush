@@ -16,6 +16,7 @@ lu_syntax_elements = { version = "0.1.0", path = "../lu_syntax_elements" }
 lu_pipeline_stage = { version = "0.1.0", path = "../lu_pipeline_stage" }
 lu_interpreter_structs = { version = "0.1.0", path = "../lu_interpreter_structs" }
 lu_cmds = { version = "0.1.0", path = "../lu_cmds" }
+lu_cfg_home = { version = "0.1.0", path = "../lu_cfg_home" }
 lu_structure_parse = { version = "0.1.0", path = "../lu_structure_parse" }
 
 derive-new = "0.5"

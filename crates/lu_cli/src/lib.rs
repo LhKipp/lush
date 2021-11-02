@@ -3,21 +3,24 @@ use lu_interpreter_structs::*;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
-const HIST_FILE: &str = "/home/leo/.config/lu/history.txt";
-const PLUGIN_DIR: &str = "/home/leo/.config/lu/plugins";
 pub fn start_cli(global_frame: ScopeFrame<Variable>) {
+    let hist_file = lu_cfg_home::cli_history();
     // `()` can be used when no completer is required
     let mut rl = Editor::<()>::new();
-    if rl.load_history(HIST_FILE).is_err() {
-        println!("No previous history.");
+    if let Ok(hist_file) = &hist_file {
+        if rl.load_history(hist_file).is_err() {
+            eprintln!("No previous history.");
+        }
     }
 
-    let mut intprt = InteractiveInterpreter::new(
-        global_frame,
-        InterpreterCfg {
-            plugin_dir: PLUGIN_DIR.into(),
-        },
-    );
+    let intprt_cfg = match InterpreterCfg::try_default() {
+        Ok(cfg) => cfg,
+        Err(e) => {
+            eprintln!("Error while generating default interpreter: {:?}", e);
+            return;
+        }
+    };
+    let mut intprt = InteractiveInterpreter::new(global_frame, intprt_cfg);
 
     loop {
         let readline = rl.readline(">> ");
@@ -43,5 +46,9 @@ pub fn start_cli(global_frame: ScopeFrame<Variable>) {
             }
         }
     }
-    rl.save_history(HIST_FILE).unwrap();
+    if let Ok(hist_file) = hist_file {
+        if let Err(e) = rl.save_history(&hist_file) {
+            eprintln!("Could not save cli_history: {}", e);
+        }
+    }
 }
