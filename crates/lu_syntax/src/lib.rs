@@ -3,11 +3,12 @@ mod build_tree;
 mod syntax_node;
 mod test;
 
-use ast::SourceFileNode;
+use ast::{addr_of_sf_node, SourceFileNode};
 use build_tree::TreeBuilder;
 use derive_new::new;
-use lu_error::{util::Outcome, LuErr};
-use lu_parser::grammar::{Rule, SourceFileRule};
+use log::warn;
+use lu_error::{util::Outcome, ParseErr, SourceCodeItem};
+use lu_parser::grammar::Rule;
 use lu_text_util::SourceCode;
 
 pub use ast::{AstElement, AstElementChildren, AstId, AstNode, AstNodeChildren, AstToken};
@@ -25,41 +26,42 @@ pub use rowan::{
 ///
 /// Note that we always produce a syntax tree, even for completely invalid
 /// files.
-///
-/// Currently the green node will always be a SourceFileNode
 #[derive(Debug, new)]
 pub struct Parse {
     pub source: SourceCode,
-    green: GreenNode,
+    pub sf_node: SourceFileNode,
 }
 
 impl Parse {
-    pub fn source_file(code: SourceCode) -> Outcome<Self> {
-        let (green, errors) = TreeBuilder::build(&code.text, &SourceFileRule {});
-        let errors: Vec<LuErr> = errors.into_iter().map(|e| e.into()).collect();
+    pub fn source_file(source: SourceCode) -> Outcome<Parse> {
+        let (green, errors) = TreeBuilder::build(&source.text);
+        let sf_node = SyntaxNode::new_root(green);
+        let sf_node = SourceFileNode::cast(sf_node)
+            .expect("Only use this func, if your parsed a source file");
+        let sf_node_addr = addr_of_sf_node(sf_node.syntax().clone());
 
-        // TODO add validation here
+        let errors = errors
+            .into_iter()
+            .map(|e| match e {
+                ParseErr::MessageAt(msg, txt_pos) => ParseErr::MessageAtItem(
+                    msg,
+                    SourceCodeItem::new(
+                        TextRange::new(txt_pos, txt_pos).into(),
+                        "".to_string(),
+                        sf_node_addr,
+                    ),
+                ),
+                _ => {
+                    warn!("Not mapping error and giving it a SourceCodeItem{:?}", e);
+                    e
+                }
+            })
+            .map(|e| e.into())
+            .collect();
+
+        // TODO add general ast validation here
         // errors.extend(validation::validate(&root));
 
-        Outcome::new(Parse::new(code, green), errors)
-    }
-
-    pub fn source_file_node(&self) -> SourceFileNode {
-        self.cast::<SourceFileNode>()
-            .expect("Only use this func, if your parsed a source file")
-    }
-    pub fn is_sf_parse(&self) -> bool {
-        self.cast::<SourceFileNode>().is_some()
-    }
-
-    pub fn syntax_node(&self) -> SyntaxNode {
-        SyntaxNode::new_root(self.green.clone())
-    }
-
-    pub fn cast<T: AstNode>(&self) -> Option<T> {
-        T::cast(self.syntax_node())
-    }
-    pub fn cast_elem<T: AstElement>(&self) -> Option<T> {
-        T::cast(self.syntax_node().into())
+        Outcome::new(Parse::new(source, sf_node), errors)
     }
 }

@@ -72,8 +72,7 @@ impl ModInfo {
     }
 
     pub fn module_from_parse(parse: Parse, mod_id: ModPath) -> Outcome<ScopeFrame<Variable>> {
-        assert!(parse.is_sf_parse());
-        Self::module_from_sf_node(mod_id, parse.source_file_node(), parse.source)
+        Self::module_from_sf_node(mod_id, parse.sf_node, parse.source)
     }
 
     /// Convert a SourceFileNode to a ScopeFrame representation.

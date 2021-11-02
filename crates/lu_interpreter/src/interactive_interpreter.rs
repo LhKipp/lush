@@ -31,7 +31,7 @@ impl InteractiveInterpreter {
     pub fn eval_line(&mut self, code: &str) -> LuResults<Value> {
         let code: SourceCode = code.into();
         let parse = Parse::source_file(code).as_results()?;
-        let parsed_node = parse.source_file_node();
+        let parsed_node = parse.sf_node.clone();
         let (line_mod_path, mut modules) =
             modules_from_start_parse(parse, &self.config.build_load_modules_config())
                 .as_results()?;

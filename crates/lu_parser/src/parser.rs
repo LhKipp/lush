@@ -2,6 +2,7 @@
 
 use log::{debug, trace};
 use std::cell::Cell;
+use text_size::TextSize;
 
 use lu_error::ParseErr;
 
@@ -21,6 +22,7 @@ pub const CMT_WS: [SyntaxKind; 2] = [Comment, Whitespace];
 pub struct Parser {
     token_source: TokenSource,
     events: Vec<Event>,
+    text_pos: TextSize,
     steps: Cell<u32>,
 }
 
@@ -31,6 +33,7 @@ impl Parser {
             token_source,
             events: Vec::new(),
             steps: Cell::new(0),
+            text_pos: 0.into(),
         }
     }
 
@@ -192,8 +195,7 @@ impl Parser {
             return true;
         }
         trace!("Expected {}, but found none. Creating error.", kinds);
-        let err: ParseErr = format!("expected {}", kinds).into();
-        self.error(err);
+        self.error(format!("expected {}", kinds));
         false
     }
 
@@ -206,8 +208,7 @@ impl Parser {
             return true;
         }
         trace!("Expected_as {}, but found none. Creating error.", kinds);
-        let err: ParseErr = format!("expected {}", kinds).into();
-        self.error(err);
+        self.error(format!("expected {}", kinds).into());
         false
     }
 
@@ -219,8 +220,7 @@ impl Parser {
         after: TS2,
     ) -> bool {
         if !self.eat_after(kinds, after) {
-            let err: ParseErr = format!("expected {}", kinds.into()).into();
-            self.error(err);
+            self.error(format!("expected {}", kinds.into()).into());
             false
         } else {
             true
@@ -235,8 +235,7 @@ impl Parser {
         after: TS2,
     ) -> bool {
         if !self.eat_after_as(kinds.clone(), as_, after) {
-            let err: ParseErr = format!("expected {}", kinds.into()).into();
-            self.error(err);
+            self.error(format!("expected {}", kinds.into()).into());
             false
         } else {
             true
@@ -301,8 +300,7 @@ impl Parser {
     }
 
     /// Emit error `err`
-    pub(crate) fn error<E: Into<ParseErr>>(&mut self, err: E) {
-        let err = err.into();
+    pub(crate) fn error(&mut self, err: String) {
         debug!(
             "Parser error: {:?} (nth_tokens(0,1,2): {} {} {})",
             err,
@@ -310,25 +308,25 @@ impl Parser {
             self.nth(1),
             self.nth(2)
         );
-        self.push_event(Event::Error(err));
+        self.push_event(Event::Error(ParseErr::MessageAt(err, self.text_pos)));
     }
     /// Create an error node and consume the next token.
     pub(crate) fn err_recover(&mut self, message: &str, recovery: TokenSet) {
         match self.current() {
             T!["{"] | T!["}"] => {
-                self.error(message);
+                self.error(message.to_string());
                 return;
             }
             _ => (),
         }
 
         if self.at(recovery) {
-            self.error(message);
+            self.error(message.to_string());
             return;
         }
 
         let m = self.start();
-        self.error(message);
+        self.error(message.to_string());
         self.bump_any();
         m.complete(self, Error);
     }
@@ -340,6 +338,7 @@ impl Parser {
 
     pub(crate) fn do_bump(&mut self, token: Token) {
         trace!("Eating: {}", token.kind);
+        self.text_pos += token.len;
         self.push_event(Event::Token(token));
     }
 

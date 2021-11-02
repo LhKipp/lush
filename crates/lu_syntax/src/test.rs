@@ -20,7 +20,7 @@ mod tests {
         let parse = Parse::source_file(src);
         let tree = parse
             .map(|parse| {
-                let s = format!("\n{:#?}\n", parse.source_file_node());
+                let s = format!("\n{:#?}\n", parse.sf_node);
                 debug!("{}", s);
                 s
             })

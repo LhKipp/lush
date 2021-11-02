@@ -11,11 +11,11 @@ fn func1 (
 - Token: "Whitespace (len: 1)"
 - Start: Signature
 - Token: "LeftParenthesis (len: 1)"
-- Error: "Message(\"expected RightParenthesis\")"
+- Error: "MessageAt(\"expected RightParenthesis\", 10)"
 - Finish: ""
-- Error: "Message(\"expected Newline\")"
+- Error: "MessageAt(\"expected Newline\", 10)"
 - Start: BlockStmt
-- Error: "Message(\"expected EndKeyword\")"
+- Error: "MessageAt(\"expected EndKeyword\", 10)"
 - Finish: ""
 - Finish: ""
 - Finish: ""

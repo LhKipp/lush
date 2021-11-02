@@ -21,7 +21,7 @@ impl Rule for ValueExprRule {
         // This func parses rules of value_expr_rule but with pratt parsing and math nodes
         let expr_ = expr(p);
         if expr_.is_none() {
-            p.error("Expected an expression");
+            p.error("Expected an expression".to_string());
         }
         expr_
     }
@@ -219,7 +219,7 @@ impl Rule for StringExprRule {
         ));
 
         if p.current() == Newline {
-            p.error("Unterminated string literal");
+            p.error("Unterminated string literal".to_string());
         }
 
         p.eat(quote_type);

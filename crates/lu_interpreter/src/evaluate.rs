@@ -28,16 +28,13 @@ macro_rules! handle_dbg_intervention_before {
         log::debug!("Handling dbg intervention {:?}", $dbg_result);
         match $dbg_result {
             Some(lu_dbg::DbgIntervention::ContinueAsIfStmtRet(val_parse)) => {
-                let node = val_parse
-                    .cast::<lu_syntax::ast::SourceFileNode>()
-                    .expect("The parse of ContinueAsIfStmtRet always castable to SourceFileNode");
                 // Don't print out evaluated parse
                 // TODO save state from before
                 lu_interpreter_structs::special_scope_vars::set_silence_stmt_returns(
                     true,
                     $scope.lock().get_cur_frame_mut(),
                 );
-                let result = match node.evaluate($scope) {
+                let result = match val_parse.sf_node.evaluate($scope) {
                     Ok(val) => Ok(val),
                     Err(e) => {
                         todo!("Dbger should only accept correct values: {:?}", e)

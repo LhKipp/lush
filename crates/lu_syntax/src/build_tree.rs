@@ -1,8 +1,8 @@
-use log::{debug, warn};
+use log::debug;
 use std::mem;
 
-use lu_error::{ParseErr, SourceCodeItem};
-use lu_parser::{grammar::Rule, Event};
+use lu_error::ParseErr;
+use lu_parser::{grammar::SourceFileRule, Event};
 use rowan::GreenNode;
 
 use crate::{
@@ -57,16 +57,6 @@ impl<'a> TreeBuilder<'a> {
 
     fn error(&mut self, error: ParseErr) {
         debug!("BuildTree: error {:?}", error);
-        let error = match error {
-            ParseErr::Message(msg) => {
-                // +1 so we have a real range
-                ParseErr::MessageAt(msg, SourceCodeItem::tmp_todo_item())
-            }
-            _ => {
-                warn!("TODO BuildTree::build error: Not giving location to error from parser");
-                error
-            }
-        };
         self.inner.error(error)
     }
 
@@ -96,9 +86,9 @@ impl<'a> TreeBuilder<'a> {
         self.inner.token(token.kind, text);
     }
 
-    pub fn build(text: &'a str, rule: &dyn Rule) -> (GreenNode, Vec<ParseErr>) {
+    pub fn build(text: &'a str) -> (GreenNode, Vec<ParseErr>) {
         let mut sink = Self::new(text);
-        let mut events = lu_parser::parse_as(text, rule);
+        let mut events = lu_parser::parse_as(text, &SourceFileRule {});
         let mut forward_parents = Vec::new();
         for i in 0..events.len() {
             match mem::replace(&mut events[i], Event::tombstone()) {

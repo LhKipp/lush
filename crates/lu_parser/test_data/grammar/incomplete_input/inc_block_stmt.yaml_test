@@ -17,7 +17,7 @@ begin
 - Token: "Number (len: 1)"
 - Finish: ""
 - Finish: ""
-- Error: "Message(\"expected EndKeyword\")"
+- Error: "MessageAt(\"expected EndKeyword\", 16)"
 - Finish: ""
 - Finish: ""
 - Finish: ""

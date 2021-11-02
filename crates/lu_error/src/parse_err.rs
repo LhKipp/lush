@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use text_size::TextSize;
 
 use crate::{LuErr, LuResult, SourceCodeItem};
 
@@ -10,14 +11,8 @@ pub struct ParseErrs {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum ParseErr {
     /// Catch-all
-    Message(String),
-    MessageAt(String, SourceCodeItem),
-}
-
-impl<S: Into<String>> From<S> for ParseErr {
-    fn from(s: S) -> Self {
-        ParseErr::Message(s.into())
-    }
+    MessageAt(String, TextSize),
+    MessageAtItem(String, SourceCodeItem),
 }
 
 impl<T> From<ParseErr> for LuResult<T> {
