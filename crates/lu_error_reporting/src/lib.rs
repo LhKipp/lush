@@ -1,5 +1,6 @@
 mod report_ast_err;
 mod report_eval_err;
+mod report_parse_err;
 mod report_ty_err;
 
 use codespan_reporting::{
@@ -11,14 +12,14 @@ use codespan_reporting::{
     },
 };
 use log::debug;
-use lu_error::{LuErr, ParseErr, SourceCodeItem};
+use lu_error::{LuErr, SourceCodeItem};
 use lu_interpreter_structs::*;
 use lu_syntax::{ast, AstNode};
 use std::collections::HashMap;
 
 use crate::{
     report_ast_err::ast_err_to_diagnostic, report_eval_err::eval_err_to_diagnostic,
-    report_ty_err::ty_err_to_diagnostic,
+    report_parse_err::parse_err_to_diagnostic, report_ty_err::ty_err_to_diagnostic,
 };
 
 // use codespan_reporting::SimpleFiles;
@@ -42,9 +43,7 @@ pub fn report_to_term(errors: &[LuErr], scope: &Scope<Variable>) -> Result<(), S
     let config = codespan_reporting::term::Config::default();
 
     for diagnostic in errors.iter().map(|error| match error {
-        LuErr::Parse(ParseErr::Message(msg)) => Diagnostic::error()
-            .with_message(msg)
-            .with_code("Internal Error"),
+        LuErr::Parse(parse_err) => parse_err_to_diagnostic(parse_err, &sf_node_addr_to_file_id),
         LuErr::Ty(ty_err) => ty_err_to_diagnostic(ty_err, &sf_node_addr_to_file_id),
         LuErr::FS(fs_err) => Diagnostic::error()
             .with_message(fs_err.to_string())

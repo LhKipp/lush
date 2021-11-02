@@ -1,7 +1,7 @@
-use log::debug;
+use log::{debug, warn};
 use std::mem;
 
-use lu_error::ParseErr;
+use lu_error::{ParseErr, SourceCodeItem};
 use lu_parser::{grammar::Rule, Event};
 use rowan::GreenNode;
 
@@ -57,6 +57,16 @@ impl<'a> TreeBuilder<'a> {
 
     fn error(&mut self, error: ParseErr) {
         debug!("BuildTree: error {:?}", error);
+        let error = match error {
+            ParseErr::Message(msg) => {
+                // +1 so we have a real range
+                ParseErr::MessageAt(msg, SourceCodeItem::tmp_todo_item())
+            }
+            _ => {
+                warn!("TODO BuildTree::build error: Not giving location to error from parser");
+                error
+            }
+        };
         self.inner.error(error)
     }
 

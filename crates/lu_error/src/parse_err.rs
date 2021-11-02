@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{LuErr, LuResult};
+use crate::{LuErr, LuResult, SourceCodeItem};
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, new)]
 pub struct ParseErrs {
@@ -11,6 +11,7 @@ pub struct ParseErrs {
 pub enum ParseErr {
     /// Catch-all
     Message(String),
+    MessageAt(String, SourceCodeItem),
 }
 
 impl<S: Into<String>> From<S> for ParseErr {
