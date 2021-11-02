@@ -1,6 +1,5 @@
 use clap::App;
 use lu_cli::start_cli;
-use lu_error_reporting::report_to_term;
 use lu_interpreter::{Interpreter, InterpreterCfg};
 use lu_interpreter_structs::*;
 use lu_text_util::SourceCode;
@@ -66,7 +65,9 @@ fn ret_code_main() -> i32 {
                 // maybe pass via flag?
             }
             Err(errs) => {
-                if let Err(e) = report_to_term(&errs, &intprtr.scope.unwrap().lock()) {
+                if let Err(e) =
+                    lu_error_reporting::report_to_term(&errs, &intprtr.scope.unwrap().lock())
+                {
                     eprintln!("Ups: An error happend, while printing errors: {}", e)
                 }
                 return 2;
