@@ -846,6 +846,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "lu_error_reporting"
+version = "0.1.0"
+dependencies = [
+ "codespan-reporting",
+ "lu_error",
+ "lu_interpreter_structs",
+ "lu_syntax",
+]
+
+[[package]]
 name = "lu_fs"
 version = "0.1.0"
 dependencies = [

@@ -35,7 +35,6 @@ pub enum LuErr {
     Eval(EvalErr),
     Ast(AstErr),
     Internal(String),
-    Errors(),
 }
 
 impl<E: Error> From<E> for LuErr {

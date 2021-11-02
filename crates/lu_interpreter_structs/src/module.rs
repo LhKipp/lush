@@ -19,7 +19,7 @@ pub struct ModInfo {
     pub src: SourceCode,
     /// Some for regular modules, None for rust-std-modules
     /// None for Cli module (must be recomputed if needed)
-    pub node: Option<SourceFileNode>,
+    pub node: Option<SourceFileNode>, // TODO 
     pub use_paths: Vec<UsePath>,
 }
 

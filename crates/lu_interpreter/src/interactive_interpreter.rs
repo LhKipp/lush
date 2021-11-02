@@ -48,6 +48,7 @@ impl InteractiveInterpreter {
         assert!(cur_frame.tag.is_module_frame());
         cur_frame.update_cli_module_frame(line_mod);
         for module in modules {
+            // TODO only push if is not yet present
             self.ty_checker.scope.push_sf_frame(module);
         }
 

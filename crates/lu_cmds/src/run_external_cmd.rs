@@ -71,7 +71,7 @@ impl Command for RunExternalCmd {
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| {
-                EvalErr::SpawningExternalProcessFailed(self.cmd_node.to_item(), format!("{:?}", e))
+                EvalErr::SpawningExternalProcessFailed(self.cmd_node.to_item(), e.to_string())
             })?;
 
         if !stdin.is_nil() {

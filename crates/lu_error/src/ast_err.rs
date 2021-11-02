@@ -20,18 +20,6 @@ pub enum AstErr {
     CmdNotInScope(SourceCodeItem),
 }
 
-impl AstErr {
-    #![allow(unused_variables)]
-    pub fn report(&self) -> Diagnostic<()> {
-        match self {
-            AstErr::Message(_) => todo!(),
-            AstErr::VarNotInScope(_) => todo!(),
-            AstErr::StrctNotInScope(_) => todo!(),
-            AstErr::CmdNotInScope(_) => todo!(),
-        }
-    }
-}
-
 impl<S: Into<String>> From<S> for AstErr {
     fn from(s: S) -> Self {
         AstErr::Message(s.into())

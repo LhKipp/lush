@@ -213,6 +213,10 @@ impl<T: fmt::Debug + 'static> Scope<T> {
         let cur_id = self.get_cur_frame_id();
         self.cur_frame_id = cur_id.ancestors(&self.arena).skip(1).next();
     }
+
+    pub fn get_all_frames(&self) -> impl Iterator<Item = &ScopeFrame<T>> + '_ {
+        self.arena.iter().map(|node| node.get())
+    }
 }
 
 impl Scope<Variable> {
