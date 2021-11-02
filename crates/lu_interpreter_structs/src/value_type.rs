@@ -228,7 +228,8 @@ impl TcVariant for ValueType {
                 (ValueType::Unspecified, other) | (other, ValueType::Unspecified) => {
                     Some(other.clone())
                 }
-                (ValueType::Any, other) | (other, ValueType::Any) => Some(other.clone()),
+                // Any cannot be made more concrete
+                (ValueType::Any, _) | (_, ValueType::Any) => Some(ValueType::Any),
                 (ValueType::String, ValueType::BareWord) => Some(ValueType::String),
                 (ValueType::BareWord, ValueType::String) => Some(ValueType::String),
                 (
