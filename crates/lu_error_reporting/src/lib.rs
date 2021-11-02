@@ -10,6 +10,7 @@ use codespan_reporting::{
         termcolor::{ColorChoice, StandardStream},
     },
 };
+use log::debug;
 use lu_error::{LuErr, ParseErr, SourceCodeItem};
 use lu_interpreter_structs::*;
 use lu_syntax::{ast, AstNode};
@@ -24,6 +25,7 @@ use crate::{
 
 pub(crate) type SFAddrToFileMap = HashMap<usize, usize>;
 pub fn report_to_term(errors: &[LuErr], scope: &Scope<Variable>) -> Result<(), String> {
+    debug!("Reporting {} errors to terminal", errors.len());
     let mut files = SimpleFiles::new();
     let mut sf_node_addr_to_file_id = HashMap::new();
 

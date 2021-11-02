@@ -215,7 +215,7 @@ impl<T: fmt::Debug + 'static> Scope<T> {
     }
 
     pub fn get_all_frames(&self) -> impl Iterator<Item = &ScopeFrame<T>> + '_ {
-        self.arena.iter().map(|node| node.get())
+        self.arena.iter().filter(|node| !node.is_removed()).map(|node| node.get())
     }
 }
 
