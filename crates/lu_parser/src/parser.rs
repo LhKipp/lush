@@ -22,7 +22,7 @@ pub const CMT_WS: [SyntaxKind; 2] = [Comment, Whitespace];
 pub struct Parser {
     token_source: TokenSource,
     events: Vec<Event>,
-    text_pos: TextSize,
+    pub(crate) text_pos: TextSize,
     steps: Cell<u32>,
 }
 
@@ -62,7 +62,7 @@ impl Parser {
         assert!(n <= 3);
 
         let steps = self.steps.get();
-        if steps > 5000 {
+        if steps > 20000 {
             panic!("the parser seems stuck")
         }
         self.steps.set(steps + 1);

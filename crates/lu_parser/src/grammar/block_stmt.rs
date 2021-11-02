@@ -98,7 +98,12 @@ impl Rule for BlockStmtRule {
             let next_non = p.next_non(CMT_NL_WS);
             next_non != Eof && !self.end_kinds.contains(next_non)
         } {
+            let text_pos_before = p.text_pos.clone();
             self.statement_rule.parse(p);
+            if text_pos_before == p.text_pos {
+                debug!("No progress by parsing block statement rule. Breaking block_stmt rule");
+                break;
+            }
         }
 
         p.eat_while(CMT_NL_WS);
