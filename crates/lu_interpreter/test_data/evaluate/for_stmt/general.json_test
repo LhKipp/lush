@@ -1,4 +1,4 @@
-1
+Iterate over string
 ===
 use std:array
 let vals = []
@@ -19,6 +19,32 @@ $vals
       },
       {
         "String": "3"
+      }
+    ]
+  }
+}
+...
+Iterate over array
+===
+use std:array
+let vals = []
+for x in [1 2 3]
+    let new_arry = push $vals $x
+    $vals = $new_arry
+end
+$vals
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 1.0
+      },
+      {
+        "Number": 2.0
+      },
+      {
+        "Number": 3.0
       }
     ]
   }
