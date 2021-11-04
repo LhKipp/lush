@@ -42,7 +42,7 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::LessThanSign(_) => Ok((lhs_val < rhs_val).into()),
             OperatorExprElement::LessOrEqualSign(_) => Ok((lhs_val <= rhs_val).into()),
             OperatorExprElement::EqualitySign(_) => Ok((lhs_val == rhs_val).into()),
-            OperatorExprElement::InequalitySign(_) => Ok((lhs_val == rhs_val).into()),
+            OperatorExprElement::InequalitySign(_) => Ok((lhs_val != rhs_val).into()),
             OperatorExprElement::BiggerThanSign(_) => Ok((lhs_val > rhs_val).into()),
             OperatorExprElement::BiggerOrEqualSign(_) => Ok((lhs_val >= rhs_val).into()),
 

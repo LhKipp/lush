@@ -1,0 +1,72 @@
+Equality
+===
+if 1 == 1
+    ret "ok"
+end
+---
+{
+  "Ok": {
+    "String": "ok"
+  }
+}
+...
+Inequality
+===
+if 1 != 2
+    ret "ok"
+end
+---
+{
+  "Ok": {
+    "String": "ok"
+  }
+}
+...
+Less than
+===
+if 1 < 2
+    ret "ok"
+end
+---
+{
+  "Ok": {
+    "String": "ok"
+  }
+}
+...
+Less or equal than
+===
+if 1 <= 1
+    ret "ok"
+end
+---
+{
+  "Ok": {
+    "String": "ok"
+  }
+}
+...
+Greater than
+===
+if 2 > 1
+    ret "ok"
+end
+---
+{
+  "Ok": {
+    "String": "ok"
+  }
+}
+...
+Greater or equal than
+===
+if 1 >= 1
+    ret "ok"
+end
+---
+{
+  "Ok": {
+    "String": "ok"
+  }
+}
+...
