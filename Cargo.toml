@@ -12,6 +12,7 @@ members = ["crates/*"]
 [dependencies]
 lu_cli = { version = "0.1.0", path = "crates/lu_cli" }
 lu_cfg_home = { version = "0.1.0", path = "crates/lu_cfg_home" }
+lu_test_support = { version = "0.1.0", path = "crates/lu_test_support" }
 lu_interpreter_structs = { version = "0.1.0", path = "crates/lu_interpreter_structs" }
 lu_interpreter = { version = "0.1.0", path = "crates/lu_interpreter" }
 lu_error = { version = "0.1.0", path = "crates/lu_error" }

@@ -1078,9 +1078,11 @@ dependencies = [
  "lu_error",
  "lu_interpreter",
  "lu_interpreter_structs",
+ "manifest-dir-macros",
  "parking_lot",
  "pretty_env_logger",
  "serde_json",
+ "temp-file",
  "temp_testdir",
  "vec_rc",
 ]
@@ -1109,7 +1111,20 @@ dependencies = [
  "lu_interpreter",
  "lu_interpreter_structs",
  "lu_stdx",
+ "lu_test_support",
  "lu_text_util",
+]
+
+[[package]]
+name = "manifest-dir-macros"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca7bbc41d799583acd24ed05a9c3db3c9275c93491b4e7cde0e609bb9598f2f0"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote 1.0.9",
+ "syn 1.0.74",
 ]
 
 [[package]]
@@ -1731,6 +1746,12 @@ name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+
+[[package]]
+name = "temp-file"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee71da36831f42b12ba5fa8bf3fc7a54305f9091f1fcb2409a80ad29aaf06152"
 
 [[package]]
 name = "temp_testdir"

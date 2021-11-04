@@ -1,10 +1,13 @@
+#[macro_use]
+extern crate manifest_dir_macros;
+pub mod binary;
 mod playground;
 pub mod test_prelude;
 
 #[macro_use]
 extern crate vec_rc;
 
-use std::rc::Rc;
+use std::{rc::Rc};
 
 pub use playground::*;
 use pretty_env_logger::env_logger;
@@ -12,6 +15,7 @@ use pretty_env_logger::env_logger;
 use lu_cmds::PrintCmd;
 use lu_interpreter::InterpreterCfg;
 use lu_interpreter_structs::{Command, ScopeFrame, ScopeFrameTag, Value, VarDeclNode, Variable};
+pub use temp_file::TempFile as TmpFile;
 
 pub fn init_logger() {
     let _ = env_logger::builder()
@@ -47,4 +51,8 @@ fn make_global_frame() -> ScopeFrame<Variable> {
         ));
     }
     frame
+}
+
+pub fn make_tmp_file(text: &[u8]) -> TmpFile {
+    temp_file::with_contents(text)
 }
