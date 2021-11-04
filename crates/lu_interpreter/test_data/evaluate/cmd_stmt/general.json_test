@@ -6,3 +6,13 @@ print "hi"
   "Ok": "Nil"
 }
 ...
+Barewords get promoted to string
+===
+fn fn_takes_str(arg: str)
+end
+fn_takes_str bareword_to_str
+---
+{
+  "Ok": "Nil"
+}
+...
