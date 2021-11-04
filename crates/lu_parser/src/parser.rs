@@ -8,11 +8,9 @@ use lu_error::ParseErr;
 
 use drop_bomb::DropBomb;
 
-use crate::T;
-
 use crate::{
     event::Event,
-    SyntaxKind::{self, Comment, Error, Newline, Tombstone, *},
+    SyntaxKind::{self, Comment, Newline, Tombstone, *},
     Token, TokenSet, TokenSource,
 };
 
@@ -310,27 +308,6 @@ impl Parser {
         );
         self.push_event(Event::Error(ParseErr::MessageAt(err, self.text_pos)));
     }
-    /// Create an error node and consume the next token.
-    pub(crate) fn err_recover(&mut self, message: &str, recovery: TokenSet) {
-        match self.current() {
-            T!["{"] | T!["}"] => {
-                self.error(message.to_string());
-                return;
-            }
-            _ => (),
-        }
-
-        if self.at(recovery) {
-            self.error(message.to_string());
-            return;
-        }
-
-        let m = self.start();
-        self.error(message.to_string());
-        self.bump_any();
-        m.complete(self, Error);
-    }
-
     pub(crate) fn do_bump_cur(&mut self) {
         let cur = self.token_source.take_and_advance();
         self.do_bump(cur);

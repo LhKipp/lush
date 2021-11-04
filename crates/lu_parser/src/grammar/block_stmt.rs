@@ -11,6 +11,7 @@ pub struct BlockStmtRule {
     pub end_kinds: TokenSet,
 
     pub statement_rule: Box<dyn Rule>,
+    pub try_recover: bool,
 }
 
 impl BlockStmtRule {
@@ -24,6 +25,7 @@ impl BlockStmtRule {
             eat_end: true,
             end_kinds: [EndKeyword].into(),
             statement_rule: Box::new(second_level_stmt()),
+            try_recover: false,
         }
     }
 
@@ -34,6 +36,7 @@ impl BlockStmtRule {
             eat_end: true,
             end_kinds: [EndKeyword].into(),
             statement_rule: Box::new(Lazy::<OrRule>::new(|| second_level_stmt())),
+            try_recover: false,
         }
     }
 
@@ -44,6 +47,7 @@ impl BlockStmtRule {
             eat_end: false,
             end_kinds: [Eof].into(),
             statement_rule: Box::new(top_level_stmt()),
+            try_recover: true,
         }
     }
 
@@ -54,6 +58,7 @@ impl BlockStmtRule {
             eat_end: false,
             end_kinds: [ElseKeyword, ElifKeyword, EndKeyword].into(),
             statement_rule: Box::new(second_level_stmt()),
+            try_recover: false,
         }
     }
 
@@ -63,6 +68,7 @@ impl BlockStmtRule {
             eat_end: true,
             end_kinds: [EndKeyword].into(),
             statement_rule: Box::new(second_level_stmt()),
+            try_recover: false,
         }
     }
 
@@ -72,7 +78,17 @@ impl BlockStmtRule {
             end_kinds: EndKeyword.into(),
             eat_end: true,
             statement_rule: Box::new(second_level_stmt()),
+            try_recover: false,
         }
+    }
+
+    /// Create an error node and consume the next token.
+    fn dump_till_match(&self, p: &mut Parser) {
+        let m = p.start();
+        while !self.statement_rule.matches(p) && !p.at(Eof) {
+            p.bump_any()
+        }
+        m.complete(p, Error);
     }
 }
 
@@ -101,8 +117,12 @@ impl Rule for BlockStmtRule {
             let text_pos_before = p.text_pos.clone();
             self.statement_rule.parse(p);
             if text_pos_before == p.text_pos {
-                debug!("No progress by parsing block statement rule. Breaking block_stmt rule");
-                break;
+                debug!("No progress by parsing block statement rule, but didn't found end keyword either.");
+                if self.try_recover {
+                    self.dump_till_match(p)
+                } else {
+                    break;
+                }
             }
         }
 

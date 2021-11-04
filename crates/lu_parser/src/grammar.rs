@@ -157,9 +157,11 @@ impl Rule for OrRule {
             rule.parse(p)
         } else {
             p.error(format!(
-                "Expected {}, but found {:?}",
+                "Expected {}, but found {}",
                 self.name(),
-                p.current()
+                // TODO can't realy tell whether ws has significance for any rule here...
+                // Best bet is to take next_non(CMT_NL_WS)
+                p.next_non(CMT_NL_WS)
             ));
             None
         }
@@ -202,7 +204,7 @@ impl Rule for SourceFileRule {
 
 fn second_level_stmt() -> OrRule {
     OrRule {
-        kind: Some("Second level stmt".into()),
+        kind: None,
         rules: vec_box![
             LetStmtRule {},
             PipedCmdsStmtRule {},
@@ -220,7 +222,7 @@ fn top_level_stmt() -> OrRule {
     second_level_stmt.rules.push(Box::new(UseStmtRule {}));
     second_level_stmt.rules.push(Box::new(FnStmtRule {}));
     second_level_stmt.rules.push(Box::new(StrctStmtRule {}));
-    second_level_stmt.kind = Some("Top level stmt".into());
+    second_level_stmt.kind = None;
 
     second_level_stmt
 }
