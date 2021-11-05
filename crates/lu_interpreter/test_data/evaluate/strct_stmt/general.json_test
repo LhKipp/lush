@@ -19,3 +19,15 @@ Ip { v: 1 }
   }
 }
 ...
+Strct access works
+===
+struct Ip{ v: num}
+let strct = Ip { v: 1 }
+$strct.v
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...

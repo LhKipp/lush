@@ -55,13 +55,30 @@ impl Evaluable for StringExprNode {
 impl Evaluable for ValuePathExprNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         let name_parts = self.var_name_parts();
-        assert_eq!(name_parts.len(), 1); // TODO handle indexing into table
-        if let Some(var) = scope.lock().find_var(&name_parts[0]) {
-            Ok(var.val.clone())
-        } else {
-            let e: RetValOrErr = LuErr::Eval(EvalErr::VarNotFound(self.to_item())).into();
-            Err(e)
+        assert!(!name_parts.is_empty());
+        let l_scope = scope.lock();
+        let mut prev_var = l_scope
+            .find_var(&name_parts[0])
+            .expect("var always found")
+            .val
+            .clone();
+
+        for index_name in &name_parts[1..] {
+            // Its field indexing into a struct
+            let (_, strct_fields) = prev_var.as_strct().expect("Prev var must be strct");
+            prev_var = strct_fields
+                .iter()
+                .find_map(|(field_name, val)| {
+                    if field_name == index_name {
+                        Some(val.clone())
+                    } else {
+                        None
+                    }
+                })
+                .expect("Index always works");
         }
+
+        Ok(prev_var)
     }
 }
 
