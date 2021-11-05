@@ -27,3 +27,29 @@ $x
   }
 }
 ...
+Fn without signature takes in var
+===
+fn take_num_ret_num
+    ret $in
+end
+1 | take_num_ret_num
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
+Fn with signature without in takes in var
+===
+fn take_num_ret_num(arg : str)
+    ret $in
+end
+1 | take_num_ret_num hi
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
