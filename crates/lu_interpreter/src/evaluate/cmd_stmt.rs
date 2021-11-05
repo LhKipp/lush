@@ -106,7 +106,24 @@ fn insert_cmd_args_into_scope(
             "TyChecking does not work. Should be nothing left"
         );
     }
-    // Insert flags
+
+    // Insert non passed bool flags (flag switches) as false if they are not present
+    for flag_sign in &cmd_sign.flags {
+        if flag_sign.ty == ValueType::Bool
+            // And not yet passed
+            && !flag_vals.iter().any(|(flag_name, _, _)| {
+                flag_sign.is_named_by(flag_name)
+            })
+        {
+            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
+                flag_sign.best_name(),
+                Value::Bool(false),
+                flag_sign.decl.clone().into(),
+            ));
+        }
+    }
+
+    // Insert passed flags
     for (flag_name, val, usage_item) in flag_vals {
         scope.lock().get_cur_frame_mut().insert_var(Variable::new(
             flag_name,

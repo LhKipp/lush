@@ -24,4 +24,17 @@ f1 --flag
   }
 }
 ...
+Flag without ty is bool flag 2
+===
+fn f1( --flag -f )
+    ret $flag
+end
+f1
+---
+{
+  "Ok": {
+    "Bool": false
+  }
+}
+...
 

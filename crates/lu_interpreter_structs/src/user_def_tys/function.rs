@@ -5,7 +5,7 @@ use crate::{
 use derive_builder::Builder;
 use derive_new::new;
 use log::trace;
-use lu_error::{LuResult, SourceCodeItem, lu_source_code_item};
+use lu_error::{lu_source_code_item, LuResult, SourceCodeItem};
 use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, SignatureNode};
 use lu_syntax::{AstNode, AstToken};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
@@ -78,6 +78,23 @@ pub struct FlagSignature {
 }
 
 impl FlagSignature {
+    pub fn is_named_by(&self, name: &str) -> bool {
+        let mut result = false;
+        if let Some(long_name) = &self.long_name {
+            result = result || name == long_name
+        }
+        if let Some(short_name) = &self.short_name {
+            result = result || name.len() == 1 && &name.chars().next().unwrap() == short_name
+        }
+        result
+    }
+
+    pub fn best_name(&self) -> String {
+        self.long_name
+            .clone()
+            .or(self.short_name.map(|c| c.to_string()))
+            .unwrap()
+    }
     pub fn is_required(&self) -> bool {
         !self.is_opt
     }
