@@ -72,7 +72,7 @@ pub struct FlagSignature {
     pub long_name: Option<String>,
     pub short_name: Option<char>,
     pub ty: ValueType,
-    #[new(default)] // TODO this default should be false, making every flag necessary
+    #[new(value = "true")]
     pub is_opt: bool,
     pub decl: SourceCodeItem,
 }
