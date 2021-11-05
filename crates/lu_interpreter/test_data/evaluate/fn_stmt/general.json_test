@@ -53,3 +53,26 @@ end
   }
 }
 ...
+Fn with signature takes args var
+===
+fn passthrough
+    ret $args
+end
+passthrough 1 2 3
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 1.0
+      },
+      {
+        "Number": 2.0
+      },
+      {
+        "Number": 3.0
+      }
+    ]
+  }
+}
+...
