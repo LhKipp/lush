@@ -51,3 +51,45 @@ end
 - Newline: 1
 - EndKeyword: 3
 ...
+Fn with generics
+===
+fn map (in: [T] ret: [U] map_fn: fn(ret:U arg: T))
+end
+---
+- FnKeyword: 2
+- Whitespace: 1
+- BareWord: 3
+- Whitespace: 1
+- LeftParenthesis: 1
+- InKeyword: 2
+- DoublePoint: 1
+- Whitespace: 1
+- LeftRectangularBrackets: 1
+- GenericType: 1
+- RightRectangularBrackets: 1
+- Whitespace: 1
+- RetKeyword: 3
+- DoublePoint: 1
+- Whitespace: 1
+- LeftRectangularBrackets: 1
+- GenericType: 1
+- RightRectangularBrackets: 1
+- Whitespace: 1
+- BareWord: 6
+- DoublePoint: 1
+- Whitespace: 1
+- FnKeyword: 2
+- LeftParenthesis: 1
+- RetKeyword: 3
+- DoublePoint: 1
+- GenericType: 1
+- Whitespace: 1
+- BareWord: 3
+- DoublePoint: 1
+- Whitespace: 1
+- GenericType: 1
+- RightParenthesis: 1
+- RightParenthesis: 1
+- Newline: 1
+- EndKeyword: 3
+...

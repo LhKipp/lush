@@ -29,6 +29,38 @@ func
   ]
 }
 ...
+Arg not passed 2
+===
+fn take_num_ret_num(arg: str)
+    ret $in
+end
+1 | take_num_ret_num
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "UnsatisfiedArg": {
+          "arg_decl": {
+            "content": "arg: str",
+            "range": [
+              20,
+              28
+            ]
+          },
+          "cmd_stmt": {
+            "content": "take_num_ret_num",
+            "range": [
+              50,
+              66
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...
 To many args passed
 ===
 fn func()

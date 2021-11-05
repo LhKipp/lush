@@ -13,7 +13,7 @@ impl TypeCheck for StatementElement {
         match self {
             // StatementElement::ForStmt(n) => n.typecheck(ty_state),
             // StatementElement::IfStmt(n) => n.typecheck(ty_state),
-            // StatementElement::PipedCmdsStmt(n) => n.typecheck(ty_state),
+            StatementElement::PipedCmdsStmt(n) => n.typecheck(ty_state),
             StatementElement::LetStmt(n) => n.typecheck(ty_state),
             StatementElement::FnStmt(n) => n.typecheck(ty_state),
             StatementElement::CmdStmt(n) => n.typecheck(ty_state),

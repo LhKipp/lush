@@ -51,7 +51,7 @@ pub enum SyntaxKind {
     StringKeyword,
     #[token("ret")]
     RetKeyword,
-    #[regex("[T|U][0-9]", priority = 10)]
+    #[regex("[TU][0-9]?", priority = 1000)]
     GenericType,
     ArrayType,
     FnType,

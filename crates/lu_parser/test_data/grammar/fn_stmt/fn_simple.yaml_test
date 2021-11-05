@@ -89,3 +89,83 @@ end
 - Finish: ""
 - Finish: ""
 ...
+fn with generics
+===
+fn map (in: [T] ret: [U] map_fn: fn(ret:U arg: T))
+end
+---
+- Start: FnStmt
+- Token: "FnKeyword (len: 2)"
+- Token: "Whitespace (len: 1)"
+- Token: "FnDeclName (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ArgSignature
+- Token: "ArgName (len: 2)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Start: ArrayType
+- Token: "LeftRectangularBrackets (len: 1)"
+- Start: LuType
+- Token: "GenericType (len: 1)"
+- Finish: ""
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Start: ArgSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ArgName (len: 3)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Start: ArrayType
+- Token: "LeftRectangularBrackets (len: 1)"
+- Start: LuType
+- Token: "GenericType (len: 1)"
+- Finish: ""
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Start: ArgSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ArgName (len: 6)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Start: FnType
+- Token: "FnKeyword (len: 2)"
+- Start: Signature
+- Token: "LeftParenthesis (len: 1)"
+- Start: ArgSignature
+- Token: "ArgName (len: 3)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "GenericType (len: 1)"
+- Finish: ""
+- Finish: ""
+- Start: ArgSignature
+- Token: "Whitespace (len: 1)"
+- Token: "ArgName (len: 3)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "GenericType (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Start: BlockStmt
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+...
