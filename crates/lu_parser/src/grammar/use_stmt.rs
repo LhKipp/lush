@@ -25,49 +25,41 @@ impl Rule for UseStmtRule {
         }
         p.eat_while(CMT_NL_WS);
 
-        let use_path_part_rule = FileNameRule {};
-        use_path_part_rule.parse(p);
-        loop {
-            if !p.eat(T![:]) {
-                break;
-            }
-            if use_path_part_rule.parse(p).is_none() {
-                break;
-            }
-        }
-
+        let file_name_rule = file_name_rule();
+        if file_name_rule.matches(p) {
+            file_name_rule.parse(p)
+        } else {
+            PluginUseStmtRule {}.parse(p)
+        };
         Some(m.complete(p, UseStmt))
     }
 }
 
-pub struct FileNameRule {}
-impl Rule for FileNameRule {
+pub struct PluginUseStmtRule {}
+impl Rule for PluginUseStmtRule {
     fn name(&self) -> String {
-        "FileNameRule".to_string()
+        "PluginUseStmtRule".into()
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        let next_token = p.next_non(CMT_NL_WS);
-        next_token == BareWord || next_token == T![.]
+        p.next_non(CMT_NL_WS) == BareWord
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        if !self.matches(p) {
+        let m = p.start();
+        if !p.expect(BareWord) {
+            m.abandon(p);
             return None;
         }
-
-        let m = p.start();
         loop {
-            let eaten = if p.eat(T![.]) {
-                p.eat(BareWord)
-            } else {
-                p.eat(BareWord)
-            };
-            if !eaten {
+            if !p.eat_after(T![:], CMT_NL_WS) {
+                break;
+            }
+            if !p.expect_after(BareWord, CMT_NL_WS) {
                 break;
             }
         }
-        Some(m.complete(p, FileName))
+        Some(m.complete(p, PluginUseStmt))
     }
 }
 

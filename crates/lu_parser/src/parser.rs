@@ -14,6 +14,7 @@ use crate::{
     Token, TokenSet, TokenSource,
 };
 
+pub const CMT_NL_WS_BW: [SyntaxKind; 4] = [Comment, Newline, Whitespace, BareWord];
 pub const CMT_NL_WS: [SyntaxKind; 3] = [Comment, Newline, Whitespace];
 pub const CMT_WS: [SyntaxKind; 2] = [Comment, Whitespace];
 

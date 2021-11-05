@@ -87,12 +87,15 @@ Config(
     ( name: "StrctFieldName"            , is_token: true                               , )                ,
 
     ( name: "FileName"                   , is_node: true                                , has_rule: false   , ) ,
+    ( name: "AbsFileName"                , is_node: true                                , has_rule: false   , ) ,
+    ( name: "RelFileName"                , is_node: true                                , has_rule: false   , ) ,
 
     // === RULES ===
     ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "StrctStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "RedirStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "UseStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
+    ( name: "PluginUseStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "StrctField"                , is_node: true                                , has_rule: false   , ) , // TODO has rule but not needed
     ( name: "StrctCtorExpr"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "StrctFieldCtorStmt"                , is_node: true                                , has_rule: false   , ) , // TODO has rule but not needed
