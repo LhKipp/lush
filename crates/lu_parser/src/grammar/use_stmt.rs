@@ -52,10 +52,10 @@ impl Rule for PluginUseStmtRule {
             return None;
         }
         loop {
-            if !p.eat_after(T![:], CMT_NL_WS) {
+            if !p.eat(T![:]) {
                 break;
             }
-            if !p.expect_after(BareWord, CMT_NL_WS) {
+            if !p.eat_while_file_name_elem() {
                 break;
             }
         }

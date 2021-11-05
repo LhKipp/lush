@@ -10,4 +10,20 @@ use std
 - Finish: ""
 - Finish: ""
 ...
+2
+===
+use plugin:plug1_f1.lu
+---
+- Start: UseStmt
+- Token: "UseKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Start: PluginUseStmt
+- Token: "BareWord (len: 6)"
+- Token: "DoublePoint (len: 1)"
+- Token: "BareWord (len: 8)"
+- Token: "Point (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+- Finish: ""
+...
 

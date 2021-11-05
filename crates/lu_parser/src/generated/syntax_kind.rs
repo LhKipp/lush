@@ -142,7 +142,6 @@ pub enum SyntaxKind {
     #[regex("[A-Z]+[_a-zA-Z0-9]")]
     StrctName,
     StrctFieldName,
-    FileName,
     AbsFileName,
     RelFileName,
     SourceFile,
@@ -175,7 +174,6 @@ pub enum SyntaxKind {
     ArrayExpr,
     TableExpr,
     BooleanExpr,
-    UsePath,
     CmdOrValueExpr,
     ValueExpr,
     Statement,
@@ -185,6 +183,8 @@ pub enum SyntaxKind {
     CmdArg,
     Flag,
     RedirToValue,
+    FileName,
+    FileNamePart,
     __LAST,
 }
 
@@ -264,7 +264,6 @@ impl SyntaxKind{
             SyntaxKind::Number => "Number",
             SyntaxKind::StrctName => "StrctName",
             SyntaxKind::StrctFieldName => "StrctFieldName",
-            SyntaxKind::FileName => "FileName",
             SyntaxKind::AbsFileName => "AbsFileName",
             SyntaxKind::RelFileName => "RelFileName",
             SyntaxKind::SourceFile => "SourceFile",
@@ -297,7 +296,6 @@ impl SyntaxKind{
             SyntaxKind::ArrayExpr => "ArrayExpr",
             SyntaxKind::TableExpr => "TableExpr",
             SyntaxKind::BooleanExpr => "BooleanExpr",
-            SyntaxKind::UsePath => "UsePath",
             SyntaxKind::CmdOrValueExpr => "CmdOrValueExpr",
             SyntaxKind::ValueExpr => "ValueExpr",
             SyntaxKind::Statement => "Statement",
@@ -307,6 +305,8 @@ impl SyntaxKind{
             SyntaxKind::CmdArg => "CmdArg",
             SyntaxKind::Flag => "Flag",
             SyntaxKind::RedirToValue => "RedirToValue",
+            SyntaxKind::FileName => "FileName",
+            SyntaxKind::FileNamePart => "FileNamePart",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }

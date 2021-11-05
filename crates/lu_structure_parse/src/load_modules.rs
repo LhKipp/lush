@@ -2,7 +2,7 @@ use std::{collections::HashSet, mem::replace};
 
 use log::debug;
 use lu_error::util::Outcome;
-use lu_interpreter_structs::{ModInfo, ModPathVariant, ScopeFrame, Variable};
+use lu_interpreter_structs::{ModInfo, ModPath, ScopeFrame, Variable};
 use lu_text_util::SourceCode;
 use walkdir::WalkDir;
 
@@ -36,15 +36,14 @@ pub fn load_mod_paths(
                 continue;
             }
             debug!("Loading module: {}", use_path);
-            match use_path.mod_path.variant {
-                ModPathVariant::StdPath => {
+            match &use_path.mod_path {
+                ModPath::StdPath(_) => {
                     let frame = (cfg.load_std_module_func)(&use_path.mod_path)[0].clone();
                     let modi = frame.get_mod_tag();
                     paths_to_source.extend(modi.use_paths.clone());
                     all_frames.push(frame);
                 }
-                ModPathVariant::PluginPath => {
-                    let plug_f_path = use_path.mod_path.as_f_path();
+                ModPath::PlugPath(plug_f_path) => {
                     let plug_f_path = cfg.plugin_dir.join(plug_f_path);
 
                     debug!("Loading plug-mod: {:?}", plug_f_path);
@@ -68,7 +67,7 @@ pub fn load_mod_paths(
                         }
                     }
                 }
-                ModPathVariant::FilePath => {
+                ModPath::FilePath(_) => {
                     todo!("Impl sourcing of files")
                 }
             }

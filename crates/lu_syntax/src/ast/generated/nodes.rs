@@ -2361,38 +2361,6 @@ impl Display for StrctFieldNameToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct FileNameNode {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AstNode for FileNameNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FileName }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl HasSyntaxKind for FileNameNode{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        self.syntax().kind()
-    }
-}
-impl HasTextRange for FileNameNode{
-    fn get_text_range(&self) -> TextRange{
-        self.syntax().text_range()
-    }
-}
-
-impl Display for FileNameNode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct AbsFileNameNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3522,77 +3490,6 @@ impl Display for BooleanExprNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
-pub enum UsePathElement {
-    FileName(FileNameNode),
-    DoublePoint(DoublePointToken),
-    DivSign(DivSignToken),
-    }
-
-impl UsePathElement {
-}
-
-impl AstElement for UsePathElement {
-    fn can_cast(kind: SyntaxKind) -> bool { 
-        
-        
-        
-        
-        match kind{
-            FileName | DoublePoint | DivSign => true,
-            _ => false,
-        }
-    }
-    fn cast(syntax: SyntaxElement) -> Option<Self> {
-        
-        
-        
-        
-        let res = match syntax.kind() {
-            FileName => UsePathElement::FileName(FileNameNode { syntax: syntax.into_node().unwrap() }),
-            DoublePoint => UsePathElement::DoublePoint(DoublePointToken { syntax: syntax.into_token().unwrap() }),
-            DivSign => UsePathElement::DivSign(DivSignToken { syntax: syntax.into_token().unwrap() }),
-            _ => return None,
-        };
-        Some(res)
-    }
-
-    fn syntax(&self) -> SyntaxElement {
-        match self {
-            
-            UsePathElement::FileName(it) => it.syntax.clone().into(),
-            
-            
-            UsePathElement::DoublePoint(it) => it.syntax.clone().into(),
-            
-            
-            UsePathElement::DivSign(it) => it.syntax.clone().into(),
-            
-            }
-    }
-}
-impl HasSyntaxKind for UsePathElement{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        match self {
-            UsePathElement::FileName(it) => it.get_syntax_kind(),
-            UsePathElement::DoublePoint(it) => it.get_syntax_kind(),
-            UsePathElement::DivSign(it) => it.get_syntax_kind(),
-            }
-    }
-}
-
-impl HasTextRange for UsePathElement{
-    fn get_text_range(&self) -> TextRange{
-        self.syntax().text_range()
-    }
-}
-
-impl Display for UsePathElement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum CmdOrValueExprElement {
     CmdStmt(CmdStmtNode),
     ValueExpr(ValueExprElement),
@@ -4457,6 +4354,164 @@ impl HasTextRange for RedirToValueElement{
 }
 
 impl Display for RedirToValueElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum FileNameElement {
+    AbsFileName(AbsFileNameNode),
+    RelFileName(RelFileNameNode),
+    }
+
+impl FileNameElement {
+}
+
+impl AstElement for FileNameElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        match kind{
+            AbsFileName | RelFileName => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        let res = match syntax.kind() {
+            AbsFileName => FileNameElement::AbsFileName(AbsFileNameNode { syntax: syntax.into_node().unwrap() }),
+            RelFileName => FileNameElement::RelFileName(RelFileNameNode { syntax: syntax.into_node().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            FileNameElement::AbsFileName(it) => it.syntax.clone().into(),
+            
+            
+            FileNameElement::RelFileName(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for FileNameElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            FileNameElement::AbsFileName(it) => it.get_syntax_kind(),
+            FileNameElement::RelFileName(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl HasTextRange for FileNameElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for FileNameElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum FileNamePartElement {
+    BareWord(BareWordToken),
+    DivSign(DivSignToken),
+    Point(PointToken),
+    MinusSign(MinusSignToken),
+    DoublePoint(DoublePointToken),
+    Number(NumberToken),
+    }
+
+impl FileNamePartElement {
+}
+
+impl AstElement for FileNamePartElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        
+        
+        
+        match kind{
+            BareWord | DivSign | Point | MinusSign | DoublePoint | Number => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        
+        
+        
+        let res = match syntax.kind() {
+            BareWord => FileNamePartElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            DivSign => FileNamePartElement::DivSign(DivSignToken { syntax: syntax.into_token().unwrap() }),
+            Point => FileNamePartElement::Point(PointToken { syntax: syntax.into_token().unwrap() }),
+            MinusSign => FileNamePartElement::MinusSign(MinusSignToken { syntax: syntax.into_token().unwrap() }),
+            DoublePoint => FileNamePartElement::DoublePoint(DoublePointToken { syntax: syntax.into_token().unwrap() }),
+            Number => FileNamePartElement::Number(NumberToken { syntax: syntax.into_token().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            FileNamePartElement::BareWord(it) => it.syntax.clone().into(),
+            
+            
+            FileNamePartElement::DivSign(it) => it.syntax.clone().into(),
+            
+            
+            FileNamePartElement::Point(it) => it.syntax.clone().into(),
+            
+            
+            FileNamePartElement::MinusSign(it) => it.syntax.clone().into(),
+            
+            
+            FileNamePartElement::DoublePoint(it) => it.syntax.clone().into(),
+            
+            
+            FileNamePartElement::Number(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for FileNamePartElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            FileNamePartElement::BareWord(it) => it.get_syntax_kind(),
+            FileNamePartElement::DivSign(it) => it.get_syntax_kind(),
+            FileNamePartElement::Point(it) => it.get_syntax_kind(),
+            FileNamePartElement::MinusSign(it) => it.get_syntax_kind(),
+            FileNamePartElement::DoublePoint(it) => it.get_syntax_kind(),
+            FileNamePartElement::Number(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl HasTextRange for FileNamePartElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for FileNamePartElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

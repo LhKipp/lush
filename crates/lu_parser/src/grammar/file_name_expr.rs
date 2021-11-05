@@ -14,7 +14,9 @@ pub(crate) fn file_name_rule() -> OrRule {
         rules: vec_box![AbsFileNameRule {}, RelFileNameRule {}],
     }
 }
-pub struct RelFileNameRule {}
+pub struct RelFileNameRule {
+}
+
 impl Rule for RelFileNameRule {
     fn name(&self) -> String {
         "RelFileNameRule".into()
@@ -41,7 +43,7 @@ impl Rule for RelFileNameRule {
             }
         }
         loop {
-            if !p.eat(BareWord) {
+            if !p.eat_while_file_name_elem() {
                 break;
             }
             if !p.eat(T![/]) {
@@ -65,7 +67,7 @@ impl Rule for AbsFileNameRule {
         let m = p.start();
         p.expect_after(T![/], CMT_NL_WS);
         loop {
-            if !p.eat(BareWord) {
+            if !p.eat_while_file_name_elem() {
                 break;
             }
             if !p.eat(T![/]) {

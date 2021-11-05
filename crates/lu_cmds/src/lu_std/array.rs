@@ -11,18 +11,13 @@ use vec_rc::vec_rc;
 
 use super::LuRustStdMod;
 
-static ARRAY_MOD_PATH: Lazy<ModPath> = Lazy::new(|| {
-    ModPath::new(
-        vec!["std".to_string(), "array".to_string()],
-        ModPathVariant::StdPath,
-    )
-});
+static ARRAY_MOD_PATH: Lazy<ModPath> = Lazy::new(|| ModPath::StdPath("std:array".into()));
 
 pub(crate) struct StdArrayMod {}
 
 impl LuRustStdMod for StdArrayMod {
-    fn id(&self) -> Vec<String> {
-        ARRAY_MOD_PATH.parts.clone()
+    fn id(&self) -> String {
+        ARRAY_MOD_PATH.as_std_path().unwrap().clone()
     }
     fn rust_decl(&self) -> SourceCodeItem {
         lu_source_code_item!()

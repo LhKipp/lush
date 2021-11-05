@@ -93,3 +93,15 @@ end
 - Newline: 1
 - EndKeyword: 3
 ...
+use stmt
+===
+use plugin:plug1_f1.lu
+---
+- UseKeyword: 3
+- Whitespace: 1
+- BareWord: 6
+- DoublePoint: 1
+- BareWord: 8
+- Point: 1
+- BareWord: 2
+...

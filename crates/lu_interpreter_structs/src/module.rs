@@ -1,6 +1,5 @@
 use crate::{
-    Command, Function, ModPath, ModPathVariant, ScopeFrame, ScopeFrameTag, Strct, StrctField,
-    UsePath, Variable,
+    Command, Function, ModPath, ScopeFrame, ScopeFrameTag, Strct, StrctField, UsePath, Variable,
 };
 use itertools::Itertools;
 use log::debug;
@@ -151,15 +150,7 @@ impl ModInfo {
     }
 
     fn source_use_stmt(use_stmt: &UseStmtNode) -> UsePath {
-        let ty = if use_stmt.is_std_path() {
-            ModPathVariant::StdPath
-        } else if use_stmt.is_plugin_path() {
-            ModPathVariant::PluginPath
-        } else {
-            assert!(use_stmt.is_file_path());
-            ModPathVariant::FilePath
-        };
-        UsePath::new(ModPath::new(use_stmt.parts(), ty), use_stmt.to_item())
+        UsePath::from_node(use_stmt)
     }
 }
 

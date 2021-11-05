@@ -11,7 +11,7 @@ use drop_bomb::DropBomb;
 use crate::{
     event::Event,
     SyntaxKind::{self, Comment, Newline, Tombstone, *},
-    Token, TokenSet, TokenSource,
+    Token, TokenSet, TokenSource, T,
 };
 
 pub const CMT_NL_WS_BW: [SyntaxKind; 4] = [Comment, Newline, Whitespace, BareWord];
@@ -322,6 +322,18 @@ impl Parser {
 
     fn push_event(&mut self, event: Event) {
         self.events.push(event)
+    }
+
+    // Returns true if at least 1 elem parsed, false otherwise
+    pub(crate) fn eat_while_file_name_elem(&mut self) -> bool {
+        if !self.eat(BareWord) && !self.eat(T![.]) && !self.eat(T![-]) && !self.eat(Number) {
+            return false;
+        }
+        loop {
+            if !self.eat(BareWord) && !self.eat(T![.]) && !self.eat(T![-]) && !self.eat(Number) {
+                return true;
+            }
+        }
     }
 }
 

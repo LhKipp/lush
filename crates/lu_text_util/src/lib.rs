@@ -47,6 +47,7 @@ impl SourceCode {
 
     // TODO this func is very convenient but crosses all boundaries, and knows much more, than it
     // actually should
+    // TODO currently only used in one place, maybe move it there
     pub fn src_variant(&self, plugin_dir: &Path) -> SourceCodeVariant {
         const LU_STD_PATH_START: &str = "crates/lu_cmds/";
         if self.path.starts_with(LU_STD_PATH_START) {

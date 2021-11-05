@@ -3,8 +3,8 @@ use super::LuNativeStdMod;
 pub(crate) struct IterFuncsMod {}
 
 impl LuNativeStdMod for IterFuncsMod {
-    fn id(&self) -> Vec<String> {
-        ["std".to_string(), "iter".to_string()].to_vec()
+    fn id(&self) -> String {
+        "std:iter".into()
     }
     fn src(&self) -> &str {
         r#"

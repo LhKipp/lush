@@ -86,7 +86,6 @@ Config(
     ( name: "StrctName"                 , regex: "[A-Z]+[_a-zA-Z0-9]" , is_token: true   , ),
     ( name: "StrctFieldName"            , is_token: true                               , )                ,
 
-    ( name: "FileName"                   , is_node: true                                , has_rule: false   , ) ,
     ( name: "AbsFileName"                , is_node: true                                , has_rule: false   , ) ,
     ( name: "RelFileName"                , is_node: true                                , has_rule: false   , ) ,
 
@@ -124,11 +123,6 @@ Config(
     ( name: "TableExpr"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "BooleanExpr"                  , is_node: true                                , has_rule: false   , ) ,//TODO
     // === GENERIC META NODES === 
-    ( name: "UsePath", is_generic: true, has_rule: false, represents_element_names: [
-        "FileName",
-        "DoublePoint",
-        "DivSign",
-        ],),
     ( name: "CmdOrValueExpr", is_generic: true, has_rule: false, represents_element_names: [
         "CmdStmt",
         "ValueExpr",
@@ -204,6 +198,20 @@ Config(
         represents_element_names: [
             "ValuePathExpr",
             "BareWord"
+        ],),
+    (name: "FileName", is_generic: true,
+        represents_element_names: [
+            "AbsFileName",
+            "RelFileName"
+        ],),
+    (name: "FileNamePart", is_generic: true,
+        represents_element_names: [
+            "BareWord",
+            "DivSign",
+            "Point",
+            "MinusSign",
+            "DoublePoint",
+            "Number",
         ],),
     ]
 )

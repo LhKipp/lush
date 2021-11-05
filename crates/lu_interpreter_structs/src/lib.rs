@@ -30,7 +30,7 @@ pub use flag::*;
 pub use module::ModInfo;
 pub use scope::{Scope, ScopeFrame, ScopeFrameId, ScopeFrameState, ScopeFrameTag, SyScope};
 pub use special_scope_vars::*;
-pub use use_path::{ModPath, ModPathVariant, UsePath};
+pub use use_path::{ModPath, UsePath};
 pub use user_def_tys::*;
 pub use value::Value;
 pub use value_type::{ValueType, ValueTypeErr};
