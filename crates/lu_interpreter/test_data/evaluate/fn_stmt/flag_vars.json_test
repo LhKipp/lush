@@ -11,4 +11,17 @@ f1 --flag 1
   }
 }
 ...
+Flag without ty is bool flag
+===
+fn f1( req --flag -f )
+    ret $flag
+end
+f1 --flag
+---
+{
+  "Ok": {
+    "Bool": true
+  }
+}
+...
 
