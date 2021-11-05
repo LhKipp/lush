@@ -4,6 +4,7 @@ use crate::{
     SyntaxKind::*,
 };
 
+use super::file_name_expr::file_name_rule;
 use super::Rule;
 
 pub struct UseStmtRule;

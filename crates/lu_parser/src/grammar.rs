@@ -33,6 +33,7 @@ mod cmd_stmt;
 mod comments;
 mod condition;
 mod expr;
+mod file_name_expr;
 mod fn_stmt;
 mod for_stmt;
 mod if_stmt;
