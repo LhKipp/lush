@@ -1,23 +1,9 @@
 #!/bin/lush
 
-impure fn echo_impure (arg)
-    echo $arg
-end
-
-fn echo_wrapped ( arg )
-    echo $arg
-end
-
-let text = ["lush" "greets" "the world"]
-echo_impure "LETS GO"
-rm "DOCUMENTATION.md"
-
-for txt in $text
-    if $txt == "lush"
+echo $does_not_exist
+echo 1 == "ty mismatch"
+for txt $text # in is missing
+    if $txt "lush" # an operator is missing
         echo $txt
-    elif $txt == "greets"
-        echo_wrapped $txt
-    else
-        echo_wrapped $txt
     end
 end

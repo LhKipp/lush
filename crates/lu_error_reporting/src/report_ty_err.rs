@@ -25,7 +25,7 @@ pub(crate) fn ty_err_to_diagnostic(
             let lhs_decl = lhs_decl.clone().unwrap();
             let rhs_decl = rhs_decl.clone().unwrap();
             Diagnostic::error()
-                .with_message("Type mismach")
+                .with_message("Type mismatch")
                 .with_code("E-Ty0003")
                 .with_labels(vec![
                     Label::secondary(
