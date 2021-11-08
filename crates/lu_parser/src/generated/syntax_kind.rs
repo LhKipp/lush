@@ -139,7 +139,7 @@ pub enum SyntaxKind {
     ShortFlag,
     #[regex("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)", priority = 3)]
     Number,
-    #[regex("[A-Z]+[_a-zA-Z0-9]")]
+    #[regex("[A-Z]+[_a-zA-Z0-9]*")]
     StrctName,
     StrctFieldName,
     AbsFileName,

@@ -83,7 +83,7 @@ Config(
 
     ( name: "Number"                     , regex: "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)" ,priority: Some(3) /* To beat FileName */, is_token: true   , ) ,
 
-    ( name: "StrctName"                 , regex: "[A-Z]+[_a-zA-Z0-9]" , is_token: true   , ),
+    ( name: "StrctName"                 , regex: "[A-Z]+[_a-zA-Z0-9]*" , is_token: true   , ),
     ( name: "StrctFieldName"            , is_token: true                               , )                ,
 
     ( name: "AbsFileName"                , is_node: true                                , has_rule: false   , ) ,

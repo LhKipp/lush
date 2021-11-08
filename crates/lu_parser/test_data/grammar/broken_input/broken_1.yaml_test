@@ -34,18 +34,25 @@ let x = 1
 - Start: Tombstone
 - Start: CmdStmt
 - Token: "BareWord (len: 4)"
+- Start: StrctCtorExpr
 - Token: "Whitespace (len: 1)"
-- Token: "BareWord (len: 4)"
+- Token: "StrctName (len: 4)"
+- Error: "MessageAt(\"expected LeftCurlyBrackets\", 22)"
+- Error: "MessageAt(\"expected RightCurlyBrackets\", 22)"
+- Finish: ""
 - Finish: ""
 - Token: "Whitespace (len: 1)"
 - Start: ForStmt
 - Token: "ForKeyword (len: 3)"
 - Token: "Whitespace (len: 1)"
-- Token: "VarDeclName (len: 13)"
+- Error: "MessageAt(\"expected BareWord\", 27)"
+- Error: "MessageAt(\"expected InKeyword\", 27)"
+- Start: StrctCtorExpr
+- Token: "StrctName (len: 13)"
 - Token: "Whitespace (len: 1)"
-- Error: "MessageAt(\"expected InKeyword\", 41)"
-- Error: "MessageAt(\"Expected an expression\", 41)"
 - Token: "LeftCurlyBrackets (len: 1)"
+- Error: "MessageAt(\"expected RightCurlyBrackets\", 42)"
+- Finish: ""
 - Token: "Newline (len: 1)"
 - Start: BlockStmt
 - Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt, but found FnKeyword\", 43)"
@@ -93,8 +100,12 @@ let x = 1
 - Start: Tombstone
 - Start: CmdStmt
 - Token: "BareWord (len: 3)"
+- Start: StrctCtorExpr
 - Token: "Whitespace (len: 1)"
-- Token: "BareWord (len: 6)"
+- Token: "StrctName (len: 6)"
+- Error: "MessageAt(\"expected LeftCurlyBrackets\", 79)"
+- Error: "MessageAt(\"expected RightCurlyBrackets\", 79)"
+- Finish: ""
 - Finish: ""
 - Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found RightParenthesis\", 79)"
 - Start: Error
@@ -154,8 +165,10 @@ let x = 1
 - Token: "LeftParenthesis (len: 1)"
 - Finish: ""
 - Start: Tombstone
-- Start: CmdStmt
-- Token: "BareWord (len: 9)"
+- Start: StrctCtorExpr
+- Token: "StrctName (len: 9)"
+- Error: "MessageAt(\"expected LeftCurlyBrackets\", 154)"
+- Error: "MessageAt(\"expected RightCurlyBrackets\", 154)"
 - Finish: ""
 - Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found RightParenthesis\", 154)"
 - Start: Error
@@ -165,11 +178,9 @@ let x = 1
 - Finish: ""
 - Token: "Whitespace (len: 1)"
 - Start: Tombstone
-- Start: CmdStmt
-- Token: "BareWord (len: 12)"
-- Finish: ""
-- Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found RightCurlyBrackets\", 171)"
-- Start: Error
+- Start: StrctCtorExpr
+- Token: "StrctName (len: 12)"
+- Error: "MessageAt(\"expected LeftCurlyBrackets\", 171)"
 - Token: "Newline (len: 1)"
 - Token: "Whitespace (len: 4)"
 - Token: "RightCurlyBrackets (len: 1)"
