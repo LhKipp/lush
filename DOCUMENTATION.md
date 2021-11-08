@@ -259,7 +259,7 @@ end
 As seen, writing a function-type is similar to declaring a function. Only the function name is left out.
 
 ## Modules
-Lush has a module system. A module is a file from functions, structs and top-level variable declarations will be exported. Modules can be brought into scope via a `use` directive.
+Lush has a module system. A module is a file from which functions and struct declarations will be exported. Modules can be brought into scope via a `use` directive.
 There are 3 different sources of modules
 - Standard library modules. Those modules start with "std".
 - All directories under '/home/<user-name>/.config/lush/plugins' are assumed to be a module.
