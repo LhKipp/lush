@@ -2,20 +2,23 @@
 
 ## Types
 `lush` is a typed shell. The following types exists:
+
 * Any - The type can be of any type
 * Nil - The empty void type
 * bool - Boolean, either `true` or `false`
 * num - A number, e.G. 1, 0.5, -5
 * str - A string, e.G. "Hello World"
-* [<type>] - An array of <type>, e.G. [1 2 3]
+* [type] - An array of "type", e.G. [num]
 * Structs - See below
 * Functions - See below
 
 `lush` supports type inference. Types do not have to be spelled out each and every time - they are mostly inferred due to the usage of variables, constants and commands.
 
 ## Comments
+Everything behind a `#` until the end of a line, is considered a comment
 ```lush
-# Everything behind the # until the end of a line, is considered a comment
+# This is a comment
+echo here is code # This is a comment again
 ```
 
 ## Variables
@@ -71,12 +74,13 @@ echo $arg # starting the 'echo' process with $arg as its first argument
 
 For convenience: when passing simple-words to arguments of type `str`, they do not have to be quoted.
 ```lush
-echo Hello World "!" # Better quote operators. They are not promoted to strings automatically.
+echo Hello World "!" # Better quote operators. 
+                     # They are not promoted to strings automatically.
 ```
 ## Pipes
 Commands do not only receive arguments via arguments and flags, but also by what is "piped" into them.
 ```lush
-echo "This value gets passed to stdin of cat" | cat TODO buggy
+echo "This value gets passed to stdin of cat" | cat
 ```
 
 ## Structs
@@ -89,6 +93,7 @@ struct Ip{ # Declaration
     d: num
 }
 let x = Ip { a: 192 b: 0 c: 0 d: 1 }
+echo $x.a
 ```
 
 ## Functions
@@ -246,7 +251,8 @@ The type of a function is its signature. Let us consider an example from the "st
 ```lush
 use std:iter
 # In std:iter
-# "filter" takes a function "filter_fn", which must return a bool and take an argument of type "T"
+# "filter" takes a function "filter_fn", which must return a bool 
+# and take an argument of type "T"
 # fn filter (in: [T] ret: [T] filter_fn: fn(ret: bool arg: T))
 #     ...
 # end
@@ -261,8 +267,9 @@ As seen, writing a function-type is similar to declaring a function. Only the fu
 ## Modules
 Lush has a module system. A module is a file from which functions and struct declarations will be exported. Modules can be brought into scope via a `use` directive.
 There are 3 different sources of modules
+
 - Standard library modules. Those modules start with "std". (See below)
-- All directories under '/home/<user-name>/.config/lush/plugins' are assumed to be a module.
+- All directories under '/home/user-name/.config/lush/plugins' are assumed to be a module.
 - Files relative to the evaluated file.
 
 Examples:
@@ -272,7 +279,7 @@ push [] 1 2 3 # Use push from std:array
 ```
 ```lush
 # Lets assume there is a file
-# /home/<user-name>/.config/lush/plugins/my_plugin/file1.lu
+# /home/user-name/.config/lush/plugins/my_plugin/file1.lu
 # with the content:
 # fn greet
 #     echo "Hello from my_plugin/file1.lu"
@@ -289,8 +296,9 @@ use ./file.lush
 greet         # Use greet from ./file.lu 
 ```
 Please note:
+
 - Each evaluated file includes relative to its own path. "use ./file.lu" from "./start_file.lu" will include a different file than "use ./file.lu" from "./dir/other_file.lu".
-- "use relative_file" is interpreted as a module include from "/home/<user-name>/.config/lush/plugins/". Prepend a "./" to the file name to make it a relative module include.
+- "use relative_file" is interpreted as a module include from "/home/user-name/.config/lush/plugins/". Prepend a "./" to the file name to make it a relative module include.
 - The `use` directive, does not evaluate anything. Files imported via `use` are not run. e.G.
 ```lush
 # In ./greet.lu:
@@ -299,10 +307,23 @@ use ./greet.lush # Won't execute "echo Hello"
 ```
 
 ##  Debugging
-`lush` offers the ability to run the code in an interactive debugger. Try `lush --debug <file>` to try it out.
+`lush` offers the ability to run the code in an simple REPL debugger. Try `lush --debug <file>` to try it out.
+The debugger will warn and ask for confirmation before executing any possible impure commands. Therefore it is safe to try out scripts in the development phase. 
+
+The following commands are understood by the debugger:
+
+* help, h - show help
+* step, s - step to the next evaluated statement
+* next, n - step over to the next statement (not recursing into function calls)
+* skip, sk, [Value] - Skip the next statement and continue as if the statement returned [Value]. Providing no value will return nil
+* print, p, [...var_names] - Print variables specified by `...var_names`
+* scope, sc - Print the current scope
+
+Hitting ctrl-c will quit the debug session.
 
 ## The standard library
 The standard library currently only consists of:
+
 - `std:array`
     - Exported functions
         - `push`: fn push(ret: [T], to_append: [T], ...elems_to_push: T) 
