@@ -26,10 +26,15 @@ let x = 1
 - Start: Error
 - Token: "LeftCurlyBrackets (len: 1)"
 - Token: "RightCurlyBrackets (len: 1)"
-- Token: "Whitespace (len: 1)"
-- Token: "LeftParenthesis (len: 1)"
-- Token: "LeftParenthesis (len: 1)"
 - Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: Tombstone
+- Token: "LeftParenthesis (len: 1)"
+- Token: "LeftParenthesis (len: 1)"
+- Error: "MessageAt(\"Expected value expr, but found BareWord\", 12)"
+- Error: "MessageAt(\"expected RightParenthesis\", 12)"
+- Error: "MessageAt(\"expected RightParenthesis\", 12)"
+- Error: "MessageAt(\"Expected an expression\", 12)"
 - Token: "Newline (len: 1)"
 - Start: Tombstone
 - Start: CmdStmt
@@ -127,12 +132,12 @@ let x = 1
 - Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found Error\", 105)"
 - Start: Error
 - Token: "Error (len: 1)"
-- Token: "LeftParenthesis (len: 1)"
 - Finish: ""
 - Start: Tombstone
-- Start: CmdStmt
+- Token: "LeftParenthesis (len: 1)"
 - Token: "BareWord (len: 4)"
-- Finish: ""
+- Error: "MessageAt(\"expected RightParenthesis\", 111)"
+- Error: "MessageAt(\"Expected an expression\", 111)"
 - Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found Point\", 111)"
 - Start: Error
 - Token: "Point (len: 1)"
@@ -159,31 +164,25 @@ let x = 1
 - Start: Tombstone
 - Start: CmdStmt
 - Token: "BareWord (len: 8)"
-- Finish: ""
-- Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found LeftParenthesis\", 144)"
-- Start: Error
 - Token: "LeftParenthesis (len: 1)"
-- Finish: ""
-- Start: Tombstone
-- Start: StrctCtorExpr
+- Start: "StrctCtorExpr (parent: 7)"
 - Token: "StrctName (len: 9)"
 - Error: "MessageAt(\"expected LeftCurlyBrackets\", 154)"
 - Error: "MessageAt(\"expected RightCurlyBrackets\", 154)"
 - Finish: ""
-- Error: "MessageAt(\"Expected let statement | piped commands | RetStmt | ForStmt | IfStmt | expressions | BlockStmt | UseStmt | FnStmt | StructStmt, but found RightParenthesis\", 154)"
-- Start: Error
 - Token: "RightParenthesis (len: 1)"
 - Token: "Whitespace (len: 1)"
+- Start: MathExpr
 - Token: "EqualitySign (len: 2)"
-- Finish: ""
-- Token: "Whitespace (len: 1)"
-- Start: Tombstone
 - Start: StrctCtorExpr
+- Token: "Whitespace (len: 1)"
 - Token: "StrctName (len: 12)"
 - Error: "MessageAt(\"expected LeftCurlyBrackets\", 171)"
 - Token: "Newline (len: 1)"
 - Token: "Whitespace (len: 4)"
 - Token: "RightCurlyBrackets (len: 1)"
+- Finish: ""
+- Finish: ""
 - Finish: ""
 - Start: LetStmt
 - Token: "Newline (len: 1)"
