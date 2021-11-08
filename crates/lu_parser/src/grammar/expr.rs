@@ -14,7 +14,7 @@ impl Rule for ValueExprRule {
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        value_expr_rule().matches(p)
+        value_expr_rule().matches(p) || p.next_non(CMT_NL_WS) == T!["("]
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
