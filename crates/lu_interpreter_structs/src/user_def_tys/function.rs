@@ -276,7 +276,7 @@ impl Function {
             // By default all lu-functions are pure :)
             // This is okay, as there will be a warning for all impure function calls
             attrs.push(CmdAttribute::new(
-                CmdAttributeVariant::Impure,
+                CmdAttributeVariant::Pure,
                 lu_source_code_item!(),
             ));
         }
