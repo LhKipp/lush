@@ -30,10 +30,11 @@ impl UsePath {
 // TODO how to represent paths within the same project?
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Hash, new, EnumAsInner)]
 pub enum ModPath {
-    // PlugPath with plug-path elements
     PlugPath(PathBuf),
     StdPath(String),
     FilePath(PathBuf),
+    // ModPath leads to the interactive cli - file
+    Interactive,
 }
 
 impl ModPath {
@@ -70,6 +71,7 @@ impl ModPath {
                     .collect(),
             ),
             SourceCodeVariant::FileCode => Self::FilePath(src.path.clone()),
+            SourceCodeVariant::InteractiveCode => Self::Interactive,
         }
     }
 }
@@ -83,6 +85,7 @@ impl Display for ModPath {
             ModPath::FilePath(p) | ModPath::PlugPath(p) => {
                 write!(f, "{}", p.display())
             }
+            ModPath::Interactive => write!(f, "Interactive input"),
         }
     }
 }

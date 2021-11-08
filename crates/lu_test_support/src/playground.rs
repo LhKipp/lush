@@ -31,4 +31,10 @@ impl Playground {
         self.test_dir = self.test_dir.permanent();
         self
     }
+
+    pub fn make_file(&self, fname: &str, content: &[u8]) -> PathBuf {
+        let path = self.root().join(fname);
+        std::fs::write(&path, content).expect("Must work");
+        path
+    }
 }

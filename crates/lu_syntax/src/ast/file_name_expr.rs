@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
-use crate::{AstElement, AstNode};
+use crate::{AstNode};
 
-use super::{support, AbsFileNameNode, FileNameElement, FileNamePartElement, RelFileNameNode};
+use super::{AbsFileNameNode, FileNameElement, RelFileNameNode};
 
 impl FileNameElement {
     pub fn path(&self) -> PathBuf {
@@ -15,15 +15,11 @@ impl FileNameElement {
 
 impl RelFileNameNode {
     pub fn path(&self) -> PathBuf {
-        support::element_children::<FileNamePartElement>(self.syntax())
-            .map(|t| t.text())
-            .collect()
+        self.text_trimmed().into()
     }
 }
 impl AbsFileNameNode {
     pub fn path(&self) -> PathBuf {
-        support::element_children::<FileNamePartElement>(self.syntax())
-            .map(|t| t.text())
-            .collect()
+        self.text_trimmed().into()
     }
 }

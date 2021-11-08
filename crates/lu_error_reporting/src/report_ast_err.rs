@@ -33,5 +33,6 @@ pub(crate) fn ast_err_to_diagnostic(
                 cmd_usage.range,
             )
             .with_message("Command not found")]),
+        AstErr::CantUseRelativeInclude(_) => todo!(),
     }
 }

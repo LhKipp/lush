@@ -63,11 +63,11 @@ impl ModInfo {
     }
 
     pub fn module_from_file_src(
+        id: ModPath,
         src: SourceCode,
         plugin_dir: &Path,
     ) -> Outcome<ScopeFrame<Variable>> {
-        let self_mod_path = ModPath::from_src_code(&src, plugin_dir);
-        Self::module_from_src(src, self_mod_path)
+        Self::module_from_src(src, id)
     }
 
     pub fn module_from_parse(parse: Parse, mod_id: ModPath) -> Outcome<ScopeFrame<Variable>> {

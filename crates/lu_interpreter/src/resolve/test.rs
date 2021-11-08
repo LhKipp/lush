@@ -36,4 +36,32 @@ mod tests {
         );
         assert!(eval_result.is_ok(), "{:?}", eval_result);
     }
+
+    #[test]
+    fn relative_file_is_loaded() {
+        let playground = Playground::new().permanent();
+        playground.make_file(
+            "other_file.lu",
+            br#"
+            fn greet
+                ret "Hi from other file"
+            end
+            "#,
+        );
+        let f_path = playground.make_file(
+            "first_file.lu",
+            br#"
+            use ./other_file.lu
+            greet
+            "#,
+        );
+
+        let (global_frame, itprt_cfg) = make_test_interpreter_in_playground(playground);
+        let eval_result = Interpreter::eval_for_tests(
+            SourceCode::new_file(f_path).unwrap(),
+            global_frame,
+            &itprt_cfg,
+        );
+        assert!(eval_result.is_ok(), "{:?}", eval_result);
+    }
 }

@@ -18,6 +18,7 @@ pub enum AstErr {
     VarNotInScope(SourceCodeItem),
     StrctNotInScope(SourceCodeItem),
     CmdNotInScope(SourceCodeItem),
+    CantUseRelativeInclude(SourceCodeItem),
 }
 
 impl<S: Into<String>> From<S> for AstErr {

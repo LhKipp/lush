@@ -24,11 +24,11 @@ pub struct InterpreterCfg {
 impl InterpreterCfg {
     pub fn build_load_modules_config(&self) -> LoadModulesConfig {
         // TODO relative_include_path_start
-        let relative_include_path_start: PathBuf = std::env::var("PWD").unwrap().into();
+        let pwd: PathBuf = std::env::var("PWD").unwrap().into();
         LoadModulesConfig {
             load_std_module_func: load_std_module,
             plugin_dir: &self.plugin_dir,
-            relative_include_path_start,
+            pwd,
         }
     }
 }
