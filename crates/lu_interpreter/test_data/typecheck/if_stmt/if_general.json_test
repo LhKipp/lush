@@ -1,0 +1,9 @@
+If stmt does not return ty
+===
+if true
+end
+---
+{
+  "Ok": null
+}
+...

@@ -19,8 +19,10 @@ use crate::{Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
 mod cmd_stmt;
+mod condition;
 mod expr;
 mod fn_stmt;
+mod if_stmt;
 mod let_stmt;
 mod math_expr;
 mod piped_cmds_stmt;

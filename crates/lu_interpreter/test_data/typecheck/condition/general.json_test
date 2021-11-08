@@ -1,0 +1,56 @@
+Cmd_Condition must return bool
+===
+fn ret_num(ret: num)
+    ret 1
+end
+
+if ret_num
+end
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "ret_num",
+            "range": [
+              39,
+              46
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...
+expr condition must be bool
+===
+if 3 + 3
+end
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "3",
+            "range": [
+              3,
+              4
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...
