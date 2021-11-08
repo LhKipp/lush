@@ -9,7 +9,7 @@ use lu_syntax::{
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
-use std::{fmt::Display, path::Path};
+use std::fmt::Display;
 
 #[derive(Clone, Debug, Eq)]
 pub struct ModInfo {
@@ -62,11 +62,7 @@ impl ModInfo {
         parse.map_flattened(|parse| Self::module_from_parse(parse, mod_id))
     }
 
-    pub fn module_from_file_src(
-        id: ModPath,
-        src: SourceCode,
-        plugin_dir: &Path,
-    ) -> Outcome<ScopeFrame<Variable>> {
+    pub fn module_from_file_src(id: ModPath, src: SourceCode) -> Outcome<ScopeFrame<Variable>> {
         Self::module_from_src(src, id)
     }
 

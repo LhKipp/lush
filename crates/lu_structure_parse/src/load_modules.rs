@@ -73,7 +73,6 @@ pub fn load_mod_paths(
                                 let (module, new_mod_err) = ModInfo::module_from_file_src(
                                     use_path.mod_path.clone(),
                                     source_code,
-                                    cfg.plugin_dir,
                                 )
                                 .split();
                                 let modi = module.get_mod_tag();
@@ -127,7 +126,6 @@ pub fn load_mod_paths(
                                 //                done right now
                                 use_path.mod_path.clone(),
                                 source_code,
-                                cfg.plugin_dir,
                             )
                             .split();
                             let modi = module.get_mod_tag();
