@@ -38,3 +38,23 @@ division
   }
 }
 ...
+parenthesized math
+===
+(1 + 2) * 3
+---
+{
+  "Ok": {
+    "Number": 9.0
+  }
+}
+...
+operator correct precedence
+===
+3 + 8 * 12 // (4 - 3) // 4
+---
+{
+  "Ok": {
+    "Number": 27.0
+  }
+}
+...
