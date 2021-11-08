@@ -31,6 +31,7 @@ mod source_file;
 mod statement;
 mod test;
 mod value_path_expr;
+mod for_stmt;
 
 pub struct TyCheckState {
     /// A TcKey (TermCheckKey) always refers to a node in the ast

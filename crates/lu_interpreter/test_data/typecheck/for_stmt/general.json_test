@@ -1,0 +1,10 @@
+for stmt inserts var into scope
+===
+for x in "test"
+    echo $x
+end
+---
+{
+  "Ok": null
+}
+...
