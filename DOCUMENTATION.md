@@ -259,12 +259,13 @@ end
 As seen, writing a function-type is similar to declaring a function. Only the function name is left out.
 
 ## Modules
-Lush has a module system. A module is a file from which only the functions will be exported. Modules can be brought into scope via a `use` directive.
+Lush has a module system. A module is a file from functions, structs and top-level variable declarations will be exported. Modules can be brought into scope via a `use` directive.
 There are 3 different sources of modules
-- The standard library. Those modules start with "std"
-- Modules from /home/<user-name>/.config/lush/plugins
-- Relative to the PWD (Currently not well supported)
+- Standard library modules. Those modules start with "std".
+- All directories under '/home/<user-name>/.config/lush/plugins' are assumed to be a module.
+- Files relative to the evaluated file.
 
+Examples:
 ```lush
 use std:array
 push [] 1 2 3 # Use push from std:array
@@ -278,6 +279,17 @@ push [] 1 2 3 # Use push from std:array
 use my_plugin:file1.lu
 greet         # Use greet from file1.lu
 ```
+```lush
+# In ./file.lush:
+# fn greet
+#   echo "Hi from file.lush"
+# end
+use ./file.lush
+greet # 
+```
+Please note:
+- Each evaluated file includes relative to its own path. "use ./file.lu" from "./start_file.lu" will include a different file than "use ./file.lu" from "./dir/other_file.lu".
+- "use relative_file" is interpreted as a module include from "/home/<user-name>/.config/lush/plugins/". Prepend a "./" to the file name to make it a relative module include.
 
 ## Debugging
 `lush` offers the ability to run the code in an interactive debugger. Try `lush --debug <file>` to try it out.
