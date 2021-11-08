@@ -36,6 +36,6 @@ impl DbgAction for DbgSkipAction {
 
     fn description(&self) -> &'static str {
         r#"Skip the next statement and continue as if the statement returned [Value].
-Providing no value will return Value::Nil"#
+Providing no value will return nil"#
     }
 }
