@@ -10,7 +10,6 @@ end
 
 let text = ["lush" "greets" "the world"]
 echo_impure "LETS GO"
-echo $asldfjds
 
 for txt in $text
     let x = $txt
