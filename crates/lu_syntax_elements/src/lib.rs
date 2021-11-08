@@ -98,7 +98,7 @@ pub fn syntax_elements_as_tera_context() -> Result<Context, Box<dyn Error>> {
         .iter_mut()
         .for_each(SyntaxElement::before_linking);
     // Deepest level of referencing is yet 2
-    for _ in 0..2 {
+    for _ in 0..3 {
         let clnd = config.syntax_elements.clone();
         config
             .syntax_elements

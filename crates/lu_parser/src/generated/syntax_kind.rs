@@ -75,6 +75,8 @@ pub enum SyntaxKind {
     #[token("*")]
     MultSign,
     #[token("/")]
+    FilePathSep,
+    #[token("//")]
     DivSign,
     #[token("<")]
     LessThanSign,
@@ -168,6 +170,7 @@ pub enum SyntaxKind {
     ArgSignature,
     LuType,
     MathExpr,
+    ParentherizedExpr,
     StringExpr,
     NumberExpr,
     ValuePathExpr,
@@ -226,6 +229,7 @@ impl SyntaxKind{
             SyntaxKind::PlusSign => "PlusSign",
             SyntaxKind::MinusSign => "MinusSign",
             SyntaxKind::MultSign => "MultSign",
+            SyntaxKind::FilePathSep => "FilePathSep",
             SyntaxKind::DivSign => "DivSign",
             SyntaxKind::LessThanSign => "LessThanSign",
             SyntaxKind::LessOrEqualSign => "LessOrEqualSign",
@@ -290,6 +294,7 @@ impl SyntaxKind{
             SyntaxKind::ArgSignature => "ArgSignature",
             SyntaxKind::LuType => "LuType",
             SyntaxKind::MathExpr => "MathExpr",
+            SyntaxKind::ParentherizedExpr => "ParentherizedExpr",
             SyntaxKind::StringExpr => "StringExpr",
             SyntaxKind::NumberExpr => "NumberExpr",
             SyntaxKind::ValuePathExpr => "ValuePathExpr",
@@ -346,7 +351,8 @@ macro_rules! T {
     [+] => {$crate::SyntaxKind::PlusSign };
     [-] => {$crate::SyntaxKind::MinusSign };
     [*] => {$crate::SyntaxKind::MultSign };
-    [/] => {$crate::SyntaxKind::DivSign };
+    [/] => {$crate::SyntaxKind::FilePathSep };
+    ["//"] => {$crate::SyntaxKind::DivSign };
     [<] => {$crate::SyntaxKind::LessThanSign };
     [<=] => {$crate::SyntaxKind::LessOrEqualSign };
     [==] => {$crate::SyntaxKind::EqualitySign };

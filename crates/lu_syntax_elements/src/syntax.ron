@@ -40,7 +40,8 @@ Config(
     ( name: "PlusSign"                   , token_text: "+"                              , is_token: true   , ) ,
     ( name: "MinusSign"                  , token_text: "-"                              , is_token: true   , ) ,
     ( name: "MultSign"                   , token_text: "*"                              , is_token: true   , ) ,
-    ( name: "DivSign"                    , token_text: "/"                              , is_token: true   , ) ,
+    ( name: "FilePathSep"                , token_text: "/"                              , is_token: true   , ) ,
+    ( name: "DivSign"                    , token_text: "//"                              , is_token: true   , ) ,
     ( name: "LessThanSign"               , token_text: "<"                              , is_token: true   , ) ,
     ( name: "LessOrEqualSign"            , token_text: "<="                             , is_token: true   , ) ,
     ( name: "EqualitySign"               , token_text: "=="                             , is_token: true   , ) ,
@@ -116,6 +117,7 @@ Config(
     ( name: "LuType"                     , is_node: true                                , has_rule: true   , ) ,
     // === EXPRESSION RULES ===
     ( name: "MathExpr"                   , is_node: true                                , )                ,
+    ( name: "ParentherizedExpr"          , is_node: true                                , )                ,
     ( name: "StringExpr"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "NumberExpr"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "ValuePathExpr"              , is_node: true                                , has_rule: true   , ) ,

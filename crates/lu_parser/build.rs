@@ -61,6 +61,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                     "DoubleQuote".into()
                 } else if "\'" == s {
                     "SingleQuote".into()
+                } else if "//" == s {
+                    format!("\"{}\"", s)
                 } else {
                     s
                 }

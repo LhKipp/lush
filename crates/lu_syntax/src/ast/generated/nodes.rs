@@ -1145,6 +1145,38 @@ impl Display for MultSignToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct FilePathSepToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for FilePathSepToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::FilePathSep }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for FilePathSepToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for FilePathSepToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for FilePathSepToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct DivSignToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -3257,6 +3289,38 @@ impl HasTextRange for MathExprNode{
 }
 
 impl Display for MathExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct ParentherizedExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for ParentherizedExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ParentherizedExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for ParentherizedExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for ParentherizedExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for ParentherizedExprNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

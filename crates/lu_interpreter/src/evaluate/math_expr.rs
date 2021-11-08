@@ -1,10 +1,5 @@
-#![allow(unused_imports)]
 use crate::evaluate::eval_prelude::*;
-use contracts::ensures;
-use lu_syntax::ast::{
-    ConditionElement, IfBlockNode, IfStmtNode, MathExprNode, OperatorExprElement, StrctStmtNode,
-    ValueExprElement,
-};
+use lu_syntax::ast::{MathExprNode, OperatorExprElement, ValueExprElement};
 
 impl Evaluable for MathExprNode {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
@@ -34,11 +29,26 @@ impl Evaluable for MathExprNode {
                 // Assignment does not return value
                 Ok(Value::Nil)
             }
-            OperatorExprElement::PlusSign(_) => return eval_plus_sign(lhs_val, rhs_val),
-            OperatorExprElement::MinusSign(_) => return eval_minus_sign(lhs_val, rhs_val),
-            OperatorExprElement::MultSign(_) => return eval_mult_sign(lhs_val, rhs_val),
-            OperatorExprElement::DivSign(_) => return eval_div_sign(lhs_val, rhs_val),
-
+            OperatorExprElement::PlusSign(_) => {
+                let l_val = lhs_val.as_number().unwrap();
+                let r_val = rhs_val.as_number().unwrap();
+                Ok(Value::Number(l_val + r_val))
+            }
+            OperatorExprElement::MinusSign(_) => {
+                let l_val = lhs_val.as_number().unwrap();
+                let r_val = rhs_val.as_number().unwrap();
+                Ok(Value::Number(l_val - r_val))
+            }
+            OperatorExprElement::MultSign(_) => {
+                let l_val = lhs_val.as_number().unwrap();
+                let r_val = rhs_val.as_number().unwrap();
+                Ok(Value::Number(l_val * r_val))
+            }
+            OperatorExprElement::DivSign(_) => {
+                let l_val = lhs_val.as_number().unwrap();
+                let r_val = rhs_val.as_number().unwrap();
+                Ok(Value::Number(l_val / r_val))
+            }
             OperatorExprElement::LessThanSign(_) => Ok((lhs_val < rhs_val).into()),
             OperatorExprElement::LessOrEqualSign(_) => Ok((lhs_val <= rhs_val).into()),
             OperatorExprElement::EqualitySign(_) => Ok((lhs_val == rhs_val).into()),
@@ -52,20 +62,4 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::MinAssignSign(_) => todo!(),
         }
     }
-}
-
-fn eval_plus_sign(lhs: Value, rhs: Value) -> EvalResult {
-    match (lhs, rhs) {
-        (Value::Number(lhs), Value::Number(rhs)) => Ok(Value::Number(lhs + rhs)),
-        _ => todo!(),
-    }
-}
-fn eval_minus_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_mult_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
-}
-fn eval_div_sign(_lhs: Value, _rhs: Value) -> EvalResult {
-    todo!()
 }

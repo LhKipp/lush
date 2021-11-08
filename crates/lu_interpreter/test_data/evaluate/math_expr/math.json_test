@@ -1,0 +1,40 @@
+Addition
+===
+1 + 1
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...
+subtraction
+===
+1 - 1
+---
+{
+  "Ok": {
+    "Number": 0.0
+  }
+}
+...
+multiplication
+===
+1 * 2
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...
+division
+===
+4 // 2
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...

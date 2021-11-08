@@ -43,7 +43,7 @@ fn next_op(p: &mut Parser) -> (u8, SyntaxKind) {
         T![<=]                        => (5,  T![<=]),
         T![<]                         => (5,  T![<]),
         T![+]                         => (10, T![+]),
-        T![/]                         => (11, T![/]),
+        T!["//"]                         => (11, T!["//"]),
         T![*]                         => (11, T![*]),
         T![-]                         => (10, T![-]),
         // Right associative ops
@@ -98,8 +98,14 @@ fn expr_bp(p: &mut Parser, bp: u8) -> Option<CompletedMarker> {
 }
 
 fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
-    // TODO shouldn't this be a simple parse?
-    value_expr_rule().opt(p)
+    if p.next_non(CMT_NL_WS) == T!["("] {
+        p.eat_after(T!["("], CMT_NL_WS);
+        let parsed_val = expr(p);
+        p.expect_after(T![")"], CMT_NL_WS);
+        parsed_val
+    } else {
+        value_expr_rule().parse(p)
+    }
 }
 
 pub(crate) fn value_expr_rule() -> OrRule {

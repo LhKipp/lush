@@ -3,11 +3,11 @@
 /a/b/c
 ---
 - Start: AbsFileName
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
 - Finish: ""
 ...
@@ -17,11 +17,11 @@
 ---
 - Start: RelFileName
 - Token: "Point (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
 - Finish: ""
 ...
@@ -31,9 +31,9 @@ a/b/c
 ---
 - Start: RelFileName
 - Token: "BareWord (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
-- Token: "DivSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
 - Token: "BareWord (len: 1)"
 - Finish: ""
 ...

@@ -10,13 +10,13 @@ use crate::{TyCheckState, TypeCheck, TypeCheckArg};
 impl TypeCheck for MathExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self.operator() {
-            OperatorExprElement::PlusSign(_) => {
+            OperatorExprElement::PlusSign(_)
+            | OperatorExprElement::MinusSign(_)
+            | OperatorExprElement::MultSign(_)
+            | OperatorExprElement::DivSign(_) => {
                 let (lhs, _) = equate(&self.lhs(), &self.rhs(), state);
                 Some(lhs)
             }
-            OperatorExprElement::MinusSign(_) => todo!(),
-            OperatorExprElement::MultSign(_) => todo!(),
-            OperatorExprElement::DivSign(_) => todo!(),
             OperatorExprElement::LessThanSign(_)
             | OperatorExprElement::LessOrEqualSign(_)
             | OperatorExprElement::BiggerThanSign(_)
