@@ -38,7 +38,7 @@ mod tests {
     }
 
     #[test]
-    fn relative_file_is_loaded() {
+    fn functions_are_exported_from_module() {
         let playground = Playground::new().permanent();
         playground.make_file(
             "other_file.lu",
@@ -63,5 +63,39 @@ mod tests {
             &itprt_cfg,
         );
         assert!(eval_result.is_ok(), "{:?}", eval_result);
+    }
+
+    #[test]
+    fn structs_are_exported_from_module() {
+        let playground = Playground::new().permanent();
+        playground.make_file(
+            "other_file.lu",
+            br#"
+            struct MyStruct{value:num}
+            "#,
+        );
+        let f_path = playground.make_file(
+            "first_file.lu",
+            br#"
+            use ./other_file.lu
+            let x = MyStruct { value: 1 }
+            $x
+            "#,
+        );
+
+        let (global_frame, itprt_cfg) = make_test_interpreter_in_playground(playground);
+        let eval_result = Interpreter::eval_for_tests(
+            SourceCode::new_file(f_path).unwrap(),
+            global_frame,
+            &itprt_cfg,
+        );
+        assert!(eval_result.is_ok(), "{:?}", eval_result);
+        assert_eq!(
+            eval_result.unwrap(),
+            Value::new_strct(
+                "MyStruct".to_string(),
+                vec![("value".to_string(), Value::Number(1.0.into()))]
+            )
+        );
     }
 }
