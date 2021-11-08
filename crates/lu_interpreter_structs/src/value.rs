@@ -53,6 +53,9 @@ impl PartialEq for Value {
             (Value::BareWord(lhs), Value::BareWord(rhs)) => lhs == rhs,
             (Value::Array(lhs), Value::Array(rhs)) => lhs == rhs,
             (Value::Command(lhs), Value::Command(rhs)) => Rc::ptr_eq(lhs, rhs),
+            (Value::Strct(lhs_name, lhs_fields), Value::Strct(rhs_name, rhs_fields)) => {
+                lhs_name == rhs_name && lhs_fields == rhs_fields
+            }
             _ => false,
         }
     }
