@@ -1,4 +1,4 @@
-use crate::evaluate::eval_prelude::*;
+use crate::{evaluate::eval_prelude::*, handle_dbg_intervention_before};
 use lu_syntax::ast::{ForStmtNode, HasAstId};
 
 impl Evaluable for ForStmtNode {
@@ -18,7 +18,9 @@ impl Evaluable for ForStmtNode {
         assert!(var_names.len() > 0);
         let iterated_val = self.iterated_value().unwrap();
 
-        lu_dbg::before_eval(&format!("{}", text_till_block), self.get_ast_id(), scope)?;
+        let result =
+            lu_dbg::before_eval(&format!("{}", text_till_block), self.get_ast_id(), scope)?;
+        handle_dbg_intervention_before!(result, scope);
 
         let iterated_val = iterated_val.evaluate(scope)?;
         let vals_to_iterate = if let Some(array) = iterated_val.as_array() {
@@ -44,7 +46,8 @@ impl Evaluable for ForStmtNode {
             // We have to do before eval, before evaluating the iterated_val once. Therefore
             // the first iteration does not need before_eval
             if i != 0 {
-                lu_dbg::before_eval(&text_till_block, self.get_ast_id(), scope)?;
+                let result = lu_dbg::before_eval(&text_till_block, self.get_ast_id(), scope)?;
+                handle_dbg_intervention_before!(result, scope);
             }
             {
                 let var = Variable::new(
@@ -64,6 +67,8 @@ impl Evaluable for ForStmtNode {
                 let mut scope = scope.lock();
                 scope.pop_frame(&ScopeFrameTag::ForStmtFrame);
             }
+
+            lu_dbg::after_eval(&self.get_ast_id(), scope);
         }
 
         Ok(Value::Nil)

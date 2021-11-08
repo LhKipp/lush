@@ -10,14 +10,14 @@ end
 
 let text = ["lush" "greets" "the world"]
 echo_impure "LETS GO"
+rm "DOCUMENTATION.md"
 
 for txt in $text
-    let x = $txt
-    if $x == "lush"
-        echo $x
-    elif $x == "greets"
-        echo_wrapped $x
+    if $txt == "lush"
+        echo $txt
+    elif $txt == "greets"
+        echo_wrapped $txt
     else
-        echo $x
+        echo_wrapped $txt
     end
 end
