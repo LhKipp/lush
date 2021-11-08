@@ -228,13 +228,13 @@ External commands are by default considered to be impure, unless their name appe
 User defined functions are neither considered to be pure nor impure. The debugger will step into them, but will check any command call for its purity before execution.
 
 ### Generic functions
-Functions can have generic arguments. For example the `push` command from the `std:array` module could be visualized in lush code as follows:
+Functions can have generic arguments. For example the `push` command from the `std:array` module could be visualized in `lush` code as follows:
 ```lush
 fn push(array: [T] ...to_push: T)
     # Impl here ...
 end
 ```
-Generics provide type safety. The inner type T of "array" does not realy matter. However the values "to_push" needs to be of the arrays inner type T. This can be statically described and verified by generics.
+Generics provide type safety. For example: the declaration of `push` guarantees that the type of "to_push" is the same as the inner type of `array`, making both values applicable to each other.
 
 The name of the generic type cannot be freely choosen. Only T0, T1 ... T9 and U0, U1 ... U9 are valid generic type names.
 
@@ -261,7 +261,7 @@ As seen, writing a function-type is similar to declaring a function. Only the fu
 ## Modules
 Lush has a module system. A module is a file from which functions and struct declarations will be exported. Modules can be brought into scope via a `use` directive.
 There are 3 different sources of modules
-- Standard library modules. Those modules start with "std".
+- Standard library modules. Those modules start with "std". (See below)
 - All directories under '/home/<user-name>/.config/lush/plugins' are assumed to be a module.
 - Files relative to the evaluated file.
 
@@ -269,7 +269,8 @@ Examples:
 ```lush
 use std:array
 push [] 1 2 3 # Use push from std:array
-
+```
+```lush
 # Lets assume there is a file
 # /home/<user-name>/.config/lush/plugins/my_plugin/file1.lu
 # with the content:
@@ -280,16 +281,36 @@ use my_plugin:file1.lu
 greet         # Use greet from file1.lu
 ```
 ```lush
-# In ./file.lush:
+# In ./file.lu:
 # fn greet
 #   echo "Hi from file.lush"
 # end
 use ./file.lush
-greet # 
+greet         # Use greet from ./file.lu 
 ```
 Please note:
 - Each evaluated file includes relative to its own path. "use ./file.lu" from "./start_file.lu" will include a different file than "use ./file.lu" from "./dir/other_file.lu".
 - "use relative_file" is interpreted as a module include from "/home/<user-name>/.config/lush/plugins/". Prepend a "./" to the file name to make it a relative module include.
+- The `use` directive, does not evaluate anything. Files imported via `use` are not run. e.G.
+```lush
+# In ./greet.lu:
+# echo Hello
+use ./greet.lush # Won't execute "echo Hello"
+```
 
-## Debugging
+##  Debugging
 `lush` offers the ability to run the code in an interactive debugger. Try `lush --debug <file>` to try it out.
+
+## The standard library
+The standard library currently only consists of:
+- `std:array`
+    - Exported functions
+        - `push`: fn push(ret: [T], to_append: [T], ...elems_to_push: T) 
+            - Returns a new array which is the concatenation of `to_append` with `...elems_to_push`
+- `std:iter`
+    - Exported functions
+        - `map`: fn map (in: [T] ret: [U] map_fn: fn(ret: U arg: T))
+            - Applies `map_fn` to every element of `in`, collects the results in an array and returns it.
+        - `filter`: fn filter (in: [T] ret: [T] filter_fn: fn(ret: bool arg: T))
+            - Applies `filter_fn` to every element in `in` and only returns those elements for which `filter_fn` returns true
+
