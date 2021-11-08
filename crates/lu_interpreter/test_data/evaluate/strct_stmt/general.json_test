@@ -31,3 +31,15 @@ $strct.v
   }
 }
 ...
+Strct access works 2
+===
+struct MyStruct{ value: num }
+let x = MyStruct { value: 1 }
+$x.value
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
