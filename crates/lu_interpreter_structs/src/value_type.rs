@@ -42,18 +42,7 @@ where
     let l_strct = strct.read();
     serializer.serialize_newtype_struct("StrctName", &l_strct.name)
 }
-// #[derive(Educe)]
-// #[educe(Hash)]
-// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-// // We need something being able to Serialize, Deserialize. Therefore we don't reuse Signature here
-// pub struct FuncType {
-//     in_ty: ValueType,
-//     ret_ty: ValueType,
-//     args_ty: Vec<ValueType>,
-//     var_arg_ty: Option<ValueType>,
-//     #[educe(Hash(ignore))]
-//     flags_ty: Vec<FlagSignature>,
-// }
+
 #[derive(Educe, Clone, Debug, Serialize, Deserialize, EnumAsInner)]
 #[educe(Hash, PartialEq)]
 pub enum ValueType {
@@ -98,33 +87,6 @@ pub enum ValueType {
 }
 
 impl Eq for ValueType {}
-// TODO remove this method and derive PartialEq
-// impl PartialEq for ValueType {
-//     fn eq(&self, other: &Self) -> bool {
-//         match (self, other) {
-//             (ValueType::Error, ValueType::Error) => true,
-//             (ValueType::Unspecified, ValueType::Unspecified) => true,
-//             (ValueType::Any, ValueType::Any) => true,
-//             (ValueType::Void, ValueType::Void) => true,
-//             (ValueType::Nil, ValueType::Nil) => true,
-//             (ValueType::Bool, ValueType::Bool) => true,
-//             (ValueType::Number, ValueType::Number) => true,
-//             (ValueType::String, ValueType::String) => true,
-//             (ValueType::BareWord, ValueType::BareWord) => true,
-//             (ValueType::Array { inner_ty: a_ty, .. }, ValueType::Array { inner_ty: b_ty, .. }) => {
-//                 a_ty == b_ty
-//             }
-//             (ValueType::Func(a_sign), ValueType::Func(b_sign)) => cmp_sign_types(a_sign, b_sign),
-//             (ValueType::StrctName(a), ValueType::StrctName(b)) => a == b,
-//             (ValueType::Generic(a), ValueType::Generic(b)) => a == b,
-//             (a, b) => {
-//                 warn!("Compared two value_types which are distinct: {} {}?", a, b);
-//                 warn!("If these 2 types are the same, add a match arm here");
-//                 false
-//             }
-//         }
-//     }
-// }
 
 impl ValueType {
     pub fn new_array(inner_ty: ValueType, inner_ty_decl: SourceCodeItem) -> Self {
