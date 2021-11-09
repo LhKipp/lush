@@ -24,3 +24,17 @@ passthrough 1 + 5
   }
 }
 ...
+Pipes break math expr
+===
+fn passthrough(in: num arg: num)
+    ret $in * $arg
+end
+pass
+3 | passthrough 1 + 5 | passthrough 2
+---
+{
+  "Ok": {
+    "Number": 36.0
+  }
+}
+...
