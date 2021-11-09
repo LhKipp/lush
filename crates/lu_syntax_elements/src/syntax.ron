@@ -139,6 +139,7 @@ Config(
         "StrctCtorExpr",
         "ArrayExpr",
         "TableExpr",
+        "CmdStmt",
         ],),
     ( name: "Statement",is_generic: true, represents_element_names: [
         "RetStmt",

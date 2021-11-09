@@ -208,12 +208,11 @@ fn second_level_stmt() -> OrRule {
         kind: None,
         rules: vec_box![
             LetStmtRule {},
+            BlockStmtRule::new_lazy_rule(),
             PipedCmdsStmtRule {},
             RetStmtRule {},
             ForStmtRule {},
             IfStmtRule {},
-            ValueExprRule {},
-            BlockStmtRule::new_lazy_rule(),
         ],
     }
 }

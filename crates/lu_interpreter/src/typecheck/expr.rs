@@ -23,6 +23,7 @@ impl TypeCheck for ValueExprElement {
             ValueExprElement::ArrayExpr(n) => n.typecheck(state),
             ValueExprElement::TableExpr(n) => n.typecheck(state),
             ValueExprElement::StrctCtorExpr(n) => n.typecheck(state),
+            ValueExprElement::CmdStmt(n) => n.typecheck(state),
         }
     }
 }

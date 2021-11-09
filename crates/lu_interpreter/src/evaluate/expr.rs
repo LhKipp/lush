@@ -10,17 +10,18 @@ impl Evaluable for ValueExprElement {
         &[]
     }
 
-    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
-            ValueExprElement::BooleanExpr(n) => n.evaluate(scope),
-            ValueExprElement::BareWord(n) => n.evaluate(scope),
-            ValueExprElement::NumberExpr(n) => n.evaluate(scope),
-            ValueExprElement::MathExpr(n) => n.evaluate(scope),
-            ValueExprElement::StringExpr(n) => n.evaluate(scope),
-            ValueExprElement::ValuePathExpr(n) => n.evaluate(scope),
-            ValueExprElement::ArrayExpr(n) => n.evaluate(scope),
-            ValueExprElement::TableExpr(n) => n.evaluate(scope),
-            ValueExprElement::StrctCtorExpr(n) => n.evaluate(scope),
+            ValueExprElement::BooleanExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::BareWord(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::NumberExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::MathExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::StringExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::ValuePathExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::ArrayExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::TableExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::StrctCtorExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
         }
     }
 }

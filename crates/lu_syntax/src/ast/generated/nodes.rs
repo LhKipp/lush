@@ -3631,6 +3631,7 @@ pub enum ValueExprElement {
     StrctCtorExpr(StrctCtorExprNode),
     ArrayExpr(ArrayExprNode),
     TableExpr(TableExprNode),
+    CmdStmt(CmdStmtNode),
     }
 
 impl ValueExprElement {
@@ -3648,12 +3649,14 @@ impl AstElement for ValueExprElement {
         
         
         
+        
         match kind{
-            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | ArrayExpr | TableExpr => true,
+            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | ArrayExpr | TableExpr | CmdStmt => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -3674,6 +3677,7 @@ impl AstElement for ValueExprElement {
             StrctCtorExpr => ValueExprElement::StrctCtorExpr(StrctCtorExprNode { syntax: syntax.into_node().unwrap() }),
             ArrayExpr => ValueExprElement::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
             TableExpr => ValueExprElement::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
+            CmdStmt => ValueExprElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
         Some(res)
@@ -3708,6 +3712,9 @@ impl AstElement for ValueExprElement {
             
             ValueExprElement::TableExpr(it) => it.syntax.clone().into(),
             
+            
+            ValueExprElement::CmdStmt(it) => it.syntax.clone().into(),
+            
             }
     }
 }
@@ -3723,6 +3730,7 @@ impl HasSyntaxKind for ValueExprElement{
             ValueExprElement::StrctCtorExpr(it) => it.get_syntax_kind(),
             ValueExprElement::ArrayExpr(it) => it.get_syntax_kind(),
             ValueExprElement::TableExpr(it) => it.get_syntax_kind(),
+            ValueExprElement::CmdStmt(it) => it.get_syntax_kind(),
             }
     }
 }

@@ -1,4 +1,4 @@
-use super::{CmdStmtRule, Rule};
+use super::{Rule};
 use crate::{
     grammar::{OrRule, ValueExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},
@@ -16,7 +16,7 @@ impl Rule for PipedCmdsStmtRule {
     fn matches(&self, p: &mut Parser) -> bool {
         let piped_arg_rule = OrRule {
             kind: Some("PipedArgRule".into()),
-            rules: vec_box![CmdStmtRule {}, ValueExprRule {}],
+            rules: vec_box![ValueExprRule {}],
         };
         piped_arg_rule.matches(p)
     }
@@ -29,7 +29,7 @@ impl Rule for PipedCmdsStmtRule {
 
         let piped_arg_rule = OrRule {
             kind: Some("PipedArgRule".into()),
-            rules: vec_box![CmdStmtRule {}, ValueExprRule {}],
+            rules: vec_box![ValueExprRule {}],
         };
 
         loop {

@@ -1,7 +1,7 @@
 use log::warn;
 use lu_interpreter_structs::{FlagVariant, ValueType};
 use lu_syntax::{
-    ast::{CmdOrValueExprElement, PipedCmdsStmtNode},
+    ast::{PipedCmdsStmtNode, ValueExprElement},
     AstElement,
 };
 use rusttyc::TcKey;
@@ -21,7 +21,7 @@ impl TypeCheck for PipedCmdsStmtNode {
 
         let mut ret_key = first_in_key;
         for cmd in self.piped_args() {
-            if let CmdOrValueExprElement::CmdStmt(cmd) = &cmd {
+            if let ValueExprElement::CmdStmt(cmd) = &cmd {
                 let cmd_name = cmd.get_cmd_name();
                 let passed_flags = FlagVariant::convert(cmd.get_passed_flags());
                 if let Some(cmd_keys) = ty_state.get_tc_cmd_from_cmd_usage(&cmd_name, &passed_flags)
