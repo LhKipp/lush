@@ -40,7 +40,7 @@ Type coherence is statically verified. Meaning: there won't be type errors durin
 ```lush
 let lush = 1
 if $lush < 3    # The following equality operators are supported: < <= == != => >
-    echo Hello
+    echo hello
 elif $lush == 42
     echo world
 else
@@ -74,7 +74,7 @@ echo $arg # starting the 'echo' process with $arg as its first argument
 
 For convenience: when passing simple-words to arguments of type `str`, they do not have to be quoted.
 ```lush
-echo Hello World "!" # Better quote operators. 
+echo hello world "!" # Better quote operators. 
                      # They are not promoted to strings automatically.
 ```
 ## Pipes
@@ -264,6 +264,36 @@ end
 ```
 As seen, writing a function-type is similar to declaring a function. Only the function name is left out.
 
+### A word about return values
+
+While in traditional shells functions and processes return their results (mostly) via stdout, the same approach has not been choosen for lush-functions. However to best work with external processes, the following is done:
+
+- The return value of an unknown command / external command is assumed to be the content written to its stdout file descriptor. Therefore this content is captured and returned as a `str`. If the return value of the command is not further handled, its printed to stdout.
+- The return value of an known command / lush function is its `ret` value. Therefore no content written to its stdout is captured.
+
+This design decision leads to some situations to be aware of
+
+```lush
+fn print_and_ret_num
+    echo this text is always printed to the terminal
+    ret 1
+end
+# print_and_ret_num will write to stdout.
+let x = print_and_ret_num
+# The output of the external command "echo" is captured and assigned to x
+let y = echo this text does not appear on the stdout
+# The output of the external command "echo" is captured, but not further handled.
+# Therefore it is then printed to stdout.
+echo this text will appear on the stdout
+
+# The output of the external command "echo" is later piped to another command.
+# Therefore it is not printed to the stdout by the lush-engine
+echo this text gets piped to cat | cat
+# Only the return value of "print_and_ret_num" gets piped to cat.
+# "print_and_ret_num" will still print to the stdout.
+print_and_ret_num | cat
+```
+
 ## Modules
 Lush has a module system. A module is a file from which functions and struct declarations will be exported. Modules can be brought into scope via a `use` directive.
 There are 3 different sources of modules
@@ -302,8 +332,8 @@ Please note:
 - The `use` directive, does not evaluate anything. Files imported via `use` are not run. e.G.
 ```lush
 # In ./greet.lu:
-# echo Hello
-use ./greet.lush # Won't execute "echo Hello"
+# echo hello
+use ./greet.lush # Won't execute "echo hello"
 ```
 
 ## Math-Expressions
