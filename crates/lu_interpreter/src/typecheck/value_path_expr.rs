@@ -17,8 +17,8 @@ impl TypeCheck for ValuePathExprNode {
                     if let Some(key) = strct
                         .field_keys
                         .iter()
-                        .find(|(name, _)| name == &part)
-                        .map(|(_, key)| key.clone())
+                        .find(|field| &field.name == &part)
+                        .map(|field| field.ty.clone())
                     {
                         prev_key = Some(key)
                     } else {

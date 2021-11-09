@@ -149,5 +149,20 @@ pub(crate) fn ty_err_to_diagnostic(
                 )
                 .with_message("Flag declared here"),
             ]),
+        TyErr::TableRowToManyCol { row } => Diagnostic::error()
+            .with_message("The table row contains to many values")
+            .with_code("E-Ty0050")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&row, sf_node_addr_to_file_id),
+                row.range,
+            )]),
+
+        TyErr::TableRowToFewCol { row } => Diagnostic::error()
+            .with_message("The table row contains to few values")
+            .with_code("E-Ty0051")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&row, sf_node_addr_to_file_id),
+                row.range,
+            )]),
     }
 }

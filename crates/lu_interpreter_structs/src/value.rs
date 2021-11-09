@@ -13,9 +13,6 @@ use serde::{Deserialize, Serialize};
 use crate::dbg_state::DbgState;
 use crate::{Command, CommandCollection, Strct};
 
-// pub const NIL_VAL: Value = Value::Nil;
-
-// TODO move this to lu_interpreter_structs
 #[derive(Clone, Serialize, Deserialize, EnumAsInner)]
 pub enum Value {
     // Lu has value semantics. All the time! This allows for easier reasoning about

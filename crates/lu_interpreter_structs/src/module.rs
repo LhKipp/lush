@@ -9,7 +9,7 @@ use lu_syntax::{
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
-use std::fmt::Display;
+use std::{convert::TryInto, fmt::Display};
 
 #[derive(Clone, Debug, Eq)]
 pub struct ModInfo {
@@ -139,7 +139,13 @@ impl ModInfo {
         // Source the struct fields (either user provided or default)
         let fields: Vec<StrctField> = struct_stmt
             .fields()
-            .map(|field| StrctField::from_node(&field))
+            .enumerate()
+            .map(|(i, field)| {
+                StrctField::from_node(
+                    &field,
+                    i.try_into().expect("No strct has more than 2 billion fields"),
+                )
+            })
             .collect();
 
         Strct::new(name, fields, struct_stmt.to_item())

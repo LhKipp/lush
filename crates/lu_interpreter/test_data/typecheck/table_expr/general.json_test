@@ -1,0 +1,43 @@
+Compatible value assignment from field 
+===
+struct Ip{ v: num }
+let x:Ip = Ip { v: 1 }
+let x_v: num = $x.v
+---
+{
+  "Ok": null
+}
+...
+Incompatible value assignment from field 
+===
+struct Ip{ v: str }
+let x:Ip = Ip { v: "val" }
+let x_v: num = $x.v
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": " v: str",
+            "range": [
+              10,
+              17
+            ]
+          },
+          "lhs_ty": "str",
+          "rhs_decl": {
+            "content": "let x_v: num",
+            "range": [
+              47,
+              59
+            ]
+          },
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...

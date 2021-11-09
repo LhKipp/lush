@@ -22,6 +22,7 @@ mod cmd_stmt;
 mod condition;
 mod expr;
 mod fn_stmt;
+mod for_stmt;
 mod if_stmt;
 mod let_stmt;
 mod math_expr;
@@ -29,9 +30,9 @@ mod piped_cmds_stmt;
 mod ret_stmt;
 mod source_file;
 mod statement;
+mod table_expr;
 mod test;
 mod value_path_expr;
-mod for_stmt;
 
 pub struct TyCheckState {
     /// A TcKey (TermCheckKey) always refers to a node in the ast
@@ -469,11 +470,17 @@ impl PipelineStage for TyCheckState {
 }
 
 #[derive(Debug, Clone, new)]
+pub struct TcStrctField {
+    pub name: String,
+    pub ty: TcKey,
+    pub field_num: u32,
+}
+#[derive(Debug, Clone, new)]
 pub struct TcStrct {
     /// Key of this strct decl. (used to get SourceCodeItem from tc_expr_table)
     self_key: TcKey,
     /// Always sorted by field name
-    field_keys: Vec<(String, TcKey)>,
+    field_keys: Vec<TcStrctField>,
 }
 
 impl TcStrct {
@@ -483,13 +490,12 @@ impl TcStrct {
         let field_keys = l_strct
             .fields
             .iter()
-            .map(|field| {
-                (
-                    field.name.clone(),
-                    ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
-                )
+            .map(|field| TcStrctField {
+                name: field.name.clone(),
+                ty: ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
+                field_num: field.field_num,
             })
-            .sorted_by(|a, b| Ord::cmp(&a.0, &b.0))
+            .sorted_by(|a, b| Ord::cmp(&a.name, &b.name))
             .collect();
 
         let self_key = ty_state.new_term_key_concretiziesd(

@@ -1,10 +1,10 @@
-use crate::{AstElementChildren, AstNode, AstToken};
+use crate::{AstNode, AstNodeChildren};
 
-use super::{support, ArrayExprNode};
+use super::{support, ArrayExprNode, StrctNameToken, TableExprNode};
 
 impl TableExprNode {
-    pub fn tbl_signature(&self) -> TableSignatureNode {
-        support::node_child(self.syntax())
+    pub fn strct_name(&self) -> Option<StrctNameToken> {
+        support::token_child(self.syntax())
     }
 
     pub fn rows(&self) -> AstNodeChildren<ArrayExprNode> {

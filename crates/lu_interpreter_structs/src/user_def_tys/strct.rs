@@ -10,11 +10,12 @@ use serde::{Deserialize, Serialize};
 pub struct StrctField {
     pub name: String,
     pub ty: ValueType,
+    pub field_num: u32,
     pub decl: SourceCodeItem,
 }
 
 impl StrctField {
-    pub fn from_node(field_node: &StrctFieldNode) -> StrctField {
+    pub fn from_node(field_node: &StrctFieldNode, field_num: u32) -> StrctField {
         let name = field_node.name();
         let decl = field_node.to_item();
         let ty = field_node
@@ -23,7 +24,7 @@ impl StrctField {
             .map(|ty_spec| ValueType::from_node(&ty_spec))
             .unwrap_or(ValueType::Unspecified);
 
-        StrctField::new(name, ty, decl)
+        StrctField::new(name, ty, field_num, decl)
     }
 }
 

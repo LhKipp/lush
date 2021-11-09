@@ -3,7 +3,7 @@ use log::warn;
 use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StrctCtorExprNode,
-        StringExprNode, TableExprNode, ValueExprElement,
+        StringExprNode, ValueExprElement,
     },
     AstNode, AstToken,
 };
@@ -76,12 +76,6 @@ impl TypeCheck for ArrayExprNode {
     }
 }
 
-impl TypeCheck for TableExprNode {
-    fn do_typecheck(&self, _: &[TypeCheckArg], _state: &mut TyCheckState) -> Option<TcKey> {
-        todo!()
-    }
-}
-
 impl TypeCheck for StrctCtorExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
         // panic!("Ty chekcing ");
@@ -106,11 +100,11 @@ impl TypeCheck for StrctCtorExprNode {
             for either_or in strct_key
                 .field_keys
                 .iter()
-                .merge_join_by(usages, |decl, field| Ord::cmp(&decl.0, &field.0))
+                .merge_join_by(usages, |decl, field| Ord::cmp(&decl.name, &field.0))
             {
                 match either_or {
-                    EitherOrBoth::Both((_, decl_key), (_, usage_key)) => {
-                        ty_state.equate_keys(decl_key.clone(), usage_key);
+                    EitherOrBoth::Both(field, (_, usage_key)) => {
+                        ty_state.equate_keys(field.ty.clone(), usage_key);
                     }
                     EitherOrBoth::Left(_) => todo!("Generate error for missing key."),
                     EitherOrBoth::Right(_) => {

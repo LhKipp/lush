@@ -47,6 +47,12 @@ pub enum TyErr {
         flag_decl: SourceCodeItem,
         cmd_stmt: SourceCodeItem,
     },
+    TableRowToManyCol {
+        row: SourceCodeItem,
+    },
+    TableRowToFewCol {
+        row: SourceCodeItem,
+    },
 }
 
 impl<S: Into<String>> From<S> for TyErr {
