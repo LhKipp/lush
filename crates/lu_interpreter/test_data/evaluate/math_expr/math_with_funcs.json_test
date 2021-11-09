@@ -38,3 +38,36 @@ pass
   }
 }
 ...
+Parentherized commands are evaluated and passed as args
+===
+fn take_nums(arg1: num arg2: num)
+    ret $arg1 + $arg2
+end
+fn ret_num
+    ret 1
+end
+take_nums (ret_num) (ret_num)
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...
+Not parentherized commands are treated as barewords
+===
+fn take_str(arg1: str)
+    ret $arg1
+end
+fn ret_str
+    ret "hi"
+end
+take_str ret_str
+---
+{
+  "Ok": {
+    "BareWord": "ret_str"
+  }
+}
+...
+
