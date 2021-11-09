@@ -1,0 +1,26 @@
+Command stmt does not eat operators
+===
+fn ret_num
+    ret 3
+end
+ret_num + 41 == (ret_num) + 41
+---
+{
+  "Ok": {
+    "Bool": true
+  }
+}
+...
+Command stmt eats math expr
+===
+fn passthrough(arg: num)
+    ret $arg * 3
+end
+passthrough 1 + 5
+---
+{
+  "Ok": {
+    "Number": 18.0
+  }
+}
+...
