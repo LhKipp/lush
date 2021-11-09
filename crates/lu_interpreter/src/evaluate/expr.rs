@@ -1,5 +1,5 @@
 use lu_syntax::ast::{
-    ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StringExprNode, TableExprNode,
+    ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StringExprNode,
     ValueExprElement, ValuePathExprNode,
 };
 
@@ -81,12 +81,6 @@ impl Evaluable for ArrayExprNode {
             values.push(val.evaluate(scope)?);
         }
         Ok(Value::new_array(values))
-    }
-}
-
-impl Evaluable for TableExprNode {
-    fn do_evaluate(&self, _: &[EvalArg], _scope: &mut SyScope) -> EvalResult {
-        todo!()
     }
 }
 

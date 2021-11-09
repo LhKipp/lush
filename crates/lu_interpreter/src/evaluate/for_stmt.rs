@@ -62,11 +62,13 @@ impl Evaluable for ForStmtNode {
                     .insert_var(var);
             }
             // We pushed ForStmtFrame, block doesn't need to push additional frame
-            block.evaluate_with_args(&[EvalArg::BlockNoPushFrame], scope)?;
+            // Make sure we deallocate ForStmtFrame before returning
+            let eval_result = block.evaluate_with_args(&[EvalArg::BlockNoPushFrame], scope);
             {
                 let mut scope = scope.lock();
                 scope.pop_frame(&ScopeFrameTag::ForStmtFrame);
             }
+            eval_result?;
 
             lu_dbg::after_eval(&self.get_ast_id(), scope);
         }

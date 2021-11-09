@@ -1,4 +1,5 @@
 use derive_new::new;
+use itertools::Itertools;
 use lu_error::SourceCodeItem;
 use lu_syntax::ast::StrctFieldNode;
 use lu_syntax::AstNode;
@@ -33,4 +34,13 @@ pub struct Strct {
     pub name: String,
     pub fields: Vec<StrctField>,
     pub decl: SourceCodeItem,
+}
+
+impl Strct {
+    pub fn fields_sorted_by_order(&self) -> Vec<&StrctField> {
+        self.fields
+            .iter()
+            .sorted_by(|a, b| Ord::cmp(&a.field_num, &b.field_num))
+            .collect()
+    }
 }

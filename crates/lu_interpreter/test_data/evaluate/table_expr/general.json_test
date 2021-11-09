@@ -1,0 +1,27 @@
+Table is constructed
+===
+struct Person{name: str}
+fn ret_inner_val(arg: [Person])
+    for p in $arg
+        ret $p
+    end
+end
+let persons = [(Person) ["Alice"]]
+ret_inner_val $persons
+---
+{
+  "Ok": {
+    "Strct": [
+      "Person",
+      [
+        [
+          "name",
+          {
+            "String": "Alice"
+          }
+        ]
+      ]
+    ]
+  }
+}
+...

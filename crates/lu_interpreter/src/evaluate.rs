@@ -22,6 +22,7 @@ mod source_file;
 mod statement;
 mod strct_stmt;
 mod test;
+mod table_expr;
 
 macro_rules! handle_dbg_intervention_before {
     ($dbg_result: ident, $scope: ident) => {{
