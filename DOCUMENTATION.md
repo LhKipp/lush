@@ -306,6 +306,53 @@ Please note:
 use ./greet.lush # Won't execute "echo Hello"
 ```
 
+## Math-Expressions
+Operators in lush behave like they do in many popular programming languages (e.G. python). Math can be done directly and does not need special function calls / expressions. 
+
+The following math-operators are currently supported
+* "+"     : Addition
+* "-"     : Subtraction
+* "*"     : Multiplication
+* "//"    : Division
+* "<"     : Less than
+* ">"     : Greater than
+* ">="    : Greater or equal than
+* "<="    : Less or equal than
+* "=="    : Equality
+* "!="    : Inequality
+
+This has some advantages, but also opens up for some subtle surprises.
+
+All arguments are evaluated before passing them. And so are math-expressions
+```lush
+echo 1 + 1 # Echo will receive one argument: 2
+```
+Command calls can be part of an math expression
+```lush
+fn ret_num
+    ret 41
+end
+ret_num + 1 == 42 # true
+```
+Passing the result of an command as an argument to the next is possible, but be sure to quote correctly
+```lush
+fn take_str(arg1: str)
+    ret $arg1
+end
+fn ret_str
+    ret "hi"
+end
+# Wrong example:
+take_str ret_str    # take_str takes a bareword "ret_str" as $arg1.
+# Correct example:
+take_str (ret_str)  # Argument (ret_str) is a command invocation and the result will be passed as $arg1
+```
+
+The ">" operator does not redirect
+```lush
+cmd_which_prints > /dev/null # The "bigger than" operator does not redirect stdout
+```
+
 ##  Debugging
 `lush` offers the ability to run the code in an simple REPL debugger. Try `lush --debug <file>` to try it out.
 The debugger will warn and ask for confirmation before executing any possible impure commands. Therefore it is safe to try out scripts in the development phase. 
