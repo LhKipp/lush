@@ -1,6 +1,9 @@
 use crate::{AstElementChildren, AstNode, AstToken};
 
-use super::{ArrayExprNode, BareWordToken, BooleanExprNode, FalseKeywordToken, NumberExprNode, NumberToken, StringContentToken, StringExprNode, ValueExprElement, support};
+use super::{
+    support, ArrayExprNode, BareWordToken, BooleanExprNode, FalseKeywordToken, NumberExprNode,
+    NumberToken, StringContentToken, StringExprNode, ValueExprElement,
+};
 
 impl NumberExprNode {
     pub fn value(&self) -> f64 {
@@ -18,18 +21,6 @@ impl NumberToken {
             .expect(&format!("Error parsing {} to a number", self.text()))
     }
 }
-
-// impl TableExprNode {
-//     pub fn value(&self) -> Value {
-//         todo!()
-//     }
-// }
-
-// impl ValuePathExprNode {
-//     pub fn value(&self) -> Value {
-//         todo!()
-//     }
-// }
 
 impl BareWordToken {
     pub fn value(&self) -> String {

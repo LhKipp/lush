@@ -13,6 +13,7 @@ mod piped_cmds_stmt;
 mod ret_stmt;
 mod signature;
 mod strct_stmt;
+mod table_expr;
 mod type_;
 mod use_stmt;
 mod value_path_expr;
