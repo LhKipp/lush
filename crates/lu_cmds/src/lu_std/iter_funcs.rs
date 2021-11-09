@@ -13,9 +13,7 @@ impl LuNativeStdMod for IterFuncsMod {
         fn map (in: [T] ret: [U] map_fn: fn(ret:U arg: T))
             let result = []
             for v in $in
-                let v_u = map_fn $v
-                let new_arr = push $result $v_u
-                $result = $new_arr
+                $result = push $result (map_fn $v)
             end
             ret $result
         end
@@ -24,8 +22,7 @@ impl LuNativeStdMod for IterFuncsMod {
             let result = []
             for v in $in
                 if filter_fn $v
-                    let new_arr = push $result $v
-                    $result = $new_arr
+                    $result = push $result $v
                 end
             end
             ret $result
