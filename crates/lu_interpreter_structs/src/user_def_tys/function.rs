@@ -307,6 +307,10 @@ impl Command for Function {
         Some(self)
     }
 
+    fn as_function_mut(&mut self) -> Option<&mut Function> {
+        Some(self)
+    }
+
     fn signature(&self) -> &Signature {
         &self.signature
     }

@@ -68,6 +68,10 @@ pub trait Command: CommandClone + Debug {
         None
     }
 
+    fn as_function_mut(&mut self) -> Option<&mut Function> {
+        None
+    }
+
     /// Returns $args
     fn expect_args<'a>(&self, scope: &'a Scope<Variable>) -> &'a Rc<Vec<Value>> {
         match &scope.find_var(ARGS_VAR_NAME).expect("Always present").val {

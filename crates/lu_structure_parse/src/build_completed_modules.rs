@@ -2,7 +2,7 @@ use lu_error::util::Outcome;
 use lu_interpreter_structs::*;
 use lu_syntax::Parse;
 
-use crate::{load_mod_paths, LoadModulesConfig};
+use crate::{load_mod_paths, resolve_strct_tys, LoadModulesConfig};
 
 /// Returns (start_id, modules)
 pub fn modules_from_start_parse(
@@ -15,7 +15,7 @@ pub fn modules_from_start_parse(
     let modules = start_mod.map_flattened(|start_mod| load_mod_paths(start_mod, cfg));
 
     // Step 3: Convert ValueType::StrctName to ValueType::Strct
-    // TODO
+    let modules = modules.map_flattened(|mods| resolve_strct_tys::resolve_strct_types(mods));
 
     // Step 4:
     // General purpose resolution?

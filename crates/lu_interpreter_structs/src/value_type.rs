@@ -257,7 +257,13 @@ impl TcVariant for ValueType {
             | ValueType::BareWord => Arity::Fixed(0),
             ValueType::Array { .. } => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
-            ValueType::StrctName(_) => unreachable!("Tmp type"),
+            ValueType::StrctName(name) => {
+                warn!(
+                    "Returning arity for tmp type ValueType::StrctName({})",
+                    name
+                );
+                Arity::Fixed(0)
+            }
         }
     }
 }
