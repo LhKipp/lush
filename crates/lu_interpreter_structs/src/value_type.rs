@@ -33,12 +33,14 @@ fn hash_as_ptr<H: Hasher>(strct: &Weak<RwLock<Strct>>, state: &mut H) {
     Hash::hash(&strct.as_ptr(), state)
 }
 
-fn serialize_name_only<S>(_: &Weak<RwLock<Strct>>, _: S) -> Result<S::Ok, S::Error>
+fn serialize_name_only<S>(strct: &Weak<RwLock<Strct>>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
     //serialze_newtype_variant
-    todo!();
+    let strct = Weak::upgrade(strct).unwrap();
+    let l_strct = strct.read();
+    serializer.serialize_newtype_struct("StrctName", &l_strct.name)
 }
 // #[derive(Educe)]
 // #[educe(Hash)]

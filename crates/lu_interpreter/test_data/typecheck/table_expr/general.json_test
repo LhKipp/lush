@@ -1,13 +1,21 @@
 Compatible table expr
 ===
-struct Ratings{ n: num s: str }
-[(Ratings)
-[1 "lush"]
-[2 "nushell"]
-[3 "fish"]]
+struct Ratings{ n: num b: bool }
+[(Ratings)[1 true] [2 true] [3 true]]
 ---
 {
-  "Ok": null
+  "Ok": {
+    "Array": {
+      "inner_ty": "Unspecified",
+      "inner_ty_decl": {
+        "content": "[(Ratings)[1 true] [2 true] [3 true]]",
+        "range": [
+          33,
+          70
+        ]
+      }
+    }
+  }
 }
 ...
 To few values in row
@@ -46,7 +54,7 @@ struct Ratings{ n: num s: str }
       "Ty": {
         "TableRowToManyCol": {
           "row": {
-            "content": "[1 "lush" 1]",
+            "content": "[1 \"lush\" 1]",
             "range": [
               47,
               59
@@ -58,3 +66,16 @@ struct Ratings{ n: num s: str }
   ]
 }
 ...
+Tables inner ty compatible with strct decl
+===
+struct Person { name: str }
+let persons = [(Person) ["Alice"]]
+for pers in $persons
+    let x: Person = $pers
+end
+---
+{
+  "Ok": null
+}
+...
+

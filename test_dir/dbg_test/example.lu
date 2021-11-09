@@ -1,9 +1,9 @@
 #!/bin/lush
 
-echo $does_not_exist
-echo 1 == "ty mismatch"
-for txt $text # in is missing
-    if $txt "lush" # an operator is missing
-        echo $txt
-    end
+struct Ratings { n: num s: str }
+let ratings =
+[(Ratings)
+[1 "lush"]]
+for rating in ratings
+    let x: Ratings = $rating
 end

@@ -1,6 +1,6 @@
 use bimap::BiHashMap;
 use itertools::Itertools;
-use log::{debug, warn};
+use log::{debug};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_interpreter_structs::{Command, FlagVariant};
@@ -185,8 +185,10 @@ impl TyCheckState {
 
             let res = self.checker.impose(key.concretizes_explicit(ty.clone()));
             self.handle_tc_result(res);
+        } else if let Some(_) = ty.as_strct() {
+            let res = self.checker.impose(key.concretizes_explicit(ty));
+            self.handle_tc_result(res);
         } else {
-            warn!("strct not handled");
             let res = self.checker.impose(key.concretizes_explicit(ty));
             self.handle_tc_result(res);
         }
