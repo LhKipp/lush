@@ -2,8 +2,8 @@ use itertools::{EitherOrBoth, Itertools};
 use log::warn;
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, BooleanExprNode, CmdOrValueExprElement, NumberExprNode,
-        StrctCtorExprNode, StringExprNode, TableExprNode, ValueExprElement,
+        ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StrctCtorExprNode,
+        StringExprNode, TableExprNode, ValueExprElement,
     },
     AstNode, AstToken,
 };
@@ -24,15 +24,6 @@ impl TypeCheck for ValueExprElement {
             ValueExprElement::TableExpr(n) => n.typecheck(state),
             ValueExprElement::StrctCtorExpr(n) => n.typecheck(state),
             ValueExprElement::CmdStmt(n) => n.typecheck(state),
-        }
-    }
-}
-
-impl TypeCheck for CmdOrValueExprElement {
-    fn do_typecheck(&self, args: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
-        match self {
-            CmdOrValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, state),
-            CmdOrValueExprElement::ValueExpr(n) => n.typecheck_with_args(args, state),
         }
     }
 }

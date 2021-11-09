@@ -125,10 +125,6 @@ Config(
     ( name: "TableExpr"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "BooleanExpr"                  , is_node: true                                , has_rule: false   , ) ,//TODO
     // === GENERIC META NODES === 
-    ( name: "CmdOrValueExpr", is_generic: true, has_rule: false, represents_element_names: [
-        "CmdStmt",
-        "ValueExpr",
-        ],),
     ( name: "ValueExpr", is_generic: true, has_rule: true, represents_element_names: [
         "BareWord",
         "NumberExpr",

@@ -1,8 +1,8 @@
 use crate::{AstNode, AstNodeChildren, AstToken};
 
 use super::{
-    support, BareWordToken, CmdOrValueExprElement, LuTypeNode, StrctCtorExprNode,
-    StrctFieldCtorStmtNode, StrctFieldNameToken, StrctFieldNode, StrctNameToken, StrctStmtNode,
+    support, BareWordToken, LuTypeNode, StrctCtorExprNode, StrctFieldCtorStmtNode,
+    StrctFieldNameToken, StrctFieldNode, StrctNameToken, StrctStmtNode, ValueExprElement,
 };
 
 impl StrctStmtNode {
@@ -48,7 +48,7 @@ impl StrctFieldCtorStmtNode {
     }
 
     /// Returns the rhs of the assignment
-    pub fn value(&self) -> Option<CmdOrValueExprElement> {
+    pub fn value(&self) -> Option<ValueExprElement> {
         support::element_child(self.syntax())
     }
 }

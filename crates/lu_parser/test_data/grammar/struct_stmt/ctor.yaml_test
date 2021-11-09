@@ -10,7 +10,6 @@ Ip{ a: 1 b: 2 }
 - Token: "StrctFieldName (len: 1)"
 - Token: "DoublePoint (len: 1)"
 - Token: "Whitespace (len: 1)"
-- Start: Tombstone
 - Start: NumberExpr
 - Token: "Number (len: 1)"
 - Finish: ""
@@ -20,7 +19,6 @@ Ip{ a: 1 b: 2 }
 - Token: "StrctFieldName (len: 1)"
 - Token: "DoublePoint (len: 1)"
 - Token: "Whitespace (len: 1)"
-- Start: Tombstone
 - Start: NumberExpr
 - Token: "Number (len: 1)"
 - Finish: ""

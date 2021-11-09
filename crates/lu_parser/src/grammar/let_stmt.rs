@@ -1,5 +1,5 @@
 use crate::{
-    grammar::{cmd_or_value_expr_rule, LuTypeRule},
+    grammar::{LuTypeRule, ValueExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::*,
     T,
@@ -31,7 +31,7 @@ impl Rule for LetStmtRule {
             LuTypeRule {}.parse(p);
         }
         if p.eat_after(T![=], CMT_NL_WS) {
-            cmd_or_value_expr_rule().parse(p);
+            ValueExprRule {}.parse(p);
         }
         Some(m.complete(p, LetStmt))
     }

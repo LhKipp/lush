@@ -79,7 +79,7 @@ impl Rule for StrctFieldCtorStmtRule {
         }
 
         if p.expect_after(T![:], CMT_NL_WS) {
-            cmd_or_value_expr_rule().parse(p);
+            ValueExprRule {}.parse(p);
         }
 
         Some(m.complete(p, StrctFieldCtorStmt))

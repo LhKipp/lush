@@ -1,6 +1,6 @@
 use lu_syntax::ast::{
-    ArrayExprNode, BareWordToken, BooleanExprNode, CmdOrValueExprElement, NumberExprNode,
-    StringExprNode, TableExprNode, ValueExprElement, ValuePathExprNode,
+    ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StringExprNode, TableExprNode,
+    ValueExprElement, ValuePathExprNode,
 };
 
 use crate::evaluate::eval_prelude::*;
@@ -22,15 +22,6 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::TableExpr(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::StrctCtorExpr(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
-        }
-    }
-}
-
-impl Evaluable for CmdOrValueExprElement {
-    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
-        match self {
-            CmdOrValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
-            CmdOrValueExprElement::ValueExpr(n) => n.evaluate_with_args(args, scope),
         }
     }
 }
