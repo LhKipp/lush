@@ -1,19 +1,19 @@
-mod push;
+mod ls;
 
-use crate::cmd_prelude::*;
-use push::ArrayPushCmd;
-
-use vec_rc::vec_rc;
+use crate::{
+    cmd_prelude::*,
+    lu_std::fs::ls::{FsLsCmd, LS_ENTRY_STRCT},
+};
 
 use super::LuRustStdMod;
 
-static ARRAY_MOD_PATH: Lazy<ModPath> = Lazy::new(|| ModPath::StdPath("std:array".into()));
+static FS_MOD_PATH: Lazy<ModPath> = Lazy::new(|| ModPath::StdPath("std:fs".into()));
 
-pub(crate) struct StdArrayMod {}
+pub(crate) struct StdFsMod {}
 
-impl LuRustStdMod for StdArrayMod {
+impl LuRustStdMod for StdFsMod {
     fn id(&self) -> String {
-        ARRAY_MOD_PATH.as_std_path().unwrap().clone()
+        FS_MOD_PATH.as_std_path().unwrap().clone()
     }
     fn rust_decl(&self) -> SourceCodeItem {
         lu_source_code_item!()
@@ -26,10 +26,10 @@ impl LuRustStdMod for StdArrayMod {
         vec![]
     }
     fn cmds(&self) -> Vec<Rc<dyn Command>> {
-        vec_rc![ArrayPushCmd::new()]
+        vec_rc![FsLsCmd::new()]
     }
 
     fn strcts(&self) -> Vec<std::sync::Arc<parking_lot::RwLock<Strct>>> {
-        vec![]
+        vec![LS_ENTRY_STRCT.clone()]
     }
 }

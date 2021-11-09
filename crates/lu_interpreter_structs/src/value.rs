@@ -185,6 +185,12 @@ impl From<OrderedFloat<f64>> for Value {
     }
 }
 
+impl From<String> for Value {
+    fn from(s: String) -> Self {
+        Value::String(s)
+    }
+}
+
 impl From<&BareWordToken> for Value {
     fn from(n: &BareWordToken) -> Self {
         Value::BareWord(n.value())

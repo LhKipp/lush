@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 use derive_more::From;
 use lu_error::SourceCodeItem;
@@ -7,6 +7,7 @@ use lu_syntax::{
     AstNode, AstToken,
 };
 use lu_syntax_elements::constants::IN_ARG_NAME;
+use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 
 use crate::{Command, CommandCollection, Strct, Value};
@@ -82,6 +83,12 @@ impl Variable {
             Value::new_strct_decl(strct),
             VarDeclNode::CatchAll(decl),
         )
+    }
+
+    pub fn new_strct_decl_arc(strct: Arc<RwLock<Strct>>) -> Variable {
+        let name = strct.read().name.clone();
+        let decl = strct.read().decl.clone();
+        Variable::new(name, Value::StrctDecl(strct), VarDeclNode::CatchAll(decl))
     }
 
     pub fn new_in(val: Value, decl: VarDeclNode) -> Self {

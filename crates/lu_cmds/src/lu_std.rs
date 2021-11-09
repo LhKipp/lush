@@ -2,6 +2,7 @@ mod array;
 mod iter_funcs;
 mod lu_native_std_mod;
 mod test;
+mod fs;
 
 use log::debug;
 use lu_interpreter_structs::{ModPath, ScopeFrame, Variable};

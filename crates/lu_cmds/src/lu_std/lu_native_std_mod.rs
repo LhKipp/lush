@@ -1,10 +1,6 @@
-use std::rc::Rc;
-
-use lu_error::SourceCodeItem;
-use lu_interpreter_structs::{
-    Command, ModInfo, ModPath, ScopeFrame, ScopeFrameTag, UsePath, Variable,
-};
-use lu_text_util::SourceCode;
+use crate::cmd_prelude::*;
+pub use parking_lot::RwLock;
+pub use std::sync::Arc;
 
 pub(crate) trait LuNativeStdMod: Send + Sync {
     fn id(&self) -> String;
@@ -29,6 +25,7 @@ pub(crate) trait LuRustStdMod: Send + Sync {
             .collect()
     }
     fn cmds(&self) -> Vec<Rc<dyn Command>>;
+    fn strcts(&self) -> Vec<Arc<RwLock<Strct>>>;
     fn frame(&self) -> ScopeFrame<Variable> {
         let self_mod_path = ModPath::StdPath(self.id());
         let modi = ModInfo::new_std_module(self_mod_path, self.rust_src(), self.uses_as_use_path());
@@ -37,6 +34,9 @@ pub(crate) trait LuRustStdMod: Send + Sync {
 
         for cmd in self.cmds() {
             frame.insert_var(Variable::new_func(cmd));
+        }
+        for strct in self.strcts() {
+            frame.insert_var(Variable::new_strct_decl_arc(strct));
         }
 
         frame
