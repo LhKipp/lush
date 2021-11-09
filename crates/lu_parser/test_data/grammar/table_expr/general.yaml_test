@@ -1,0 +1,68 @@
+Table with one column
+===
+[ (names: str) ]
+---
+- Start: TableExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Start: TableSignature
+- Token: "Whitespace (len: 1)"
+- Token: "LeftParenthesis (len: 1)"
+- Start: TableSignatureField
+- Token: "BareWord (len: 5)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "StringKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+...
+Table with row
+===
+[(names: str)
+ ["Alice"]
+ ["Bob"]]
+---
+- Start: TableExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Start: TableSignature
+- Token: "LeftParenthesis (len: 1)"
+- Start: TableSignatureField
+- Token: "BareWord (len: 5)"
+- Token: "DoublePoint (len: 1)"
+- Start: LuType
+- Token: "Whitespace (len: 1)"
+- Token: "StringKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+- Token: "RightParenthesis (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: ArrayExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 5)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Token: "Newline (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: ArrayExpr
+- Token: "LeftRectangularBrackets (len: 1)"
+- Start: StringExpr
+- Token: "DoubleQuote (len: 1)"
+- Token: "StringContent (len: 3)"
+- Token: "DoubleQuote (len: 1)"
+- Finish: ""
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+- Token: "RightRectangularBrackets (len: 1)"
+- Finish: ""
+...

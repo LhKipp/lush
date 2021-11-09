@@ -117,16 +117,10 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(StringExprRule {}),
             Box::new(BooleanExprRule {}),
             Box::new(StrctCtorExprRule {}),
-            Box::new(table_or_array_rule()),
+            Box::new(TableExprRule {}),
+            Box::new(ArrayExprRule {}),
             Box::new(CmdStmtRule {}),
         ],
-    }
-}
-
-pub(crate) fn table_or_array_rule() -> OrRule {
-    OrRule {
-        kind: None,
-        rules: vec![Box::new(TableExprRule {}), Box::new(ArrayExprRule {})],
     }
 }
 
@@ -159,18 +153,77 @@ impl Rule for TableExprRule {
 
     fn matches(&self, p: &mut Parser) -> bool {
         p.next_non(CMT_NL_WS) == T!["["]
+            // And also TableSignatureRule matches
             && p.next_non(&[Comment, Newline, Whitespace, T!["["]]) == T!["("]
     }
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
-        // TODO proper table parsing
-        p.eat_while(CMT_NL_WS);
         let m = p.start();
-        p.eat(T!["["]);
-        // arrays are allowed to span multiple lines
-        while p.eat(&[Whitespace, Newline]) || { value_expr_rule().opt(p).is_some() } {}
-        p.expect(T!["]"]);
+        if !p.expect_after(T!["["], CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
+        let table_sign_rule = TableSignatureRule {};
+        if table_sign_rule.parse(p).is_none() {
+            m.abandon(p);
+            return None;
+        }
+        let array_rule = ArrayExprRule {};
+        while array_rule.matches(p) {
+            array_rule.parse(p);
+        }
+        p.expect_after(T!["]"], CMT_NL_WS);
         Some(m.complete(p, TableExpr))
+    }
+}
+
+pub struct TableSignatureRule {}
+impl Rule for TableSignatureRule {
+    fn name(&self) -> String {
+        "TableSignatureRule".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == T!["("]
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
+        if !p.expect_after(T!["("], CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
+        let table_sign_field_rule = TableSignatureFieldRule {};
+        while table_sign_field_rule.matches(p) {
+            table_sign_field_rule.parse(p);
+        }
+        p.expect_after(T![")"], CMT_NL_WS);
+        Some(m.complete(p, TableSignature))
+    }
+}
+
+struct TableSignatureFieldRule;
+impl Rule for TableSignatureFieldRule {
+    fn name(&self) -> String {
+        "TableSignatureFieldRule".to_string()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        p.next_non(CMT_NL_WS) == BareWord
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
+        if !p.expect_after(BareWord, CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
+
+        if p.eat_after(T![:], CMT_NL_WS) {
+            LuTypeRule {}.parse(p);
+        }
+
+        Some(m.complete(p, TableSignatureField))
     }
 }
 
@@ -249,5 +302,20 @@ impl Rule for BooleanExprRule {
             return None;
         }
         Some(m.complete(p, BooleanExpr))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{parse_as, Event};
+
+    use super::TableExprRule;
+
+    use {conformance, serde_yaml};
+
+    #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/table_expr/general.yaml_test")]
+    fn parse_tables(s: &str) -> Vec<Event> {
+        lu_test_support::init_logger();
+        parse_as(s, &TableExprRule {})
     }
 }

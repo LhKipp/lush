@@ -123,6 +123,8 @@ Config(
     ( name: "ValuePathExpr"              , is_node: true                                , has_rule: true   , ) ,
     ( name: "ArrayExpr"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "TableExpr"                  , is_node: true                                , has_rule: true   , ) ,
+    ( name: "TableSignature"                  , is_node: true                                , has_rule: false   , ) ,
+    ( name: "TableSignatureField"                  , is_node: true                                , has_rule: false   , ) ,
     ( name: "BooleanExpr"                  , is_node: true                                , has_rule: false   , ) ,//TODO
     // === GENERIC META NODES === 
     ( name: "ValueExpr", is_generic: true, has_rule: true, represents_element_names: [
