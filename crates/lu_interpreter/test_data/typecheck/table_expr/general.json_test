@@ -1,40 +1,57 @@
-Compatible value assignment from field 
+Compatible table expr
 ===
-struct Ip{ v: num }
-let x:Ip = Ip { v: 1 }
-let x_v: num = $x.v
+struct Ratings{ n: num s: str }
+[(Ratings)
+[1 "lush"]
+[2 "nushell"]
+[3 "fish"]]
 ---
 {
   "Ok": null
 }
 ...
-Incompatible value assignment from field 
+To few values in row
 ===
-struct Ip{ v: str }
-let x:Ip = Ip { v: "val" }
-let x_v: num = $x.v
+struct Ratings{ n: num s: str }
+[(Ratings)
+    [1]]
 ---
 {
   "Err": [
     {
       "Ty": {
-        "TypesNotEqual": {
-          "lhs_decl": {
-            "content": " v: str",
+        "TableRowToFewCol": {
+          "row": {
+            "content": "[1]",
             "range": [
-              10,
-              17
+              47,
+              50
             ]
-          },
-          "lhs_ty": "str",
-          "rhs_decl": {
-            "content": "let x_v: num",
+          }
+        }
+      }
+    }
+  ]
+}
+...
+To many values in row
+===
+struct Ratings{ n: num s: str }
+[(Ratings)
+    [1 "lush" 1]]
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TableRowToManyCol": {
+          "row": {
+            "content": "[1 "lush" 1]",
             "range": [
               47,
               59
             ]
-          },
-          "rhs_ty": "num"
+          }
         }
       }
     }

@@ -46,7 +46,11 @@ impl TypeCheck for TableExprNode {
                     self.to_item(),
                     ValueType::new_array(ValueType::Unspecified, self.to_item()),
                 );
-                ty_state.equate_keys(own_key, strct.self_key);
+                let own_inner_key = ty_state
+                    .get_arr_inner_tc(&own_key)
+                    .expect("Just inserted")
+                    .clone();
+                ty_state.equate_keys(own_inner_key, strct.self_key);
                 return Some(own_key);
             }
         }
