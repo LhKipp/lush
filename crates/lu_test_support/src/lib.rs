@@ -7,7 +7,7 @@ pub mod test_prelude;
 #[macro_use]
 extern crate vec_rc;
 
-use std::{rc::Rc};
+use std::rc::Rc;
 
 pub use playground::*;
 use pretty_env_logger::env_logger;
@@ -32,14 +32,14 @@ pub fn make_test_interpreter_in_playground(
     playground: Playground,
 ) -> (ScopeFrame<Variable>, InterpreterCfg) {
     (
-        make_global_frame(),
+        make_test_global_frame(),
         InterpreterCfg {
             plugin_dir: playground.plugin_dir(),
         },
     )
 }
 
-fn make_global_frame() -> ScopeFrame<Variable> {
+fn make_test_global_frame() -> ScopeFrame<Variable> {
     let cmds: Vec<Rc<dyn Command>> = vec_rc![PrintCmd::new()];
 
     let mut frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
