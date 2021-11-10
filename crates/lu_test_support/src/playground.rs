@@ -34,7 +34,17 @@ impl Playground {
 
     pub fn make_file(&self, fname: &str, content: &[u8]) -> PathBuf {
         let path = self.root().join(fname);
+        // make parent dirs
+        let mut dirs = path.clone();
+        dirs.pop();
+        std::fs::create_dir_all(dirs).expect("Must work");
+
         std::fs::write(&path, content).expect("Must work");
         path
+    }
+    pub fn make_dirs(&self, dir_name: &str) {
+        let path = self.root().join(dir_name);
+        // make parent dirs
+        std::fs::create_dir_all(path).expect("Must work");
     }
 }

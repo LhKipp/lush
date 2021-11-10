@@ -162,7 +162,7 @@ impl Display for Value {
             Value::Number(v) => v.fmt(f),
             Value::String(v) => v.fmt(f),
             Value::BareWord(v) => v.fmt(f),
-            Value::Array(arr) => write!(f, "{:?}", arr),
+            Value::Array(arr) => write!(f, "{:#?}", arr),
             Value::Command(v) => write!(f, "Command: {} {:?}", v.name(), v.signature_item()),
             Value::StrctDecl(v) => write!(f, "{:p}", Arc::as_ptr(v)),
             Value::Strct(name, fields) => write!(f, "{}{:?}", name, fields),
@@ -182,6 +182,12 @@ impl From<bool> for Value {
 impl From<OrderedFloat<f64>> for Value {
     fn from(v: OrderedFloat<f64>) -> Self {
         Value::Number(v)
+    }
+}
+
+impl From<u64> for Value {
+    fn from(v: u64) -> Self {
+        Value::Number((v as f64).into())
     }
 }
 

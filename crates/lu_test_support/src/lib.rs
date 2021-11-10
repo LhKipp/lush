@@ -9,6 +9,7 @@ extern crate vec_rc;
 
 use std::rc::Rc;
 
+use lu_error::lu_source_code_item;
 pub use playground::*;
 use pretty_env_logger::env_logger;
 
@@ -32,14 +33,14 @@ pub fn make_test_interpreter_in_playground(
     playground: Playground,
 ) -> (ScopeFrame<Variable>, InterpreterCfg) {
     (
-        make_test_global_frame(),
+        make_test_global_frame(playground.root().to_string_lossy().to_string()),
         InterpreterCfg {
             plugin_dir: playground.plugin_dir(),
         },
     )
 }
 
-fn make_test_global_frame() -> ScopeFrame<Variable> {
+fn make_test_global_frame(pwd: String) -> ScopeFrame<Variable> {
     let cmds: Vec<Rc<dyn Command>> = vec_rc![PrintCmd::new()];
 
     let mut frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
@@ -50,6 +51,12 @@ fn make_test_global_frame() -> ScopeFrame<Variable> {
             VarDeclNode::Dummy,
         ));
     }
+    frame.insert_var(Variable::new(
+        "PWD".into(),
+        pwd.clone().into(),
+        lu_source_code_item!().into(),
+    ));
+    std::env::set_var("PWD", pwd);
     frame
 }
 

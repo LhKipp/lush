@@ -1,5 +1,8 @@
+use std::env;
+
 use clap::App;
 use lu_cli::start_cli;
+use lu_error::lu_source_code_item;
 use lu_interpreter::{Interpreter, InterpreterCfg};
 use lu_interpreter_structs::*;
 use lu_stdx::new_amtx;
@@ -33,7 +36,7 @@ fn ret_code_main() -> i32 {
         )
         .get_matches();
 
-    let mut global_frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
+    let mut global_frame = make_global_frame();
 
     if arg_matches.is_present("debug") {
         // It is a debug session
@@ -84,4 +87,17 @@ fn ret_code_main() -> i32 {
         start_cli(global_frame);
         0
     }
+}
+
+fn make_global_frame() -> ScopeFrame<Variable> {
+    let mut frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
+    //insert env vars
+    for (key, value) in env::vars() {
+        frame.insert_var(Variable::new(
+            key,
+            value.into(),
+            lu_source_code_item!().into(),
+        ));
+    }
+    frame
 }

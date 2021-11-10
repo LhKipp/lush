@@ -116,13 +116,18 @@ pub struct Signature {
     pub var_arg: Option<ArgSignature>,
     #[builder(default)]
     pub flags: Vec<FlagSignature>,
+    #[builder(default = "Signature::default_in_ret_void_arg()")]
     pub in_arg: ArgSignature,
+    #[builder(default = "Signature::default_in_ret_void_arg()")]
     pub ret_arg: ArgSignature,
 
     pub decl: SourceCodeItem,
 }
 
 impl Signature {
+    fn default_in_ret_void_arg() -> ArgSignature {
+        ArgSignature::new("Unused".to_string(), ValueType::Nil, lu_source_code_item!())
+    }
     pub fn req_flags(&self) -> Vec<FlagVariant> {
         self.flags
             .iter()
