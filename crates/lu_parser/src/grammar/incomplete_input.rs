@@ -7,7 +7,7 @@ mod tests {
     #[lu_conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/incomplete_input")]
     fn parse_cmds(s: &str) -> Vec<Event> {
         lu_test_support::init_logger();
-        parse_as(s, &SourceFileRule {})
+        parse_as(s, &SourceFileRule::default())
     }
 
     #[test]
@@ -23,7 +23,7 @@ mod tests {
                 let x = 1
             ";
         // must return as usual
-        parse_as(s, &SourceFileRule {});
+        parse_as(s, &SourceFileRule::default());
         assert!(true);
     }
 }

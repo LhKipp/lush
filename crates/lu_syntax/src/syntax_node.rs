@@ -49,6 +49,12 @@ impl SyntaxTreeBuilder {
         let kind = LuLanguage::kind_to_raw(kind);
         self.inner.token(kind, SmolStr::new(text))
     }
+    
+    // Same as above but passing String
+    pub fn token_with_string(&mut self, kind: SyntaxKind, text: String) {
+        let kind = LuLanguage::kind_to_raw(kind);
+        self.inner.token(kind, SmolStr::new(text))
+    }
 
     pub fn start_node(&mut self, kind: SyntaxKind) {
         let kind = LuLanguage::kind_to_raw(kind);

@@ -9,6 +9,6 @@ mod tests {
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/comments/comment_fn.yaml_test")]
     fn parse_cmds(s: &str) -> Vec<Event> {
         let _ = env_logger::builder().is_test(true).try_init();
-        parse_as(s, &SourceFileRule {})
+        parse_as(s, &SourceFileRule::default())
     }
 }

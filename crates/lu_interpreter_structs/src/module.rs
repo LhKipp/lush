@@ -5,7 +5,7 @@ use itertools::Itertools;
 use log::debug;
 use lu_error::util::Outcome;
 use lu_syntax::{
-    ast::{SourceFileNode, StrctStmtNode, UseStmtNode},
+    ast::{self, SourceFileNode, StrctStmtNode, UseStmtNode},
     AstNode, Parse,
 };
 use lu_text_util::SourceCode;
@@ -34,8 +34,25 @@ impl ModInfo {
     pub fn update_cli_module_info(&mut self, mut other: ModInfo) {
         assert!(self.node.is_none());
         assert!(self.id == other.id);
+        assert!(self.id.as_interactive().is_some());
         self.src.text.push_str(&other.src.text);
         self.use_paths.append(&mut other.use_paths);
+    }
+
+    pub fn mod_int_address(&self) -> Option<usize> {
+        match self.id {
+            ModPath::PlugPath(_) | ModPath::FilePath(_) => Some(ast::addr_of_node(
+                self.node.as_ref().unwrap().syntax().clone(),
+            )),
+            ModPath::Interactive => Some(ast::CLI_LINE_NODE_ADDRESS),
+            ModPath::StdPath(_) => {
+                if let Some(sf_node) = &self.node {
+                    Some(ast::addr_of_node(sf_node.syntax().clone()))
+                } else {
+                    None
+                }
+            }
+        }
     }
 }
 
@@ -110,7 +127,7 @@ impl ModInfo {
         source_node: &SourceFileNode,
         source_node_id: ModPath,
     ) -> SourcedFile {
-        let block = source_node.block().unwrap();
+        let block = source_node.block();
 
         // TODO source variables
         let use_paths = block
@@ -143,7 +160,8 @@ impl ModInfo {
             .map(|(i, field)| {
                 StrctField::from_node(
                     &field,
-                    i.try_into().expect("No strct has more than 2 billion fields"),
+                    i.try_into()
+                        .expect("No strct has more than 2 billion fields"),
                 )
             })
             .collect();

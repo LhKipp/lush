@@ -4,8 +4,8 @@ use rowan::TextRange;
 use crate::{AstNode, AstToken};
 
 use super::{
-    addr_of_ancestor_sf_node, support, BlockStmtNode, FnDeclNameToken, FnKeywordToken, FnStmtNode,
-    ImpureKeywordToken, SignatureNode,
+    addr_of_mod_node_contained_in, support, BlockStmtNode, FnDeclNameToken, FnKeywordToken,
+    FnStmtNode, ImpureKeywordToken, SignatureNode,
 };
 
 impl FnStmtNode {
@@ -72,7 +72,7 @@ impl FnStmtNode {
         SourceCodeItem::new(
             text_range.into(),
             text.to_string(),
-            addr_of_ancestor_sf_node(self.syntax().clone()),
+            addr_of_mod_node_contained_in(self.syntax().clone()),
         )
     }
 

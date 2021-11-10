@@ -1,3 +1,4 @@
+use log::debug;
 use lu_interpreter::*;
 use lu_interpreter_structs::*;
 use rustyline::error::ReadlineError;
@@ -25,21 +26,27 @@ pub fn start_cli(global_frame: ScopeFrame<Variable>) {
     loop {
         let readline = rl.readline(">> ");
         match readline {
-            Ok(line) => {
+            Ok(mut line) => {
+                line.push('\n');
                 match intprt.eval_line(&line) {
                     Ok(_) => {
                         // Value will already be printed
                     }
-                    Err(e) => print!("{:?}", e),
+                    Err(err) => {
+                        debug!("EvalLine returned errors: {:?}", err);
+                        if let Err(e) =
+                            lu_error_reporting::report_to_term(&err, &intprt.ty_checker.scope)
+                        {
+                            eprintln!("Ups: An error happend, while printing errors: {}", e)
+                        }
+                    }
                 };
                 rl.add_history_entry(line.as_str());
             }
             Err(ReadlineError::Interrupted) => {
-                println!("CTRL-C");
                 break;
             }
             Err(ReadlineError::Eof) => {
-                println!("CTRL-D");
                 break;
             }
             Err(err) => {

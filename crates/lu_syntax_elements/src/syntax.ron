@@ -91,7 +91,9 @@ Config(
     ( name: "RelFileName"                , is_node: true                                , has_rule: false   , ) ,
 
     // === RULES ===
-    ( name: "SourceFile"                 , is_node: true                                , has_rule: true   , ) ,
+    ( name: "SourceFile"                 , is_node: true                                , has_rule: false   , ) ,
+    ( name: "CliLine"                 , is_token: true                                , has_rule: false   , ) ,
+    ( name: "Offset"                 , is_token: true                                , has_rule: false   , ) ,
     ( name: "StrctStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "RedirStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "UseStmt"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e

@@ -81,14 +81,21 @@ impl<'a> TreeBuilder<'a> {
     fn do_token(&mut self, token: Token) {
         debug!("BuildTree: doing token: {:?}", token);
         let range = TextRange::at(self.text_pos, token.len);
-        let text = &self.text[range];
-        self.text_pos += token.len;
-        self.inner.token(token.kind, text);
+        if token.kind == SyntaxKind::Offset {
+            // Generate back up string
+            let text = " ".repeat(token.len.into());
+            // No increasing of text_pos as text is not real
+            self.inner.token_with_string(token.kind, text);
+        } else {
+            let text = &self.text[range];
+            self.text_pos += token.len;
+            self.inner.token(token.kind, text);
+        }
     }
 
-    pub fn build(text: &'a str) -> (GreenNode, Vec<ParseErr>) {
+    pub fn build(text: &'a str, sf_rule: &SourceFileRule) -> (GreenNode, Vec<ParseErr>) {
         let mut sink = Self::new(text);
-        let mut events = lu_parser::parse_as(text, &SourceFileRule {});
+        let mut events = lu_parser::parse_as(text, sf_rule);
         let mut forward_parents = Vec::new();
         for i in 0..events.len() {
             match mem::replace(&mut events[i], Event::tombstone()) {

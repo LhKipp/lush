@@ -50,12 +50,14 @@ mod value_path_expr;
 use itertools::Itertools;
 use log::debug;
 use once_cell::unsync::Lazy;
+use text_size::TextSize;
 use vec_box::vec_box;
 
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     token_set::TokenSet,
     SyntaxKind::{self, *},
+    Token,
 };
 
 pub use block_stmt::BlockStmtRule;
@@ -186,7 +188,19 @@ where
     }
 }
 
-pub struct SourceFileRule;
+pub struct SourceFileRule {
+    pub mark_as_cli_line: bool,
+    pub offset: TextSize,
+}
+
+impl Default for SourceFileRule {
+    fn default() -> Self {
+        SourceFileRule {
+            mark_as_cli_line: false,
+            offset: 0.into(),
+        }
+    }
+}
 impl Rule for SourceFileRule {
     fn name(&self) -> String {
         "lu file".into()
@@ -194,6 +208,12 @@ impl Rule for SourceFileRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
+        if self.mark_as_cli_line {
+            p.do_bump(Token::new(CliLine, 0.into()));
+        }
+        if self.offset != 0.into() {
+            p.do_bump(Token::new(Offset, self.offset));
+        }
         BlockStmtRule::source_file_block().parse(p);
         Some(m.complete(p, SourceFile))
     }

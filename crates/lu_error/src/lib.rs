@@ -102,6 +102,19 @@ impl SourceCodeItem {
         }
     }
 
+    pub fn is_lu_source_code_item(&self) -> bool {
+        self.sf_node_addr == usize::MAX
+    }
+
+    pub fn lu_line(&self) -> usize {
+        self.range.start().into()
+    }
+
+    pub fn lu_source_code_file_name(&self) -> &str {
+        assert!(self.is_lu_source_code_item());
+        &self.content
+    }
+
     pub fn tmp_todo_item() -> SourceCodeItem {
         SourceCodeItem::new(999..999, "TMP_ITEM", 1337 as usize)
     }
@@ -113,9 +126,14 @@ macro_rules! lu_source_code_item {
     () => {{
         {
             let f_name = file!();
+            log::debug!("File macro: {}", f_name);
             let line = line!();
             // TODO better source code item
-            lu_error::SourceCodeItem::new(0..line as usize, f_name.clone(), 0 as usize)
+            lu_error::SourceCodeItem::new(
+                (line as usize)..(line as usize),
+                f_name.clone(),
+                usize::MAX,
+            )
         }
     }};
 }

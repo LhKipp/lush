@@ -2482,14 +2482,71 @@ impl HasTextRange for SourceFileNode{
     }
 }
 
-
-use lu_parser::grammar::SourceFileRule;
-impl HasRule for SourceFileNode{
-    fn get_belonging_rule() -> Box<dyn Rule>{
-        Box::new(SourceFileRule{})
+impl Display for SourceFileNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
-impl Display for SourceFileNode {
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct CliLineToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for CliLineToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::CliLine }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for CliLineToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for CliLineToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for CliLineToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct OffsetToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for OffsetToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::Offset }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for OffsetToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for OffsetToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for OffsetToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

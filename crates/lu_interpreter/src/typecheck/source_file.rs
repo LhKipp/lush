@@ -9,6 +9,6 @@ impl TypeCheck for SourceFileNode {
         _: &[super::TypeCheckArg],
         ty_state: &mut TyCheckState,
     ) -> Option<TcKey> {
-        self.block().unwrap().typecheck(ty_state)
+        self.block().typecheck(ty_state)
     }
 }

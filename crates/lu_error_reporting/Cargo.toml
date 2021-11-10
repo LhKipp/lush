@@ -11,3 +11,9 @@ lu_error = { version = "0.1.0", path = "../lu_error" }
 lu_syntax = { version = "0.1.0", path = "../lu_syntax" }
 codespan-reporting = "0.11.1"
 log = "0.4.14"
+
+[build-dependencies]
+manifest-dir-macros = "0.1.11"
+walkdir = "2.3.2"
+itertools = "0.10.1"
+fs-err = "2.6.0"

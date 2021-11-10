@@ -4,8 +4,8 @@ use rowan::TextRange;
 use crate::{AstElement, AstNode, AstToken};
 
 use super::{
-    addr_of_ancestor_sf_node, support, LetKeywordToken, LetStmtNode, LuTypeNode, ValueExprElement,
-    VarDeclNameToken,
+    addr_of_mod_node_contained_in, support, LetKeywordToken, LetStmtNode, LuTypeNode,
+    ValueExprElement, VarDeclNameToken,
 };
 
 impl LetStmtNode {
@@ -46,7 +46,7 @@ impl LetStmtNode {
         SourceCodeItem::new(
             text_range.into(),
             text.to_string(),
-            addr_of_ancestor_sf_node(self.syntax().clone()),
+            addr_of_mod_node_contained_in(self.syntax().clone()),
         )
     }
 }

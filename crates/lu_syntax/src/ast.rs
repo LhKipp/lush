@@ -89,7 +89,7 @@ pub trait AstNode {
     }
 
     fn to_item(&self) -> SourceCodeItem {
-        let sf_addr = addr_of_ancestor_sf_node(self.syntax().clone());
+        let sf_addr = addr_of_mod_node_contained_in(self.syntax().clone());
         SourceCodeItem::new(
             self.syntax().text_range().into(),
             self.syntax().text(),
@@ -130,7 +130,7 @@ pub trait AstToken {
     }
 
     fn to_item(&self) -> SourceCodeItem {
-        let sf_addr = addr_of_ancestor_sf_node(self.syntax().parent());
+        let sf_addr = addr_of_mod_node_contained_in(self.syntax().parent());
         SourceCodeItem::new(
             self.syntax().text_range().into(),
             self.text().to_string(),
@@ -162,14 +162,14 @@ pub trait AstElement {
 
     fn to_item(&self) -> SourceCodeItem {
         let sf_addr = match self.syntax() {
-            rowan::NodeOrToken::Node(n) => addr_of_ancestor_sf_node(n),
-            rowan::NodeOrToken::Token(t) => addr_of_ancestor_sf_node(t.parent()),
+            rowan::NodeOrToken::Node(n) => addr_of_mod_node_contained_in(n),
+            rowan::NodeOrToken::Token(t) => addr_of_mod_node_contained_in(t.parent()),
         };
         SourceCodeItem::new(self.syntax().text_range().into(), self.text(), sf_addr)
     }
 }
 
-pub fn nodes_sf_parent(node: SyntaxNode) -> SyntaxNode {
+fn nodes_addr_containing_parent(node: SyntaxNode) -> SyntaxNode {
     // Find sf_node addr
     let mut parent = Some(node.clone());
     while let Some(par) = &parent {
@@ -178,19 +178,21 @@ pub fn nodes_sf_parent(node: SyntaxNode) -> SyntaxNode {
         }
         parent = par.parent();
     }
-    assert_eq!(
-        parent.as_ref().expect("Always Some").kind(),
-        SyntaxKind::SourceFile,
-        "All nodes are below a sf node"
-    );
-    parent.unwrap()
+    parent.expect("All nodes are below a sf node")
 }
-pub fn addr_of_sf_node(sf_node: SyntaxNode) -> usize {
-    assert_eq!(sf_node.kind(), SyntaxKind::SourceFile);
-    sf_node.green() as *const GreenNode as usize
+
+pub const CLI_LINE_NODE_ADDRESS: usize = 0;
+// TODO ref here
+pub fn addr_of_node(addr_containing_node: SyntaxNode) -> usize {
+    assert!(addr_containing_node.kind() == SyntaxKind::SourceFile);
+    if support::token_child::<CliLineToken>(&addr_containing_node).is_some() {
+        CLI_LINE_NODE_ADDRESS
+    } else {
+        addr_containing_node.green() as *const GreenNode as usize
+    }
 }
-pub fn addr_of_ancestor_sf_node(node: SyntaxNode) -> usize {
-    addr_of_sf_node(nodes_sf_parent(node))
+pub fn addr_of_mod_node_contained_in(node: SyntaxNode) -> usize {
+    addr_of_node(nodes_addr_containing_parent(node))
 }
 
 /// An iterator over `SyntaxNode` children of a particular AST type.

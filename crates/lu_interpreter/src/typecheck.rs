@@ -1,6 +1,6 @@
 use bimap::BiHashMap;
 use itertools::Itertools;
-use log::{debug};
+use log::debug;
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_interpreter_structs::{Command, FlagVariant};
@@ -57,7 +57,7 @@ pub struct TyCheckState {
     /// Final result of typechecking
     pub ty_table: HashMap<TcKey, ValueType>,
 
-    errors: Vec<LuErr>,
+    pub(crate) errors: Vec<LuErr>,
 
     /// The final result of this ty
     pub result: Option<ValueType>,

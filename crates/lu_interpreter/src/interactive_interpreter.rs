@@ -5,14 +5,14 @@ use lu_syntax::Parse;
 use lu_text_util::SourceCode;
 use parking_lot::Mutex;
 
-use std::{rc::Rc, sync::Arc};
+use std::{mem, rc::Rc, sync::Arc};
 
 use crate::{typecheck::TyCheckState, Evaluable, Evaluator, InterpreterCfg, Scope, Variable};
 
 pub struct InteractiveInterpreter {
     pub config: Rc<InterpreterCfg>,
 
-    ty_checker: TyCheckState,
+    pub ty_checker: TyCheckState,
 }
 
 impl InteractiveInterpreter {
@@ -28,13 +28,32 @@ impl InteractiveInterpreter {
         }
     }
 
+    fn get_cli_modi(&self) -> &ModInfo {
+        self.ty_checker
+            .scope
+            .get_all_frames()
+            .filter_map(|frame| frame.get_tag().as_module_frame())
+            .find_map(|module| {
+                if module.id.as_interactive().is_some() {
+                    Some(module)
+                } else {
+                    None
+                }
+            })
+            .unwrap()
+    }
+
     pub fn eval_line(&mut self, code: &str) -> LuResults<Value> {
-        let code: SourceCode = code.into();
-        let parse = Parse::source_file(code).as_results()?;
-        let parsed_node = parse.sf_node.clone();
-        let (line_mod_path, mut modules) =
-            modules_from_start_parse(parse, &self.config.build_load_modules_config())
-                .as_results()?;
+        let cli_modi = self.get_cli_modi();
+        let parse = Parse::cli_line(code.into(), (cli_modi.src.text.len() as u32).into());
+        let parsed_node = parse.val.sf_node.clone();
+        // We can only display the errors after all modules have been updated in the scope
+        let (modules, errs) = parse
+            .map_flattened(|parse| {
+                modules_from_start_parse(parse, &self.config.build_load_modules_config())
+            })
+            .split();
+        let (line_mod_path, mut modules) = modules;
 
         let line_mod = modules
             .iter()
@@ -51,7 +70,16 @@ impl InteractiveInterpreter {
             self.ty_checker.scope.push_sf_frame(module);
         }
 
+        // After merging of the modules into the scope, we can display the errors
+        if !errs.is_empty() {
+            return Err(errs);
+        }
+
         self.ty_checker.typecheck(parsed_node.clone());
+        if !self.ty_checker.errors.is_empty() {
+            return Err(mem::replace(&mut self.ty_checker.errors, vec![]));
+        }
+
         let scope = &mut Arc::new(Mutex::new(self.ty_checker.scope.clone()));
 
         let result = match Evaluator::eval_result_to_lu_result(parsed_node.evaluate(scope)) {

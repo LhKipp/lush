@@ -3,12 +3,12 @@ mod build_tree;
 mod syntax_node;
 mod test;
 
-use ast::{addr_of_sf_node, SourceFileNode};
+use ast::{addr_of_node, SourceFileNode};
 use build_tree::TreeBuilder;
 use derive_new::new;
 use log::warn;
 use lu_error::{util::Outcome, ParseErr, SourceCodeItem};
-use lu_parser::grammar::Rule;
+use lu_parser::{grammar::Rule, SourceFileRule};
 use lu_text_util::SourceCode;
 
 pub use ast::{AstElement, AstElementChildren, AstId, AstNode, AstNodeChildren, AstToken};
@@ -33,12 +33,30 @@ pub struct Parse {
 }
 
 impl Parse {
+    pub fn cli_line(line: SourceCode, offset: TextSize) -> Outcome<Parse> {
+        Self::parse(
+            line,
+            &SourceFileRule {
+                mark_as_cli_line: true,
+                offset,
+            },
+        )
+    }
     pub fn source_file(source: SourceCode) -> Outcome<Parse> {
-        let (green, errors) = TreeBuilder::build(&source.text);
+        Self::parse(
+            source,
+            &SourceFileRule {
+                mark_as_cli_line: false,
+                offset: 0.into(),
+            },
+        )
+    }
+
+    fn parse(source: SourceCode, rule: &SourceFileRule) -> Outcome<Parse> {
+        let (green, errors) = TreeBuilder::build(&source.text, rule);
         let sf_node = SyntaxNode::new_root(green);
-        let sf_node = SourceFileNode::cast(sf_node)
-            .expect("Only use this func, if your parsed a source file");
-        let sf_node_addr = addr_of_sf_node(sf_node.syntax().clone());
+        let sf_node = SourceFileNode::cast(sf_node).unwrap();
+        let sf_node_addr = addr_of_node(sf_node.syntax().clone());
 
         let errors = errors
             .into_iter()

@@ -7,10 +7,7 @@ use crate::AstNode;
 use super::support;
 
 impl SourceFileNode {
-    pub fn block(&self) -> Option<BlockStmtNode> {
-        // TODO unwrap this. Always works
-        support::node_child(self.syntax())
+    pub fn block(&self) -> BlockStmtNode {
+        support::node_child(self.syntax()).unwrap()
     }
 }
-
-

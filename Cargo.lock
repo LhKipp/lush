@@ -852,8 +852,10 @@ dependencies = [
 name = "lu_cli"
 version = "0.1.0"
 dependencies = [
+ "log",
  "lu_cfg_home",
  "lu_error",
+ "lu_error_reporting",
  "lu_interpreter",
  "lu_interpreter_structs",
  "rustyline",
@@ -934,10 +936,14 @@ name = "lu_error_reporting"
 version = "0.1.0"
 dependencies = [
  "codespan-reporting",
+ "fs-err",
+ "itertools",
  "log",
  "lu_error",
  "lu_interpreter_structs",
  "lu_syntax",
+ "manifest-dir-macros",
+ "walkdir",
 ]
 
 [[package]]
