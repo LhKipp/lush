@@ -411,4 +411,8 @@ The standard library currently only consists of:
             - Applies `map_fn` to every element of `in`, collects the results in an array and returns it.
         - `filter`: fn filter (in: [T] ret: [T] filter_fn: fn(ret: bool arg: T))
             - Applies `filter_fn` to every element in `in` and only returns those elements for which `filter_fn` returns true
+- `std:fs`
+    - Exported functions
+        - `ls`: fn ls (ret: [LsEntry])
+            - Lists content in current directory
 
