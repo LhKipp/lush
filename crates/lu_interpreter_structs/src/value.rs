@@ -11,7 +11,7 @@ use std::{fmt::Display, rc::Rc};
 use serde::{Deserialize, Serialize};
 
 use crate::dbg_state::DbgState;
-use crate::{Command, CommandCollection, Strct};
+use crate::{table, Command, CommandCollection, Strct};
 
 #[derive(Clone, Serialize, Deserialize, EnumAsInner)]
 pub enum Value {
@@ -162,7 +162,15 @@ impl Display for Value {
             Value::Number(v) => v.fmt(f),
             Value::String(v) => v.fmt(f),
             Value::BareWord(v) => v.fmt(f),
-            Value::Array(arr) => write!(f, "{:#?}", arr),
+            Value::Array(arr) => {
+                if arr.is_empty() {
+                    write!(f, "")
+                } else if arr[0].as_strct().is_some() {
+                    write!(f, "{}", table::to_fmt_table(arr))
+                } else {
+                    write!(f, "{:?}", arr)
+                }
+            }
             Value::Command(v) => write!(f, "Command: {} {:?}", v.name(), v.signature_item()),
             Value::StrctDecl(v) => write!(f, "{:p}", Arc::as_ptr(v)),
             Value::Strct(name, fields) => write!(f, "{}{:?}", name, fields),

@@ -27,7 +27,9 @@ pub fn start_cli(global_frame: ScopeFrame<Variable>) {
         match readline {
             Ok(line) => {
                 match intprt.eval_line(&line) {
-                    Ok(val) => print!("{}", val),
+                    Ok(_) => {
+                        // Value will already be printed
+                    }
                     Err(e) => print!("{:?}", e),
                 };
                 rl.add_history_entry(line.as_str());
