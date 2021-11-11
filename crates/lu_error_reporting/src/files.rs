@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use codespan_reporting::files::{self, Files};
+use log::debug;
 
 use crate::{
     lu_source_files::FILE_TO_STR,
@@ -56,10 +57,19 @@ impl<'a> Files<'a> for DiagnosticFileContainer<'a> {
     ) -> Result<usize, codespan_reporting::files::Error> {
         let content = self.source(id).unwrap();
         let line_starts: Vec<_> = files::line_starts(content).collect();
-        match line_starts.binary_search(&byte_index) {
+        debug!(
+            "Found line_starts: {:?} for content\n{}",
+            line_starts, content
+        );
+        let result = match line_starts.binary_search(&byte_index) {
             Ok(line) => Ok(line),
             Err(next_line) => Ok(next_line - 1),
-        }
+        };
+        debug!(
+            "Returning line_index {:?} for file:{} byte_index:{}",
+            result, id, byte_index
+        );
+        result
     }
 
     fn line_range(
@@ -70,19 +80,20 @@ impl<'a> Files<'a> for DiagnosticFileContainer<'a> {
         let content = self.source(id).unwrap();
         let line_starts: Vec<_> = files::line_starts(content).collect();
 
-        if let Some((idx, _)) = line_starts
-            .iter()
-            .enumerate()
-            .skip_while(|(_, elem)| **elem < line_index)
-            .next()
-        {
-            if idx == line_starts.len() - 1 {
-                Ok(line_index..(content.as_bytes().len()))
-            } else {
-                Ok(line_index..(line_starts[idx + 1]))
-            }
+        // If line_index and next is present in line_starts
+        let line_range = if line_index + 1 < line_starts.len() {
+            let line_byte_begin = line_starts[line_index];
+            let next_line_byte_begin = line_starts[line_index + 1];
+            let line_byte_end = next_line_byte_begin - 1; // \n is 1 byte long
+            Ok(line_byte_begin..line_byte_end)
         } else {
-            Ok(line_index..(content.as_bytes().len()))
-        }
+            let line_byte_begin = line_starts[line_index];
+            Ok(line_byte_begin..(content.as_bytes().len()))
+        };
+        debug!(
+            "Returning line_range {:?} for file:{} line_index:{}",
+            line_range, id, line_index
+        );
+        line_range
     }
 }
