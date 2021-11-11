@@ -18,9 +18,6 @@ impl LuRustStdMod for StdArrayMod {
     fn rust_decl(&self) -> SourceCodeItem {
         lu_source_code_item!()
     }
-    fn rust_src(&self) -> SourceCode {
-        lu_source_code!()
-    }
 
     fn uses(&self) -> Vec<ModPath> {
         vec![]

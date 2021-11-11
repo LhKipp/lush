@@ -3,10 +3,7 @@ use std::collections::HashMap;
 use codespan_reporting::files::{self, Files};
 use log::debug;
 
-use crate::{
-    lu_source_files::FILE_TO_STR,
-    lu_source_files_util::{LU_FILE_ID_MAX, LU_FILE_ID_MIN},
-};
+use crate::lu_source_files_util::{get_file, LU_FILE_ID_MAX, LU_FILE_ID_MIN};
 
 pub(crate) struct DiagnosticFileContainer<'a> {
     file_id_to_content: HashMap<usize, &'a str>,
@@ -35,7 +32,7 @@ impl<'a> Files<'a> for DiagnosticFileContainer<'a> {
 
     fn name(&'a self, id: Self::FileId) -> Result<Self::Name, codespan_reporting::files::Error> {
         match id {
-            LU_FILE_ID_MIN..=LU_FILE_ID_MAX => Ok(FILE_TO_STR[id].0.to_string()),
+            LU_FILE_ID_MIN..=LU_FILE_ID_MAX => Ok(get_file(id).0.to_string()),
             _ => Ok(self.file_id_to_name.get(&id).unwrap().clone()),
         }
     }
@@ -45,7 +42,7 @@ impl<'a> Files<'a> for DiagnosticFileContainer<'a> {
         id: Self::FileId,
     ) -> Result<Self::Source, codespan_reporting::files::Error> {
         match id {
-            LU_FILE_ID_MIN..=LU_FILE_ID_MAX => Ok(FILE_TO_STR[id].1),
+            LU_FILE_ID_MIN..=LU_FILE_ID_MAX => Ok(get_file(id).1),
             _ => Ok(self.file_id_to_content.get(&id).unwrap()),
         }
     }

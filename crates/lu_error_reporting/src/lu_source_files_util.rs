@@ -16,3 +16,8 @@ pub(crate) fn find_file(name: &str) -> Option<(usize, &'static str)> {
             }
         })
 }
+
+pub(crate) fn get_file(f_id: usize) -> (&'static str, &'static str) {
+    assert!(f_id >= LU_FILE_ID_MIN && f_id <= LU_FILE_ID_MAX);
+    FILE_TO_STR[f_id - 1]
+}

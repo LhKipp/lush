@@ -85,6 +85,7 @@ fn byte_range_of_item(item: &SourceCodeItem) -> Range<usize> {
             }
             cur_line != line
         });
+        content_iter.next(); // Skip '\n'
         let (line_start_byte, _) = content_iter.next().unwrap();
         let mut content_iter = content_iter.skip_while(|(_, byte)| **byte != b'\n');
         let line_end_byte = content_iter
@@ -92,7 +93,14 @@ fn byte_range_of_item(item: &SourceCodeItem) -> Range<usize> {
             .map(|(line_end_byte, _)| line_end_byte)
             .unwrap_or(content.as_bytes().len());
 
-        line_start_byte..line_end_byte
+        let result = line_start_byte..line_end_byte;
+        debug!(
+            "Found result-byte range: {:?} for lu_source_code_file: {} line: {}",
+            result,
+            item.lu_source_code_file_name(),
+            line
+        );
+        result
     } else {
         item.range.into()
     }

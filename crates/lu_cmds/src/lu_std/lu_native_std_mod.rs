@@ -15,7 +15,6 @@ pub(crate) trait LuNativeStdMod: Send + Sync {
 pub(crate) trait LuRustStdMod: Send + Sync {
     fn id(&self) -> String;
     fn rust_decl(&self) -> SourceCodeItem;
-    fn rust_src(&self) -> SourceCode;
     fn uses(&self) -> Vec<ModPath>;
     fn uses_as_use_path(&self) -> Vec<UsePath> {
         let decl = self.rust_decl();
@@ -28,7 +27,11 @@ pub(crate) trait LuRustStdMod: Send + Sync {
     fn strcts(&self) -> Vec<Arc<RwLock<Strct>>>;
     fn frame(&self) -> ScopeFrame<Variable> {
         let self_mod_path = ModPath::StdPath(self.id());
-        let modi = ModInfo::new_std_module(self_mod_path, self.rust_src(), self.uses_as_use_path());
+        let modi = ModInfo::new_std_module(
+            self_mod_path,
+            "".to_string().into(),
+            self.uses_as_use_path(),
+        );
 
         let mut frame = ScopeFrame::new(ScopeFrameTag::ModuleFrame(modi));
 

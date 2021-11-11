@@ -16,22 +16,21 @@ static PUSH_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
 
 impl ArrayPushCmd {
     pub fn new() -> Self {
-        let push_decl = lu_source_code_item!();
         let mut sign_builder = SignatureBuilder::default();
         let array_arg_ty = ArgSignature::new(
             ARRAY_ARG_NAME.into(),
-            ValueType::new_array(ValueType::Generic("T".to_string()), push_decl.clone()),
-            push_decl.clone().into(),
+            ValueType::new_array(ValueType::Generic("T".to_string()), lu_source_code_item!()),
+            lu_source_code_item!(-1),
         );
         sign_builder
-            .decl(push_decl.clone())
+            .decl(lu_source_code_item!())
             .args(vec![array_arg_ty.clone()])
             .var_arg(ArgSignature::new(
                 VALUES_ARG_NAME.to_string(),
                 ValueType::Generic("T".to_string()),
-                push_decl.clone().into(),
+                lu_source_code_item!(-1),
             ))
-            .in_arg(ArgSignature::void(push_decl.clone().into()))
+            .in_arg(ArgSignature::void(lu_source_code_item!()))
             .ret_arg(array_arg_ty);
 
         ArrayPushCmd {

@@ -123,11 +123,15 @@ impl SourceCodeItem {
 /// New SourceCodeItem pointing to the file and line from the caller
 #[macro_export]
 macro_rules! lu_source_code_item {
-    () => {{
+    () => {
+        lu_source_code_item!(0)
+    };
+    ($line_count_below:expr) => {{
         {
             let f_name = file!();
             log::debug!("File macro: {}", f_name);
             let line = line!();
+            let line = (line as i32 + $line_count_below) as u32;
             // TODO better source code item
             lu_error::SourceCodeItem::new(
                 (line as usize)..(line as usize),
