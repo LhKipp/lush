@@ -142,3 +142,13 @@ echo hi >> $var
 - Finish: ""
 - Finish: ""
 ...
+Cmd with bareword
+===
+echo hi
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+...
