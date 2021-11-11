@@ -4,6 +4,7 @@ struct Ratings { n: num s: str }
 let ratings =
 [(Ratings)
 [1 "lush"]]
-for rating in ratings
+for rating in $ratings
     let x: Ratings = $rating
+
 end

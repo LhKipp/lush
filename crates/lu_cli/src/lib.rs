@@ -41,6 +41,7 @@ pub fn start_cli(global_frame: ScopeFrame<Variable>) {
                         }
                     }
                 };
+                line.pop(); // Remove pushed '\n'
                 rl.add_history_entry(line.as_str());
             }
             Err(ReadlineError::Interrupted) => {
