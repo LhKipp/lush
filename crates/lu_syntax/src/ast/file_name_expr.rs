@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{AstNode};
+use crate::AstNode;
 
 use super::{AbsFileNameNode, FileNameElement, RelFileNameNode};
 
