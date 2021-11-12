@@ -491,6 +491,38 @@ impl Display for AnyKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct PathKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for PathKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::PathKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for PathKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for PathKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for PathKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct NilKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -4110,6 +4142,7 @@ pub enum LuTypeSpecifierElement {
     NumberKeyword(NumberKeywordToken),
     AnyKeyword(AnyKeywordToken),
     NilKeyword(NilKeywordToken),
+    PathKeyword(PathKeywordToken),
     BoolKeyword(BoolKeywordToken),
     StringKeyword(StringKeywordToken),
     GenericType(GenericTypeToken),
@@ -4135,8 +4168,9 @@ impl AstElement for LuTypeSpecifierElement {
         
         
         
+        
         match kind{
-            NumberKeyword | AnyKeyword | NilKeyword | BoolKeyword | StringKeyword | GenericType | BareWord | StrctName | ArrayType | FnType => true,
+            NumberKeyword | AnyKeyword | NilKeyword | PathKeyword | BoolKeyword | StringKeyword | GenericType | BareWord | StrctName | ArrayType | FnType => true,
             _ => false,
         }
     }
@@ -4152,10 +4186,12 @@ impl AstElement for LuTypeSpecifierElement {
         
         
         
+        
         let res = match syntax.kind() {
             NumberKeyword => LuTypeSpecifierElement::NumberKeyword(NumberKeywordToken { syntax: syntax.into_token().unwrap() }),
             AnyKeyword => LuTypeSpecifierElement::AnyKeyword(AnyKeywordToken { syntax: syntax.into_token().unwrap() }),
             NilKeyword => LuTypeSpecifierElement::NilKeyword(NilKeywordToken { syntax: syntax.into_token().unwrap() }),
+            PathKeyword => LuTypeSpecifierElement::PathKeyword(PathKeywordToken { syntax: syntax.into_token().unwrap() }),
             BoolKeyword => LuTypeSpecifierElement::BoolKeyword(BoolKeywordToken { syntax: syntax.into_token().unwrap() }),
             StringKeyword => LuTypeSpecifierElement::StringKeyword(StringKeywordToken { syntax: syntax.into_token().unwrap() }),
             GenericType => LuTypeSpecifierElement::GenericType(GenericTypeToken { syntax: syntax.into_token().unwrap() }),
@@ -4178,6 +4214,9 @@ impl AstElement for LuTypeSpecifierElement {
             
             
             LuTypeSpecifierElement::NilKeyword(it) => it.syntax.clone().into(),
+            
+            
+            LuTypeSpecifierElement::PathKeyword(it) => it.syntax.clone().into(),
             
             
             LuTypeSpecifierElement::BoolKeyword(it) => it.syntax.clone().into(),
@@ -4209,6 +4248,7 @@ impl HasSyntaxKind for LuTypeSpecifierElement{
             LuTypeSpecifierElement::NumberKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::AnyKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::NilKeyword(it) => it.get_syntax_kind(),
+            LuTypeSpecifierElement::PathKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::BoolKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::StringKeyword(it) => it.get_syntax_kind(),
             LuTypeSpecifierElement::GenericType(it) => it.get_syntax_kind(),

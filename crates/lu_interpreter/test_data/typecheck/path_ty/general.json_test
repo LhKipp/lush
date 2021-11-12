@@ -1,50 +1,50 @@
 FilePath is path
 ===
-fn echo_wrapped(arg: path)
+fn echo_wrapped(arg: path ret: nil)
 end
 echo_wrapped hi/mom
 ---
 {
-  "Ok": "null"
+  "Ok": "Nil"
 }
 ...
 BareWord can be passed to path
 ===
-fn echo_wrapped(arg: path)
+fn echo_wrapped(arg: path ret:nil)
 end
 echo_wrapped himom
 ---
 {
-  "Ok": "null"
+  "Ok": "Nil"
 }
 ...
 String can be passed to path
 ===
-fn echo_wrapped(arg: path)
+fn echo_wrapped(arg: path ret:nil)
 end
 echo_wrapped "StonksOnlyGoUp"
 ---
 {
-  "Ok": "null"
+  "Ok": "Nil"
 }
 ...
 FilePath can be passed to string
 ===
-fn echo_wrapped(arg: string)
+fn echo_wrapped(arg: str ret:nil)
 end
-echo_wrapped much/coin/much/wow
+echo_wrapped /hi/mom
 ---
 {
-  "Ok": "null"
+  "Ok": "Nil"
 }
 ...
 String can be passed to filename
 ===
-fn echo_wrapped(arg: path)
+fn echo_wrapped(arg: path ret:nil)
 end
 echo_wrapped "peace"
 ---
 {
-  "Ok": "null"
+  "Ok": "Nil"
 }
 ...

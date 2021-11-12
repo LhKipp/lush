@@ -141,6 +141,7 @@ impl ValueType {
             LuTypeSpecifierElement::NumberKeyword(_) => ValueType::Number,
             LuTypeSpecifierElement::NilKeyword(_) => ValueType::Nil,
             LuTypeSpecifierElement::BoolKeyword(_) => ValueType::Bool,
+            LuTypeSpecifierElement::PathKeyword(_) => ValueType::FileName,
             LuTypeSpecifierElement::StringKeyword(_) => ValueType::String,
             LuTypeSpecifierElement::BareWord(_) => ValueType::BareWord,
             LuTypeSpecifierElement::GenericType(n) => ValueType::Generic(n.text().to_string()),

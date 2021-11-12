@@ -14,7 +14,6 @@ use crate::{
     Token, TokenSet, TokenSource, T,
 };
 
-pub const CMT_NL_WS_BW: [SyntaxKind; 4] = [Comment, Newline, Whitespace, BareWord];
 pub const CMT_NL_WS: [SyntaxKind; 3] = [Comment, Newline, Whitespace];
 pub const CMT_WS: [SyntaxKind; 2] = [Comment, Whitespace];
 
@@ -81,6 +80,17 @@ impl Parser {
             .iter()
             .map(|t| t.kind)
             .skip_while(|t| ts.contains(*t))
+            .next()
+            .unwrap_or(Eof)
+    }
+
+    pub(crate) fn next_token_after<TS: Into<TokenSet>>(&self, ts: TS) -> SyntaxKind {
+        let ts: TokenSet = ts.into();
+        self.token_source
+            .iter()
+            .map(|t| t.kind)
+            .skip_while(|t| !ts.contains(*t))
+            .skip(1)
             .next()
             .unwrap_or(Eof)
     }

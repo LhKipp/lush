@@ -1,0 +1,23 @@
+1
+===
+echo_wrapped much/coin/much/wow
+---
+- Start: SourceFile
+- Start: BlockStmt
+- Start: Tombstone
+- Start: CmdStmt
+- Token: "BareWord (len: 12)"
+- Start: RelFileName
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 4)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 4)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 4)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 3)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...

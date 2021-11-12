@@ -37,6 +37,8 @@ pub enum SyntaxKind {
     InKeyword,
     #[token("any")]
     AnyKeyword,
+    #[token("path")]
+    PathKeyword,
     #[token("nil")]
     NilKeyword,
     #[token("bool")]
@@ -210,6 +212,7 @@ impl SyntaxKind{
             SyntaxKind::BeginKeyword => "BeginKeyword",
             SyntaxKind::InKeyword => "InKeyword",
             SyntaxKind::AnyKeyword => "AnyKeyword",
+            SyntaxKind::PathKeyword => "PathKeyword",
             SyntaxKind::NilKeyword => "NilKeyword",
             SyntaxKind::BoolKeyword => "BoolKeyword",
             SyntaxKind::TrueKeyword => "TrueKeyword",
@@ -337,6 +340,7 @@ macro_rules! T {
     [begin] => {$crate::SyntaxKind::BeginKeyword };
     [in] => {$crate::SyntaxKind::InKeyword };
     [any] => {$crate::SyntaxKind::AnyKeyword };
+    [path] => {$crate::SyntaxKind::PathKeyword };
     [nil] => {$crate::SyntaxKind::NilKeyword };
     [bool] => {$crate::SyntaxKind::BoolKeyword };
     [true] => {$crate::SyntaxKind::TrueKeyword };

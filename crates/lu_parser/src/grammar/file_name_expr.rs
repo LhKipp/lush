@@ -1,4 +1,3 @@
-use crate::parser::CMT_NL_WS_BW;
 use crate::T;
 use crate::{
     parser::{CompletedMarker, Parser, CMT_NL_WS},
@@ -31,7 +30,7 @@ impl Rule for RelFileNameRule {
         let next_token = p.next_non(CMT_NL_WS);
         if next_token == BareWord {
             // FileSep has to come right after
-            let token_after_bw = p.next_non(CMT_NL_WS_BW);
+            let token_after_bw = p.next_token_after(BareWord);
             token_after_bw == T![/]
         } else if next_token == T![*] && self.allow_wildcards {
             true
@@ -91,7 +90,7 @@ impl Rule for AbsFileNameRule {
 
 #[cfg(test)]
 mod tests {
-    use crate::{parse_as, Event};
+    use crate::{parse_as, Event, SourceFileRule};
 
     use super::file_name_rule;
 
@@ -106,5 +105,10 @@ mod tests {
     fn parse_with_wildcards(s: &str) -> Vec<Event> {
         lu_test_support::init_logger();
         parse_as(s, &file_name_rule(true))
+    }
+    #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/file_name_expr/as_cmd_arg.yaml_test")]
+    fn parse_as_cmd_arg(s: &str) -> Vec<Event> {
+        lu_test_support::init_logger();
+        parse_as(s, &SourceFileRule::default())
     }
 }

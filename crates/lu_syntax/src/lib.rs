@@ -6,7 +6,7 @@ mod test;
 use ast::{addr_of_node, SourceFileNode};
 use build_tree::TreeBuilder;
 use derive_new::new;
-use log::warn;
+use log::{debug, warn};
 use lu_error::{util::Outcome, ParseErr, SourceCodeItem};
 use lu_parser::{grammar::Rule, SourceFileRule};
 use lu_text_util::SourceCode;
@@ -55,6 +55,7 @@ impl Parse {
     fn parse(source: SourceCode, rule: &SourceFileRule) -> Outcome<Parse> {
         let (green, errors) = TreeBuilder::build(&source.text, rule);
         let sf_node = SyntaxNode::new_root(green);
+        debug!("Result of build_tree: {:#?}", sf_node);
         let sf_node = SourceFileNode::cast(sf_node).unwrap();
         let sf_node_addr = addr_of_node(sf_node.syntax().clone());
 

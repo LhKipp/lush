@@ -56,6 +56,7 @@ fn lu_type_specifier() -> OrRule {
             NumberKeyword,
             AnyKeyword,
             NilKeyword,
+            PathKeyword,
             BoolKeyword,
             StringKeyword,
             FnTypeRule {},
