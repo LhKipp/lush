@@ -1,5 +1,5 @@
 use lu_syntax::ast::{
-    ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StringExprNode,
+    ArrayExprNode, BareWordToken, BooleanExprNode, FileNameElement, NumberExprNode, StringExprNode,
     ValueExprElement, ValuePathExprNode,
 };
 
@@ -21,6 +21,7 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::ArrayExpr(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::TableExpr(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::StrctCtorExpr(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::FileName(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
         }
     }
@@ -29,6 +30,12 @@ impl Evaluable for ValueExprElement {
 impl Evaluable for BareWordToken {
     fn do_evaluate(&self, _: &[EvalArg], _: &mut SyScope) -> EvalResult {
         Ok(Value::BareWord(self.text().to_string()))
+    }
+}
+
+impl Evaluable for FileNameElement {
+    fn do_evaluate(&self, _: &[EvalArg], _: &mut SyScope) -> EvalResult {
+        Ok(Value::FileName(self.text_trimmed()))
     }
 }
 

@@ -135,6 +135,7 @@ Config(
         "StringExpr",
         "ValuePathExpr",
         "StrctCtorExpr",
+        "FileName",
         "ArrayExpr",
         "TableExpr",
         "CmdStmt",

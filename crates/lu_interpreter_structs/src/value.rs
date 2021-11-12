@@ -25,7 +25,8 @@ pub enum Value {
     Number(OrderedFloat<f64>),
     String(String),
     BareWord(String),
-
+    /// A file name. May contain wildcards
+    FileName(String),
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
     // Strcts fields
@@ -97,6 +98,7 @@ impl Hash for Value {
             Value::CommandCollection(col) => col.hash(state),
             Value::StrctDecl(strct) => Arc::as_ptr(strct).hash(state),
             Value::DbgState(v) => Arc::as_ptr(v).hash(state),
+            Value::FileName(v) => v.hash(state),
         }
     }
 }
@@ -137,6 +139,7 @@ impl Value {
         match self {
             Value::Nil => Some(false),
             Value::Bool(v) => Some(*v),
+            Value::FileName(_) => None,
             Value::Number(n) => Some(*n != OrderedFloat::from(0f64)),
             Value::String(s) | Value::BareWord(s) => Some(!s.is_empty()),
             Value::Array(arr) => Some(!arr.is_empty()),
@@ -177,6 +180,7 @@ impl Display for Value {
             // TODO nice display here
             Value::CommandCollection(col) => write!(f, "{:?}", col),
             Value::DbgState(dbg_state) => write!(f, "{:?}", dbg_state),
+            Value::FileName(s) => write!(f, "{}", s),
         }
     }
 }

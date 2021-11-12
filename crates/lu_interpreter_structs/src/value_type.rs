@@ -63,6 +63,7 @@ pub enum ValueType {
     Number,
     String,
     BareWord,
+    FileName,
     /// Struct with name (Final Strct type when)
     #[serde(skip_deserializing)]
     #[serde(serialize_with = "serialize_name_only")]
@@ -254,6 +255,7 @@ impl TcVariant for ValueType {
             | ValueType::String
             | ValueType::Func(_)
             | ValueType::Strct(_)
+            | ValueType::FileName
             | ValueType::BareWord => Arity::Fixed(0),
             ValueType::Array { .. } => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
@@ -301,6 +303,7 @@ impl Display for ValueType {
             ValueType::Void => write!(f, "void"),
             ValueType::Generic(name) => write!(f, "{}", name),
             ValueType::StrctName(name) => write!(f, "{}", name),
+            ValueType::FileName => write!(f, "path"),
         }
     }
 }

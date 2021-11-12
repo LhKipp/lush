@@ -2,10 +2,10 @@ use itertools::{EitherOrBoth, Itertools};
 use log::warn;
 use lu_syntax::{
     ast::{
-        ArrayExprNode, BareWordToken, BooleanExprNode, NumberExprNode, StrctCtorExprNode,
-        StringExprNode, ValueExprElement,
+        ArrayExprNode, BareWordToken, BooleanExprNode, FileNameElement, NumberExprNode,
+        StrctCtorExprNode, StringExprNode, ValueExprElement,
     },
-    AstNode, AstToken,
+    AstElement, AstNode, AstToken,
 };
 use rusttyc::TcKey;
 
@@ -24,6 +24,7 @@ impl TypeCheck for ValueExprElement {
             ValueExprElement::TableExpr(n) => n.typecheck(state),
             ValueExprElement::StrctCtorExpr(n) => n.typecheck(state),
             ValueExprElement::CmdStmt(n) => n.typecheck(state),
+            ValueExprElement::FileName(n) => n.typecheck(state),
         }
     }
 }
@@ -31,6 +32,12 @@ impl TypeCheck for ValueExprElement {
 impl TypeCheck for BareWordToken {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
         Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::BareWord))
+    }
+}
+
+impl TypeCheck for FileNameElement {
+    fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::FileName))
     }
 }
 

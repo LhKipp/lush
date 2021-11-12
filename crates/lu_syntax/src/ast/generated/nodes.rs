@@ -3622,6 +3622,7 @@ pub enum ValueExprElement {
     ArrayExpr(ArrayExprNode),
     TableExpr(TableExprNode),
     CmdStmt(CmdStmtNode),
+    FileName(FileNameElement),
     }
 
 impl ValueExprElement {
@@ -3640,8 +3641,11 @@ impl AstElement for ValueExprElement {
         
         
         
+        FileNameElement::can_cast(kind) ||
+        
+        
         match kind{
-            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | ArrayExpr | TableExpr | CmdStmt => true,
+            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | ArrayExpr | TableExpr | CmdStmt | FileName => true,
             _ => false,
         }
     }
@@ -3655,6 +3659,10 @@ impl AstElement for ValueExprElement {
         
         
         
+        
+        if let Some(casted) = FileNameElement::cast(syntax.clone()){
+                return Some(Self::FileName(casted));
+            }
         
         
         let res = match syntax.kind() {
@@ -3705,6 +3713,9 @@ impl AstElement for ValueExprElement {
             
             ValueExprElement::CmdStmt(it) => it.syntax.clone().into(),
             
+            
+            ValueExprElement::FileName(it) => it.syntax().clone().into(),
+            
             }
     }
 }
@@ -3721,6 +3732,7 @@ impl HasSyntaxKind for ValueExprElement{
             ValueExprElement::ArrayExpr(it) => it.get_syntax_kind(),
             ValueExprElement::TableExpr(it) => it.get_syntax_kind(),
             ValueExprElement::CmdStmt(it) => it.get_syntax_kind(),
+            ValueExprElement::FileName(it) => it.get_syntax_kind(),
             }
     }
 }

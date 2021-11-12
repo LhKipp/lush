@@ -47,7 +47,27 @@ impl Command for RunExternalCmd {
         let l_scope = scope.lock();
 
         let args = self.expect_args(&l_scope);
-        let args: Vec<String> = args.iter().map(Value::to_string).collect();
+
+        // Historic shells expand wildcards (*, **) to all files matching the pattern in the
+        // current PWD. Lush doesn't do the same automatically for internal cmds. For better
+        // compatability, we now expand filenames
+        let mut args_as_str = vec![];
+        for arg in &**args {
+            if let Value::FileName(f_name) = arg {
+                for entry in glob::glob(&f_name).unwrap() {
+                    match entry {
+                        Ok(path) => args_as_str.push(path.display().to_string()),
+                        Err(e) => {
+                            return Err(EvalErr::Message(e.to_string()).into());
+                        }
+                    }
+                }
+            } else {
+                args_as_str.push(arg.to_string())
+            }
+        }
+
+        let args = args_as_str;
         let stdin = self.get_in(&l_scope).cloned().unwrap_or(Value::Nil);
 
         let mut child = std::process::Command::new(self.cmd_name.clone())
