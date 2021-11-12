@@ -37,6 +37,9 @@ impl TypeCheck for BareWordToken {
 
 impl TypeCheck for FileNameElement {
     fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        if let Some(err) = self.validate() {
+            ty_state.push_err(err);
+        }
         Some(ty_state.new_term_key_concretiziesd(self.to_item(), ValueType::FileName))
     }
 }

@@ -19,6 +19,10 @@ pub enum AstErr {
     StrctNotInScope(SourceCodeItem),
     CmdNotInScope(SourceCodeItem),
     CantUseRelativeInclude(SourceCodeItem),
+    PatternError {
+        pattern: SourceCodeItem,
+        err: String,
+    },
 }
 
 impl<S: Into<String>> From<S> for AstErr {

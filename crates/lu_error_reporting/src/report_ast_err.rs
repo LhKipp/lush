@@ -30,6 +30,20 @@ pub(crate) fn ast_err_to_diagnostic(err: &AstErr) -> Diagnostic<usize> {
                 byte_range_of_item(&(cmd_usage)),
             )
             .with_message("Command not found")]),
-        AstErr::CantUseRelativeInclude(_) => todo!(),
+        AstErr::CantUseRelativeInclude(item) => Diagnostic::error()
+            .with_message("Cannot use a relative include here")
+            .with_code("E-Ast00010")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&item),
+                byte_range_of_item(&(item)),
+            )]),
+        AstErr::PatternError { pattern, err } => Diagnostic::error()
+            .with_message("Command not in scope")
+            .with_code("E-Ast0004")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&pattern),
+                byte_range_of_item(&pattern),
+            )
+            .with_message(err)]),
     }
 }
