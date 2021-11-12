@@ -195,6 +195,14 @@ impl TcVariant for ValueType {
                 }
                 // Any cannot be made more concrete
                 (ValueType::Any, _) | (_, ValueType::Any) => Some(ValueType::Any),
+                // FileName can be interpreted as a string
+                (ValueType::FileName, ValueType::String) => Some(ValueType::String),
+                (ValueType::String, ValueType::FileName) => Some(ValueType::String),
+                // BareWord can be seen as a filename
+                (ValueType::FileName, ValueType::BareWord) => Some(ValueType::FileName),
+                (ValueType::BareWord, ValueType::FileName) => Some(ValueType::FileName),
+
+                // TODO remove bareword... and add quotation to string
                 (ValueType::String, ValueType::BareWord) => Some(ValueType::String),
                 (ValueType::BareWord, ValueType::String) => Some(ValueType::String),
                 (

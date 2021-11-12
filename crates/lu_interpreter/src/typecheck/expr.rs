@@ -1,5 +1,6 @@
 use itertools::{EitherOrBoth, Itertools};
 use log::warn;
+use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, BooleanExprNode, FileNameElement, NumberExprNode,
