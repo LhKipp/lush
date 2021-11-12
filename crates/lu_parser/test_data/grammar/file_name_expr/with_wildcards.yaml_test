@@ -1,0 +1,35 @@
+1
+===
+*
+---
+- Start: RelFileName
+- Token: "MultSign (len: 1)"
+- Finish: ""
+...
+2
+===
+dir/**/file.rs
+---
+- Start: RelFileName
+- Token: "BareWord (len: 3)"
+- Token: "FilePathSep (len: 1)"
+- Token: "MultSign (len: 1)"
+- Token: "MultSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 4)"
+- Token: "Point (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+...
+3
+===
+dir/*/hi
+---
+- Start: RelFileName
+- Token: "BareWord (len: 3)"
+- Token: "FilePathSep (len: 1)"
+- Token: "MultSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+...

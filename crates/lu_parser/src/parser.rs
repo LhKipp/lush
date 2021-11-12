@@ -324,16 +324,44 @@ impl Parser {
         self.events.push(event)
     }
 
-    // Returns true if at least 1 elem parsed, false otherwise
-    pub(crate) fn eat_while_file_name_elem(&mut self) -> bool {
-        if !self.eat(BareWord) && !self.eat(T![.]) && !self.eat(T![-]) && !self.eat(Number) {
-            return false;
-        }
-        loop {
-            if !self.eat(BareWord) && !self.eat(T![.]) && !self.eat(T![-]) && !self.eat(Number) {
-                return true;
+    pub fn is_file_name_elem(&self, token: &SyntaxKind, allow_wildcards: bool) -> bool {
+        *token == BareWord
+            || *token == T![.]
+            || *token == T![-]
+            || *token == Number
+            || if allow_wildcards {
+                *token == T![*]
+            } else {
+                false
             }
+    }
+    // Returns true if at least 1 elem parsed, false otherwise
+    pub(crate) fn eat_while_file_name_elem(&mut self, allow_wildcards: bool) -> bool {
+        trace!(
+            "Eating while file_name_elem at: nth({},{},{}...), allow_wildcards {}",
+            self.nth(0),
+            self.nth(1),
+            self.nth(2),
+            allow_wildcards
+        );
+        let mut eaten_once = false;
+        loop {
+            let wildcard_eaten = if allow_wildcards {
+                self.eat(T![*])
+            } else {
+                false
+            };
+            if !self.eat(BareWord)
+                && !self.eat(T![.])
+                && !self.eat(T![-])
+                && !self.eat(Number)
+                && !wildcard_eaten
+            {
+                break;
+            }
+            eaten_once = true;
         }
+        eaten_once
     }
 }
 

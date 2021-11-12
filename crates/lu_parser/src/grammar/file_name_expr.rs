@@ -8,13 +8,18 @@ use vec_box::vec_box;
 
 use super::{OrRule, Rule};
 
-pub(crate) fn file_name_rule() -> OrRule {
+pub(crate) fn file_name_rule(allow_wildcards: bool) -> OrRule {
     OrRule {
         kind: Some("FileName".into()),
-        rules: vec_box![AbsFileNameRule {}, RelFileNameRule {}],
+        rules: vec_box![
+            AbsFileNameRule { allow_wildcards },
+            RelFileNameRule { allow_wildcards }
+        ],
     }
 }
+
 pub struct RelFileNameRule {
+    allow_wildcards: bool,
 }
 
 impl Rule for RelFileNameRule {
@@ -28,6 +33,8 @@ impl Rule for RelFileNameRule {
             // FileSep has to come right after
             let token_after_bw = p.next_non(CMT_NL_WS_BW);
             token_after_bw == T![/]
+        } else if next_token == T![*] && self.allow_wildcards {
+            true
         } else {
             // ./<bw> rule
             next_token == T![.]
@@ -41,9 +48,11 @@ impl Rule for RelFileNameRule {
                 m.abandon(p);
                 return None;
             }
+        } else {
+            p.eat_while(CMT_NL_WS);
         }
         loop {
-            if !p.eat_while_file_name_elem() {
+            if !p.eat_while_file_name_elem(self.allow_wildcards) {
                 break;
             }
             if !p.eat(T![/]) {
@@ -53,7 +62,9 @@ impl Rule for RelFileNameRule {
         Some(m.complete(p, RelFileName))
     }
 }
-pub struct AbsFileNameRule {}
+pub struct AbsFileNameRule {
+    allow_wildcards: bool,
+}
 impl Rule for AbsFileNameRule {
     fn name(&self) -> String {
         "AbsFileNameRule".into()
@@ -67,7 +78,7 @@ impl Rule for AbsFileNameRule {
         let m = p.start();
         p.expect_after(T![/], CMT_NL_WS);
         loop {
-            if !p.eat_while_file_name_elem() {
+            if !p.eat_while_file_name_elem(self.allow_wildcards) {
                 break;
             }
             if !p.eat(T![/]) {
@@ -87,8 +98,13 @@ mod tests {
     use {conformance, serde_yaml};
 
     #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/file_name_expr/general.yaml_test")]
-    fn parse_cmds(s: &str) -> Vec<Event> {
+    fn parse_without_wildcard(s: &str) -> Vec<Event> {
         lu_test_support::init_logger();
-        parse_as(s, &file_name_rule())
+        parse_as(s, &file_name_rule(false))
+    }
+    #[conformance::tests(exact, serde=serde_yaml, file="test_data/grammar/file_name_expr/with_wildcards.yaml_test")]
+    fn parse_with_wildcards(s: &str) -> Vec<Event> {
+        lu_test_support::init_logger();
+        parse_as(s, &file_name_rule(true))
     }
 }

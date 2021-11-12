@@ -105,3 +105,13 @@ use plugin:plug1_f1.lu
 - Point: 1
 - BareWord: 2
 ...
+file_path
+===
+a/b/c
+---
+- BareWord: 1
+- FilePathSep: 1
+- BareWord: 1
+- FilePathSep: 1
+- BareWord: 1
+...

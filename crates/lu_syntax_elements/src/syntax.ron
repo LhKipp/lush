@@ -39,7 +39,7 @@ Config(
     ( name: "RightRectangularBrackets"   , token_text: "]"                              , is_token: true   , ) ,
     ( name: "PlusSign"                   , token_text: "+"                              , is_token: true   , ) ,
     ( name: "MinusSign"                  , token_text: "-"                              , is_token: true   , ) ,
-    ( name: "MultSign"                   , token_text: "*"                              , is_token: true   , ) ,
+    ( name: "MultSign"                   , token_text: "*"                              ,priority: Some(3), is_token: true   , ) ,
     ( name: "FilePathSep"                , token_text: "/"                              , is_token: true   , ) ,
     ( name: "DivSign"                    , token_text: "//"                              , is_token: true   , ) ,
     ( name: "LessThanSign"               , token_text: "<"                              , is_token: true   , ) ,

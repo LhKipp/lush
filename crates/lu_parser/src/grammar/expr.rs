@@ -1,6 +1,7 @@
 use super::*;
 
 use crate::{
+    grammar::file_name_expr::file_name_rule,
     parser::{CompletedMarker, Parser, CMT_NL_WS},
     SyntaxKind::{self, *},
 };
@@ -119,6 +120,7 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(StrctCtorExprRule {}),
             Box::new(TableExprRule {}),
             Box::new(ArrayExprRule {}),
+            Box::new(file_name_rule(true)),
             Box::new(CmdStmtRule {}),
         ],
     }

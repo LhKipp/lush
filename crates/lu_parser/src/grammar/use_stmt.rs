@@ -25,7 +25,7 @@ impl Rule for UseStmtRule {
         }
         p.eat_while(CMT_NL_WS);
 
-        let file_name_rule = file_name_rule();
+        let file_name_rule = file_name_rule(false);
         if file_name_rule.matches(p) {
             file_name_rule.parse(p)
         } else {
@@ -55,7 +55,7 @@ impl Rule for PluginUseStmtRule {
             if !p.eat(T![:]) {
                 break;
             }
-            if !p.eat_while_file_name_elem() {
+            if !p.eat_while_file_name_elem(false) {
                 break;
             }
         }

@@ -72,7 +72,7 @@ pub enum SyntaxKind {
     PlusSign,
     #[token("-")]
     MinusSign,
-    #[token("*")]
+    #[token("*", priority = 3)]
     MultSign,
     #[token("/")]
     FilePathSep,

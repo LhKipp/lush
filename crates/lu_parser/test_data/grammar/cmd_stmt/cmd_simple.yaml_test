@@ -152,3 +152,34 @@ echo hi
 - Token: "BareWord (len: 2)"
 - Finish: ""
 ...
+Cmd with regexes
+===
+echo * dir/**/file.rs dir/*/hi
+---
+- Start: CmdStmt
+- Token: "BareWord (len: 4)"
+- Start: RelFileName
+- Token: "Whitespace (len: 1)"
+- Token: "MultSign (len: 1)"
+- Finish: ""
+- Start: RelFileName
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 3)"
+- Token: "FilePathSep (len: 1)"
+- Token: "MultSign (len: 1)"
+- Token: "MultSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 4)"
+- Token: "Point (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+- Start: RelFileName
+- Token: "Whitespace (len: 1)"
+- Token: "BareWord (len: 3)"
+- Token: "FilePathSep (len: 1)"
+- Token: "MultSign (len: 1)"
+- Token: "FilePathSep (len: 1)"
+- Token: "BareWord (len: 2)"
+- Finish: ""
+- Finish: ""
+...

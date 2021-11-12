@@ -1,6 +1,6 @@
 use log::debug;
 
-use super::{expr::ValueExprRule, Rule};
+use super::{expr::ValueExprRule, file_name_expr::file_name_rule, Rule};
 use crate::{
     grammar::{OrRule, ValuePathExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},
@@ -47,19 +47,35 @@ impl Rule for CmdStmtRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         p.eat_while(CMT_NL_WS);
         let m = p.start();
+        // Eat commands name
+        if !p.expect_after(BareWord, CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
+
         //consume all ws delimited cmd's and arguments
         let arg_rule = ValueExprRule {};
+        let file_name_rule = file_name_rule(true);
         loop {
             debug!("CmdStmtRule checking for arg or cmd_name");
             let next_token = p.next_non(Whitespace);
             if next_token == Eof || next_token == Newline {
+                p.eat_until(&[Eof, Newline].into());
                 break;
             }
-            if !p.eat_after(ShortFlag, Whitespace)
-                && !p.eat_after(LongFlag, Whitespace)
-                && !p.eat_after(BareWord, Whitespace)
-                && !arg_rule.opt(p).is_some()
+            if
+            // Give BareWord precedence over ValueExprRule CmdStmt
+            // We allow simple barewords as cmdarg
+            // But filenames still require precedence over barewords...
+            // TODO integrate bareword optionally into ValueExpr
+            file_name_rule.opt(p).is_some()
+                || p.eat_after(BareWord, Whitespace)
+                || arg_rule.opt(p).is_some()
+                || p.eat_after(ShortFlag, Whitespace)
+                || p.eat_after(LongFlag, Whitespace)
             {
+                continue;
+            } else {
                 break;
             }
         }
