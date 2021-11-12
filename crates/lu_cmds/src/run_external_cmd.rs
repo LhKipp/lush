@@ -54,13 +54,18 @@ impl Command for RunExternalCmd {
         let mut args_as_str = vec![];
         for arg in &**args {
             if let Value::FileName(f_name) = arg {
-                for entry in glob::glob(&f_name).unwrap() {
-                    match entry {
-                        Ok(path) => args_as_str.push(path.display().to_string()),
-                        Err(e) => {
-                            return Err(EvalErr::Message(e.to_string()).into());
+                match glob::glob(&f_name) {
+                    Ok(entries) => {
+                        for entry in entries {
+                            match entry {
+                                Ok(path) => args_as_str.push(path.display().to_string()),
+                                Err(e) => {
+                                    return Err(EvalErr::Message(e.to_string()).into());
+                                }
+                            }
                         }
                     }
+                    Err(e) => unreachable!("TODO check all globs are valid: {}", e),
                 }
             } else {
                 args_as_str.push(arg.to_string())
