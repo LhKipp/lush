@@ -1,0 +1,11 @@
+Ty of reports back ty
+===
+let x = 1
+type_of $x
+---
+{
+  "Ok": {
+    "String": "num"
+  }
+}
+...

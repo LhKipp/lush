@@ -1,10 +1,13 @@
 #!/bin/lush
 
-struct Ratings { n: num s: str }
-let ratings =
-[(Ratings)
-[1 "lush"]]
-for rating in $ratings
-    let x: Ratings = $rating
-
+fn cmd_taking_anything(arg: any)
+    let ty = type_of $arg
+    if $ty == "num"
+        echo passed argument has type number
+    else
+        echo not number but $ty
+    end
 end
+
+cmd_taking_anything 1
+cmd_taking_anything "hello"
