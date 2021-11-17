@@ -14,9 +14,20 @@
 
 `lush` supports type inference. Types do not have to be spelled out each and every time - they are mostly inferred due to the usage of variables, constants and commands.
 
-A value of type `any` can be casted at runtime to a different type by using the `as` operator.
+The type of a value can be visualized by leveraging the `type_of` command. A value of type `any` can be casted at runtime to a different type by using the `as` operator.
+
 ```lush
-$any_var as num
+fn cmd_taking_anything(arg: any)
+    let ty = type_of $arg
+    if $ty == "num"
+        echo passed argument has type number
+    else
+        echo passed argument has type $ty
+    end
+end
+
+cmd_taking_anything 1         # passed argument has type number
+cmd_taking_anything "hello"   # passed argument has type str
 ```
 
 ## Comments
