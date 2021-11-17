@@ -60,6 +60,7 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::MulAssignSign(_) => todo!(),
             OperatorExprElement::AddAssignSign(_) => todo!(),
             OperatorExprElement::MinAssignSign(_) => todo!(),
+            OperatorExprElement::AsKeyword(_) => todo!(),
         }
     }
 }

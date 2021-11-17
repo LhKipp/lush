@@ -11,6 +11,8 @@ pub enum SyntaxKind {
     ImpureKeyword,
     #[token("struct")]
     StrctKeyword,
+    #[token("as")]
+    AsKeyword,
     #[token("req")]
     ReqKeyword,
     #[token("use")]
@@ -199,6 +201,7 @@ impl SyntaxKind{
         match self {
             SyntaxKind::ImpureKeyword => "ImpureKeyword",
             SyntaxKind::StrctKeyword => "StrctKeyword",
+            SyntaxKind::AsKeyword => "AsKeyword",
             SyntaxKind::ReqKeyword => "ReqKeyword",
             SyntaxKind::UseKeyword => "UseKeyword",
             SyntaxKind::LetKeyword => "LetKeyword",
@@ -327,6 +330,7 @@ impl SyntaxKind{
 macro_rules! T {
     [impure] => {$crate::SyntaxKind::ImpureKeyword };
     [struct] => {$crate::SyntaxKind::StrctKeyword };
+    [as] => {$crate::SyntaxKind::AsKeyword };
     [req] => {$crate::SyntaxKind::ReqKeyword };
     [use] => {$crate::SyntaxKind::UseKeyword };
     [let] => {$crate::SyntaxKind::LetKeyword };

@@ -3,6 +3,7 @@ Config(
     // === KEYWORDS ===
     ( name: "ImpureKeyword"              , token_text: "impure"                         , is_token: true   , ) ,
     ( name: "StrctKeyword"               , token_text: "struct"                         , is_token: true   , ) ,
+    ( name: "AsKeyword"                  , token_text: "as"                         , is_token: true   , ) ,
     ( name: "ReqKeyword"                 , token_text: "req"                            , is_token: true   , ) ,
     ( name: "UseKeyword"                 , token_text: "use"                            , is_token: true   , ) ,
     ( name: "LetKeyword"                 , token_text: "let"                            , is_token: true   , ) ,
@@ -157,6 +158,7 @@ Config(
         ],),
     (name: "OperatorExpr", is_generic: true,
         represents_element_names: [
+            "AsKeyword",
             "PlusSign",
             "MinusSign",
             "MultSign",

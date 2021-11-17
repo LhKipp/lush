@@ -2,8 +2,8 @@
 use crate::{AstElement, AstNode, AstToken};
 
 use super::{
-    support, BlockStmtNode, ConditionElement, ElifKeywordToken, IfStmtNode, MathExprNode,
-    OperatorExprElement, ValueExprElement,
+    support, BlockStmtNode, ConditionElement, ElifKeywordToken, IfStmtNode, LuTypeNode,
+    MathExprNode, OperatorExprElement, ValueExprElement,
 };
 
 impl MathExprNode {
@@ -11,6 +11,16 @@ impl MathExprNode {
         support::element_child(self.syntax()).unwrap()
     }
 
+    pub fn rhs_as_lu_type(&self) -> Option<LuTypeNode> {
+        support::node_child(self.syntax())
+    }
+
+    pub fn rhs_safe(&self) -> Option<ValueExprElement> {
+        // TODO CHECK Is this always working?
+        support::element_children(self.syntax()).skip(1).next()
+    }
+
+    // TODO remove this, use rhs_safe
     pub fn rhs(&self) -> ValueExprElement {
         // TODO CHECK Is this always working?
         support::element_children(self.syntax())

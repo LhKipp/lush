@@ -1,0 +1,9 @@
+As cast returns ty of passed ty
+===
+let x: any
+$x as num
+---
+{
+  "Ok": "Number"
+}
+...

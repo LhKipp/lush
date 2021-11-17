@@ -1,4 +1,5 @@
 use lu_interpreter_structs::ValueType;
+use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{MathExprNode, OperatorExprElement, ValueExprElement},
     AstNode,
@@ -10,6 +11,24 @@ use crate::{TyCheckState, TypeCheck, TypeCheckArg};
 impl TypeCheck for MathExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self.operator() {
+            OperatorExprElement::AsKeyword(_) => {
+                if let Some(ty) = self.rhs_as_lu_type() {
+                    match ValueType::from_node_or_err_resolve_strct_name(
+                        &ty.into_type(),
+                        &state.scope,
+                    )
+                    .as_results()
+                    {
+                        Ok(ty) => {
+                            return Some(state.new_term_key_concretiziesd(self.to_item(), ty))
+                        }
+                        Err(e) => state.push_errs(e),
+                    }
+                } else {
+                    todo!("Either incomplete input or raise warning: Expected lu type as rhs. Always raising warning here is fine");
+                }
+                None
+            }
             OperatorExprElement::PlusSign(_)
             | OperatorExprElement::MinusSign(_)
             | OperatorExprElement::MultSign(_)

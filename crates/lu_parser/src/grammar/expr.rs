@@ -44,7 +44,7 @@ fn next_op(p: &mut Parser) -> (u8, SyntaxKind) {
         T![<=]                        => (5,  T![<=]),
         T![<]                         => (5,  T![<]),
         T![+]                         => (10, T![+]),
-        T!["//"]                         => (11, T!["//"]),
+        T!["//"]                      => (11, T!["//"]),
         T![*]                         => (11, T![*]),
         T![-]                         => (10, T![-]),
         // Right associative ops
@@ -53,6 +53,7 @@ fn next_op(p: &mut Parser) -> (u8, SyntaxKind) {
         T![-=]                        => (1, T![-=]),
         T![/=]                        => (1, T![/=]),
         T![*=]                        => (1, T![*=]),
+        SyntaxKind::AsKeyword         => (15, AsKeyword),
 
         _                             => NOT_AN_OP
     };
@@ -91,8 +92,15 @@ fn expr_bp(p: &mut Parser, bp: u8) -> Option<CompletedMarker> {
         let m = expr_m.precede(p);
         p.bump(op);
 
-        expr_bp(p, op_bp + 1); // This will complete the rhs of the expr
-                               // After we have generated the rhs in the above stmt, we now complete our expr
+        // TODO this is a hack. It works, as typecast has highest precedence...
+        // It should rather pass: allow_type_specifiers=true to expr_bp and continue as normal
+        if op == SyntaxKind::AsKeyword {
+            LuTypeRule {}.parse(p);
+        } else {
+            expr_bp(p, op_bp + 1); // This will complete the rhs of the expr
+        }
+
+        // After we have generated the rhs in the above stmt, we now complete our expr
         expr_m = m.complete(p, MathExpr);
     }
     Some(expr_m)
