@@ -3,8 +3,8 @@
 ## Types
 `lush` is a typed shell. The following types exists:
 
-* Any - The type can be of any type
-* Nil - The empty void type
+* any - The type can be of any type
+* nil - The empty void type
 * bool - Boolean, either `true` or `false`
 * num - A number, e.G. 1, 0.5, -5
 * str - A string, e.G. "Hello World"
@@ -13,6 +13,11 @@
 * Functions - See below
 
 `lush` supports type inference. Types do not have to be spelled out each and every time - they are mostly inferred due to the usage of variables, constants and commands.
+
+A value of type `any` can be casted at runtime to a different type by using the `as` operator.
+```lush
+$any_var as num
+```
 
 ## Comments
 Everything behind a `#` until the end of a line, is considered a comment
