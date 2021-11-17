@@ -1,9 +1,11 @@
 1
 ===
-print "hi"
+echo "hi"
 ---
 {
-  "Ok": "Nil"
+  "Ok": {
+    "BareWord": "hi\n"
+  }
 }
 ...
 Barewords get promoted to string

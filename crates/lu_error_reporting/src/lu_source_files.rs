@@ -5,6 +5,7 @@
 
 use clap::App;
 use lu_cli::start_cli;
+use lu_cmds::builtin;
 use lu_error::lu_source_code_item;
 use lu_interpreter::{Interpreter, InterpreterCfg};
 use lu_interpreter_structs::*;
@@ -101,6 +102,11 @@ fn make_global_frame() -> ScopeFrame<Variable> {
             value.into(),
             lu_source_code_item!().into(),
         ));
+    }
+
+    // insert builtin cmds
+    for cmd in builtin::all_builtin_cmds() {
+        frame.insert_var(Variable::new_func(cmd));
     }
     frame
 }
@@ -680,6 +686,66 @@ impl Command for PrintCmd {
 }
 
 const REDIR0: &str = "REDIR0";
+"#####)
+,("crates/lu_cmds/src/builtin/ty_of.rs",r#####"use crate::cmd_prelude::*;
+
+#[derive(Debug, Clone)]
+pub struct TyOfBuiltin {
+    sign: Signature,
+}
+
+const TO_GET_TY_OF_ARG: &str = "value";
+static TY_OF_BUILTIN_ATTRS: Lazy<Vec<CmdAttribute>> =
+    Lazy::new(|| vec![CmdAttribute::new(Pure, lu_source_code_item!())]);
+
+impl TyOfBuiltin {
+    pub fn new() -> Self {
+        let mut sign_builder = SignatureBuilder::default();
+        sign_builder
+            .decl(lu_source_code_item!())
+            .args(vec![ArgSignature::new(
+                TO_GET_TY_OF_ARG.to_string(),
+                ValueType::Any,
+                lu_source_code_item!(-3).into(),
+            )])
+            .ret_arg(ArgSignature::new(
+                "value_type".into(),
+                ValueType::String,
+                lu_source_code_item!(),
+            ));
+        TyOfBuiltin {
+            sign: sign_builder.build().unwrap(),
+        }
+    }
+}
+
+impl Command for TyOfBuiltin {
+    fn name(&self) -> &str {
+        "type_of"
+    }
+
+    fn signature(&self) -> &Signature {
+        &self.sign
+    }
+
+    fn signature_item(&self) -> SourceCodeItem {
+        lu_source_code_item!()
+    }
+
+    fn parent_module(&self) -> Option<&ModPath> {
+        None
+    }
+
+    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
+        let mut l_scope = scope.lock();
+        let val = self.expect_arg(&mut l_scope, TO_GET_TY_OF_ARG).clone();
+        Ok(Value::String(val.get_ty().to_string()))
+    }
+
+    fn attributes(&self) -> &[CmdAttribute] {
+        &*TY_OF_BUILTIN_ATTRS
+    }
+}
 "#####)
 ,("crates/lu_cmds/src/run_external_cmd.rs",r#####"use crate::external_cmds_attr::EXT_CMDS_ATTRIBUTES;
 use crate::{cmd_prelude::*, external_cmds_attr::EXT_CMDS_DEF_ATTRIBUTES};
@@ -1482,18 +1548,13 @@ pub mod binary;
 mod playground;
 pub mod test_prelude;
 
-#[macro_use]
-extern crate vec_rc;
-
-use std::rc::Rc;
-
 use lu_error::lu_source_code_item;
 pub use playground::*;
 use pretty_env_logger::env_logger;
 
-use lu_cmds::PrintCmd;
+use lu_cmds::builtin;
 use lu_interpreter::InterpreterCfg;
-use lu_interpreter_structs::{Command, ScopeFrame, ScopeFrameTag, Value, VarDeclNode, Variable};
+use lu_interpreter_structs::{ScopeFrame, ScopeFrameTag, Variable};
 pub use temp_file::TempFile as TmpFile;
 
 pub fn init_logger() {
@@ -1519,15 +1580,10 @@ pub fn make_test_interpreter_in_playground(
 }
 
 fn make_test_global_frame(pwd: String) -> ScopeFrame<Variable> {
-    let cmds: Vec<Rc<dyn Command>> = vec_rc![PrintCmd::new()];
-
     let mut frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
-    for cmd in cmds {
-        frame.insert_var(Variable::new(
-            cmd.name().to_string(),
-            Value::new_func(cmd),
-            VarDeclNode::Dummy,
-        ));
+    // insert builtin cmds
+    for cmd in builtin::all_builtin_cmds() {
+        frame.insert_var(Variable::new_func(cmd));
     }
     frame.insert_var(Variable::new(
         "PWD".into(),

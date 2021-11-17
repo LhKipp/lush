@@ -1198,6 +1198,7 @@ dependencies = [
  "log",
  "lu_cfg_home",
  "lu_cli",
+ "lu_cmds",
  "lu_error",
  "lu_error_reporting",
  "lu_interpreter",

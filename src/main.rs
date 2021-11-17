@@ -2,6 +2,7 @@ use std::env;
 
 use clap::App;
 use lu_cli::start_cli;
+use lu_cmds::builtin;
 use lu_error::lu_source_code_item;
 use lu_interpreter::{Interpreter, InterpreterCfg};
 use lu_interpreter_structs::*;
@@ -98,6 +99,11 @@ fn make_global_frame() -> ScopeFrame<Variable> {
             value.into(),
             lu_source_code_item!().into(),
         ));
+    }
+
+    // insert builtin cmds
+    for cmd in builtin::all_builtin_cmds() {
+        frame.insert_var(Variable::new_func(cmd));
     }
     frame
 }
