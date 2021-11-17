@@ -24,6 +24,12 @@ pub enum EvalErr {
     ExternalCmdFailed(SourceCodeItem),
 
     // Pseudo err to conveniently return execution. Does not print anything
+    BadCast {
+        cast_math_expr: SourceCodeItem,
+        expected_ty: String,
+        value_item: SourceCodeItem,
+        value_ty: String,
+    },
     DbgAbort,
 }
 

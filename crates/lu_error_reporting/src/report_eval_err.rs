@@ -54,5 +54,24 @@ pub(crate) fn eval_err_to_diagnostic(err: &EvalErr) -> Diagnostic<usize> {
             )
             .with_message("External command called here")]),
         EvalErr::DbgAbort => Diagnostic::note().with_message("Abort through user intervention"),
+        EvalErr::BadCast {
+            cast_math_expr,
+            value_item,
+            value_ty,
+            expected_ty,
+        } => Diagnostic::error()
+            .with_message("Typecast failed")
+            .with_code("E-Eval0010")
+            .with_labels(vec![
+                Label::primary(
+                    f_id_of_item(&cast_math_expr),
+                    byte_range_of_item(&cast_math_expr),
+                ),
+                Label::secondary(f_id_of_item(&value_item), byte_range_of_item(&value_item))
+                    .with_message(format!(
+                        "Was found to be of type {} which is not compatible with {}",
+                        value_ty, expected_ty
+                    )),
+            ]),
     }
 }

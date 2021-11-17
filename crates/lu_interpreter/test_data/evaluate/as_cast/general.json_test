@@ -1,0 +1,43 @@
+As cast gives back value if ty matches
+===
+let x: any = 1
+$x as num
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
+As cast throws err if ty does not match
+===
+let x: any = true
+$x as num
+---
+{
+  "Err": [
+    {
+      "Eval": {
+        "BadCast": {
+          "cast_math_expr": {
+            "content": "$x as num",
+            "range": [
+              18,
+              27
+            ]
+          },
+          "expected_ty": "num",
+          "value_item": {
+            "content": "$x",
+            "range": [
+              18,
+              20
+            ]
+          },
+          "value_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...

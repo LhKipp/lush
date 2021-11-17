@@ -6,12 +6,40 @@ impl Evaluable for MathExprNode {
         &[DbgSetting::StopDbgBeforeEval]
     }
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+        // As cast is handled special
+        let operator = self.operator();
+        if let OperatorExprElement::AsKeyword(_) = operator {
+            let lhs = self.lhs();
+            let lhs_val = lhs.evaluate(scope)?;
+            let rhs_ty = ValueType::from_node_or_err_resolve_strct_name(
+                &self.rhs_as_lu_type().unwrap().into_type(),
+                &scope.lock(),
+            )
+            .as_results();
+            let rhs_ty = Evaluator::lu_results_to_eval_result(rhs_ty)?;
+            if !lhs_val.is_of_type(&rhs_ty) {
+                let err: LuErr = EvalErr::BadCast {
+                    cast_math_expr: self.to_item(),
+                    value_item: lhs.to_item(),
+                    value_ty: lhs_val.get_ty().to_string(),
+                    expected_ty: rhs_ty.to_string(),
+                }
+                .into();
+                return Err(err.into());
+            } else {
+                return Ok(lhs_val);
+            }
+        }
+
         let lhs = self.lhs();
         let rhs = self.rhs();
         let lhs_val = lhs.evaluate(scope)?;
         let rhs_val = rhs.evaluate(scope)?;
 
-        match self.operator() {
+        match operator {
+            OperatorExprElement::AsKeyword(_) => {
+                unreachable!("Handled above")
+            }
             OperatorExprElement::AssignSign(_) => {
                 let lhs_var = if let ValueExprElement::ValuePathExpr(e) = lhs {
                     e
@@ -60,7 +88,6 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::MulAssignSign(_) => todo!(),
             OperatorExprElement::AddAssignSign(_) => todo!(),
             OperatorExprElement::MinAssignSign(_) => todo!(),
-            OperatorExprElement::AsKeyword(_) => todo!(),
         }
     }
 }

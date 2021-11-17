@@ -12,6 +12,11 @@ impl TypeCheck for MathExprNode {
     fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self.operator() {
             OperatorExprElement::AsKeyword(_) => {
+                // let lhs_key = self.lhs().typecheck(state).expect("ValueExpr always gives key");
+                // TODO this is currently a noop, as anything can be Any. It should somehow be
+                // expressable, that only any is allowed here
+                // state.concretizes_key(lhs_key, ValueType::Any);
+
                 if let Some(ty) = self.rhs_as_lu_type() {
                     match ValueType::from_node_or_err_resolve_strct_name(
                         &ty.into_type(),
@@ -25,7 +30,7 @@ impl TypeCheck for MathExprNode {
                         Err(e) => state.push_errs(e),
                     }
                 } else {
-                    todo!("Either incomplete input or raise warning: Expected lu type as rhs. Always raising warning here is fine");
+                    // Either incomplete input, or grammar already gave warning here :)
                 }
                 None
             }

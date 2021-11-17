@@ -1,17 +1,18 @@
 use enum_as_inner::EnumAsInner;
+use lu_error::lu_source_code_item;
 use lu_stdx::AMtx;
 use lu_syntax::ast::{BareWordToken, NumberExprNode, StringExprNode};
 use ordered_float::OrderedFloat;
 use parking_lot::RwLock;
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 use std::{fmt::Display, rc::Rc};
 
 use serde::{Deserialize, Serialize};
 
 use crate::dbg_state::DbgState;
-use crate::{table, Command, CommandCollection, Strct};
+use crate::{table, Command, CommandCollection, Strct, ValueType};
 
 #[derive(Clone, Serialize, Deserialize, EnumAsInner)]
 pub enum Value {
@@ -30,6 +31,7 @@ pub enum Value {
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
     // Strcts fields
+    // TODO this should contian weak pointer to decl. makes everything easier
     Strct(String, Rc<Vec<(String, Value)>>),
     #[serde(skip)]
     Command(Rc<dyn Command>),
@@ -148,6 +150,59 @@ impl Value {
             Value::Strct(_, _) => None,
             Value::CommandCollection(_) => None,
             Value::DbgState(_) => None,
+        }
+    }
+
+    pub fn is_of_type(&self, ty: &ValueType) -> bool {
+        match (self, ty) {
+            (Value::Nil, ValueType::Nil)
+            | (Value::Bool(_), ValueType::Bool)
+            | (Value::Number(_), ValueType::Number)
+            | (Value::String(_), ValueType::String)
+            | (Value::BareWord(_), ValueType::String)
+            | (Value::BareWord(_), ValueType::FileName)
+            | (Value::FileName(_), ValueType::String)
+            | (Value::FileName(_), ValueType::FileName) => return true,
+            (Value::Strct(name, _), ValueType::Strct(strct)) => {
+                let strct = Weak::upgrade(strct).unwrap();
+                let l_strct = strct.read();
+                *name == l_strct.name
+            }
+            (Value::Command(_), ValueType::Func(_)) => {
+                todo!("Assert signatures are the same")
+            }
+            (Value::Array(inner), ValueType::Array { inner_ty, .. }) => {
+                // TODO add array ty to value
+                if inner.is_empty() {
+                    true
+                } else {
+                    inner[0].is_of_type(inner_ty)
+                }
+            }
+            _ => false,
+        }
+    }
+
+    pub fn get_ty(&self) -> ValueType {
+        match self {
+            Value::Nil => ValueType::Nil,
+            Value::Bool(_) => ValueType::Bool,
+            Value::Number(_) => ValueType::Number,
+            Value::String(_) => ValueType::String,
+            Value::BareWord(_) => ValueType::BareWord,
+            Value::FileName(_) => ValueType::FileName,
+            // TODO better inner_ty
+            Value::Array(_) => ValueType::Array {
+                inner_ty: Box::new(ValueType::Unspecified),
+                inner_ty_decl: lu_source_code_item!(),
+            },
+            // TODO if strct contains pointer to decl return proper strct here
+            Value::Strct(name, _) => ValueType::StrctName(name.clone()),
+            Value::Command(cmd) => ValueType::Func(Box::new(cmd.signature().clone())),
+            // TODO these should never be reachable
+            Value::StrctDecl(_) => todo!("Add pseudo ValueType::StructDecl"),
+            Value::DbgState(_) => todo!("Add pseudo ValueType::DbgState"),
+            Value::CommandCollection(_) => todo!(),
         }
     }
 }

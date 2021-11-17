@@ -3,7 +3,7 @@ use lu_syntax::ast::HasAstId;
 use std::fmt::{Debug, Display};
 
 use log::debug;
-use lu_error::{LuErr, LuResult, SourceCodeItem};
+use lu_error::{LuErr, LuResult, LuResults, SourceCodeItem};
 use lu_interpreter_structs::{EvalResult, RetValOrErr, SyScope, Value};
 
 mod block_stmt;
@@ -21,8 +21,8 @@ mod ret_stmt;
 mod source_file;
 mod statement;
 mod strct_stmt;
-mod test;
 mod table_expr;
+mod test;
 
 macro_rules! handle_dbg_intervention_before {
     ($dbg_result: ident, $scope: ident) => {{
@@ -122,6 +122,14 @@ impl Evaluator {
 
     pub fn lu_result_to_eval_result<T>(result: LuResult<T>) -> Result<T, RetValOrErr> {
         result.map_err(|e| e.into())
+    }
+
+    // Only gives back first err of lu_results
+    pub fn lu_results_to_eval_result<T>(result: LuResults<T>) -> Result<T, RetValOrErr> {
+        result.map_err(|e| {
+            assert!(!e.is_empty());
+            e[0].clone().into()
+        })
     }
 
     pub fn eval_result_to_lu_result(result: EvalResult) -> LuResult<Value> {
