@@ -8,6 +8,7 @@
 * bool - Boolean, either `true` or `false`
 * num - A number, e.G. 1, 0.5, -5
 * str - A string, e.G. "Hello World"
+* path - A file path (potentially containing wildcards), e.G. /home/sweet/*
 * [type] - An array of "type", e.G. [num]
 * Structs - See below
 * Functions - See below
