@@ -1,5 +1,6 @@
 #!/bin/lush
 
+let x: any
 fn cmd_taking_anything(arg: any)
     let ty = type_of $arg
     if $ty == "num"

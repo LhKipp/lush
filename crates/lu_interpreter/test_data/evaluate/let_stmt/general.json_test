@@ -20,3 +20,12 @@ $x
   }
 }
 ...
+Simple decl has nil value
+===
+let x
+$x
+---
+{
+  "Ok": "Nil"
+}
+...

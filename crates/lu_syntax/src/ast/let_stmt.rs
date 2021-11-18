@@ -1,7 +1,7 @@
 use lu_error::SourceCodeItem;
 use rowan::TextRange;
 
-use crate::{AstElement, AstNode, AstToken};
+use crate::{AstNode, AstToken};
 
 use super::{
     addr_of_mod_node_contained_in, support, LetKeywordToken, LetStmtNode, LuTypeNode,
@@ -33,13 +33,14 @@ impl LetStmtNode {
             .unwrap()
             .syntax()
             .text_range();
-        let end = self
-            .decl_ty()
-            .map_or_else(
-                || self.value().map(|n| n.syntax().text_range()),
-                |n| Some(n.syntax().text_range()),
-            )
-            .unwrap();
+        // Decly ty or first value before
+        let end = if let Some(ty) = self.decl_ty() {
+            ty.syntax().text_range()
+        } else if let Some(name) = self.var_token() {
+            name.syntax().text_range()
+        } else {
+            start.clone()
+        };
         let text_range = TextRange::new(start.start(), end.end());
         let text = self.text_at(&text_range);
 
