@@ -46,7 +46,15 @@ impl Command for RunExternalCmd {
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let l_scope = scope.lock();
 
-        let args = self.expect_args(&l_scope);
+        let args = self.expect_args(
+            &self
+                .signature()
+                .var_arg
+                .as_ref()
+                .expect("ExternalCmd has vararg")
+                .name,
+            &l_scope,
+        );
 
         // Historic shells expand wildcards (*, **) to all files matching the pattern in the
         // current PWD. Lush doesn't do the same automatically for internal cmds. For better

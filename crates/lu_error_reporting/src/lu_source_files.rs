@@ -476,6 +476,7 @@ impl LuRustStdMod for StdArrayMod {
 ,("crates/lu_cmds/src/lu_std/fs/ls.rs",r#####"use std::sync::Arc;
 
 use crate::cmd_prelude::*;
+use glob::Paths;
 use lu_error::EvalErr;
 use once_cell::sync::Lazy;
 use parking_lot::RwLock;
@@ -485,7 +486,7 @@ pub struct FsLsCmd {
     sign: Signature,
 }
 
-const PATHS_ARG_NAME: &str = "paths";
+const PATHS_VAR_ARG_NAME: &str = "paths";
 static LS_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
     Lazy::new(|| vec![CmdAttribute::new(Pure, lu_source_code_item!())]);
 
@@ -515,8 +516,8 @@ impl FsLsCmd {
         sign_builder
             .decl(ls_decl.clone())
             .var_arg(ArgSignature::new(
-                PATHS_ARG_NAME.to_string(),
-                ValueType::String,
+                PATHS_VAR_ARG_NAME.to_string(),
+                ValueType::FileName,
                 ls_decl.clone().into(),
             ))
             .ret_arg(ArgSignature::new(
@@ -564,13 +565,31 @@ impl Command for FsLsCmd {
             .clone();
         assert!(!pwd.ends_with("/"));
 
-        let pattern = "*"; // TODO take pattern as arg
+        let mut l_scope = scope.lock();
+        let patterns = {
+            let mut patterns: Vec<_> = self
+                .expect_args(PATHS_VAR_ARG_NAME, &mut l_scope)
+                .iter()
+                .map(|pattern| match pattern {
+                    Value::FileName(pattern) => pattern.clone(),
+                    _ => unreachable!(),
+                })
+                .collect();
+            if patterns.is_empty() {
+                patterns.push("*".into())
+            }
+            patterns
+        };
 
-        let glob_pattern = format!("{}/{}", pwd, pattern);
-        debug!("ls {}", glob_pattern);
-        let paths = glob::glob(&glob_pattern).map_err(|e| EvalErr::Message(e.to_string()))?;
+        let matching_paths: Result<Vec<Paths>, EvalErr> = patterns
+            .into_iter()
+            .map(|pattern| {
+                let glob_pattern = format!("{}/{}", pwd, pattern);
+                glob::glob(&glob_pattern).map_err(|e| EvalErr::Message(e.to_string()))
+            })
+            .collect();
 
-        for path in paths {
+        for path in matching_paths?.into_iter().flatten() {
             let path = path.map_err(|e| EvalErr::Message(e.to_string()))?;
             let path_name = path
                 .display()
@@ -795,7 +814,15 @@ impl Command for RunExternalCmd {
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let l_scope = scope.lock();
 
-        let args = self.expect_args(&l_scope);
+        let args = self.expect_args(
+            &self
+                .signature()
+                .var_arg
+                .as_ref()
+                .expect("ExternalCmd has vararg")
+                .name,
+            &l_scope,
+        );
 
         // Historic shells expand wildcards (*, **) to all files matching the pattern in the
         // current PWD. Lush doesn't do the same automatically for internal cmds. For better

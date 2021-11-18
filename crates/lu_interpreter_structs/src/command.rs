@@ -10,7 +10,6 @@ use lu_error::{LuResult, SourceCodeItem};
 use serde::{Deserialize, Serialize};
 
 pub const IN_VAR_NAME: &str = "in";
-pub const ARGS_VAR_NAME: &str = "args";
 
 #[derive(Debug, Clone, Serialize, Deserialize, is_enum_variant, PartialEq, Eq)]
 pub enum CmdAttributeVariant {
@@ -72,14 +71,6 @@ pub trait Command: CommandClone + Debug {
         None
     }
 
-    /// Returns $args
-    fn expect_args<'a>(&self, scope: &'a Scope<Variable>) -> &'a Rc<Vec<Value>> {
-        match &scope.find_var(ARGS_VAR_NAME).expect("Always present").val {
-            Value::Array(v) => &v,
-            _ => unreachable!("Args are always an array"),
-        }
-    }
-
     /// Returns $in
     fn get_in<'a>(&self, scope: &'a Scope<Variable>) -> Option<&'a Value> {
         self.get_arg(scope, IN_VAR_NAME)
@@ -109,6 +100,14 @@ pub trait Command: CommandClone + Debug {
             .find_var_mut(arg_name)
             .expect("Variable always present")
             .val
+    }
+
+    /// Returns $args
+    fn expect_args<'a>(&self, args_name: &str, scope: &'a Scope<Variable>) -> &'a Rc<Vec<Value>> {
+        match &scope.find_var(args_name).expect("Always present").val {
+            Value::Array(v) => &v,
+            _ => unreachable!("Args are always an array"),
+        }
     }
 
     /// Takes the contents of the vararg
