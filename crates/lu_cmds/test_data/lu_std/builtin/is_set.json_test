@@ -19,3 +19,29 @@ is_set x
   }
 }
 ...
+Isset returns false for not passed flag
+===
+fn cmd(--flag:num)
+    ret is_set flag
+end
+cmd
+---
+{
+  "Ok": {
+    "Bool": false
+  }
+}
+...
+Isset returns true for passed flag
+===
+fn cmd(--flag:num)
+    ret is_set flag
+end
+cmd --flag 1
+---
+{
+  "Ok": {
+    "Bool": true
+  }
+}
+...
