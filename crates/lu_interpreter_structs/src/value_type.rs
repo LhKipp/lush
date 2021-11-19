@@ -84,6 +84,12 @@ pub enum ValueType {
         #[educe(PartialEq(ignore))]
         inner_ty_decl: SourceCodeItem,
     },
+    Optional {
+        #[educe(PartialEq(method = "cmp_inner_tys"))]
+        inner_ty: Box<ValueType>,
+        #[educe(PartialEq(ignore))]
+        inner_ty_decl: SourceCodeItem,
+    },
     Func(#[educe(PartialEq(method = "cmp_sign_types"))] Box<Signature>),
 }
 
@@ -266,7 +272,7 @@ impl TcVariant for ValueType {
             | ValueType::Strct(_)
             | ValueType::FileName
             | ValueType::BareWord => Arity::Fixed(0),
-            ValueType::Array { .. } => Arity::Fixed(1),
+            ValueType::Array { .. } | ValueType::Optional { .. } => Arity::Fixed(1),
             ValueType::Error => Self::arity(&ValueType::Any),
             ValueType::StrctName(name) => {
                 warn!(
@@ -313,6 +319,7 @@ impl Display for ValueType {
             ValueType::Generic(name) => write!(f, "{}", name),
             ValueType::StrctName(name) => write!(f, "{}", name),
             ValueType::FileName => write!(f, "path"),
+            ValueType::Optional { inner_ty, .. } => write!(f, "Opt({})", *inner_ty),
         }
     }
 }

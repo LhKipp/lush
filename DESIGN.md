@@ -175,3 +175,6 @@ everything and user shall pick what he wants to see.
 <!-- ``` -->
 <!-- This will lead to any operation done on an enum, potentially returning an error. -->
 The feature is removed because of the above reason
+
+ifopt val = $flag
+end

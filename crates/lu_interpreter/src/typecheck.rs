@@ -51,6 +51,8 @@ pub struct TyCheckState {
     tc_strct_table: HashMap<TcKey, TcStrct>,
     /// TcKey to Inner Tc of Array
     tc_array_table: HashMap<TcKey, TcKey>,
+    /// TcKey to Inner Tc of Optional
+    tc_optional_table: HashMap<TcKey, TcKey>,
     /// TcKey to Generic name
     tc_generic_table: HashMap<TcKey, String>,
 
@@ -78,6 +80,7 @@ impl TyCheckState {
             tc_strct_table: HashMap::new(),
             tc_generic_table: HashMap::new(),
             tc_array_table: HashMap::new(),
+            tc_optional_table: HashMap::new(),
             ty_table: HashMap::new(),
             result: None,
             tc_var_cmd_table: Vec::new(),
@@ -139,6 +142,15 @@ impl TyCheckState {
             return; // No more work to do
         }
 
+        // Check whether both are optionals
+        if let (Some(key1_arr_inner_tc), Some(key2_arr_inner_tc)) = (
+            self.get_opt_inner_tc(&key1).cloned(),
+            self.get_opt_inner_tc(&key2).cloned(),
+        ) {
+            self.equate_keys(key1_arr_inner_tc, key2_arr_inner_tc);
+            return; // No more work to do
+        }
+
         // Check whether both are funcs
         if let (Some(key1_func_tc), Some(key2_func_tc)) = (
             self.get_tc_func(&key1).cloned(),
@@ -157,18 +169,29 @@ impl TyCheckState {
 
         // If other is a func, we need to also equate the inner func_keys
         // We do so by inserting cloning and reinserting the tc_func
+        /* For Funcs */
         if let Some(tc_func) = self.tc_func_table.get(&key2).cloned() {
             self.tc_func_table.insert(key1, tc_func);
         } else if let Some(tc_func) = self.tc_func_table.get(&key1).cloned() {
             self.tc_func_table.insert(key2, tc_func);
-        } else if let Some(tc_strct) = self.tc_strct_table.get(&key2).cloned() {
+        }
+        /* For structs*/
+        else if let Some(tc_strct) = self.tc_strct_table.get(&key2).cloned() {
             self.tc_strct_table.insert(key1, tc_strct);
         } else if let Some(tc_strct) = self.tc_strct_table.get(&key1).cloned() {
             self.tc_strct_table.insert(key2, tc_strct);
-        } else if let Some(tc_array) = self.tc_array_table.get(&key2).cloned() {
+        }
+        /* for arrays */
+        else if let Some(tc_array) = self.tc_array_table.get(&key2).cloned() {
             self.tc_array_table.insert(key1, tc_array);
         } else if let Some(tc_array) = self.tc_array_table.get(&key1).cloned() {
             self.tc_array_table.insert(key2, tc_array);
+        }
+        /* for optionals */
+        else if let Some(tc_opt) = self.tc_optional_table.get(&key2).cloned() {
+            self.tc_optional_table.insert(key1, tc_opt);
+        } else if let Some(tc_opt) = self.tc_optional_table.get(&key1).cloned() {
+            self.tc_optional_table.insert(key2, tc_opt);
         }
     }
 
@@ -183,6 +206,12 @@ impl TyCheckState {
                 self.new_term_key_concretiziesd(inner_ty_decl.clone(), *inner_ty.clone());
             self.tc_array_table.insert(key, inner_ty_key);
 
+            let res = self.checker.impose(key.concretizes_explicit(ty.clone()));
+            self.handle_tc_result(res);
+        } else if let Some((inner_ty, inner_ty_decl)) = ty.as_optional() {
+            let inner_ty_key =
+                self.new_term_key_concretiziesd(inner_ty_decl.clone(), *inner_ty.clone());
+            self.tc_optional_table.insert(key, inner_ty_key);
             let res = self.checker.impose(key.concretizes_explicit(ty.clone()));
             self.handle_tc_result(res);
         } else if let Some(_) = ty.as_strct() {
@@ -455,6 +484,10 @@ impl TyCheckState {
     fn get_arr_inner_tc(&self, key: &TcKey) -> Option<&TcKey> {
         self.tc_array_table.get(key)
     }
+
+    fn get_optional_inner_tc(&self, key: &TcKey) -> Option<&TcKey> {
+        self.tc_optional_table.get(key)
+    }
 }
 
 impl PipelineStage for TyCheckState {
@@ -596,6 +629,11 @@ impl TcFunc {
                 debug!("Substitute Generics: Found inner array_ty. Recursing into that");
                 let new_inner_arr_key = subst_generic_key(inner_arr_key, seen_generics, ty_state);
                 ty_state.tc_array_table.insert(key, new_inner_arr_key); // TODO bit of direct access here...
+                key
+            } else if let Some(inner_opt_key) = ty_state.get_optional_inner_tc(&key).cloned() {
+                debug!("Substitute Generics: Found inner array_ty. Recursing into that");
+                let new_inner_opt_key = subst_generic_key(inner_opt_key, seen_generics, ty_state);
+                ty_state.tc_optional_table.insert(key, new_inner_opt_key); // TODO bit of direct access here...
                 key
             } else {
                 debug!("Found non generic normal key. Not substituting");
