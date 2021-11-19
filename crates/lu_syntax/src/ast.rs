@@ -9,6 +9,7 @@ mod generated;
 mod if_stmt;
 mod let_stmt;
 mod math_expr;
+mod optional_expr;
 mod piped_cmds_stmt;
 mod ret_stmt;
 mod signature;

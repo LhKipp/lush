@@ -75,6 +75,102 @@ impl Display for StrctKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct OptionalTyKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for OptionalTyKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptionalTyKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for OptionalTyKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for OptionalTyKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for OptionalTyKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct SomeKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for SomeKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::SomeKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for SomeKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for SomeKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for SomeKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct NoneKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for NoneKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::NoneKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for NoneKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for NoneKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for NoneKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct AsKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -3604,6 +3700,38 @@ impl Display for ArrayExprNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct OptionalExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for OptionalExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptionalExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for OptionalExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for OptionalExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for OptionalExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct TableExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3683,6 +3811,7 @@ pub enum ValueExprElement {
     StringExpr(StringExprNode),
     ValuePathExpr(ValuePathExprNode),
     StrctCtorExpr(StrctCtorExprNode),
+    OptionalExpr(OptionalExprNode),
     ArrayExpr(ArrayExprNode),
     TableExpr(TableExprNode),
     CmdStmt(CmdStmtNode),
@@ -3705,15 +3834,17 @@ impl AstElement for ValueExprElement {
         
         
         
+        
         FileNameElement::can_cast(kind) ||
         
         
         match kind{
-            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | ArrayExpr | TableExpr | CmdStmt | FileName => true,
+            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | OptionalExpr | ArrayExpr | TableExpr | CmdStmt | FileName => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -3737,6 +3868,7 @@ impl AstElement for ValueExprElement {
             StringExpr => ValueExprElement::StringExpr(StringExprNode { syntax: syntax.into_node().unwrap() }),
             ValuePathExpr => ValueExprElement::ValuePathExpr(ValuePathExprNode { syntax: syntax.into_node().unwrap() }),
             StrctCtorExpr => ValueExprElement::StrctCtorExpr(StrctCtorExprNode { syntax: syntax.into_node().unwrap() }),
+            OptionalExpr => ValueExprElement::OptionalExpr(OptionalExprNode { syntax: syntax.into_node().unwrap() }),
             ArrayExpr => ValueExprElement::ArrayExpr(ArrayExprNode { syntax: syntax.into_node().unwrap() }),
             TableExpr => ValueExprElement::TableExpr(TableExprNode { syntax: syntax.into_node().unwrap() }),
             CmdStmt => ValueExprElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
@@ -3769,6 +3901,9 @@ impl AstElement for ValueExprElement {
             ValueExprElement::StrctCtorExpr(it) => it.syntax.clone().into(),
             
             
+            ValueExprElement::OptionalExpr(it) => it.syntax.clone().into(),
+            
+            
             ValueExprElement::ArrayExpr(it) => it.syntax.clone().into(),
             
             
@@ -3793,6 +3928,7 @@ impl HasSyntaxKind for ValueExprElement{
             ValueExprElement::StringExpr(it) => it.get_syntax_kind(),
             ValueExprElement::ValuePathExpr(it) => it.get_syntax_kind(),
             ValueExprElement::StrctCtorExpr(it) => it.get_syntax_kind(),
+            ValueExprElement::OptionalExpr(it) => it.get_syntax_kind(),
             ValueExprElement::ArrayExpr(it) => it.get_syntax_kind(),
             ValueExprElement::TableExpr(it) => it.get_syntax_kind(),
             ValueExprElement::CmdStmt(it) => it.get_syntax_kind(),

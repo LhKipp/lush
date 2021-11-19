@@ -74,8 +74,16 @@ pub(crate) fn ty_err_to_diagnostic(err: &TyErr) -> Diagnostic<usize> {
             )
             .with_message("Item declared here")]),
         TyErr::ItemExpectedToBeArray(item) => Diagnostic::error()
-            .with_message("Statement expected to be a array")
+            .with_message("Statement expected to be an array")
             .with_code("E-Ty0008")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&item),
+                byte_range_of_item(&(item)),
+            )
+            .with_message("Item declared here")]),
+        TyErr::ItemExpectedToBeOptional(item) => Diagnostic::error()
+            .with_message("Statement expected to be an optional")
+            .with_code("E-Ty0009")
             .with_labels(vec![Label::primary(
                 f_id_of_item(&item),
                 byte_range_of_item(&(item)),

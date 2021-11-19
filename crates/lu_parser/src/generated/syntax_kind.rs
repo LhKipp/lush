@@ -11,6 +11,12 @@ pub enum SyntaxKind {
     ImpureKeyword,
     #[token("struct")]
     StrctKeyword,
+    #[token("Opt")]
+    OptionalTyKeyword,
+    #[token("Some")]
+    SomeKeyword,
+    #[token("None")]
+    NoneKeyword,
     #[token("as")]
     AsKeyword,
     #[token("req")]
@@ -181,6 +187,7 @@ pub enum SyntaxKind {
     NumberExpr,
     ValuePathExpr,
     ArrayExpr,
+    OptionalExpr,
     TableExpr,
     BooleanExpr,
     ValueExpr,
@@ -201,6 +208,9 @@ impl SyntaxKind{
         match self {
             SyntaxKind::ImpureKeyword => "ImpureKeyword",
             SyntaxKind::StrctKeyword => "StrctKeyword",
+            SyntaxKind::OptionalTyKeyword => "OptionalTyKeyword",
+            SyntaxKind::SomeKeyword => "SomeKeyword",
+            SyntaxKind::NoneKeyword => "NoneKeyword",
             SyntaxKind::AsKeyword => "AsKeyword",
             SyntaxKind::ReqKeyword => "ReqKeyword",
             SyntaxKind::UseKeyword => "UseKeyword",
@@ -308,6 +318,7 @@ impl SyntaxKind{
             SyntaxKind::NumberExpr => "NumberExpr",
             SyntaxKind::ValuePathExpr => "ValuePathExpr",
             SyntaxKind::ArrayExpr => "ArrayExpr",
+            SyntaxKind::OptionalExpr => "OptionalExpr",
             SyntaxKind::TableExpr => "TableExpr",
             SyntaxKind::BooleanExpr => "BooleanExpr",
             SyntaxKind::ValueExpr => "ValueExpr",
@@ -330,6 +341,9 @@ impl SyntaxKind{
 macro_rules! T {
     [impure] => {$crate::SyntaxKind::ImpureKeyword };
     [struct] => {$crate::SyntaxKind::StrctKeyword };
+    [Opt] => {$crate::SyntaxKind::OptionalTyKeyword };
+    [Some] => {$crate::SyntaxKind::SomeKeyword };
+    [None] => {$crate::SyntaxKind::NoneKeyword };
     [as] => {$crate::SyntaxKind::AsKeyword };
     [req] => {$crate::SyntaxKind::ReqKeyword };
     [use] => {$crate::SyntaxKind::UseKeyword };

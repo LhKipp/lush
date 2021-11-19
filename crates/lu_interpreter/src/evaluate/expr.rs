@@ -23,6 +23,7 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::StrctCtorExpr(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::FileName(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
+            ValueExprElement::OptionalExpr(_) => todo!(),
         }
     }
 }

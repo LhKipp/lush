@@ -128,9 +128,44 @@ pub(crate) fn value_expr_rule() -> OrRule {
             Box::new(StrctCtorExprRule {}),
             Box::new(TableExprRule {}),
             Box::new(ArrayExprRule {}),
+            Box::new(OptionalExprRule {}),
             Box::new(file_name_rule(true)),
             Box::new(CmdStmtRule {}),
         ],
+    }
+}
+
+pub struct OptionalExprRule;
+impl Rule for OptionalExprRule {
+    fn name(&self) -> String {
+        "Optional".into()
+    }
+
+    fn matches(&self, p: &mut Parser) -> bool {
+        let next = p.next_non(CMT_NL_WS);
+        next == NoneKeyword || next == SomeKeyword
+    }
+
+    fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
+        let m = p.start();
+        if p.eat_after(NoneKeyword, CMT_NL_WS) {
+            Some(m.complete(p, OptionalExpr))
+        } else if p.eat_after(SomeKeyword, CMT_NL_WS) {
+            if !p.expect_after(T!["{"], CMT_NL_WS) {
+                m.abandon(p);
+                return None;
+            }
+            LuTypeRule {}.parse(p);
+            if !p.expect_after(T!["}"], CMT_NL_WS) {
+                m.abandon(p);
+                return None;
+            }
+            Some(m.complete(p, OptionalExpr))
+        } else {
+            p.error("Expected None or Some{..}".to_string());
+            m.abandon(p);
+            None
+        }
     }
 }
 

@@ -4,7 +4,7 @@ use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{
         ArrayExprNode, BareWordToken, BooleanExprNode, FileNameElement, NumberExprNode,
-        StrctCtorExprNode, StringExprNode, ValueExprElement,
+        OptionalExprNode, StrctCtorExprNode, StringExprNode, ValueExprElement,
     },
     AstElement, AstNode, AstToken,
 };
@@ -26,6 +26,33 @@ impl TypeCheck for ValueExprElement {
             ValueExprElement::StrctCtorExpr(n) => n.typecheck(state),
             ValueExprElement::CmdStmt(n) => n.typecheck(state),
             ValueExprElement::FileName(n) => n.typecheck(state),
+            ValueExprElement::OptionalExpr(n) => n.typecheck(state),
+        }
+    }
+}
+
+impl TypeCheck for OptionalExprNode {
+    fn do_typecheck(&self, _: &[TypeCheckArg], ty_state: &mut TyCheckState) -> Option<TcKey> {
+        match self.value() {
+            Some(inner) => {
+                let result = ty_state.new_term_key_concretiziesd(
+                    self.to_item(),
+                    ValueType::new_optional(ValueType::Unspecified, inner.to_item()),
+                );
+
+                if let Some(inner_key) = inner.typecheck(ty_state) {
+                    let inner_opt_key = ty_state
+                        .expect_opt_inner_ty_from_key(result)
+                        .expect("Prev inserted, always present");
+                    ty_state.equate_keys(inner_opt_key, inner_key);
+                }
+
+                Some(result)
+            }
+            None => Some(ty_state.new_term_key_concretiziesd(
+                self.to_item(),
+                ValueType::new_optional(ValueType::Unspecified, self.to_item()),
+            )),
         }
     }
 }

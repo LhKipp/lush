@@ -3,6 +3,9 @@ Config(
     // === KEYWORDS ===
     ( name: "ImpureKeyword"              , token_text: "impure"                         , is_token: true   , ) ,
     ( name: "StrctKeyword"               , token_text: "struct"                         , is_token: true   , ) ,
+    ( name: "OptionalTyKeyword"          , token_text: "Opt"                         , is_token: true   , ) ,
+    ( name: "SomeKeyword"                , token_text: "Some"                         , is_token: true   , ) ,
+    ( name: "NoneKeyword"                , token_text: "None"                         , is_token: true   , ) ,
     ( name: "AsKeyword"                  , token_text: "as"                         , is_token: true   , ) ,
     ( name: "ReqKeyword"                 , token_text: "req"                            , is_token: true   , ) ,
     ( name: "UseKeyword"                 , token_text: "use"                            , is_token: true   , ) ,
@@ -126,6 +129,7 @@ Config(
     ( name: "NumberExpr"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "ValuePathExpr"              , is_node: true                                , has_rule: true   , ) ,
     ( name: "ArrayExpr"                  , is_node: true                                , has_rule: true   , ) ,
+    ( name: "OptionalExpr"                  , is_node: true                                , has_rule: false   , ) ,
     ( name: "TableExpr"                  , is_node: true                                , has_rule: true   , ) ,
     ( name: "BooleanExpr"                  , is_node: true                                , has_rule: false   , ) ,//TODO
     // === GENERIC META NODES === 
@@ -137,6 +141,7 @@ Config(
         "StringExpr",
         "ValuePathExpr",
         "StrctCtorExpr",
+        "OptionalExpr",
         "FileName",
         "ArrayExpr",
         "TableExpr",

@@ -103,6 +103,13 @@ impl ValueType {
         }
     }
 
+    pub fn new_optional(inner_ty: ValueType, inner_ty_decl: SourceCodeItem) -> Self {
+        ValueType::Optional {
+            inner_ty: Box::new(inner_ty),
+            inner_ty_decl,
+        }
+    }
+
     pub fn new_func(sign: Signature) -> Self {
         ValueType::Func(Box::new(sign))
     }

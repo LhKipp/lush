@@ -460,6 +460,18 @@ impl TyCheckState {
         inner_ty_key
     }
 
+    /// Returns the inner_ty key behind key if key is a optional. Records an error otherwise
+    /// Therefore the user does not have to handle the None case
+    fn expect_opt_inner_ty_from_key(&mut self, opt_key: TcKey) -> Option<TcKey> {
+        let inner_ty_key = self.get_optional_inner_tc(&opt_key.clone()).cloned();
+
+        if inner_ty_key.is_none() {
+            let key_item = self.get_item_of(&opt_key).clone();
+            self.push_err(TyErr::ItemExpectedToBeOptional(key_item).into());
+        }
+        inner_ty_key
+    }
+
     /// Get the SourceCodeItem behind the key
     pub(crate) fn get_item_of(&self, key: &TcKey) -> &SourceCodeItem {
         self.tc_expr_table.get(key).unwrap()
