@@ -29,3 +29,13 @@ $x
   "Ok": "Nil"
 }
 ...
+let with reassignment
+===
+let x: num = 1
+let x: str = "hi"
+$x
+---
+{
+  "Ok": "String"
+}
+...
