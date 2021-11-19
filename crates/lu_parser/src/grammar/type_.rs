@@ -83,7 +83,7 @@ impl Rule for LuTypeRule {
         // p.expect_after_as(BareWord, LuTypeName, CMT_NL_WS);
         lu_type_specifier().parse(p);
         // TODO make option type special in the language?
-        // p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
+        p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
         Some(m.complete(p, LuType))
     }
 }

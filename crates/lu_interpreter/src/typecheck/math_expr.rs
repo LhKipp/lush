@@ -18,11 +18,8 @@ impl TypeCheck for MathExprNode {
                 // state.concretizes_key(lhs_key, ValueType::Any);
 
                 if let Some(ty) = self.rhs_as_lu_type() {
-                    match ValueType::from_node_or_err_resolve_strct_name(
-                        &ty.into_type(),
-                        &state.scope,
-                    )
-                    .as_results()
+                    match ValueType::from_node_or_err_resolve_strct_name(&ty, &state.scope)
+                        .as_results()
                     {
                         Ok(ty) => {
                             return Some(state.new_term_key_concretiziesd(self.to_item(), ty))

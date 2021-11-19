@@ -21,8 +21,7 @@ impl StrctField {
         let decl = field_node.to_item();
         let ty = field_node
             .ty()
-            .map(|ty_node| ty_node.into_type())
-            .map(|ty_spec| ValueType::from_node(&ty_spec))
+            .map(|ty_node| ValueType::from_node(&ty_node))
             .unwrap_or(ValueType::Unspecified);
 
         StrctField::new(name, ty, field_num, decl)

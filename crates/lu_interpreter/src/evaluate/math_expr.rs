@@ -12,7 +12,7 @@ impl Evaluable for MathExprNode {
             let lhs = self.lhs();
             let lhs_val = lhs.evaluate(scope)?;
             let rhs_ty = ValueType::from_node_or_err_resolve_strct_name(
-                &self.rhs_as_lu_type().unwrap().into_type(),
+                &self.rhs_as_lu_type().unwrap(),
                 &scope.lock(),
             )
             .as_results();

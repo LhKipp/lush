@@ -7,7 +7,10 @@ use std::{
 use enum_as_inner::EnumAsInner;
 use log::{debug, warn};
 use lu_error::{util::Outcome, SourceCodeItem};
-use lu_syntax::{ast::LuTypeSpecifierElement, AstElement, AstNode, AstToken};
+use lu_syntax::{
+    ast::{LuTypeNode, LuTypeSpecifierElement},
+    AstElement, AstNode, AstToken,
+};
 use parking_lot::RwLock;
 use rusttyc::{types::Arity, Constructable, Partial, Variant as TcVariant};
 use serde::{Deserialize, Serialize, Serializer};
@@ -128,7 +131,7 @@ impl ValueType {
     /// Option2: do the resolve_strct_names step for typecheck and keep using this func (preferred
     /// now)
     pub fn from_node_or_err_resolve_strct_name(
-        node: &LuTypeSpecifierElement,
+        node: &LuTypeNode,
         scope: &Scope<Variable>,
     ) -> Outcome<ValueType> {
         let ty = Self::from_node(node);
@@ -144,9 +147,9 @@ impl ValueType {
         }
     }
 
-    pub fn from_node(node: &LuTypeSpecifierElement) -> ValueType {
+    pub fn from_node(ty_node: &LuTypeNode) -> ValueType {
         // TODO make return type (ValueType, Option<LuErr>)
-        let ty = match node {
+        let ty = match ty_node.type_specifier() {
             LuTypeSpecifierElement::AnyKeyword(_) => {
                 warn!("RETURNING WRONG VALUE_TYPE: Any INSTEAD OF AnyOf");
                 ValueType::Any // TODO this must be AnyOf!!!
@@ -161,7 +164,7 @@ impl ValueType {
             LuTypeSpecifierElement::StrctName(n) => ValueType::StrctName(n.text().to_string()),
             LuTypeSpecifierElement::ArrayType(arr) => {
                 let (inner_ty, inner_ty_decl) = if let Some(inner) = arr.inner_type() {
-                    (ValueType::from_node(&inner.into_type()), inner.to_item())
+                    (ValueType::from_node(&inner), inner.to_item())
                 } else {
                     (ValueType::Unspecified, arr.to_item())
                 };
@@ -172,7 +175,11 @@ impl ValueType {
                 ValueType::new_func(sign)
             }
         };
-        ty
+        if ty_node.is_opt_type() {
+            ValueType::new_optional(ty, ty_node.type_specifier().to_item())
+        } else {
+            ty
+        }
     }
 }
 

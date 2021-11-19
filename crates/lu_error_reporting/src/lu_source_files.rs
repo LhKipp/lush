@@ -1050,7 +1050,7 @@ impl ArgSignature {
             .map(|in_node| {
                 in_node.type_().map(|ty| {
                     // Ty should always be some
-                    ValueType::from_node(&ty.into_type())
+                    ValueType::from_node(&ty)
                 })
             })
             .flatten()
@@ -1189,7 +1189,7 @@ impl Signature {
                 let arg_name = arg_node.name();
                 let ty = arg_node
                     .type_()
-                    .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
+                    .map(|ty_node| ValueType::from_node(&ty_node))
                     .unwrap_or(ValueType::Unspecified);
                 ArgSignature::new(arg_name, ty, arg_node.to_item())
             })
@@ -1201,7 +1201,7 @@ impl Signature {
                 let short_name = flag_node.short_name();
                 let ty = flag_node
                     .type_()
-                    .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
+                    .map(|ty_node| ValueType::from_node(&ty_node))
                     .unwrap_or(ValueType::Bool); // Flags have a default ty of bool.
                 let optional = !flag_node.is_required();
                 FlagSignature::new(long_name, short_name, ty, optional, flag_node.to_item())
@@ -1211,7 +1211,7 @@ impl Signature {
             let name = var_arg_node.name();
             let ty = var_arg_node
                 .type_()
-                .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
+                .map(|ty_node| ValueType::from_node(&ty_node))
                 .unwrap_or(ValueType::Any);
             ArgSignature::new(name, ty, var_arg_node.to_item())
         });
