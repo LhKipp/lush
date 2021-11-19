@@ -160,6 +160,20 @@ struct GroupedArgs {
     flag_vals: Vec<(String, Value, SourceCodeItem)>,
 }
 
+macro_rules! insert_if_bool_flag_or_set_as_last_seen {
+    ($flag_vals:ident, $last_seen_flag:ident, $cmd_flags:ident, $passed_flag:ident, $find_flag_sign_cls:expr) => {{
+        let flag_sign = $cmd_flags
+            .iter()
+            .find($find_flag_sign_cls)
+            .expect("Flag will always be found");
+        if flag_sign.ty == ValueType::Bool {
+            $flag_vals.push((flag_sign.best_name(), true.into(), $passed_flag.to_item()));
+        } else {
+            $last_seen_flag = Some((flag_sign, $passed_flag.to_item()));
+        }
+    }};
+}
+
 fn evaluate_and_group_args(
     args: impl Iterator<Item = CmdArgElement>,
     cmd_flags: &[FlagSignature],
@@ -174,35 +188,41 @@ fn evaluate_and_group_args(
     for arg in args {
         match arg {
             CmdArgElement::LongFlag(long_flag) => {
-                let flag_name = long_flag.flag_name();
-                match flag_usage_to_flag_arg(cmd_flags, |flag_sign| {
-                    if flag_sign.long_name.as_ref() == Some(&flag_name) {
-                        Some((flag_name.clone(), flag_sign.ty.clone()))
-                    } else {
-                        None
-                    }
-                }) {
-                    Ok((flag_name, val)) => flag_vals.push((flag_name, val, long_flag.to_item())),
-                    Err(flag_name) => last_seen_flag = Some((flag_name, long_flag.to_item())),
-                }
+                insert_if_bool_flag_or_set_as_last_seen!(
+                    flag_vals,
+                    last_seen_flag,
+                    cmd_flags,
+                    long_flag,
+                    |flag_sign| flag_sign.long_name.as_ref() == Some(&long_flag.flag_name())
+                );
             }
             CmdArgElement::ShortFlag(short_flag) => {
-                let flag_name = short_flag.flag_name();
-                match flag_usage_to_flag_arg(cmd_flags, |flag_sign| {
-                    if flag_sign.short_name == Some(flag_name) {
-                        Some((flag_name.to_string(), flag_sign.ty.clone()))
-                    } else {
-                        None
-                    }
-                }) {
-                    Ok((flag_name, val)) => flag_vals.push((flag_name, val, short_flag.to_item())),
-                    Err(flag_name) => last_seen_flag = Some((flag_name, short_flag.to_item())),
-                }
+                insert_if_bool_flag_or_set_as_last_seen!(
+                    flag_vals,
+                    last_seen_flag,
+                    cmd_flags,
+                    short_flag,
+                    |flag_sign| flag_sign.short_name.as_ref() == Some(&short_flag.flag_name())
+                );
             }
             CmdArgElement::ValueExpr(n) => {
                 let val = n.evaluate(scope)?;
-                if let Some((flag_name, usage_item)) = last_seen_flag.take() {
-                    flag_vals.push((flag_name, val, usage_item));
+                if let Some((flag_sign, passed_flag_decl)) = last_seen_flag.take() {
+                    let val = if flag_sign.is_opt {
+                        Value::Optional {
+                            inner_ty: flag_sign.ty.clone(),
+                            val: Some(Box::new(val)),
+                        }
+                    } else {
+                        val
+                    };
+
+                    flag_vals.push((
+                        flag_sign.best_name(),
+                        val,
+                        // TODO maybe include also val? Needs merging of SourceCodeItem
+                        passed_flag_decl,
+                    ));
                 } else {
                     arg_vals.push(val);
                 }
@@ -214,23 +234,4 @@ fn evaluate_and_group_args(
         arg_vals,
         flag_vals,
     })
-}
-
-/// Ok if flag is simple toggle and can be converted to a flag_arg, otherwise Err with flag_name
-fn flag_usage_to_flag_arg<FindMapFn>(
-    cmd_flags: &[FlagSignature],
-    flag_sign_matches_passed_flag: FindMapFn,
-) -> Result<(String, Value), String>
-where
-    FindMapFn: FnMut(&FlagSignature) -> Option<(String, ValueType)>,
-{
-    let (flag_name, flag_ty) = cmd_flags
-        .iter()
-        .find_map(flag_sign_matches_passed_flag)
-        .expect("Flag will always be found");
-    if flag_ty == ValueType::Bool {
-        Ok((flag_name, true.into()))
-    } else {
-        Err(flag_name)
-    }
 }

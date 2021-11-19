@@ -30,6 +30,10 @@ pub enum Value {
     FileName(String),
     // The following types are lu-copy-on-write (and therefore enclosed in a Rc)
     Array(Rc<Vec<Value>>),
+    Optional {
+        inner_ty: ValueType,
+        val: Option<Box<Value>>,
+    },
     // Strcts fields
     // TODO this should contian weak pointer to decl. makes everything easier
     Strct(String, Rc<Vec<(String, Value)>>),
@@ -101,6 +105,7 @@ impl Hash for Value {
             Value::StrctDecl(strct) => Arc::as_ptr(strct).hash(state),
             Value::DbgState(v) => Arc::as_ptr(v).hash(state),
             Value::FileName(v) => v.hash(state),
+            Value::Optional { val, .. } => val.hash(state),
         }
     }
 }
@@ -150,6 +155,7 @@ impl Value {
             Value::Strct(_, _) => None,
             Value::CommandCollection(_) => None,
             Value::DbgState(_) => None,
+            Value::Optional { .. } => None,
         }
     }
 
@@ -203,6 +209,10 @@ impl Value {
             Value::StrctDecl(_) => todo!("Add pseudo ValueType::StructDecl"),
             Value::DbgState(_) => todo!("Add pseudo ValueType::DbgState"),
             Value::CommandCollection(_) => todo!(),
+            Value::Optional { inner_ty, .. } => ValueType::Optional {
+                inner_ty: Box::new(inner_ty.clone()),
+                inner_ty_decl: lu_source_code_item!(),
+            },
         }
     }
 
@@ -243,6 +253,10 @@ impl Display for Value {
             Value::CommandCollection(col) => write!(f, "{:?}", col),
             Value::DbgState(dbg_state) => write!(f, "{:?}", dbg_state),
             Value::FileName(s) => write!(f, "{}", s),
+            Value::Optional { val, .. } => match val {
+                Some(val) => write!(f, "Some({})", val),
+                None => write!(f, "None"),
+            },
         }
     }
 }

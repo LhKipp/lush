@@ -1,4 +1,3 @@
-use log::warn;
 use lu_interpreter_structs::{FlagVariant, ValueType};
 use lu_syntax::ast::FnStmtNode;
 use rusttyc::TcKey;
@@ -53,7 +52,7 @@ impl TypeCheck for FnStmtNode {
                 if flag.ty.is_bool() || flag.is_required() {
                     var_ty_to_insert.push((flag.to_var(), key))
                 } else {
-                    // optional and not bool, needs to be optional then
+                    // optional flag and ty is not bool, inserted flag is optional then
                     let key = ty_state.new_term_key_concretiziesd(
                         flag.decl.clone(),
                         ValueType::Optional {
