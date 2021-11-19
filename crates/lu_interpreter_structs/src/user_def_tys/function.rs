@@ -72,7 +72,6 @@ pub struct FlagSignature {
     pub long_name: Option<String>,
     pub short_name: Option<char>,
     pub ty: ValueType,
-    #[new(value = "true")]
     pub is_opt: bool,
     pub decl: SourceCodeItem,
 }
@@ -207,7 +206,8 @@ impl Signature {
                     .type_()
                     .map(|ty_node| ValueType::from_node(&ty_node.into_type()))
                     .unwrap_or(ValueType::Bool); // Flags have a default ty of bool.
-                FlagSignature::new(long_name, short_name, ty, flag_node.to_item())
+                let optional = !flag_node.is_required();
+                FlagSignature::new(long_name, short_name, ty, optional, flag_node.to_item())
             })
             .collect();
         let var_arg = sign_node.var_arg().map(|var_arg_node| {

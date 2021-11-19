@@ -1,12 +1,33 @@
-flag var is inserted when passed
+required flag var is of declared ty
 ===
 fn f1(ret: num req --flag: num)
-    let x: num = $flag
-    ret $x
+    ret $flag
 end
 f1 --flag 1
 ---
 {
   "Ok": "Number"
+}
+...
+optional flag var is optional of declared ty
+===
+fn f1(--flag: num)
+    ret $flag
+end
+f1 --flag 1
+---
+{
+  "Ok": {
+    "Optional": {
+      "inner_ty": "Number",
+      "inner_ty_decl": {
+        "content": "--flag: num",
+        "range": [
+          6,
+          17
+        ]
+      }
+    }
+  }
 }
 ...

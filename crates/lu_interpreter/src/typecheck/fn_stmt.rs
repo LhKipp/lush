@@ -1,5 +1,5 @@
 use log::warn;
-use lu_interpreter_structs::FlagVariant;
+use lu_interpreter_structs::{FlagVariant, ValueType};
 use lu_syntax::ast::FnStmtNode;
 use rusttyc::TcKey;
 
@@ -49,9 +49,20 @@ impl TypeCheck for FnStmtNode {
             if let Some(var_arg) = &own_signature.var_arg {
                 var_ty_to_insert.push((var_arg.to_var(), own_tc_func.var_arg_key.unwrap()));
             }
-            warn!("Inserting all fn's flags with declared ty. For optional flag ty should be Option(declared_ty)");
             for (flag, key) in own_tc_func.flags_keys {
-                var_ty_to_insert.push((flag.to_var(), key))
+                if flag.ty.is_bool() || flag.is_required() {
+                    var_ty_to_insert.push((flag.to_var(), key))
+                } else {
+                    // optional and not bool, needs to be optional then
+                    let key = ty_state.new_term_key_concretiziesd(
+                        flag.decl.clone(),
+                        ValueType::Optional {
+                            inner_ty: Box::new(flag.ty.clone()),
+                            inner_ty_decl: flag.decl.clone(), // TODO fixup ty decl
+                        },
+                    );
+                    var_ty_to_insert.push((flag.to_var(), key))
+                }
             }
             var_ty_to_insert
         };

@@ -144,8 +144,8 @@ impl TyCheckState {
 
         // Check whether both are optionals
         if let (Some(key1_arr_inner_tc), Some(key2_arr_inner_tc)) = (
-            self.get_opt_inner_tc(&key1).cloned(),
-            self.get_opt_inner_tc(&key2).cloned(),
+            self.get_optional_inner_tc(&key1).cloned(),
+            self.get_optional_inner_tc(&key2).cloned(),
         ) {
             self.equate_keys(key1_arr_inner_tc, key2_arr_inner_tc);
             return; // No more work to do

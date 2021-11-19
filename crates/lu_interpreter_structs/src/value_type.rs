@@ -43,7 +43,7 @@ where
     serializer.serialize_newtype_struct("StrctName", &l_strct.name)
 }
 
-#[derive(Educe, Clone, Debug, Serialize, Deserialize, EnumAsInner)]
+#[derive(Educe, Clone, Debug, Serialize, Deserialize, EnumAsInner, is_enum_variant)]
 #[educe(Hash, PartialEq)]
 pub enum ValueType {
     /// Variant to indicate an already occured error. Error acts like any does, but
