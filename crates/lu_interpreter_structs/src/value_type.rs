@@ -252,6 +252,33 @@ impl TcVariant for ValueType {
                     )?;
                     Some(ValueType::new_array(inner.variant, lhs_decl.clone())) // TODO the decl may be wrong for some meets
                 }
+                (
+                    ValueType::Optional {
+                        inner_ty: lhs_inner,
+                        inner_ty_decl: lhs_decl,
+                    },
+                    ValueType::Optional {
+                        inner_ty: rhs_inner,
+                        ..
+                    },
+                ) => {
+                    let (lhs_arity, rhs_arity) = match (lhs_inner.arity(), rhs_inner.arity()) {
+                        (Arity::Fixed(l), Arity::Fixed(r)) => (l, r),
+                        _ => unreachable!("All types have fixed arity"),
+                    };
+                    let inner = ValueType::meet(
+                        Partial {
+                            variant: *lhs_inner.clone(),
+                            least_arity: lhs_arity,
+                        },
+                        Partial {
+                            variant: *rhs_inner.clone(),
+                            least_arity: rhs_arity,
+                        },
+                    )?;
+                    Some(ValueType::new_optional(inner.variant, lhs_decl.clone()))
+                    // TODO the decl may be wrong for some meets
+                }
                 _ => None,
             };
             coercable_ty.ok_or_else(|| ValueTypeErr::NotMeetAble {

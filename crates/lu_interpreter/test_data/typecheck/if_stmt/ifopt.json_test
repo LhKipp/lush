@@ -1,0 +1,39 @@
+ifopt with optional works
+===
+let x: num? = Some{1}
+ifopt inner = $x
+    ret $inner
+end
+---
+{
+  "Ok": null
+}
+...
+ifopt with non opt type does not work
+===
+let x: num = 1
+ifopt inner = $x
+    ret $inner
+end
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "let x: num",
+            "range": [
+              0,
+              10
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "Opt(UNSPECIFIED)"
+        }
+      }
+    }
+  ]
+}
+...

@@ -83,6 +83,7 @@ impl Rule for IfElifOptRulePart {
 
         match self.to_parse {
             IfKeyword | ElifKeyword => {
+                // The condition
                 PipedCmdsStmtRule {}.parse(p);
             }
             IfOptKeyword | ElifOptKeyword => {
@@ -90,7 +91,7 @@ impl Rule for IfElifOptRulePart {
                 if p.eat_after(T![:], CMT_NL_WS) {
                     LuTypeRule {}.parse(p);
                 }
-                if !p.expect_after(T![=], CMT_NL_WS) {
+                if p.expect_after(T![=], CMT_NL_WS) {
                     ValueExprRule {}.parse(p);
                 }
             }
