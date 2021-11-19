@@ -25,6 +25,10 @@ impl Evaluable for IfElifElseStmtPartElement {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
         &[DbgSetting::StopDbgBeforeEval]
     }
+
+    fn dbg_node_text(&self) -> String {
+        self.fmt_for_debug()
+    }
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
             IfElifElseStmtPartElement::IfOptElifOptStmt(n) => n.evaluate(scope),
@@ -75,7 +79,7 @@ impl Evaluable for IfOptElifOptStmtNode {
         let (_, cond_val) = optional_val.as_optional().expect("Must be optional");
 
         let dbg_result = lu_dbg::before_eval(
-            &format!("{}", self.fmt_for_debug()),
+            &format!("{}", self.fmt_cond_for_debug()),
             self.get_ast_id(),
             scope,
         )?;

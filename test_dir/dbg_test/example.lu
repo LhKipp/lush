@@ -1,6 +1,9 @@
 #!/bin/lush
 
 fn f
+    if 1 == 2
+        echo hi
+    end
     let x = Some{1}
     ifopt x = $x
         ret $x

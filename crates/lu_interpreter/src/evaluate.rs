@@ -69,11 +69,15 @@ pub enum EvalArg {
 #[derive(Debug, PartialEq, Eq)]
 pub enum DbgSetting {
     StopDbgBeforeEval,
+    StopDbgBeforeEvalWithNodeText(String),
 }
 
 pub trait Evaluable: Display + HasAstId {
     fn dbg_settings(&self) -> &'static [DbgSetting] {
         &[]
+    }
+    fn dbg_node_text(&self) -> String {
+        self.to_string().trim().to_string()
     }
 
     /// Evaluate the AST-Node/Token given the state.
@@ -88,8 +92,7 @@ pub trait Evaluable: Display + HasAstId {
 
         let should_stop_for_dbg = self.dbg_settings().contains(&DbgSetting::StopDbgBeforeEval);
         if should_stop_for_dbg {
-            let dbg_result =
-                lu_dbg::before_eval(&self.to_string().trim(), self.get_ast_id(), scope)?;
+            let dbg_result = lu_dbg::before_eval(&self.dbg_node_text(), self.get_ast_id(), scope)?;
             handle_dbg_intervention_before!(dbg_result, scope);
         }
 
