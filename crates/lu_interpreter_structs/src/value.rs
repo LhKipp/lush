@@ -123,6 +123,12 @@ impl Value {
     pub fn new_strct(name: String, vals: Vec<(String, Value)>) -> Self {
         Value::Strct(name, Rc::new(vals))
     }
+    pub fn new_optional(inner_ty: ValueType, inner_val: Option<Value>) -> Self {
+        Value::Optional {
+            inner_ty,
+            val: inner_val.map(|val| Box::new(val)),
+        }
+    }
 
     pub fn expect_array(&mut self) -> &mut Vec<Value> {
         match self {

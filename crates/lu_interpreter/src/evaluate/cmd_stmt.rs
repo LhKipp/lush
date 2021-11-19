@@ -107,17 +107,26 @@ fn insert_cmd_args_into_scope(
         );
     }
 
-    // Insert non passed bool flags (flag switches) as false if they are not present
+    // Insert non passed flags
     for flag_sign in &cmd_sign.flags {
-        if flag_sign.ty == ValueType::Bool
-            // And not yet passed
-            && !flag_vals.iter().any(|(flag_name, _, _)| {
-                flag_sign.is_named_by(flag_name)
-            })
+        // Skip already inserted flags
+        if flag_vals
+            .iter()
+            .any(|(flag_name, _, _)| flag_sign.is_named_by(flag_name))
         {
+            continue;
+        }
+        // Non passed switches (flags with ty bool) are inserted as false
+        if flag_sign.ty == ValueType::Bool {
             scope.lock().get_cur_frame_mut().insert_var(Variable::new(
                 flag_sign.best_name(),
-                Value::Bool(false),
+                false.into(),
+                flag_sign.decl.clone().into(),
+            ));
+        } else {
+            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
+                flag_sign.best_name(),
+                Value::new_optional(flag_sign.ty.clone(), None),
                 flag_sign.decl.clone().into(),
             ));
         }
