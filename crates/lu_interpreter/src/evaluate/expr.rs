@@ -6,10 +6,6 @@ use lu_syntax::ast::{
 use crate::evaluate::eval_prelude::*;
 
 impl Evaluable for ValueExprElement {
-    fn dbg_settings(&self) -> &'static [DbgSetting] {
-        &[]
-    }
-
     fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
             ValueExprElement::BooleanExpr(n) => n.evaluate_with_args(args, scope),

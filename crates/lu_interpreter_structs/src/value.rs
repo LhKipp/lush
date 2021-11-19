@@ -147,7 +147,7 @@ impl Value {
 
     /// Returns Some(true|false) if self represents a true or false value
     /// Returns None if self is not convertible to bool
-    pub fn convert_to_bool(&self) -> Option<bool> {
+    pub fn coerce_to_bool(&self) -> Option<bool> {
         // TODO check what else should be false / true
         match self {
             Value::Nil => Some(false),

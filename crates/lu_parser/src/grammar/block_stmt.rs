@@ -52,11 +52,11 @@ impl BlockStmtRule {
     }
 
     /// BlockRule for if or elif blocks
-    pub fn if_elif_block() -> Self {
+    pub fn if_elif_elifopt_block() -> Self {
         BlockStmtRule {
             parse_begin: false,
             eat_end: false,
-            end_kinds: [ElseKeyword, ElifKeyword, EndKeyword].into(),
+            end_kinds: [ElseKeyword, ElifKeyword, ElifOptKeyword, EndKeyword].into(),
             statement_rule: Box::new(second_level_stmt()),
             try_recover: false,
         }

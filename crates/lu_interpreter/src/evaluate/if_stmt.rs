@@ -1,93 +1,107 @@
 use crate::{evaluate::eval_prelude::*, handle_dbg_intervention_before};
-use lu_syntax::{
-    ast::ConditionElement,
-    ast::{BlockStmtNode, HasAstId, IfStmtNode},
+use lu_syntax::ast::{
+    ElseStmtNode, HasAstId, IfElifElseStmtNode, IfElifElseStmtPartElement, IfElifStmtNode,
+    IfOptElifOptStmtNode,
 };
 
-impl Evaluable for IfStmtNode {
+impl Evaluable for IfElifElseStmtNode {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
-        let if_cond = self.if_condition().unwrap();
-        let if_block = self.if_block().unwrap();
-
-        let dbg_result = lu_dbg::before_eval(
-            &format!("if {}", if_cond.to_string().trim()),
-            self.get_ast_id(),
-            scope,
-        )?;
-        // TODO no handle_dbg_intervention_before would be necessary if "if_stmt" gets parsed as
-        // IfElifElseStmt -- Has dbg_before not set
-        //   IfStmt -- Has dbg_before set
-        //   ElifStmt -- Has dbg_before set
-        //   ElseStmt -- Has dbg_before set
-        handle_dbg_intervention_before!(dbg_result, scope);
-
-        let (evaluated, result) = eval_block_if_true(&if_cond, &if_block, scope);
-        if evaluated || result.is_err() {
-            return result;
-        }
-
-        for (elif_cond, elif_block) in self.elif_blocks() {
-            let elif_cond = elif_cond.unwrap();
-            let elif_block = elif_block.unwrap();
-
-            let dbg_result = lu_dbg::before_eval(
-                &format!("elif {}", elif_cond.text_trimmed()),
-                self.get_ast_id(),
-                scope,
-            )?;
-            handle_dbg_intervention_before!(dbg_result, scope);
-
-            let (evaluated, result) = eval_block_if_true(&elif_cond, &elif_block, scope);
-            if evaluated || result.is_err() {
-                return result;
+        for part in self.parts() {
+            match part.evaluate(scope)? {
+                Value::Bool(has_evaluated) => {
+                    if has_evaluated {
+                        return Ok(Value::Nil);
+                    }
+                }
+                _ => unreachable!(),
             }
         }
-
-        if let Some(else_block) = self.else_block() {
-            let dbg_result = lu_dbg::before_eval("else", self.get_ast_id(), scope)?;
-            handle_dbg_intervention_before!(dbg_result, scope);
-            return eval_block(&else_block, scope);
-        }
-
         Ok(Value::Nil)
     }
 }
 
-/// Eval `block` if `cond` evaluates to true
-/// Returns (true, result) if block has been evaluated
-/// Returns (false, result) if block has not been evaluated (result can still contain error)
-///
-/// (The value of v in return (false, Ok(v)) is unspecified)
-fn eval_block_if_true(
-    cond: &ConditionElement,
-    block: &BlockStmtNode,
-    scope: &mut SyScope,
-) -> (bool, EvalResult) {
-    let cond_val = match cond.evaluate(scope) {
-        Ok(v) => v,
-        Err(e) => return (false, Err(e)),
-    };
-
-    let cond_val = match cond_val.convert_to_bool() {
-        None => {
-            return (
-                false,
-                Err(LuErr::Eval(EvalErr::NotConvertibleToBool(cond.to_item())).into()),
-            )
+// Parts returns whether their block have been evaluated
+impl Evaluable for IfElifElseStmtPartElement {
+    fn dbg_settings(&self) -> &'static [DbgSetting] {
+        &[DbgSetting::StopDbgBeforeEval]
+    }
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+        match self {
+            IfElifElseStmtPartElement::IfOptElifOptStmt(n) => n.evaluate(scope),
+            IfElifElseStmtPartElement::IfElifStmt(n) => n.evaluate(scope),
+            IfElifElseStmtPartElement::ElseStmt(n) => n.evaluate(scope),
         }
-        Some(v) => v,
-    };
-
-    if cond_val {
-        (true, eval_block(block, scope))
-    } else {
-        (false, Ok(Value::Nil))
     }
 }
 
-fn eval_block(block: &BlockStmtNode, scope: &mut SyScope) -> EvalResult {
-    scope.lock().push_frame(ScopeFrameTag::IfStmtFrame);
-    let result = block.evaluate_with_args(&[EvalArg::BlockNoPushFrame], scope);
-    scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);
-    result
+impl Evaluable for ElseStmtNode {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+        if let Some(block) = self.block() {
+            block.evaluate(scope)?;
+        };
+        Ok(true.into())
+    }
+}
+
+impl Evaluable for IfElifStmtNode {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+        let cond_val = self.condition().unwrap().evaluate(scope)?;
+        let cond_val = match cond_val.coerce_to_bool() {
+            None => {
+                // TODO shouldnt happen this should be cahtche by ty
+                //  check wheter it isn't
+                return Err(LuErr::Eval(EvalErr::NotConvertibleToBool(
+                    self.condition().unwrap().to_item(),
+                ))
+                .into());
+            }
+            Some(v) => v,
+        };
+
+        if cond_val {
+            if let Some(block) = self.block() {
+                block.evaluate(scope)?;
+            }
+            Ok(true.into())
+        } else {
+            Ok(false.into())
+        }
+    }
+}
+
+impl Evaluable for IfOptElifOptStmtNode {
+    fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+        let optional_val = self.rhs_opt().unwrap().evaluate(scope)?;
+        let (_, cond_val) = optional_val.as_optional().expect("Must be optional");
+
+        let dbg_result = lu_dbg::before_eval(
+            &format!("{}", self.fmt_for_debug()),
+            self.get_ast_id(),
+            scope,
+        )?;
+        handle_dbg_intervention_before!(dbg_result, scope);
+
+        if let Some(cond_val) = cond_val.clone() {
+            let var_name = self.var_name().unwrap();
+            scope
+                .lock()
+                .push_frame(ScopeFrameTag::IfStmtFrame)
+                .1
+                .insert_var(Variable::new(
+                    var_name.to_string(),
+                    *cond_val,
+                    var_name.to_item().into(),
+                ));
+            let result = self
+                .block()
+                .unwrap()
+                .evaluate_with_args(&[EvalArg::BlockNoPushFrame], scope);
+            scope.lock().pop_frame(&ScopeFrameTag::IfStmtFrame);
+            result?;
+
+            Ok(true.into())
+        } else {
+            Ok(false.into())
+        }
+    }
 }

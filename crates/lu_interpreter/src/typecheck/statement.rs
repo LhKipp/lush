@@ -11,7 +11,7 @@ impl TypeCheck for StatementElement {
     ) -> Option<TcKey> {
         match self {
             StatementElement::ForStmt(n) => n.typecheck(ty_state),
-            StatementElement::IfStmt(n) => n.typecheck(ty_state),
+            StatementElement::IfElifElseStmt(n) => n.typecheck(ty_state),
             StatementElement::PipedCmdsStmt(n) => n.typecheck(ty_state),
             StatementElement::LetStmt(n) => n.typecheck(ty_state),
             StatementElement::FnStmt(n) => n.typecheck(ty_state),

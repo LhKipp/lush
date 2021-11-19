@@ -54,6 +54,9 @@ pub struct Variable {
 }
 
 impl Variable {
+    pub fn new_nil(name: String, decl: VarDeclNode) -> Self {
+        Variable::new(name, Value::Nil, decl)
+    }
     pub fn new_func(func: Rc<dyn Command>) -> Variable {
         // TODO better decl here
         let decl = func.signature().decl.clone();

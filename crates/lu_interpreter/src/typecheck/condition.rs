@@ -10,8 +10,9 @@ impl TypeCheck for ConditionElement {
         ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         let ret_key = match self {
-            ConditionElement::CmdStmt(cmd) => cmd.typecheck(ty_state),
+            ConditionElement::PipedCmdsStmt(cmd) => cmd.typecheck(ty_state),
             ConditionElement::ValueExpr(expr) => expr.typecheck(ty_state),
+            ConditionElement::CmdStmt(cmd) => cmd.typecheck(ty_state),
         };
         if let Some(ret_key) = ret_key {
             ty_state.concretizes_key(ret_key, ValueType::Bool);

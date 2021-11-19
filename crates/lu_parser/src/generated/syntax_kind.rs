@@ -29,12 +29,16 @@ pub enum SyntaxKind {
     FnKeyword,
     #[token("for")]
     ForKeyword,
-    #[token("elif")]
-    ElifKeyword,
-    #[token("else")]
-    ElseKeyword,
     #[token("if")]
     IfKeyword,
+    #[token("ifopt")]
+    IfOptKeyword,
+    #[token("elif")]
+    ElifKeyword,
+    #[token("elifopt")]
+    ElifOptKeyword,
+    #[token("else")]
+    ElseKeyword,
     #[token("while")]
     WhileKeyword,
     #[token("end")]
@@ -169,7 +173,10 @@ pub enum SyntaxKind {
     LetStmt,
     FnStmt,
     RetStmt,
-    IfStmt,
+    IfElifElseStmt,
+    IfOptElifOptStmt,
+    IfElifStmt,
+    ElseStmt,
     IfBlock,
     ElifBlock,
     ElseBlock,
@@ -200,6 +207,7 @@ pub enum SyntaxKind {
     RedirToValue,
     FileName,
     FileNamePart,
+    IfElifElseStmtPart,
     __LAST,
 }
 
@@ -217,9 +225,11 @@ impl SyntaxKind{
             SyntaxKind::LetKeyword => "LetKeyword",
             SyntaxKind::FnKeyword => "FnKeyword",
             SyntaxKind::ForKeyword => "ForKeyword",
-            SyntaxKind::ElifKeyword => "ElifKeyword",
-            SyntaxKind::ElseKeyword => "ElseKeyword",
             SyntaxKind::IfKeyword => "IfKeyword",
+            SyntaxKind::IfOptKeyword => "IfOptKeyword",
+            SyntaxKind::ElifKeyword => "ElifKeyword",
+            SyntaxKind::ElifOptKeyword => "ElifOptKeyword",
+            SyntaxKind::ElseKeyword => "ElseKeyword",
             SyntaxKind::WhileKeyword => "WhileKeyword",
             SyntaxKind::EndKeyword => "EndKeyword",
             SyntaxKind::BeginKeyword => "BeginKeyword",
@@ -300,7 +310,10 @@ impl SyntaxKind{
             SyntaxKind::LetStmt => "LetStmt",
             SyntaxKind::FnStmt => "FnStmt",
             SyntaxKind::RetStmt => "RetStmt",
-            SyntaxKind::IfStmt => "IfStmt",
+            SyntaxKind::IfElifElseStmt => "IfElifElseStmt",
+            SyntaxKind::IfOptElifOptStmt => "IfOptElifOptStmt",
+            SyntaxKind::IfElifStmt => "IfElifStmt",
+            SyntaxKind::ElseStmt => "ElseStmt",
             SyntaxKind::IfBlock => "IfBlock",
             SyntaxKind::ElifBlock => "ElifBlock",
             SyntaxKind::ElseBlock => "ElseBlock",
@@ -331,6 +344,7 @@ impl SyntaxKind{
             SyntaxKind::RedirToValue => "RedirToValue",
             SyntaxKind::FileName => "FileName",
             SyntaxKind::FileNamePart => "FileNamePart",
+            SyntaxKind::IfElifElseStmtPart => "IfElifElseStmtPart",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }
@@ -350,9 +364,11 @@ macro_rules! T {
     [let] => {$crate::SyntaxKind::LetKeyword };
     [fn] => {$crate::SyntaxKind::FnKeyword };
     [for] => {$crate::SyntaxKind::ForKeyword };
-    [elif] => {$crate::SyntaxKind::ElifKeyword };
-    [else] => {$crate::SyntaxKind::ElseKeyword };
     [if] => {$crate::SyntaxKind::IfKeyword };
+    [ifopt] => {$crate::SyntaxKind::IfOptKeyword };
+    [elif] => {$crate::SyntaxKind::ElifKeyword };
+    [elifopt] => {$crate::SyntaxKind::ElifOptKeyword };
+    [else] => {$crate::SyntaxKind::ElseKeyword };
     [while] => {$crate::SyntaxKind::WhileKeyword };
     [end] => {$crate::SyntaxKind::EndKeyword };
     [begin] => {$crate::SyntaxKind::BeginKeyword };

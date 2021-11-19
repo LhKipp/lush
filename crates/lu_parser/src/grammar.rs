@@ -31,7 +31,6 @@
 mod block_stmt;
 mod cmd_stmt;
 mod comments;
-mod condition;
 mod expr;
 mod file_name_expr;
 mod fn_stmt;
@@ -62,11 +61,10 @@ use crate::{
 
 pub use block_stmt::BlockStmtRule;
 pub use cmd_stmt::CmdStmtRule;
-pub use condition::ConditionRule;
 pub use expr::{ArrayExprRule, NumberExprRule, StringExprRule, TableExprRule, ValueExprRule};
 pub use fn_stmt::FnStmtRule;
 pub use for_stmt::ForStmtRule;
-pub use if_stmt::IfStmtRule;
+pub use if_stmt::IfElifElseRule;
 pub use let_stmt::LetStmtRule;
 pub use piped_cmds_stmt::PipedCmdsStmtRule;
 pub use ret_stmt::RetStmtRule;
@@ -232,7 +230,7 @@ fn second_level_stmt() -> OrRule {
             PipedCmdsStmtRule {},
             RetStmtRule {},
             ForStmtRule {},
-            IfStmtRule {},
+            IfElifElseRule {},
         ],
     }
 }

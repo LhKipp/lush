@@ -5,7 +5,7 @@ impl Evaluable for StatementElement {
     fn do_evaluate(&self, _: &[EvalArg], scope: &mut SyScope) -> EvalResult {
         match self {
             // Statements that do not print their result
-            StatementElement::IfStmt(n) => n.evaluate(scope),
+            StatementElement::IfElifElseStmt(n) => n.evaluate(scope),
             StatementElement::LetStmt(n) => n.evaluate(scope),
             StatementElement::FnStmt(n) => n.evaluate(scope),
             StatementElement::ForStmt(n) => n.evaluate(scope),

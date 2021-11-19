@@ -363,6 +363,70 @@ impl Display for ForKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct IfKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for IfKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for IfKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for IfKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for IfKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct IfOptKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for IfOptKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfOptKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for IfOptKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for IfOptKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for IfOptKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElifKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -395,6 +459,38 @@ impl Display for ElifKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct ElifOptKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for ElifOptKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElifOptKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for ElifOptKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for ElifOptKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for ElifOptKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ElseKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -421,38 +517,6 @@ impl HasTextRange for ElseKeywordToken{
 }
 
 impl Display for ElseKeywordToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.text())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct IfKeywordToken {
-    pub(crate) syntax: SyntaxToken,
-}
-impl AstToken for IfKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfKeyword }
-    fn cast(syntax: SyntaxToken) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxToken { &self.syntax }
-}
-impl HasSyntaxKind for IfKeywordToken{
-    fn get_syntax_kind(&self) -> SyntaxKind{
-        self.syntax().kind()
-    }
-}
-impl HasTextRange for IfKeywordToken{
-    fn get_text_range(&self) -> TextRange{
-        self.syntax().text_range()
-    }
-}
-
-impl Display for IfKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }
@@ -3054,11 +3118,11 @@ impl Display for RetStmtNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct IfStmtNode {
+pub struct IfElifElseStmtNode {
     pub(crate) syntax: SyntaxNode,
 }
-impl AstNode for IfStmtNode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfStmt }
+impl AstNode for IfElifElseStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfElifElseStmt }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3068,25 +3132,114 @@ impl AstNode for IfStmtNode {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl HasSyntaxKind for IfStmtNode{
+impl HasSyntaxKind for IfElifElseStmtNode{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
-impl HasTextRange for IfStmtNode{
+impl HasTextRange for IfElifElseStmtNode{
     fn get_text_range(&self) -> TextRange{
         self.syntax().text_range()
     }
 }
 
-
-use lu_parser::grammar::IfStmtRule;
-impl HasRule for IfStmtNode{
-    fn get_belonging_rule() -> Box<dyn Rule>{
-        Box::new(IfStmtRule{})
+impl Display for IfElifElseStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
     }
 }
-impl Display for IfStmtNode {
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct IfOptElifOptStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for IfOptElifOptStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfOptElifOptStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for IfOptElifOptStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for IfOptElifOptStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for IfOptElifOptStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct IfElifStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for IfElifStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::IfElifStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for IfElifStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for IfElifStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for IfElifStmtNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct ElseStmtNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for ElseStmtNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ElseStmt }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for ElseStmtNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for ElseStmtNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for ElseStmtNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }
@@ -3962,7 +4115,7 @@ pub enum StatementElement {
     ForStmt(ForStmtNode),
     LetStmt(LetStmtNode),
     FnStmt(FnStmtNode),
-    IfStmt(IfStmtNode),
+    IfElifElseStmt(IfElifElseStmtNode),
     CmdStmt(CmdStmtNode),
     PipedCmdsStmt(PipedCmdsStmtNode),
     ValueExpr(ValueExprElement),
@@ -3985,7 +4138,7 @@ impl AstElement for StatementElement {
         
         
         match kind{
-            RetStmt | ForStmt | LetStmt | FnStmt | IfStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
+            RetStmt | ForStmt | LetStmt | FnStmt | IfElifElseStmt | CmdStmt | PipedCmdsStmt | ValueExpr => true,
             _ => false,
         }
     }
@@ -4007,7 +4160,7 @@ impl AstElement for StatementElement {
             ForStmt => StatementElement::ForStmt(ForStmtNode { syntax: syntax.into_node().unwrap() }),
             LetStmt => StatementElement::LetStmt(LetStmtNode { syntax: syntax.into_node().unwrap() }),
             FnStmt => StatementElement::FnStmt(FnStmtNode { syntax: syntax.into_node().unwrap() }),
-            IfStmt => StatementElement::IfStmt(IfStmtNode { syntax: syntax.into_node().unwrap() }),
+            IfElifElseStmt => StatementElement::IfElifElseStmt(IfElifElseStmtNode { syntax: syntax.into_node().unwrap() }),
             CmdStmt => StatementElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
             PipedCmdsStmt => StatementElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
@@ -4030,7 +4183,7 @@ impl AstElement for StatementElement {
             StatementElement::FnStmt(it) => it.syntax.clone().into(),
             
             
-            StatementElement::IfStmt(it) => it.syntax.clone().into(),
+            StatementElement::IfElifElseStmt(it) => it.syntax.clone().into(),
             
             
             StatementElement::CmdStmt(it) => it.syntax.clone().into(),
@@ -4051,7 +4204,7 @@ impl HasSyntaxKind for StatementElement{
             StatementElement::ForStmt(it) => it.get_syntax_kind(),
             StatementElement::LetStmt(it) => it.get_syntax_kind(),
             StatementElement::FnStmt(it) => it.get_syntax_kind(),
-            StatementElement::IfStmt(it) => it.get_syntax_kind(),
+            StatementElement::IfElifElseStmt(it) => it.get_syntax_kind(),
             StatementElement::CmdStmt(it) => it.get_syntax_kind(),
             StatementElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
             StatementElement::ValueExpr(it) => it.get_syntax_kind(),
@@ -4073,6 +4226,7 @@ impl Display for StatementElement {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum ConditionElement {
+    PipedCmdsStmt(PipedCmdsStmtNode),
     CmdStmt(CmdStmtNode),
     ValueExpr(ValueExprElement),
     }
@@ -4084,15 +4238,17 @@ impl AstElement for ConditionElement {
     fn can_cast(kind: SyntaxKind) -> bool { 
         
         
+        
         ValueExprElement::can_cast(kind) ||
         
         
         match kind{
-            CmdStmt | ValueExpr => true,
+            PipedCmdsStmt | CmdStmt | ValueExpr => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         if let Some(casted) = ValueExprElement::cast(syntax.clone()){
                 return Some(Self::ValueExpr(casted));
@@ -4100,6 +4256,7 @@ impl AstElement for ConditionElement {
         
         
         let res = match syntax.kind() {
+            PipedCmdsStmt => ConditionElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
             CmdStmt => ConditionElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
             _ => return None,
         };
@@ -4108,6 +4265,9 @@ impl AstElement for ConditionElement {
 
     fn syntax(&self) -> SyntaxElement {
         match self {
+            
+            ConditionElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
+            
             
             ConditionElement::CmdStmt(it) => it.syntax.clone().into(),
             
@@ -4120,6 +4280,7 @@ impl AstElement for ConditionElement {
 impl HasSyntaxKind for ConditionElement{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
+            ConditionElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
             ConditionElement::CmdStmt(it) => it.get_syntax_kind(),
             ConditionElement::ValueExpr(it) => it.get_syntax_kind(),
             }
@@ -4802,6 +4963,77 @@ impl HasTextRange for FileNamePartElement{
 }
 
 impl Display for FileNamePartElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum IfElifElseStmtPartElement {
+    IfOptElifOptStmt(IfOptElifOptStmtNode),
+    IfElifStmt(IfElifStmtNode),
+    ElseStmt(ElseStmtNode),
+    }
+
+impl IfElifElseStmtPartElement {
+}
+
+impl AstElement for IfElifElseStmtPartElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        
+        match kind{
+            IfOptElifOptStmt | IfElifStmt | ElseStmt => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        
+        
+        let res = match syntax.kind() {
+            IfOptElifOptStmt => IfElifElseStmtPartElement::IfOptElifOptStmt(IfOptElifOptStmtNode { syntax: syntax.into_node().unwrap() }),
+            IfElifStmt => IfElifElseStmtPartElement::IfElifStmt(IfElifStmtNode { syntax: syntax.into_node().unwrap() }),
+            ElseStmt => IfElifElseStmtPartElement::ElseStmt(ElseStmtNode { syntax: syntax.into_node().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            IfElifElseStmtPartElement::IfOptElifOptStmt(it) => it.syntax.clone().into(),
+            
+            
+            IfElifElseStmtPartElement::IfElifStmt(it) => it.syntax.clone().into(),
+            
+            
+            IfElifElseStmtPartElement::ElseStmt(it) => it.syntax.clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for IfElifElseStmtPartElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            IfElifElseStmtPartElement::IfOptElifOptStmt(it) => it.get_syntax_kind(),
+            IfElifElseStmtPartElement::IfElifStmt(it) => it.get_syntax_kind(),
+            IfElifElseStmtPartElement::ElseStmt(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl HasTextRange for IfElifElseStmtPartElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for IfElifElseStmtPartElement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

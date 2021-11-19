@@ -1,43 +1,54 @@
-use crate::{AstElement, AstNode, AstToken};
+use log::debug;
+use rowan::TextRange;
+
+use crate::{AstElement, AstElementChildren, AstNode, AstToken};
 
 use super::{
-    support, BlockStmtNode, ConditionElement, ElifKeywordToken, ElseKeywordToken, IfStmtNode,
+    support, BlockStmtNode, ConditionElement, ElifOptKeywordToken, ElseStmtNode, IfElifStmtNode,
+    IfOptElifOptStmtNode, IfOptKeywordToken, ValueExprElement, VarDeclNameToken,
 };
+use super::{IfElifElseStmtNode, IfElifElseStmtPartElement};
 
-impl IfStmtNode {
-    pub fn if_condition(&self) -> Option<ConditionElement> {
-        support::element_child::<ConditionElement>(self.syntax())
+impl IfElifElseStmtNode {
+    pub fn parts(&self) -> AstElementChildren<IfElifElseStmtPartElement> {
+        support::element_children(self.syntax())
     }
+}
 
-    pub fn if_block(&self) -> Option<BlockStmtNode> {
+impl IfElifStmtNode {
+    pub fn condition(&self) -> Option<ConditionElement> {
+        debug!("{:#?}", self);
+        support::element_child(self.syntax())
+    }
+    pub fn block(&self) -> Option<BlockStmtNode> {
         support::node_child(self.syntax())
     }
-
-    pub fn elif_blocks(&self) -> Vec<(Option<ConditionElement>, Option<BlockStmtNode>)> {
-        let mut result = Vec::new();
-        let elems: Vec<_> = self.syntax().children_with_tokens().collect();
-        for i in 0..elems.len() {
-            let elem = &elems[i];
-            if ElifKeywordToken::can_cast(elem.kind()) {
-                let cond = elems[(i + 1)..elems.len()]
-                    .iter()
-                    // TODO performance filter based on kind first
-                    .find_map(|n| ConditionElement::cast(n.clone()));
-                let block = elems[(i + 1)..elems.len()]
-                    .iter()
-                    .find_map(|n| BlockStmtNode::cast_element(n.clone()));
-                result.push((cond, block))
-            }
-        }
-        result
+}
+impl IfOptElifOptStmtNode {
+    pub fn fmt_for_debug(&self) -> String {
+        let start = support::token_child::<IfOptKeywordToken>(self.syntax())
+            .map(|n| n.syntax().text_range())
+            .or(support::token_child::<ElifOptKeywordToken>(self.syntax())
+                .map(|n| n.syntax().text_range()))
+            .unwrap()
+            .start();
+        let end = self.rhs_opt().unwrap().syntax().text_range().end();
+        self.text_at(&TextRange::new(start, end)).into()
     }
 
-    pub fn else_block(&self) -> Option<BlockStmtNode> {
-        let mut after_else = self
-            .syntax()
-            .children_with_tokens()
-            .skip_while(|n| !ElseKeywordToken::can_cast(n.kind()))
-            .skip(1);
-        after_else.find_map(BlockStmtNode::cast_element)
+    pub fn block(&self) -> Option<BlockStmtNode> {
+        support::node_child(self.syntax())
+    }
+    pub fn var_name(&self) -> Option<VarDeclNameToken> {
+        support::token_child(self.syntax())
+    }
+    pub fn rhs_opt(&self) -> Option<ValueExprElement> {
+        support::element_child(self.syntax())
+    }
+}
+
+impl ElseStmtNode {
+    pub fn block(&self) -> Option<BlockStmtNode> {
+        support::node_child(self.syntax())
     }
 }
