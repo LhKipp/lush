@@ -1,6 +1,6 @@
 use lu_syntax::ast::{
-    ArrayExprNode, BareWordToken, BooleanExprNode, FileNameElement, NumberExprNode, StringExprNode,
-    ValueExprElement, ValuePathExprNode,
+    ArrayExprNode, BareWordToken, BooleanExprNode, FileNameElement, NumberExprNode,
+    OptionalExprNode, StringExprNode, ValueExprElement, ValuePathExprNode,
 };
 
 use crate::evaluate::eval_prelude::*;
@@ -23,7 +23,20 @@ impl Evaluable for ValueExprElement {
             ValueExprElement::StrctCtorExpr(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::FileName(n) => n.evaluate_with_args(args, scope),
             ValueExprElement::CmdStmt(n) => n.evaluate_with_args(args, scope),
-            ValueExprElement::OptionalExpr(_) => todo!(),
+            ValueExprElement::OptionalExpr(n) => n.evaluate_with_args(args, scope),
+        }
+    }
+}
+
+impl Evaluable for OptionalExprNode {
+    fn do_evaluate(&self, args: &[EvalArg], scope: &mut SyScope) -> EvalResult {
+        if let Some(some_val) = self.value() {
+            let val = some_val.evaluate_with_args(args, scope)?;
+            // TODO correct value ty from ty checking?
+            Ok(Value::new_optional(val.get_ty(), Some(val)))
+        } else {
+            // TODO correct value ty from ty checking?
+            Ok(Value::new_optional(ValueType::Unspecified, None))
         }
     }
 }

@@ -155,14 +155,14 @@ impl Rule for OptionalExprRule {
                 m.abandon(p);
                 return None;
             }
-            LuTypeRule {}.parse(p);
+            ValueExprRule {}.parse(p);
             if !p.expect_after(T!["}"], CMT_NL_WS) {
                 m.abandon(p);
                 return None;
             }
             Some(m.complete(p, OptionalExpr))
         } else {
-            p.error("Expected None or Some{..}".to_string());
+            p.error("Expected None or Some{<expr>}".to_string());
             m.abandon(p);
             None
         }

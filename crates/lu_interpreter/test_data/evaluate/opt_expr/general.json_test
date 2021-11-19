@@ -1,0 +1,28 @@
+Some expr is some
+===
+Some{1}
+---
+{
+  "Ok": {
+    "Optional": {
+      "inner_ty": "Number",
+      "val": {
+        "Number": 1.0
+      }
+    }
+  }
+}
+...
+None is none
+===
+None
+---
+{
+  "Ok": {
+    "Optional": {
+      "inner_ty": "Unspecified",
+      "val": null
+    }
+  }
+}
+...
