@@ -1,0 +1,21 @@
+Isset returns false for not set var
+===
+is_set x
+---
+{
+  "Ok": {
+    "Bool": false
+  }
+}
+...
+Isset returns true for var which exist
+===
+let x
+is_set x
+---
+{
+  "Ok": {
+    "Bool": true
+  }
+}
+...

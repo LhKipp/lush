@@ -205,6 +205,13 @@ impl Value {
             Value::CommandCollection(_) => todo!(),
         }
     }
+
+    pub fn coerce_to_string(&self) -> Option<&String> {
+        match self {
+            Value::String(s) | Value::BareWord(s) | Value::FileName(s) => Some(s),
+            _ => None,
+        }
+    }
 }
 
 impl std::fmt::Debug for Value {
