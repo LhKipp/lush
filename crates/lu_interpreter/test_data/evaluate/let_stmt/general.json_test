@@ -36,6 +36,8 @@ let x: str = "hi"
 $x
 ---
 {
-  "Ok": "String"
+  "Ok": {
+    "String": "hi"
+  }
 }
 ...
