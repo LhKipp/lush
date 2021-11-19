@@ -1,0 +1,43 @@
+ifopt inner value of opt is assigned to declared var
+===
+let x: num? = Some{1}
+ifopt inner = $x
+    ret $inner
+end
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
+elifopt inner value of opt is assigned to declared var
+===
+let x: num? = Some{1}
+if 1 == 2
+elifopt inner = $x
+    ret $inner
+end
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
+name can be reassigned in ifopt
+===
+fn f
+    let x = Some{1}
+    ifopt x = $x
+        ret $x
+    end
+end
+f
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...

@@ -361,13 +361,10 @@ impl TypeCheck for IfOptElifOptStmtNode {
         }
 
         if let Some(var_name) = self.var_name() {
-            ty_state
-                .scope
-                .get_cur_frame_mut()
-                .insert_var(Variable::new_nil(
-                    var_name.to_string(),
-                    var_name.to_item().into(),
-                ));
+            ty_state.insert_var(Variable::new_nil(
+                var_name.to_string(),
+                var_name.to_item().into(),
+            ));
         }
 
         typecheck_block(self.block(), ty_state);

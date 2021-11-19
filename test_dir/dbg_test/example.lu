@@ -1,14 +1,9 @@
 #!/bin/lush
 
-let x: any
-fn cmd_taking_anything(arg: any)
-    let ty = type_of $arg
-    if $ty == "num"
-        echo passed argument has type number
-    else
-        echo not number but $ty
+fn f
+    let x = Some{1}
+    ifopt x = $x
+        ret $x
     end
 end
-
-cmd_taking_anything 1
-cmd_taking_anything "hello"
+f
