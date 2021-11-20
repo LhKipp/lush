@@ -115,13 +115,3 @@ a/b/c
 - FilePathSep: 1
 - BareWord: 1
 ...
-rest arg name
-===
-...rest
----
-- BareWord: 1
-- FilePathSep: 1
-- BareWord: 1
-- FilePathSep: 1
-- BareWord: 1
-...

@@ -53,18 +53,26 @@ impl Rule for ArgSignatureRule {
     }
 
     fn matches(&self, p: &mut Parser) -> bool {
-        let ts: TokenSet = [InKeyword, RetKeyword, VarArgName, BareWord].into();
+        // T![.] for vararg
+        let ts: TokenSet = [InKeyword, RetKeyword, T![.], BareWord].into();
         ts.contains(p.next_non(CMT_NL_WS))
     }
 
     /// name (<:> type)?
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
-        p.expect_after_as(
-            [InKeyword, RetKeyword, VarArgName, BareWord],
-            ArgName,
-            CMT_NL_WS,
-        );
+        if p.eat_after_as([InKeyword, RetKeyword, BareWord], ArgName, CMT_NL_WS) {
+        } else if p.next_non(CMT_NL_WS) == T![.] {
+            // Var arg
+            p.expect_after(T![.], CMT_NL_WS);
+            p.expect_after(T![.], CMT_NL_WS);
+            p.expect_after(T![.], CMT_NL_WS);
+            p.expect_as(BareWord, VarArgName);
+        } else {
+            p.error("Expected an cmd argument".into());
+            m.abandon(p);
+            return None;
+        }
         p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
         if p.eat_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);

@@ -1,9 +1,9 @@
 use crate::{AstNode, AstNodeChildren, AstToken};
-use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARG_START};
+use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME};
 
 use super::{
     support, ArgNameToken, ArgSignatureNode, FlagSignatureNode, LongFlagToken, LuTypeNode,
-    OptModifierToken, ReqKeywordToken, ShortFlagToken, SignatureNode,
+    OptModifierToken, ReqKeywordToken, ShortFlagToken, SignatureNode, VarArgNameToken,
 };
 
 impl SignatureNode {
@@ -39,8 +39,11 @@ impl SignatureNode {
 
 impl ArgSignatureNode {
     pub fn name(&self) -> String {
-        let name = support::token_child::<ArgNameToken>(self.syntax());
-        name.map(|t| t.text().trim_start_matches(VAR_ARG_START).to_string())
+        support::token_child::<ArgNameToken>(self.syntax())
+            .map(|t| t.to_string())
+            .or_else(|| {
+                support::token_child::<VarArgNameToken>(self.syntax()).map(|t| t.to_string())
+            })
             .unwrap()
     }
 
@@ -49,8 +52,7 @@ impl ArgSignatureNode {
     }
 
     pub fn is_var_arg(&self) -> bool {
-        let name = support::token_child::<ArgNameToken>(self.syntax());
-        name.map(|t| t.text().starts_with(VAR_ARG_START)).unwrap()
+        support::token_child::<VarArgNameToken>(self.syntax()).is_some()
     }
 
     pub fn type_(&self) -> Option<LuTypeNode> {
