@@ -79,7 +79,7 @@ fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
             ),
             CmdArgElement::ValueExpr(arg) => {
                 match called_func_arg_tc_iter.next() {
-                    Some(called_func_arg_tc) => {
+                    Some((_, called_func_arg_tc)) => {
                         ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);
                     }
                     None => {
@@ -103,7 +103,11 @@ fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
         }
     }
 
-    for non_passed_arg in called_func_arg_tc_iter {
+    for (arg, non_passed_arg) in called_func_arg_tc_iter {
+        if arg.is_opt {
+            // Okay. optional arg not passed.
+            continue;
+        }
         let arg_decl = ty_state.get_item_of(non_passed_arg).clone();
         ty_state.push_err(
             TyErr::UnsatisfiedArg {

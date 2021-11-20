@@ -1,0 +1,34 @@
+Passed opt arg is inserted as some
+===
+fn f1(arg?)
+    ret $arg
+end
+f1 1
+---
+{
+  "Ok": {
+    "Optional": {
+      "inner_ty": "Unspecified",
+      "val": {
+        "Number": 1.0
+      }
+    }
+  }
+}
+...
+Not passed arg is inserted as None
+===
+fn f1(arg?)
+    ret $arg
+end
+f1
+---
+{
+  "Ok": {
+    "Optional": {
+      "inner_ty": "Unspecified",
+      "val": null
+    }
+  }
+}
+...

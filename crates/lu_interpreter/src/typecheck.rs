@@ -3,13 +3,12 @@ use itertools::Itertools;
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
-use lu_interpreter_structs::{Command, FlagVariant};
+use lu_interpreter_structs::{ArgSignature, Command, FlagVariant};
 use lu_pipeline_stage::PipelineStage;
 use parking_lot::RwLock;
 use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::collections::hash_map::Entry;
 use std::fmt::Display;
-use std::iter;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::{collections::HashMap, fmt::Debug};
@@ -576,20 +575,12 @@ pub struct TcFunc {
 
     in_key: TcKey,
     ret_key: TcKey,
-    args_keys: Vec<TcKey>,
+    args_keys: Vec<(ArgSignature, TcKey)>,
     var_arg_key: Option<TcKey>,
     flags_keys: Vec<(FlagSignature, TcKey)>,
 }
 
 impl TcFunc {
-    #[allow(unused)]
-    pub fn all_keys_iter(&self) -> impl Iterator<Item = TcKey> + '_ {
-        iter::once(self.in_key.clone())
-            .chain(iter::once(self.ret_key.clone()))
-            .chain(self.args_keys.clone())
-            .chain(self.var_arg_key)
-    }
-
     pub(crate) fn substitute_generics(self, ty_state: &mut TyCheckState) -> TcFunc {
         debug!(
             "Substituting generics in: {:?}",
@@ -658,7 +649,7 @@ impl TcFunc {
         if let Some(var_arg_key) = &mut self.var_arg_key {
             *var_arg_key = subst_generic_key(*var_arg_key, seen_generics, ty_state);
         }
-        for arg_key in self.args_keys.iter_mut() {
+        for (_, arg_key) in self.args_keys.iter_mut() {
             *arg_key = subst_generic_key(*arg_key, seen_generics, ty_state)
         }
         // TODO handle flags
@@ -689,7 +680,9 @@ impl TcFunc {
             .args
             .iter()
             .map(|arg_sign| {
-                ty_state.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.ty.clone())
+                let arg_key =
+                    ty_state.new_term_key_concretiziesd(arg_sign.decl.clone(), arg_sign.ty.clone());
+                (arg_sign.clone(), arg_key)
             })
             .collect();
 
@@ -745,8 +738,16 @@ impl TcFunc {
             self.in_key.equate_with(other.in_key),
             self.ret_key.equate_with(other.ret_key),
         ];
-        let self_args_key_iter = self.args_keys.iter().chain(self.var_arg_key.as_ref());
-        let other_args_key_iter = other.args_keys.iter().chain(other.var_arg_key.as_ref());
+        let self_args_key_iter = self
+            .args_keys
+            .iter()
+            .map(|(_, key)| key)
+            .chain(self.var_arg_key.as_ref());
+        let other_args_key_iter = other
+            .args_keys
+            .iter()
+            .map(|(_, key)| key)
+            .chain(other.var_arg_key.as_ref());
         let args_constr = itertools::zip(self_args_key_iter, other_args_key_iter)
             .map(|(self_arg_key, other_arg_key)| self_arg_key.equate_with(*other_arg_key))
             .chain(in_ret_constr);

@@ -1,0 +1,22 @@
+Not passed opt arg does not raise error
+===
+fn f1(arg?)
+    ret $arg
+end
+f1
+---
+{
+  "Ok": {
+    "Optional": {
+      "inner_ty": "Unspecified",
+      "inner_ty_decl": {
+        "content": "arg?",
+        "range": [
+          6,
+          10
+        ]
+      }
+    }
+  }
+}
+...
