@@ -1,35 +1,4 @@
-## Basics
-
-## Types
-`lush` is a typed shell. The following types exists:
-
-* any - The type can be of any type
-* nil - The empty void type
-* bool - Boolean, either `true` or `false`
-* num - A number, e.G. 1, 0.5, -5
-* str - A string, e.G. "Hello World"
-* path - A file path (potentially containing wildcards), e.G. /home/sweet/*
-* [type] - An array of "type", e.G. [num]
-* Structs - See below
-* Functions - See below
-
-`lush` supports type inference. Types do not have to be spelled out each and every time - they are mostly inferred due to the usage of variables, constants and commands.
-
-The type of a value can be visualized by leveraging the `type_of` command. A value of type `any` can be casted at runtime to a different type by using the `as` operator.
-
-```lush
-fn cmd_taking_anything(arg: any)
-    let ty = type_of $arg
-    if $ty == "num"
-        echo passed argument has type number
-    else
-        echo passed argument has type $ty
-    end
-end
-
-cmd_taking_anything 1         # passed argument has type number
-cmd_taking_anything "hello"   # passed argument has type str
-```
+# Basics
 
 ## Comments
 Everything behind a `#` until the end of a line, is considered a comment
@@ -44,28 +13,79 @@ Variables can be declared via the `let` statement.
 let unassigned  # Variable without initial value
 let x = 1       # Variable with intial value
 ```
-Variables are typed in lush. If the type is not declared, it will be inferred based on the usage.
+Variables are typed in lush. If the type is not declared, it will be inferred based on the usage (see below).
 ```
 let var1: num = 1 # var1 with an explicit type (number)
 let var2
 var2 = 2 # var2 inferred to be a number here
 ```
-Type coherence is statically verified. Meaning: there won't be type errors during runtime.
+Type coherence is statically verified. Meaning: there won't be type errors during runtime (except typecasts).
 
-## if - elif - else
+## Types
+`lush` is a typed shell. The following types exists:
 
+* any - The variable can be of any type
+* nil - The empty void type
+* bool - Boolean, either `true` or `false`
+* num - A number, e.G. 1, 0.5, -5
+* str - A string, e.G. "Hello World"
+* path - A file path (potentially containing wildcards), e.G. /home/sweet/*
+* [type] - An array of "type", e.G. [num]
+* type? - An `Optional` of "type", e.G. num?
+* Structs - See below
+* Functions - See below
+
+`lush` supports type inference. Types do not have to be spelled out each and every time - they are mostly inferred due to the usage of variables, constants and commands.
+
+The type of a value can be visualized by leveraging the `type_of` command. A value of type `any` can be casted at runtime to a different type by using the `as` operator.
+
+### Type: Optional
+An `Optional` is either `None` or `Some{<value>}`. Examples:
+```lush
+let nothing = None
+let something = Some{1}
+```
+
+### Type: path
+A path is a specifier containing slashes ('/'). It may contain wildcards (aka Pattern's).
+```lush
+let pics_of_my_dog = Pictures/holidays/*/sweet_dog.png
+```
+Currently only '*' and '**' is supported as patterns.
+
+Wildcards are not expanded by default. They are passed to internal commands unmodified, while they are being expanded if used as an argument to an external (!) command.
+```lush
+fn ls_in_home_dir(sub_path: path)
+    let ls_path = combine_paths /home/user/ $sub_path # The function 'combine_paths' does not yet exists
+    ls $ls_path # Wildcards expanded before passed to external cmd "ls"
+end
+ls_in_home_dir Music                 # passed as 1 argument
+ls_in_home_dir Music/**/*bob_marley* # passed as 1 argument
+```
+(This choice has been taken for better compatability with external cmds, while making internal commands more convenient. A call like "git_branch_wrapper --list ma*" would not require you to qoute "ma*", if git_branch_wrapper's --list flag takes an `path` argument.)
+
+## Control structures
+### if - ifopt - elif - elifopt - else
+`ifopt` stands for "if optional", while `elifopt` stands for "else if optional". They can be used to check whether an optional is Some and get the inner value at the same time.
 ```lush
 let lush = 1
+let world = Some{"world"}
 if $lush < 3    # The following equality operators are supported: < <= == != => >
     echo hello
-elif $lush == 42
-    echo world
+elifopt world_val = $world
+    # The above line reads as:
+    # else if the optional $world is Some, 
+    # assign the contained value of $world to world_val and run this block.
+    # the "counterpart" of elifopt is ifopt
+    echo $world_val
+elif 42 == 1337
+    # Do nothing. Never true
 else
     echo "!"
 end
 ```
 
-## for
+### for
 Iteration over strings and arrays is possible.
 ```lush
 for character in "abcde"
@@ -159,13 +179,15 @@ end
 ```
 
 ### Arguments
-Functions can accept arguments by declaring them within a `signature`
+#### Required arguments
+Functions can accept arguments by declaring them within a `signature`. Simple arguments are always required to pass.
 ```lush
 fn fn_with_args (arg1: num arg2:str)
     echo $arg1 $arg2
 end
 ```
-A variable amount of arguments can be taken by declaring a var_arg argument
+#### Variable amount of arguments
+A variable amount of arguments can be taken by declaring a `vararg` argument. They are declared by prepending "..." to the arguments name. It is possible for users to pass zero arguments, leaving the `vararg` an empty array.
 ```lush
 fn fn_with_args (arg1: num ...rest: num)
     echo $arg1 
@@ -173,9 +195,28 @@ fn fn_with_args (arg1: num ...rest: num)
         echo $val
     end
 end
+fn_with_args 1     2 3 4            # Okay
+             ^arg1 ^----rest
+fn_with_args 1                      # Okay
+             ^arg1 (rest left empty)
+fn_with_args 1                      # Error. Required argument not passed
+```
+#### Optional arguments
+Optional arguments (arguments which can be passed, but don't have to) can be declared by appending a questionmark ('?') to the end of an arguments name. Users can either pass a value or not. An optional argument get
+```lush
+fn fn_with_opt_arg (arg?)
+    ifopt val = $arg
+        echo passed $val
+    else
+        echo passed nothing
+    end
+end
+fn_with_opt_arg "value provided" 
+fn_with_opt_arg
 ```
 
-If no signature is declared a command will have an implicit var_arg argument `args` of type `[any]`
+#### Default arguments
+If no signature is declared a command will have an implicit var_arg argument named `args` of type `[any]`. The `ret` value and the `in` value will be inferred as usual.
 ```lush
 fn passthrough
     echo $args
@@ -184,39 +225,49 @@ passthrough 1 2 3
 ```
 
 ### Flags
+#### Optional flags
 Flags can be declared by prepeding "--" to their name.
 ```lush
 fn fn_with_flag( --flag1: num )
-    echo $flag1
+    ifopt val = $flag1
+        echo $val
+    end
 end
 fn_with_flag --flag 1
 ```
-If the type of a flag is not declared, it defaults to bool. Boolean flags are like switches, passing them assigns `true` to them, `false` otherwise.
-```lush
-fn fn_with_switch( --switch ) # Type of switch is bool
-    echo $switch
-end
-fn_with_switch --switch # prints true
-fn_with_switch          # prints false
-```
-
 A flag can also be given a shorter name (one character name), or only a shortname
 ```lush
 fn fn_with_flag( --flag1 -f: num )
-    echo $flag1
+    ifopt val = $flag1
+        echo $val
+    end
 end
 fn fn_with_short_flag( -f: num )
-    echo $f
+    ifopt val = $f
+        echo $val
+    end
 end
 fn_with_flag --flag 1
 fn_with_short_flag -f 1
 ```
-Flags are by default optional to pass, but they can be made required by adding the `req` keyword
+Flags are by default optional to pass. If a value is passed, its forwarded as `Some{$passed_value}`, otherwise the value of the flag is left as `None`. Optional flags are (much like optional arguments) of the `Optional` type.
 
+#### Required flags
+Flags can be made required by adding the `req` keyword.
 ```lush
 fn fn_with_req_flag( req --flag1: num )
-    echo $flag1
+    echo $flag1 # $flag1 is of type num (not Optional)
 end
+```
+
+#### Switches
+If the type of a flag is not declared, it defaults to bool. Boolean flags are like switches, passing them assigns `true` to them, `false` otherwise.
+```lush
+fn fn_with_switch( --switch1 # Type of switch is bool
+                   --switch2: bool ) 
+    echo $switch1 $switch2
+end
+fn_with_switch --switch1 # prints true false
 ```
 
 ### Function overloading
@@ -367,7 +418,9 @@ The following math-operators are currently supported
 * "<="    : Less or equal than
 * "=="    : Equality
 * "!="    : Inequality
+* "as"    : Typecast for any
 
+### Examples with a word of caution
 This has some advantages, but also opens up for some subtle surprises.
 
 All arguments are evaluated before passing them. And so are math-expressions
@@ -399,6 +452,23 @@ The ">" operator does not redirect
 ```lush
 cmd_which_prints > /dev/null # The "bigger than" operator does not redirect stdout
 ```
+
+### The `as` operator
+`as` can be used to cast a variable of type `any` to another type. If the typecast fails, an error is thrown at runtime. Examples:
+```lush
+fn cmd_taking_anything(arg: any)
+    let ty = type_of $arg
+    if $ty == "num"
+        echo passed argument has type number
+    else
+        echo passed argument has type $ty
+    end
+end
+
+cmd_taking_anything 1         # passed argument has type number
+cmd_taking_anything "hello"   # passed argument has type str
+```
+
 
 ##  Debugging
 `lush` offers the ability to run the code in an simple REPL debugger. Try `lush --debug <file>` to try it out.
@@ -433,3 +503,9 @@ The standard library currently only consists of:
         - `ls`: fn ls (ret: [LsEntry])
             - Lists content in current directory
 
+## Builtins
+Builtins are commands that are always available. Currently the following builtins are present:
+- `is_set`: fn is_set(ret: bool, to_check: str)
+    - Returns whether a var with name `to_check` exists
+- `type_of`: fn type_of(ret: str, val: any)
+    - Returns the type of `val` as a string
