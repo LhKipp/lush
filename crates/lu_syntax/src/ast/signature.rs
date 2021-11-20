@@ -3,7 +3,7 @@ use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARG_START};
 
 use super::{
     support, ArgNameToken, ArgSignatureNode, FlagSignatureNode, LongFlagToken, LuTypeNode,
-    ReqKeywordToken, ShortFlagToken, SignatureNode,
+    OptModifierToken, ReqKeywordToken, ShortFlagToken, SignatureNode,
 };
 
 impl SignatureNode {
@@ -42,6 +42,10 @@ impl ArgSignatureNode {
         let name = support::token_child::<ArgNameToken>(self.syntax());
         name.map(|t| t.text().trim_start_matches(VAR_ARG_START).to_string())
             .unwrap()
+    }
+
+    pub fn opt_modifier(&self) -> Option<OptModifierToken> {
+        support::token_child(self.syntax())
     }
 
     pub fn is_var_arg(&self) -> bool {

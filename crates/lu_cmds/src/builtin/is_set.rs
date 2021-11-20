@@ -14,12 +14,12 @@ impl IsSetBuiltin {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(lu_source_code_item!())
-            .args(vec![ArgSignature::new(
+            .args(vec![ArgSignature::req(
                 VAR_NAME_TO_LOOKUP.to_string(),
                 ValueType::String,
                 lu_source_code_item!(-3).into(),
             )])
-            .ret_arg(ArgSignature::new(
+            .ret_arg(ArgSignature::req(
                 "value_exists".into(),
                 ValueType::Bool,
                 lu_source_code_item!(),

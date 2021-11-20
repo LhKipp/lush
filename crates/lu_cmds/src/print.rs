@@ -17,7 +17,7 @@ impl PrintCmd {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(print_decl.clone())
-            .var_arg(ArgSignature::new(
+            .var_arg(ArgSignature::req(
                 TO_PRINT_ARG_NAME.to_string(),
                 ValueType::Any,
                 print_decl.clone().into(),

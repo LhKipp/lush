@@ -40,12 +40,12 @@ impl FsLsCmd {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(ls_decl.clone())
-            .var_arg(ArgSignature::new(
+            .var_arg(ArgSignature::req(
                 PATHS_VAR_ARG_NAME.to_string(),
                 ValueType::FileName,
                 ls_decl.clone().into(),
             ))
-            .ret_arg(ArgSignature::new(
+            .ret_arg(ArgSignature::req(
                 "LsTable".into(),
                 ValueType::Strct(Arc::downgrade(&*LS_ENTRY_STRCT)),
                 ls_decl.clone().into(),

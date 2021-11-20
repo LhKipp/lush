@@ -75,11 +75,11 @@ impl Display for StrctKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
-pub struct OptionalTyKeywordToken {
+pub struct OptKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
-impl AstToken for OptionalTyKeywordToken {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptionalTyKeyword }
+impl AstToken for OptKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OptKeyword }
     fn cast(syntax: SyntaxToken) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -89,18 +89,18 @@ impl AstToken for OptionalTyKeywordToken {
     }
     fn syntax(&self) -> &SyntaxToken { &self.syntax }
 }
-impl HasSyntaxKind for OptionalTyKeywordToken{
+impl HasSyntaxKind for OptKeywordToken{
     fn get_syntax_kind(&self) -> SyntaxKind{
         self.syntax().kind()
     }
 }
-impl HasTextRange for OptionalTyKeywordToken{
+impl HasTextRange for OptKeywordToken{
     fn get_text_range(&self) -> TextRange{
         self.syntax().text_range()
     }
 }
 
-impl Display for OptionalTyKeywordToken {
+impl Display for OptKeywordToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
     }

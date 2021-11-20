@@ -7,14 +7,14 @@ pub fn external_cmd_signature() -> Signature {
     let lu_item = lu_source_code_item!();
     Signature::new(
         Vec::new(),
-        Some(ArgSignature::new(
+        Some(ArgSignature::req(
             VAR_ARGS_DEF_NAME.into(),
             ValueType::Any,
             lu_item.clone(),
         )),
         Vec::new(),
-        ArgSignature::new(IN_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
-        ArgSignature::new(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
+        ArgSignature::req(IN_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
+        ArgSignature::req(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
         lu_item,
     )
 }

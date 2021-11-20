@@ -3,7 +3,7 @@ Config(
     // === KEYWORDS ===
     ( name: "ImpureKeyword"              , token_text: "impure"                         , is_token: true   , ) ,
     ( name: "StrctKeyword"               , token_text: "struct"                         , is_token: true   , ) ,
-    ( name: "OptionalTyKeyword"          , token_text: "Opt"                         , is_token: true   , ) ,
+    ( name: "OptKeyword"                 , token_text: "opt"                         , is_token: true   , ) ,
     ( name: "SomeKeyword"                , token_text: "Some"                         , is_token: true   , ) ,
     ( name: "NoneKeyword"                , token_text: "None"                         , is_token: true   , ) ,
     ( name: "AsKeyword"                  , token_text: "as"                         , is_token: true   , ) ,

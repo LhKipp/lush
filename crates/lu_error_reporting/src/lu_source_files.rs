@@ -485,7 +485,7 @@ static PUSH_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
 impl ArrayPushCmd {
     pub fn new() -> Self {
         let mut sign_builder = SignatureBuilder::default();
-        let array_arg_ty = ArgSignature::new(
+        let array_arg_ty = ArgSignature::req(
             ARRAY_ARG_NAME.into(),
             ValueType::new_array(ValueType::Generic("T".to_string()), lu_source_code_item!()),
             lu_source_code_item!(-1),
@@ -493,7 +493,7 @@ impl ArrayPushCmd {
         sign_builder
             .decl(lu_source_code_item!())
             .args(vec![array_arg_ty.clone()])
-            .var_arg(ArgSignature::new(
+            .var_arg(ArgSignature::req(
                 VALUES_ARG_NAME.to_string(),
                 ValueType::Generic("T".to_string()),
                 lu_source_code_item!(-1),
@@ -622,12 +622,12 @@ impl FsLsCmd {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(ls_decl.clone())
-            .var_arg(ArgSignature::new(
+            .var_arg(ArgSignature::req(
                 PATHS_VAR_ARG_NAME.to_string(),
                 ValueType::FileName,
                 ls_decl.clone().into(),
             ))
-            .ret_arg(ArgSignature::new(
+            .ret_arg(ArgSignature::req(
                 "LsTable".into(),
                 ValueType::Strct(Arc::downgrade(&*LS_ENTRY_STRCT)),
                 ls_decl.clone().into(),
@@ -750,7 +750,7 @@ impl PrintCmd {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(print_decl.clone())
-            .var_arg(ArgSignature::new(
+            .var_arg(ArgSignature::req(
                 TO_PRINT_ARG_NAME.to_string(),
                 ValueType::Any,
                 print_decl.clone().into(),
@@ -829,12 +829,12 @@ impl IsSetBuiltin {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(lu_source_code_item!())
-            .args(vec![ArgSignature::new(
+            .args(vec![ArgSignature::req(
                 VAR_NAME_TO_LOOKUP.to_string(),
                 ValueType::String,
                 lu_source_code_item!(-3).into(),
             )])
-            .ret_arg(ArgSignature::new(
+            .ret_arg(ArgSignature::req(
                 "value_exists".into(),
                 ValueType::Bool,
                 lu_source_code_item!(),
@@ -895,12 +895,12 @@ impl TyOfBuiltin {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(lu_source_code_item!())
-            .args(vec![ArgSignature::new(
+            .args(vec![ArgSignature::req(
                 TO_GET_TY_OF_ARG.to_string(),
                 ValueType::Any,
                 lu_source_code_item!(-3).into(),
             )])
-            .ret_arg(ArgSignature::new(
+            .ret_arg(ArgSignature::req(
                 "value_type".into(),
                 ValueType::String,
                 lu_source_code_item!(),
@@ -1121,24 +1121,30 @@ pub type ArgDecl = SourceCodeItem;
 pub struct ArgSignature {
     pub name: String,
     pub ty: ValueType,
-    #[new(default)] // TODO this default should be false, making every flag necessary
     pub is_opt: bool, // TODO this is prob a bad idea???
     pub decl: ArgDecl,
 }
 
 impl ArgSignature {
+    pub fn req(name: String, ty: ValueType, decl: SourceCodeItem) -> Self {
+        Self::new(name, ty, false, decl)
+    }
+    pub fn opt(name: String, ty: ValueType, decl: SourceCodeItem) -> Self {
+        Self::new(name, ty, true, decl)
+    }
+
     pub fn void(decl: ArgDecl) -> ArgSignature {
-        ArgSignature::new("unused".into(), ValueType::Nil, decl)
+        ArgSignature::req("unused".into(), ValueType::Nil, decl)
     }
 
     /// ArgSignature with default in name
     pub fn in_(ty: ValueType, decl: ArgDecl) -> ArgSignature {
-        ArgSignature::new(IN_ARG_NAME.into(), ty, decl)
+        ArgSignature::req(IN_ARG_NAME.into(), ty, decl)
     }
 
     /// ArgSignature with default ret name
     pub fn ret(ty: ValueType, decl: ArgDecl) -> ArgSignature {
-        ArgSignature::new(RET_ARG_NAME.into(), ty, decl)
+        ArgSignature::req(RET_ARG_NAME.into(), ty, decl)
     }
 
     pub fn from_node(
@@ -1163,7 +1169,7 @@ impl ArgSignature {
             .flatten()
             .unwrap_or(fallback_ty); // or if in is not specified, use fallback
 
-        ArgSignature::new(name, ty, decl)
+        ArgSignature::req(name, ty, decl)
     }
 
     pub fn to_var(&self) -> Variable {
@@ -1229,7 +1235,7 @@ pub struct Signature {
 
 impl Signature {
     fn default_in_ret_void_arg() -> ArgSignature {
-        ArgSignature::new("Unused".to_string(), ValueType::Nil, lu_source_code_item!())
+        ArgSignature::req("Unused".to_string(), ValueType::Nil, lu_source_code_item!())
     }
     pub fn req_flags(&self) -> Vec<FlagVariant> {
         self.flags
@@ -1250,18 +1256,18 @@ impl Signature {
     pub fn default_signature(fn_sign_node_decl: SourceCodeItem) -> Signature {
         Signature::new(
             Vec::new(),
-            Some(ArgSignature::new(
+            Some(ArgSignature::req(
                 VAR_ARGS_DEF_NAME.into(),
                 ValueType::Any,
                 fn_sign_node_decl.clone().into(),
             )),
             Vec::new(),
-            ArgSignature::new(
+            ArgSignature::req(
                 IN_ARG_NAME.into(),
                 ValueType::Unspecified,
                 fn_sign_node_decl.clone().into(),
             ),
-            ArgSignature::new(
+            ArgSignature::req(
                 RET_ARG_NAME.into(),
                 ValueType::Unspecified,
                 fn_sign_node_decl.clone().into(),
@@ -1294,11 +1300,12 @@ impl Signature {
             .iter()
             .map(|arg_node| -> ArgSignature {
                 let arg_name = arg_node.name();
+                let is_optional = arg_node.opt_modifier().is_some();
                 let ty = arg_node
                     .type_()
                     .map(|ty_node| ValueType::from_node(&ty_node))
                     .unwrap_or(ValueType::Unspecified);
-                ArgSignature::new(arg_name, ty, arg_node.to_item())
+                ArgSignature::new(arg_name, ty, is_optional, arg_node.to_item())
             })
             .collect();
         let flags = sign_node
@@ -1320,7 +1327,7 @@ impl Signature {
                 .type_()
                 .map(|ty_node| ValueType::from_node(&ty_node))
                 .unwrap_or(ValueType::Any);
-            ArgSignature::new(name, ty, var_arg_node.to_item())
+            ArgSignature::req(name, ty, var_arg_node.to_item())
         });
         let sign = Signature::new(args, var_arg, flags, in_ty, ret_ty, sign_node.to_item());
         trace!("Generated Signature: {:#?}", sign);
@@ -1446,14 +1453,14 @@ pub fn external_cmd_signature() -> Signature {
     let lu_item = lu_source_code_item!();
     Signature::new(
         Vec::new(),
-        Some(ArgSignature::new(
+        Some(ArgSignature::req(
             VAR_ARGS_DEF_NAME.into(),
             ValueType::Any,
             lu_item.clone(),
         )),
         Vec::new(),
-        ArgSignature::new(IN_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
-        ArgSignature::new(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
+        ArgSignature::req(IN_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
+        ArgSignature::req(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
         lu_item,
     )
 }

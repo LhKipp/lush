@@ -17,7 +17,7 @@ static PUSH_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
 impl ArrayPushCmd {
     pub fn new() -> Self {
         let mut sign_builder = SignatureBuilder::default();
-        let array_arg_ty = ArgSignature::new(
+        let array_arg_ty = ArgSignature::req(
             ARRAY_ARG_NAME.into(),
             ValueType::new_array(ValueType::Generic("T".to_string()), lu_source_code_item!()),
             lu_source_code_item!(-1),
@@ -25,7 +25,7 @@ impl ArrayPushCmd {
         sign_builder
             .decl(lu_source_code_item!())
             .args(vec![array_arg_ty.clone()])
-            .var_arg(ArgSignature::new(
+            .var_arg(ArgSignature::req(
                 VALUES_ARG_NAME.to_string(),
                 ValueType::Generic("T".to_string()),
                 lu_source_code_item!(-1),

@@ -65,8 +65,7 @@ impl Rule for ArgSignatureRule {
             ArgName,
             CMT_NL_WS,
         );
-        // TODO optional args?
-        // p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
+        p.eat_after_as(T![?], OptModifier, CMT_NL_WS);
         if p.eat_after(T![:], CMT_NL_WS) {
             LuTypeRule {}.parse(p);
         }

@@ -14,12 +14,12 @@ impl TyOfBuiltin {
         let mut sign_builder = SignatureBuilder::default();
         sign_builder
             .decl(lu_source_code_item!())
-            .args(vec![ArgSignature::new(
+            .args(vec![ArgSignature::req(
                 TO_GET_TY_OF_ARG.to_string(),
                 ValueType::Any,
                 lu_source_code_item!(-3).into(),
             )])
-            .ret_arg(ArgSignature::new(
+            .ret_arg(ArgSignature::req(
                 "value_type".into(),
                 ValueType::String,
                 lu_source_code_item!(),
