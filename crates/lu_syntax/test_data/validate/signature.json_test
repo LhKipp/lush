@@ -1,0 +1,60 @@
+Req arg after opt arg gives error
+===
+fn f (arg1? arg2)
+end
+---
+{
+  "Err": [
+    {
+      "Ast": {
+        "ReqArgAfterOptionalArg": {
+          "opt_arg": {
+            "content": "arg1?",
+            "range": [
+              6,
+              11
+            ]
+          },
+          "req_arg": {
+            "content": " arg2",
+            "range": [
+              11,
+              16
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...
+Vararg arg after opt arg gives error
+===
+fn f (arg1? ...rest)
+end
+---
+{
+  "Err": [
+    {
+      "Ast": {
+        "VarArgAfterOptionalArg": {
+          "var_arg": {
+            "content": " ...rest",
+            "range": [
+              11,
+              19
+            ]
+          },
+          "opt_arg": {
+            "content": "arg1?",
+            "range": [
+              6,
+              11
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...

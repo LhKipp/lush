@@ -2,6 +2,7 @@ pub mod ast;
 mod build_tree;
 mod syntax_node;
 mod test;
+mod validate;
 
 use ast::{addr_of_node, SourceFileNode};
 use build_tree::TreeBuilder;
@@ -55,11 +56,10 @@ impl Parse {
     fn parse(source: SourceCode, rule: &SourceFileRule) -> Outcome<Parse> {
         let (green, errors) = TreeBuilder::build(&source.text, rule);
         let sf_node = SyntaxNode::new_root(green);
-        debug!("Result of build_tree: {:#?}", sf_node);
         let sf_node = SourceFileNode::cast(sf_node).unwrap();
         let sf_node_addr = addr_of_node(sf_node.syntax().clone());
 
-        let errors = errors
+        let mut errors: Vec<_> = errors
             .into_iter()
             .map(|e| match e {
                 ParseErr::MessageAt(msg, txt_pos) => ParseErr::MessageAtItem(
@@ -78,9 +78,16 @@ impl Parse {
             .map(|e| e.into())
             .collect();
 
-        // TODO add general ast validation here
-        // errors.extend(validation::validate(&root));
+        // General validation
+        if let Err(ast_errs) = validate::validate(&sf_node) {
+            errors.extend(ast_errs);
+        }
 
+        debug!(
+            "Result of build_tree: {:#?}\nWith {} errors",
+            sf_node,
+            errors.len()
+        );
         Outcome::new(Parse::new(source, sf_node), errors)
     }
 }

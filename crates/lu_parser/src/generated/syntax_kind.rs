@@ -147,7 +147,7 @@ pub enum SyntaxKind {
     VarDeclName,
     FnDeclName,
     ArgName,
-    #[token("...[_a-zA-Z]+[_a-zA-Z0-9]*")]
+    #[token("...[_a-zA-Z]+[_a-zA-Z0-9]*", priority = 10)]
     VarArgName,
     #[regex("--[_a-zA-Z]+[_a-zA-Z0-9]*")]
     LongFlag,

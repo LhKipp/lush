@@ -839,6 +839,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "lu_ast_check"
+version = "0.1.0"
+
+[[package]]
 name = "lu_cfg_home"
 version = "0.1.0"
 dependencies = [

@@ -23,6 +23,14 @@ pub enum AstErr {
         pattern: SourceCodeItem,
         err: String,
     },
+    ReqArgAfterOptionalArg {
+        opt_arg: SourceCodeItem,
+        req_arg: SourceCodeItem,
+    },
+    VarArgAfterOptionalArg {
+        opt_arg: SourceCodeItem,
+        var_arg: SourceCodeItem,
+    },
 }
 
 impl<S: Into<String>> From<S> for AstErr {

@@ -45,5 +45,23 @@ pub(crate) fn ast_err_to_diagnostic(err: &AstErr) -> Diagnostic<usize> {
                 byte_range_of_item(&pattern),
             )
             .with_message(err)]),
+        AstErr::ReqArgAfterOptionalArg { req_arg, opt_arg } => Diagnostic::error()
+            .with_message("A required argument can not come after an optional one")
+            .with_code("E-Ast0005")
+            .with_labels(vec![
+                Label::primary(f_id_of_item(&req_arg), byte_range_of_item(&req_arg))
+                    .with_message("Required argument declared here"),
+                Label::secondary(f_id_of_item(&opt_arg), byte_range_of_item(&opt_arg))
+                    .with_message("Optional argument declared here"),
+            ]),
+        AstErr::VarArgAfterOptionalArg { var_arg, opt_arg } => Diagnostic::error()
+            .with_message("A vararg argument can not come after an optional one")
+            .with_code("E-Ast0006")
+            .with_labels(vec![
+                Label::primary(f_id_of_item(&var_arg), byte_range_of_item(&var_arg))
+                    .with_message("Vararg argument declared here"),
+                Label::secondary(f_id_of_item(&opt_arg), byte_range_of_item(&opt_arg))
+                    .with_message("Optional argument declared here"),
+            ]),
     }
 }
