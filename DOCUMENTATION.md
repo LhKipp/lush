@@ -133,6 +133,16 @@ let x = Ip { a: 192 b: 0 c: 0 d: 1 }
 echo $x.a
 ```
 
+## Tables
+An array of structs is visualized as a table. For example the `ls` command from `std:fs` outputs a table as:
+```lush
+ls
+# Name     | Type      | Size 
+# dir_a    | Directory | 40 
+# file.txt | File      | 1 
+# dir_b    | Directory | 40 
+```
+
 ## Functions
 A function can be declared via the `fn` keyword
 ```lush
@@ -500,7 +510,7 @@ The standard library currently only consists of:
             - Applies `filter_fn` to every element in `in` and only returns those elements for which `filter_fn` returns true
 - `std:fs`
     - Exported functions
-        - `ls`: fn ls (ret: [LsEntry])
+        - `ls`: fn ls (ret: [LsEntry] ...files: path)
             - Lists content in current directory
 
 ## Builtins
