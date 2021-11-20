@@ -86,11 +86,16 @@ fn insert_cmd_args_into_scope(
 
     let mut arg_iter = arg_vals.into_iter();
     for arg in &cmd_sign.args {
-        scope.lock().get_cur_frame_mut().insert_var(Variable::new(
-            arg.name.clone(),
+        let val = if arg.is_opt {
+            Value::new_optional(arg.ty.clone(), arg_iter.next())
+        } else {
             arg_iter
                 .next()
-                .expect("Always present if ty_checking works"),
+                .expect("Always present if ty_checking works")
+        };
+        scope.lock().get_cur_frame_mut().insert_var(Variable::new(
+            arg.name.clone(),
+            val,
             VarDeclNode::CatchAll(arg.decl.clone()),
         ));
     }
@@ -117,19 +122,17 @@ fn insert_cmd_args_into_scope(
             continue;
         }
         // Non passed switches (flags with ty bool) are inserted as false
-        if flag_sign.ty == ValueType::Bool {
-            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
-                flag_sign.best_name(),
-                false.into(),
-                flag_sign.decl.clone().into(),
-            ));
+        let val = if flag_sign.ty == ValueType::Bool {
+            false.into()
         } else {
-            scope.lock().get_cur_frame_mut().insert_var(Variable::new(
-                flag_sign.best_name(),
-                Value::new_optional(flag_sign.ty.clone(), None),
-                flag_sign.decl.clone().into(),
-            ));
-        }
+            Value::new_optional(flag_sign.ty.clone(), None)
+        };
+
+        scope.lock().get_cur_frame_mut().insert_var(Variable::new(
+            flag_sign.best_name(),
+            val,
+            flag_sign.decl.clone().into(),
+        ));
     }
 
     // Insert passed flags

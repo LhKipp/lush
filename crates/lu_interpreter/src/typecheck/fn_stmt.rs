@@ -38,11 +38,25 @@ impl TypeCheck for FnStmtNode {
                 .scope
                 .find_func(&fn_name, &required_flags)
                 .expect("FnNode will be sourced")
-                .signature();
+                .signature()
+                // have to clone for new_term_key_concretiziesd :[
+                .clone();
             let mut var_ty_to_insert = Vec::new();
 
             for (arg, key) in own_signature.args.iter().zip(own_tc_func.args_keys) {
-                var_ty_to_insert.push((arg.to_var(), key));
+                if arg.is_opt {
+                    // optional arg is inserted as optional<ty>
+                    let key = ty_state.new_term_key_concretiziesd(
+                        arg.decl.clone(),
+                        ValueType::Optional {
+                            inner_ty: Box::new(arg.ty.clone()),
+                            inner_ty_decl: arg.decl.clone(),
+                        },
+                    );
+                    var_ty_to_insert.push((arg.to_var(), key))
+                } else {
+                    var_ty_to_insert.push((arg.to_var(), key));
+                }
             }
             var_ty_to_insert.push((own_signature.in_arg.to_var(), own_tc_func.in_key));
             if let Some(var_arg) = &own_signature.var_arg {
