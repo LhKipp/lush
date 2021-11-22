@@ -21,7 +21,7 @@ const LS_ENTRY_FIELD_1: &str = "Type";
 const LS_ENTRY_FIELD_2: &str = "Size";
 
 pub(crate) static LS_ENTRY_STRCT: Lazy<Arc<RwLock<Strct>>> = Lazy::new(|| {
-    let decl = lu_source_code_item!();
+    let decl = lu_source_code_item!(-1);
     let ls_entry_strct = Strct::new(
         LS_ENTRY_STRCT_NAME.into(),
         vec![
@@ -47,7 +47,10 @@ impl FsLsCmd {
             ))
             .ret_arg(ArgSignature::req(
                 "LsTable".into(),
-                ValueType::Strct(Arc::downgrade(&*LS_ENTRY_STRCT)),
+                ValueType::new_array(
+                    ValueType::Strct(Arc::downgrade(&*LS_ENTRY_STRCT)),
+                    lu_source_code_item!(),
+                ),
                 ls_decl.clone().into(),
             ));
 

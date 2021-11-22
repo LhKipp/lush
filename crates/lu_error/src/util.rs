@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::iter::FromIterator;
 
-use crate::{LuErr, LuResults};
+use crate::{LuErr, LuResult, LuResults};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Outcome<T> {
@@ -88,6 +88,25 @@ impl<T> FromIterator<Outcome<T>> for Outcome<Vec<T>> {
         for outcome in iter {
             values.push(outcome.val);
             errors.extend(outcome.errs);
+        }
+
+        Outcome {
+            val: values,
+            errs: errors,
+        }
+    }
+}
+
+impl<T> FromIterator<LuResult<T>> for Outcome<Vec<T>> {
+    fn from_iter<O: IntoIterator<Item = LuResult<T>>>(iter: O) -> Self {
+        let mut values = Vec::new();
+        let mut errors = Vec::new();
+
+        for result in iter {
+            match result {
+                Ok(v) => values.push(v),
+                Err(e) => errors.push(e),
+            }
         }
 
         Outcome {

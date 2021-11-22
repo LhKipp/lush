@@ -145,5 +145,31 @@ pub(crate) fn ty_err_to_diagnostic(err: &TyErr) -> Diagnostic<usize> {
                 f_id_of_item(&row),
                 byte_range_of_item(&(row)),
             )]),
+        TyErr::ExpectedStmtToBeInferred { stmt } => Diagnostic::error()
+            .with_message("Expected to be able to infer the type behind the statement")
+            .with_code("E-Ty0060")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&stmt),
+                byte_range_of_item(&(stmt)),
+            )
+            .with_message("Hint: Try adding type annotations")]),
+        TyErr::ExpectedStmtToReturnAnArrayOfStrcts {
+            stmt_with_wrong_ret,
+            found_ty,
+        } => Diagnostic::error()
+            .with_message("select's input must be a table")
+            .with_code("E-Ty0061")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&stmt_with_wrong_ret),
+                byte_range_of_item(&(stmt_with_wrong_ret)),
+            )
+            .with_message(format!("Returns: {}", found_ty))]),
+        TyErr::SelectArgMustBeBareWordOrString { arg } => Diagnostic::error()
+            .with_message("selected column name must be a bareword or a string")
+            .with_code("E-Ty0062")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&arg),
+                byte_range_of_item(&arg),
+            )]),
     }
 }

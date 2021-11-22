@@ -16,7 +16,7 @@ impl SelectBuiltin {
             .decl(lu_source_code_item!())
             .var_arg(ArgSignature::req(
                 COL_NAMES.to_string(),
-                ValueType::Any,
+                ValueType::String,
                 lu_source_code_item!(-3).into(),
             ))
             .in_arg(ArgSignature::req(
@@ -27,6 +27,12 @@ impl SelectBuiltin {
                 },
                 lu_source_code_item!(),
             ))
+            .flags(vec![FlagSignature::opt(
+                Some("gen_struct_name".into()),
+                Some('n'),
+                ValueType::String,
+                lu_source_code_item!(-4),
+            )])
             .ret_arg(ArgSignature::req(
                 "projected_table".into(),
                 ValueType::Any,

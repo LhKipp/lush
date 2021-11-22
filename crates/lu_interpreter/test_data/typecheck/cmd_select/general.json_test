@@ -1,0 +1,154 @@
+Select returns new struct
+===
+use std:fs
+ls | select Name Type Size
+---
+{
+  "Ok": {
+    "Array": {
+      "inner_ty": {
+        "StrctName": "Select_textrange_16:37"
+      },
+      "inner_ty_decl": {
+        "content": "select Name Type Size",
+        "range": [
+          16,
+          37
+        ]
+      }
+    }
+  }
+}
+...
+Select no such field error
+===
+use std:fs
+ls | select NotExistent
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "StructDoesNotHaveField": {
+          "field_name": "NotExistent",
+          "strct_decl": {
+            "content": "crates/lu_cmds/src/lu_std/fs/ls.rs",
+            "range": [
+              23,
+              23
+            ]
+          },
+          "usage": {
+            "content": "NotExistent",
+            "range": [
+              23,
+              34
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...
+Select requires array of structs
+===
+fn f(ret: [any])
+    ret []
+end
+f | select
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "ExpectedStmtToReturnAnArrayOfStrcts": {
+          "stmt_with_wrong_ret": {
+            "content": "f",
+            "range": [
+              32,
+              33
+            ]
+          },
+          "found_ty": "[any]"
+        }
+      }
+    }
+  ]
+}
+...
+select args ty checked
+===
+use std:fs
+ls | select 1
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "crates/lu_cmds/src/builtin/select.rs",
+            "range": [
+              17,
+              17
+            ]
+          },
+          "lhs_ty": "str",
+          "rhs_decl": {
+            "content": "1",
+            "range": [
+              23,
+              24
+            ]
+          },
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...
+select flags ty checked
+===
+use std:fs
+ls | select --no_such_flag
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "PassingOfNotDeclaredFlag": {
+          "content": "--no_such_flag",
+          "range": [
+            23,
+            37
+          ]
+        }
+      }
+    }
+  ]
+}
+...
+multiple select works
+===
+use std:fs
+ls | select Name Type Size | select Name Type | select Name
+---
+{
+  "Ok": {
+    "Array": {
+      "inner_ty": {
+        "StrctName": "Select_textrange_59:70"
+      },
+      "inner_ty_decl": {
+        "content": "select Name",
+        "range": [
+          59,
+          70
+        ]
+      }
+    }
+  }
+}
+...

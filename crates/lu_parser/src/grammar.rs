@@ -154,7 +154,11 @@ impl Rule for OrRule {
 
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         if let Some(rule) = self.rules.iter().find(|rule| rule.matches(p)) {
-            debug!("OrRule {}: Parsing rule {}", self.name(), rule.name());
+            debug!(
+                "Parsing rule {} (OrRule options: {})",
+                rule.name(),
+                self.name()
+            );
             rule.parse(p)
         } else {
             p.error(format!(

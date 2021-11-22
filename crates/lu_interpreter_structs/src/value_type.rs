@@ -181,6 +181,24 @@ impl ValueType {
             ty
         }
     }
+
+    /// Test only. Go from Strct to strctname. Helpful for serializing
+    pub fn map_from_strct_to_strct_name_test_only(&mut self) {
+        debug!(
+            "Check whether ty is strct and has to be mapped for serializing {:?}",
+            self
+        );
+        if let Some(strct_decl) = self.as_strct() {
+            debug!("Mapping from strct to strctname");
+            let strct_decl = Weak::upgrade(strct_decl).unwrap();
+            let l_strct_decl = strct_decl.read();
+            *self = ValueType::StrctName(l_strct_decl.name.clone());
+        } else if let ValueType::Array { inner_ty, .. } = self {
+            inner_ty.map_from_strct_to_strct_name_test_only();
+        } else if let ValueType::Optional { inner_ty, .. } = self {
+            inner_ty.map_from_strct_to_strct_name_test_only();
+        }
+    }
 }
 
 #[derive(Clone, Debug)]

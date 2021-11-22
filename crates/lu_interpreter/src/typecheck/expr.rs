@@ -13,20 +13,20 @@ use rusttyc::TcKey;
 use crate::{TyCheckState, TypeCheck, TypeCheckArg, ValueType};
 
 impl TypeCheck for ValueExprElement {
-    fn do_typecheck(&self, _: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
+    fn do_typecheck(&self, args: &[TypeCheckArg], state: &mut TyCheckState) -> Option<TcKey> {
         match self {
-            ValueExprElement::BooleanExpr(n) => n.typecheck(state),
-            ValueExprElement::BareWord(n) => n.typecheck(state),
-            ValueExprElement::NumberExpr(n) => n.typecheck(state),
-            ValueExprElement::MathExpr(n) => n.typecheck(state),
-            ValueExprElement::StringExpr(n) => n.typecheck(state),
-            ValueExprElement::ValuePathExpr(n) => n.typecheck(state),
-            ValueExprElement::ArrayExpr(n) => n.typecheck(state),
-            ValueExprElement::TableExpr(n) => n.typecheck(state),
-            ValueExprElement::StrctCtorExpr(n) => n.typecheck(state),
-            ValueExprElement::CmdStmt(n) => n.typecheck(state),
-            ValueExprElement::FileName(n) => n.typecheck(state),
-            ValueExprElement::OptionalExpr(n) => n.typecheck(state),
+            ValueExprElement::BooleanExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::BareWord(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::NumberExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::MathExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::StringExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::ValuePathExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::ArrayExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::TableExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::StrctCtorExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::FileName(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::OptionalExpr(n) => n.typecheck_with_args(args, state),
         }
     }
 }

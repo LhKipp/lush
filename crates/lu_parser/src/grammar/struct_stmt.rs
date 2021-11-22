@@ -102,7 +102,10 @@ impl Rule for StrctCtorExprRule {
             m.abandon(p);
             return None;
         }
-        p.expect_after(T!["{"], CMT_NL_WS);
+        if !p.expect_after(T!["{"], CMT_NL_WS) {
+            m.abandon(p);
+            return None;
+        }
 
         //consume all <name: value_expr_rule> args
         let field_rule = StrctFieldCtorStmtRule {};

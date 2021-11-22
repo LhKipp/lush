@@ -228,6 +228,10 @@ impl SourceCodeItem {
         &self.content
     }
 
+    pub fn display_range(&self) -> String {
+        format!("{:?}:{:?}", self.range.start(), self.range.end())
+    }
+
     pub fn tmp_todo_item() -> SourceCodeItem {
         SourceCodeItem::new(999..999, "TMP_ITEM", 1337 as usize)
     }
@@ -603,7 +607,7 @@ const LS_ENTRY_FIELD_1: &str = "Type";
 const LS_ENTRY_FIELD_2: &str = "Size";
 
 pub(crate) static LS_ENTRY_STRCT: Lazy<Arc<RwLock<Strct>>> = Lazy::new(|| {
-    let decl = lu_source_code_item!();
+    let decl = lu_source_code_item!(-1);
     let ls_entry_strct = Strct::new(
         LS_ENTRY_STRCT_NAME.into(),
         vec![
@@ -629,7 +633,10 @@ impl FsLsCmd {
             ))
             .ret_arg(ArgSignature::req(
                 "LsTable".into(),
-                ValueType::Strct(Arc::downgrade(&*LS_ENTRY_STRCT)),
+                ValueType::new_array(
+                    ValueType::Strct(Arc::downgrade(&*LS_ENTRY_STRCT)),
+                    lu_source_code_item!(),
+                ),
                 ls_decl.clone().into(),
             ));
 
@@ -831,7 +838,7 @@ impl SelectBuiltin {
             .decl(lu_source_code_item!())
             .var_arg(ArgSignature::req(
                 COL_NAMES.to_string(),
-                ValueType::Any,
+                ValueType::String,
                 lu_source_code_item!(-3).into(),
             ))
             .in_arg(ArgSignature::req(
@@ -842,6 +849,12 @@ impl SelectBuiltin {
                 },
                 lu_source_code_item!(),
             ))
+            .flags(vec![FlagSignature::opt(
+                Some("gen_struct_name".into()),
+                Some('n'),
+                ValueType::String,
+                lu_source_code_item!(-4),
+            )])
             .ret_arg(ArgSignature::req(
                 "projected_table".into(),
                 ValueType::Any,
@@ -1255,6 +1268,14 @@ pub struct FlagSignature {
 }
 
 impl FlagSignature {
+    pub fn opt(
+        long_name: Option<String>,
+        short_name: Option<char>,
+        ty: ValueType,
+        decl: SourceCodeItem,
+    ) -> Self {
+        Self::new(long_name, short_name, ty, true, decl)
+    }
     pub fn is_named_by(&self, name: &str) -> bool {
         let mut result = false;
         if let Some(long_name) = &self.long_name {

@@ -215,7 +215,10 @@ impl<T: fmt::Debug + 'static> Scope<T> {
     }
 
     pub fn get_all_frames(&self) -> impl Iterator<Item = &ScopeFrame<T>> + '_ {
-        self.arena.iter().filter(|node| !node.is_removed()).map(|node| node.get())
+        self.arena
+            .iter()
+            .filter(|node| !node.is_removed())
+            .map(|node| node.get())
     }
 }
 
@@ -234,22 +237,6 @@ impl Scope<Variable> {
                 None
             }
         })
-    }
-
-    #[allow(dead_code)]
-    fn cur_source_f_id(&self) -> Option<NodeId> {
-        if let Some(cur_frame_id) = self.cur_frame_id {
-            cur_frame_id.ancestors(&self.arena).find_map(|n_id| {
-                let frame = self.arena[n_id].get();
-                if frame.get_tag().as_module_frame().is_some() {
-                    Some(n_id)
-                } else {
-                    None
-                }
-            })
-        } else {
-            None
-        }
     }
 
     fn frames_to_find_var_in(&self) -> Vec<NodeId> {
@@ -409,6 +396,22 @@ impl Scope<Variable> {
                 f_to_set
             )))
         }
+    }
+
+    pub fn get_cur_mod_frame(&mut self) -> Option<&mut ScopeFrame<Variable>> {
+        if let Some(cur_frame_id) = self.cur_frame_id {
+            for ancestor_id in cur_frame_id.ancestors(&self.arena).collect::<Vec<_>>() {
+                if self.arena[ancestor_id]
+                    .get_mut()
+                    .get_tag()
+                    .as_module_frame()
+                    .is_some()
+                {
+                    return Some(self.arena[ancestor_id].get_mut());
+                }
+            }
+        }
+        None
     }
 }
 

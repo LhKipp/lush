@@ -1,4 +1,5 @@
 use bimap::BiHashMap;
+use enum_as_inner::EnumAsInner;
 use itertools::Itertools;
 use log::debug;
 use lu_error::{AstErr, LuErr, LuResults};
@@ -17,6 +18,7 @@ use crate::{visit_arg::VisitArg, FlagSignature, Scope, ValueType, Variable};
 use crate::{Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
+mod cmd_select;
 mod cmd_stmt;
 mod condition;
 mod expr;
@@ -98,6 +100,25 @@ impl TyCheckState {
                 self.handle_tc_err(e);
             }
         }
+    }
+
+    /// Expect to get the ty behind key. The ty behind key may not yet be inferred. In that case an
+    /// error is recorded.
+    /// This is an expensive operation
+    pub(crate) fn expect_ty_of_key(&mut self, key: TcKey) -> Option<ValueType> {
+        if let Ok(t) = self.checker.clone().type_check() {
+            if let Some(ty) = t.get(&key) {
+                return Some(ty.clone());
+            }
+        }
+        self.push_err(
+            TyErr::ExpectedStmtToBeInferred {
+                stmt: self.get_item_of(&key).clone(),
+            }
+            .into(),
+        );
+
+        None
     }
 
     pub(crate) fn new_term_key(&mut self, term: SourceCodeItem) -> TcKey {
@@ -759,10 +780,10 @@ impl TcFunc {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, EnumAsInner)]
 pub enum TypeCheckArg {
     Arg(VisitArg),
-    CmdStmt { prev_key: Option<TcKey> },
+    CmdStmt { in_piped_arg_key: TcKey },
 }
 
 pub trait TypeCheck: Display {
@@ -782,7 +803,7 @@ pub trait TypeCheck: Display {
         args: &[TypeCheckArg],
         ty_state: &mut TyCheckState,
     ) -> Option<TcKey> {
-        debug!("Typechecking: {}", self);
+        debug!("Typechecking: {}, with {} args", self, args.len());
         let result = self.do_typecheck(args, ty_state);
         debug!(
             "Result of Typechecking: {}: {:?}",

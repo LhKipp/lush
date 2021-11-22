@@ -1,7 +1,5 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
-use std::{collections::HashMap, iter};
-
 use log::{debug, warn};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_interpreter_structs::{external_cmd, FlagSignature, FlagVariant, Value};
@@ -11,13 +9,15 @@ use lu_syntax::{
     AstElement, AstNode, AstToken,
 };
 use rusttyc::TcKey;
+use std::{collections::HashMap, iter};
 
+use crate::typecheck::cmd_select::do_extra_ty_check_select_cmd;
 use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
 
 impl TypeCheck for CmdStmtNode {
     fn do_typecheck(
         &self,
-        _args: &[TypeCheckArg],
+        args: &[TypeCheckArg],
         ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         debug!("Cur Scope Frame: {}", ty_state.scope.get_cur_frame());
@@ -39,7 +39,11 @@ impl TypeCheck for CmdStmtNode {
         // Ty check args
         ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);
 
-        // TODO ty check redir stmt
+        if self.get_cmd_name() == "select" {
+            if let Some(key) = do_extra_ty_check_select_cmd(self, args, ty_state) {
+                return Some(key);
+            }
+        }
         Some(ty_state.new_term_key_equated(self.to_item(), cmd_keys.ret_key))
     }
 }

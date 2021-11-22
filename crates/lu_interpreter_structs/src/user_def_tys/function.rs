@@ -83,6 +83,14 @@ pub struct FlagSignature {
 }
 
 impl FlagSignature {
+    pub fn opt(
+        long_name: Option<String>,
+        short_name: Option<char>,
+        ty: ValueType,
+        decl: SourceCodeItem,
+    ) -> Self {
+        Self::new(long_name, short_name, ty, true, decl)
+    }
     pub fn is_named_by(&self, name: &str) -> bool {
         let mut result = false;
         if let Some(long_name) = &self.long_name {

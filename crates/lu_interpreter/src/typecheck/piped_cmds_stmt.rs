@@ -1,4 +1,4 @@
-use log::warn;
+use log::{warn};
 use lu_interpreter_structs::{FlagVariant, ValueType};
 use lu_syntax::{
     ast::{PipedCmdsStmtNode, ValueExprElement},
@@ -35,7 +35,14 @@ impl TypeCheck for PipedCmdsStmtNode {
                 // be equated
             }
 
-            ret_key = cmd.typecheck(ty_state).expect("Cmd always returns");
+            ret_key = cmd
+                .typecheck_with_args(
+                    &[TypeCheckArg::CmdStmt {
+                        in_piped_arg_key: ret_key,
+                    }],
+                    ty_state,
+                )
+                .expect("Cmd always returns");
         }
         Some(ret_key)
     }

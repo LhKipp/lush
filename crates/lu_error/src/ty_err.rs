@@ -54,6 +54,16 @@ pub enum TyErr {
     TableRowToFewCol {
         row: SourceCodeItem,
     },
+    ExpectedStmtToBeInferred {
+        stmt: SourceCodeItem,
+    },
+    ExpectedStmtToReturnAnArrayOfStrcts {
+        found_ty: String,
+        stmt_with_wrong_ret: SourceCodeItem,
+    },
+    SelectArgMustBeBareWordOrString {
+        arg: SourceCodeItem,
+    },
 }
 
 impl<S: Into<String>> From<S> for TyErr {

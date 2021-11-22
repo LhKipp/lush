@@ -115,6 +115,10 @@ impl SourceCodeItem {
         &self.content
     }
 
+    pub fn display_range(&self) -> String {
+        format!("{:?}:{:?}", self.range.start(), self.range.end())
+    }
+
     pub fn tmp_todo_item() -> SourceCodeItem {
         SourceCodeItem::new(999..999, "TMP_ITEM", 1337 as usize)
     }

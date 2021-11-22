@@ -102,7 +102,10 @@ impl Interpreter {
         ty_errs.extend(ty_check.errs);
 
         if ty_errs.is_empty() {
-            Ok(ty_check.val.result)
+            Ok(ty_check.val.result.map(|mut ty| {
+                ty.map_from_strct_to_strct_name_test_only();
+                ty
+            }))
         } else {
             Err(ty_errs)
         }
