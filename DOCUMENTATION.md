@@ -136,6 +136,7 @@ echo $x.a
 ## Tables
 An array of structs is visualized as a table. For example the `ls` command from `std:fs` outputs a table as:
 ```lush
+use std:fs
 ls
 # Name     | Type      | Size 
 # dir_a    | Directory | 40 
