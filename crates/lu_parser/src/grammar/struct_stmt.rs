@@ -89,7 +89,8 @@ impl Rule for StrctFieldCtorStmtRule {
 pub struct StrctCtorExprRule;
 impl Rule for StrctCtorExprRule {
     fn matches(&self, p: &mut Parser) -> bool {
-        p.next_non(CMT_NL_WS) == StrctName
+        let next = p.next_non(CMT_NL_WS);
+        next == StrctName && p.next_non(&[Comment, Newline, Whitespace, StrctName]) == T!["{"]
     }
 
     fn name(&self) -> String {

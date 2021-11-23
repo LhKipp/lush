@@ -73,6 +73,7 @@ impl Rule for CmdStmtRule {
                 || arg_rule.opt(p).is_some()
                 || p.eat_after(ShortFlag, Whitespace)
                 || p.eat_after(LongFlag, Whitespace)
+                || p.eat_after_as(StrctName, BareWord, Whitespace)
             {
                 continue;
             } else {
