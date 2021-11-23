@@ -18,7 +18,7 @@ use crate::{visit_arg::VisitArg, FlagSignature, Scope, ValueType, Variable};
 use crate::{Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
-mod cmd_select;
+pub mod cmd_select;
 mod cmd_stmt;
 mod condition;
 mod expr;

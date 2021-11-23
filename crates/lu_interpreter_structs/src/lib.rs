@@ -15,13 +15,14 @@ mod flag;
 mod module;
 pub mod prelude;
 mod scope;
+pub mod special_cmds;
 pub mod special_scope_vars;
+mod table;
 mod use_path;
 mod user_def_tys;
 mod value;
 mod value_type;
 mod variable;
-mod table;
 
 pub use command::{CmdAttribute, CmdAttributeVariant, Command};
 pub use command_collection::CommandCollection;

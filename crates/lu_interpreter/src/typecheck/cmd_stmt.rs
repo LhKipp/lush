@@ -2,7 +2,9 @@
 #![allow(unused_variables)]
 use log::{debug, warn};
 use lu_error::{SourceCodeItem, TyErr};
-use lu_interpreter_structs::{external_cmd, FlagSignature, FlagVariant, Value};
+use lu_interpreter_structs::{
+    external_cmd, special_cmds::SELECT_CMD_NAME, FlagSignature, FlagVariant, Value,
+};
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{CmdArgElement, CmdStmtNode, LetStmtNode, ValueExprElement},
@@ -39,7 +41,7 @@ impl TypeCheck for CmdStmtNode {
         // Ty check args
         ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);
 
-        if self.get_cmd_name() == "select" {
+        if self.get_cmd_name() == SELECT_CMD_NAME {
             if let Some(key) = do_extra_ty_check_select_cmd(self, args, ty_state) {
                 return Some(key);
             }

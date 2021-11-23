@@ -41,6 +41,8 @@ impl Evaluable for StatementElement {
                     Value::BareWord(s) => s.strip_suffix("\n").unwrap_or(&val_as_str),
                     _ => &val_as_str,
                 };
+                println!("PRINTING STMT RETURN {}", self);
+                println!("PRINTING STMT RETURN {:?}", self.syntax().parent());
                 println!("{}", shortened);
                 Ok(value)
             }

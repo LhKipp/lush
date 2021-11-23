@@ -1,0 +1,96 @@
+Select selects
+===
+struct Person {
+    name: str
+    age: num
+    female: bool
+}
+fn f (ret: [Person])
+    ret [(Person)
+            ["Lisa" 8 true]
+            ["Bart" 10 false]
+        ]
+end
+f | select name 
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Select_textrange_177:188",
+          [
+            [
+              "name",
+              {
+                "String": "Lisa"
+              }
+            ]
+          ]
+        ]
+      },
+      {
+        "Strct": [
+          "Select_textrange_177:188",
+          [
+            [
+              "name",
+              {
+                "String": "Bart"
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}
+...
+Select selects 2
+===
+struct Person {
+    name: str
+    age: num
+    female: bool
+}
+fn f (ret: [Person])
+    ret [(Person)
+            ["Lisa" 8 true]
+            ["Bart" 10 false]
+        ]
+end
+f | select name age | select name 
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Select_textrange_195:206",
+          [
+            [
+              "name",
+              {
+                "String": "Lisa"
+              }
+            ]
+          ]
+        ]
+      },
+      {
+        "Strct": [
+          "Select_textrange_195:206",
+          [
+            [
+              "name",
+              {
+                "String": "Bart"
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}
+...

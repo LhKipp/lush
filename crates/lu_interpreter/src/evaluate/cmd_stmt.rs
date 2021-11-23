@@ -1,6 +1,8 @@
 use super::handle_dbg_intervention_before;
+use crate::special_cmds::{self, SELECT_CMD_NAME};
 use crate::{eval_function, evaluate::eval_prelude::*};
 use crate::{Command, RunExternalCmd};
+use lu_interpreter_structs::special_cmds::SELECT_DEF_STRCT_DECL_ARG_NAME;
 use lu_syntax::ast::{CmdArgElement, CmdStmtNode, HasAstId};
 use std::rc::Rc;
 
@@ -39,6 +41,23 @@ impl Evaluable for CmdStmtNode {
         scope.lock().push_frame(cmd_call_frame.clone());
 
         insert_cmd_args_into_scope(cmd.signature(), eval_args, grouped_args, scope);
+
+        if self.get_cmd_name() == SELECT_CMD_NAME {
+            let mut l_scope = scope.lock();
+            let gen_strct_name = special_cmds::select_def_strct_name(&self.to_item());
+            let strct_decl = l_scope
+                .find_var(&gen_strct_name)
+                .unwrap()
+                .val
+                .as_strct_decl()
+                .expect("Must be strct decl")
+                .clone();
+            l_scope.get_cur_frame_mut().insert_var(Variable::new(
+                SELECT_DEF_STRCT_DECL_ARG_NAME.to_string(),
+                Value::StrctDecl(strct_decl),
+                self.to_item().into(),
+            ));
+        }
 
         // And now we can finally run the cmd
         // See Function::run

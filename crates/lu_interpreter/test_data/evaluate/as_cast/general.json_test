@@ -1,4 +1,4 @@
-As cast gives back value if ty matches
+A s cast gives back value if ty matches
 ===
 let x: any = 1
 $x as num

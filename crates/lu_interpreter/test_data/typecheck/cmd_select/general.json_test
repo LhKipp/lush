@@ -90,8 +90,8 @@ ls | select 1
           "lhs_decl": {
             "content": "crates/lu_cmds/src/builtin/select.rs",
             "range": [
-              17,
-              17
+              19,
+              19
             ]
           },
           "lhs_ty": "str",

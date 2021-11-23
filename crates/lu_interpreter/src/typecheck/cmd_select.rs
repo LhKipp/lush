@@ -5,7 +5,7 @@ use std::{
 
 use log::debug;
 use lu_error::{util::Outcome, SourceCodeItem, TyErr};
-use lu_interpreter_structs::{Strct, StrctField, ValueType, Variable};
+use lu_interpreter_structs::{special_cmds, Strct, StrctField, ValueType, Variable};
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
     ast::{CmdArgElement, CmdStmtNode, ValueExprElement},
@@ -45,7 +45,7 @@ pub(crate) fn do_extra_ty_check_select_cmd(
                 let fields = get_selected_fields(args, &l_strct_decl);
                 let fields = ty_state.ok_and_record(fields);
                 let decl = cmd_stmt.to_item();
-                let name = new_default_strct_name(&decl);
+                let name = special_cmds::select_def_strct_name(&decl);
 
                 let strct = Arc::new(RwLock::new(Strct::new(name.clone(), fields, decl)));
                 // Insert strct
@@ -79,10 +79,6 @@ pub(crate) fn do_extra_ty_check_select_cmd(
     }
 
     None
-}
-
-pub(crate) fn new_default_strct_name(cmd_stmt_decl: &SourceCodeItem) -> String {
-    format!("Select_textrange_{}", cmd_stmt_decl.display_range())
 }
 
 struct SelectArgs {

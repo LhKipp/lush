@@ -820,7 +820,9 @@ impl Command for PrintCmd {
 
 const REDIR0: &str = "REDIR0";
 "#####)
-,("crates/lu_cmds/src/builtin/select.rs",r#####"use crate::cmd_prelude::*;
+,("crates/lu_cmds/src/builtin/select.rs",r#####"use lu_interpreter_structs::special_cmds::SELECT_DEF_STRCT_DECL_ARG_NAME;
+
+use crate::cmd_prelude::*;
 
 #[derive(Debug, Clone)]
 pub struct SelectBuiltin {
@@ -884,9 +886,42 @@ impl Command for SelectBuiltin {
     }
 
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
-        let mut l_scope = scope.lock();
-        let val = self.expect_arg(&mut l_scope, COL_NAMES).clone();
-        Ok(Value::String(val.get_ty().to_string()))
+        let l_scope = scope.lock();
+        // let val = self.expect_args(COL_NAMES, &l_scope).clone();
+        let table = self.expect_in(&l_scope).as_array().unwrap().clone();
+
+        let gen_strct_decl = self
+            .expect_arg(&l_scope, SELECT_DEF_STRCT_DECL_ARG_NAME)
+            .as_strct_decl()
+            .expect("Arg is always passed and is strct decl");
+        let l_gen_strct_decl = gen_strct_decl.read();
+
+        let selected_cols: Vec<_> = table
+            .iter()
+            .map(|row| {
+                let (_, row) = row.as_strct().expect("Always strct");
+
+                let selected_vals: Vec<_> = l_gen_strct_decl
+                    .fields
+                    .iter()
+                    .map(|field_decl| {
+                        row.iter()
+                            .find_map(|(col_name, col_val)| {
+                                if *col_name == field_decl.name {
+                                    Some((field_decl.name.clone(), col_val.clone()))
+                                } else {
+                                    None
+                                }
+                            })
+                            .expect("Always found")
+                    })
+                    .collect();
+
+                Value::new_strct(l_gen_strct_decl.name.clone(), selected_vals)
+            })
+            .collect();
+
+        Ok(Value::new_array(selected_cols))
     }
 
     fn attributes(&self) -> &[CmdAttribute] {
