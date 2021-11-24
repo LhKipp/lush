@@ -1,7 +1,7 @@
 use bimap::BiHashMap;
 use enum_as_inner::EnumAsInner;
 use itertools::Itertools;
-use log::debug;
+use log::{debug, trace};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_interpreter_structs::{ArgSignature, Command, FlagVariant};
@@ -149,9 +149,11 @@ impl TyCheckState {
 
     pub(crate) fn equate_keys(&mut self, key1: TcKey, key2: TcKey) {
         debug!(
-            "Equating keys: {:?} {:?}",
+            "Equating({}({:?}),{}({:?}))",
             self.get_item_of(&key1),
-            self.get_item_of(&key2)
+            key1,
+            self.get_item_of(&key2),
+            key2,
         );
         // Check whether both are arrays
         if let (Some(key1_arr_inner_tc), Some(key2_arr_inner_tc)) = (
@@ -216,29 +218,41 @@ impl TyCheckState {
     }
 
     fn concretizes_key(&mut self, key: TcKey, ty: ValueType) {
+        let concretizes_lib_key = |key: TcKey, ty: ValueType| {
+            key.concretizes_explicit(ty.subst_generic_ty(ValueType::Unspecified))
+        };
+
         if let Some(func_ty) = ty.as_func() {
             let tc_func = TcFunc::from_signature(&*func_ty, self); // Generate func first
             self.equate_keys(key, tc_func.self_key) // Set term equal to func
         } else if let Some(generic_name) = ty.as_generic() {
+            debug!(
+                "Not concretizising {}({:?}) with generic ty {}",
+                self.get_item_of(&key),
+                key,
+                ty
+            );
+            // We never concretizes a key to be generic. doesnt make sense
             self.tc_generic_table.insert(key, generic_name.clone()); // No further concretization needed
         } else if let Some((inner_ty, inner_ty_decl)) = ty.as_array() {
             let inner_ty_key =
                 self.new_term_key_concretiziesd(inner_ty_decl.clone(), *inner_ty.clone());
             self.tc_array_table.insert(key, inner_ty_key);
 
-            let res = self.checker.impose(key.concretizes_explicit(ty.clone()));
+            let res = self.checker.impose(concretizes_lib_key(key, ty.clone()));
             self.handle_tc_result(res);
         } else if let Some((inner_ty, inner_ty_decl)) = ty.as_optional() {
             let inner_ty_key =
                 self.new_term_key_concretiziesd(inner_ty_decl.clone(), *inner_ty.clone());
             self.tc_optional_table.insert(key, inner_ty_key);
-            let res = self.checker.impose(key.concretizes_explicit(ty.clone()));
+
+            let res = self.checker.impose(concretizes_lib_key(key, ty.clone()));
             self.handle_tc_result(res);
         } else if let Some(_) = ty.as_strct() {
-            let res = self.checker.impose(key.concretizes_explicit(ty));
+            let res = self.checker.impose(concretizes_lib_key(key, ty.clone()));
             self.handle_tc_result(res);
         } else {
-            let res = self.checker.impose(key.concretizes_explicit(ty));
+            let res = self.checker.impose(concretizes_lib_key(key, ty.clone()));
             self.handle_tc_result(res);
         }
     }
@@ -604,11 +618,16 @@ pub struct TcFunc {
 impl TcFunc {
     pub(crate) fn substitute_generics(self, ty_state: &mut TyCheckState) -> TcFunc {
         debug!(
-            "Substituting generics in: {:?}",
+            "Substituting generics in: {}",
             ty_state.get_item_of(&self.self_key)
         );
         let mut generics_key = HashMap::<String, TcKey>::new();
-        self.substitute_generics_rec(&mut generics_key, ty_state)
+        let result = self.substitute_generics_rec(&mut generics_key, ty_state);
+        debug!(
+            "Finished Substituting generics in: {}",
+            ty_state.get_item_of(&result.self_key)
+        );
+        result
     }
 
     fn substitute_generics_rec(
@@ -630,37 +649,43 @@ impl TcFunc {
                         let already_inserted_generic_item =
                             ty_state.get_item_of(already_inserted_key.get());
                         debug!(
-                            "Unifying {:?} with other generic {:?}",
+                            "Unifying {} with other generic {}",
                             key_item, already_inserted_generic_item
                         );
                         ty_state.equate_keys(generic_key, already_inserted_key.get().clone());
                     }
                     Entry::Vacant(v) => {
                         debug!(
-                            "Found generic ty: {:?} for first time and substituted it.",
-                            key_item
+                            "Found generic ty: {} for first time and generated key {:?}",
+                            key_item, generic_key
                         );
                         v.insert(generic_key);
                     }
                 };
                 generic_key
             } else if let Some(tc_func) = ty_state.get_tc_func(&key).cloned() {
-                debug!("Substitute Generics: Found inner func_ty. Recursing into that");
+                trace!(
+                    "Substitute Generics: Found inner func_ty({}). Recursing into that",
+                    ty_state.get_item_of(&tc_func.self_key)
+                );
                 let key = tc_func.self_key.clone();
                 tc_func.substitute_generics_rec(seen_generics, ty_state);
                 key
             } else if let Some(inner_arr_key) = ty_state.get_arr_inner_tc(&key).cloned() {
-                debug!("Substitute Generics: Found inner array_ty. Recursing into that");
+                trace!("Substitute Generics: Found inner array_ty. Recursing into that");
                 let new_inner_arr_key = subst_generic_key(inner_arr_key, seen_generics, ty_state);
                 ty_state.tc_array_table.insert(key, new_inner_arr_key); // TODO bit of direct access here...
                 key
             } else if let Some(inner_opt_key) = ty_state.get_optional_inner_tc(&key).cloned() {
-                debug!("Substitute Generics: Found inner array_ty. Recursing into that");
+                trace!("Substitute Generics: Found inner optional. Recursing into that");
                 let new_inner_opt_key = subst_generic_key(inner_opt_key, seen_generics, ty_state);
                 ty_state.tc_optional_table.insert(key, new_inner_opt_key); // TODO bit of direct access here...
                 key
             } else {
-                debug!("Found non generic normal key. Not substituting");
+                trace!(
+                    "Found non generic normal key {}. Not substituting",
+                    ty_state.get_item_of(&key)
+                );
                 key
             }
         }
@@ -686,6 +711,7 @@ impl TcFunc {
 
         let in_key =
             ty_state.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());
+        debug!("generated new in key, now gen ret key");
 
         let ret_key =
             ty_state.new_term_key_concretiziesd(sign.ret_arg.decl.clone(), sign.ret_arg.ty.clone());

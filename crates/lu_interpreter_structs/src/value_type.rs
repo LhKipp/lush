@@ -199,6 +199,45 @@ impl ValueType {
             inner_ty.map_from_strct_to_strct_name_test_only();
         }
     }
+
+    pub fn subst_generic_ty(self, subst_with: ValueType) -> Self {
+        match self {
+            ValueType::Error
+            | ValueType::Unspecified
+            | ValueType::Any
+            | ValueType::Void
+            | ValueType::Nil
+            | ValueType::Bool
+            | ValueType::Number
+            | ValueType::String
+            | ValueType::BareWord
+            | ValueType::FileName
+            | ValueType::Strct(_)
+            | ValueType::StrctName(_) => self,
+            ValueType::Generic(_) => {
+                debug!("Substituting generic ty {} with {}", self, subst_with);
+                subst_with
+            }
+            ValueType::Array {
+                inner_ty,
+                inner_ty_decl,
+            } => ValueType::Array {
+                inner_ty: Box::new(inner_ty.subst_generic_ty(subst_with)),
+                inner_ty_decl,
+            },
+            ValueType::Optional {
+                inner_ty,
+                inner_ty_decl,
+            } => ValueType::Optional {
+                inner_ty: Box::new(inner_ty.subst_generic_ty(subst_with)),
+                inner_ty_decl,
+            },
+            ValueType::Func(_) => {
+                warn!("Not substituting generics in func ValueType");
+                self
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -220,12 +259,11 @@ impl TcVariant for ValueType {
 
     fn meet(lhs: Partial<Self>, rhs: Partial<Self>) -> Result<Partial<Self>, Self::Err> {
         assert!(
-            lhs.variant.as_generic().is_none() && rhs.variant.as_generic().is_none(),
+            lhs.variant.as_generic().is_none() || rhs.variant.as_generic().is_none(),
             "Generics have to be substituted before meet"
         );
-        debug!("Meeting: {} {}", lhs.variant, rhs.variant);
         let ty = if lhs.variant == rhs.variant {
-            lhs.variant
+            lhs.variant.clone()
         } else {
             // Not equal check for special coercion rules
             let coercable_ty = match (&lhs.variant, &rhs.variant) {
@@ -300,17 +338,17 @@ impl TcVariant for ValueType {
                 _ => None,
             };
             coercable_ty.ok_or_else(|| ValueTypeErr::NotMeetAble {
-                lhs_ty: lhs.variant,
-                rhs_ty: rhs.variant,
+                lhs_ty: lhs.variant.clone(),
+                rhs_ty: rhs.variant.clone(),
             })?
         };
 
         let arity = match ty.arity() {
-            Arity::Variable => unreachable!("All types have fixed arity"),
+            Arity::Variable => 0,
             Arity::Fixed(arity) => arity,
         };
 
-        debug!("Result of meet: {}", ty);
+        debug!("Meet({}, {}) ==> {}", lhs.variant, rhs.variant, ty);
         Ok(Partial {
             variant: ty,
             least_arity: arity,
@@ -321,7 +359,6 @@ impl TcVariant for ValueType {
         match self {
             ValueType::Unspecified
             | ValueType::Void
-            | ValueType::Any
             | ValueType::Nil
             | ValueType::Generic(_)
             | ValueType::Bool
@@ -340,6 +377,7 @@ impl TcVariant for ValueType {
                 );
                 Arity::Fixed(0)
             }
+            ValueType::Any => Arity::Variable,
         }
     }
 }

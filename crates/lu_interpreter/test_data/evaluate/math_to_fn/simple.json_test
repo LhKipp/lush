@@ -19,3 +19,58 @@ use std:iter
   }
 }
 ...
+complex pipeline with math expr
+===
+use std:array
+
+struct Person {
+    name: str
+    age: num
+    female: bool
+}
+fn f (ret: [Person])
+    ret [(Person)
+            ["Lisa" 8 true]
+            ["Bart" 10 false]
+            ["Homer" 35 false]
+            ["Marge" 40 true]
+        ]
+end
+fn name_in_array(arg)
+    push [] $arg
+end
+f | filter $arg.age < 36 | select name female | map $arg.name
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Select_textrange_195:206",
+          [
+            [
+              "name",
+              {
+                "String": "Lisa"
+              }
+            ]
+          ]
+        ]
+      },
+      {
+        "Strct": [
+          "Select_textrange_195:206",
+          [
+            [
+              "name",
+              {
+                "String": "Bart"
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}
+...

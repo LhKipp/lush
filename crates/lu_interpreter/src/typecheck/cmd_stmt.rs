@@ -34,11 +34,19 @@ impl TypeCheck for CmdStmtNode {
             .cloned();
         let cmd_keys = if let Some(cmd) = called_cmd {
             ty_state
+                // TODO use get_tc_cmd_from_cmd_usage
                 .get_tc_cmd_from_rc_cmd(&cmd)
                 .expect("If cmd is found in scope it must be found in ty_state")
         } else {
             TcFunc::from_signature(&external_cmd::external_cmd_signature(), ty_state)
         };
+
+        if let Some(in_key) = args.iter().find_map(|arg| arg.as_cmd_stmt()) {
+            ty_state.equate_keys(cmd_keys.in_key.clone(), *in_key);
+        } else {
+            warn!("Cmd stmt arg should always be passed");
+            ty_state.concretizes_key(cmd_keys.in_key.clone(), ValueType::Nil);
+        }
 
         // Ty check args
         ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{convert::TryInto, error::Error, ops::Range};
+use std::{convert::TryInto, error::Error, fmt::Display, ops::Range};
 use text_size::TextRange;
 
 mod ast_err;
@@ -73,9 +73,6 @@ impl From<AstErr> for LuErr {
 
 /// An item in the source code to be used in the `Error` enum.
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-// #[educe(Debug)]
-// use derive_more::Display;
-// #[display(fmt = "{}/{:?}..{:?}", content, range.start() as 32, range.end() as 32)]
 pub struct SourceCodeItem {
     pub content: String,
     pub range: TextRange,
@@ -144,4 +141,10 @@ macro_rules! lu_source_code_item {
             )
         }
     }};
+}
+
+impl Display for SourceCodeItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "SItem({},{})", self.content, self.display_range())
+    }
 }

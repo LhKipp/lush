@@ -112,7 +112,7 @@ fn make_global_frame() -> ScopeFrame<Variable> {
 }
 "#####)
 ,("crates/lu_error/src/lib.rs",r#####"use serde::{Deserialize, Serialize};
-use std::{convert::TryInto, error::Error, ops::Range};
+use std::{convert::TryInto, error::Error, fmt::Display, ops::Range};
 use text_size::TextRange;
 
 mod ast_err;
@@ -186,9 +186,6 @@ impl From<AstErr> for LuErr {
 
 /// An item in the source code to be used in the `Error` enum.
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
-// #[educe(Debug)]
-// use derive_more::Display;
-// #[display(fmt = "{}/{:?}..{:?}", content, range.start() as 32, range.end() as 32)]
 pub struct SourceCodeItem {
     pub content: String,
     pub range: TextRange,
@@ -258,6 +255,12 @@ macro_rules! lu_source_code_item {
         }
     }};
 }
+
+impl Display for SourceCodeItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "SItem({},{})", self.content, self.display_range())
+    }
+}
 "#####)
 ,("crates/lu_interpreter/src/evaluate/piped_cmds_stmt.rs",r#####"use crate::evaluate::eval_prelude::*;
 use lu_error::lu_source_code_item;
@@ -317,11 +320,19 @@ impl TypeCheck for CmdStmtNode {
             .cloned();
         let cmd_keys = if let Some(cmd) = called_cmd {
             ty_state
+                // TODO use get_tc_cmd_from_cmd_usage
                 .get_tc_cmd_from_rc_cmd(&cmd)
                 .expect("If cmd is found in scope it must be found in ty_state")
         } else {
             TcFunc::from_signature(&external_cmd::external_cmd_signature(), ty_state)
         };
+
+        if let Some(in_key) = args.iter().find_map(|arg| arg.as_cmd_stmt()) {
+            ty_state.equate_keys(cmd_keys.in_key.clone(), *in_key);
+        } else {
+            warn!("Cmd stmt arg should always be passed");
+            ty_state.concretizes_key(cmd_keys.in_key.clone(), ValueType::Nil);
+        }
 
         // Ty check args
         ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);

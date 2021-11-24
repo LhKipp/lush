@@ -1,4 +1,4 @@
-Math as func works
+math as func works
 ===
 use std:iter
 [1 2 3] | map $arg + 1
@@ -6,9 +6,7 @@ use std:iter
 {
   "Ok": {
     "Array": {
-      "inner_ty": {
-        "Generic": "U"
-      },
+      "inner_ty": "Unspecified",
       "inner_ty_decl": {
         "content": "U",
         "range": [
@@ -50,5 +48,81 @@ use std:iter
       }
     }
   ]
+}
+...
+math as func works 2
+===
+use std:iter
+[1 2 3] | filter $arg < 3 | map $arg + 1
+---
+{
+  "Ok": {
+    "Array": {
+      "inner_ty": "Unspecified",
+      "inner_ty_decl": {
+        "content": "U",
+        "range": [
+          54,
+          55
+        ]
+      }
+    }
+  }
+}
+...
+complex pipeline with math expr
+===
+use std:array
+use std:iter
+
+struct Person {
+    name: str
+    age: num
+    female: bool
+}
+fn f (ret: [Person])
+    ret [(Person)
+            ["Lisa" 8 true]
+            ["Bart" 10 false]
+            ["Homer" 35 false]
+            ["Marge" 40 true]
+        ]
+end
+fn name_in_array(arg)
+    push [] $arg
+end
+f | filter $arg.age < 36 | select name female | map $arg.name
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Select_textrange_195:206",
+          [
+            [
+              "name",
+              {
+                "String": "Lisa"
+              }
+            ]
+          ]
+        ]
+      },
+      {
+        "Strct": [
+          "Select_textrange_195:206",
+          [
+            [
+              "name",
+              {
+                "String": "Bart"
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
 }
 ...
