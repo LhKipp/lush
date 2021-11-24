@@ -49,6 +49,10 @@ impl TypeCheck for ValuePathExprNode {
             }
         }
 
-        prev_key
+        if let Some(prev_key) = prev_key {
+            Some(state.new_term_key_equated(self.to_item(), prev_key))
+        } else {
+            None
+        }
     }
 }

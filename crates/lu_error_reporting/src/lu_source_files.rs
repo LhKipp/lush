@@ -281,6 +281,241 @@ impl Evaluable for PipedCmdsStmtNode {
     }
 }
 "#####)
+,("crates/lu_interpreter/src/typecheck/cmd_stmt.rs",r#####"#![allow(unused_imports)]
+#![allow(unused_variables)]
+use log::{debug, warn};
+use lu_error::{lu_source_code_item, SourceCodeItem, TyErr};
+use lu_interpreter_structs::{
+    external_cmd,
+    special_cmds::{MATH_FN_NAME, SELECT_CMD_NAME},
+    FlagSignature, FlagVariant, ScopeFrameTag, Value,
+};
+use lu_pipeline_stage::{ErrorContainer, PipelineStage};
+use lu_syntax::{
+    ast::{CmdArgElement, CmdStmtNode, LetStmtNode, MathExprNode, ValueExprElement},
+    AstElement, AstNode, AstToken,
+};
+use rusttyc::TcKey;
+use std::{collections::HashMap, iter};
+
+use crate::typecheck::cmd_select::do_extra_ty_check_select_cmd;
+use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
+
+impl TypeCheck for CmdStmtNode {
+    fn do_typecheck(
+        &self,
+        args: &[TypeCheckArg],
+        ty_state: &mut crate::TyCheckState,
+    ) -> Option<TcKey> {
+        debug!("Cur Scope Frame: {}", ty_state.scope.get_cur_frame());
+
+        // Finding result type here
+        let passed_flags = FlagVariant::convert(self.get_passed_flags());
+        let called_cmd = ty_state
+            .scope
+            .find_func(&self.get_cmd_name(), &passed_flags)
+            .cloned();
+        let cmd_keys = if let Some(cmd) = called_cmd {
+            ty_state
+                .get_tc_cmd_from_rc_cmd(&cmd)
+                .expect("If cmd is found in scope it must be found in ty_state")
+        } else {
+            TcFunc::from_signature(&external_cmd::external_cmd_signature(), ty_state)
+        };
+
+        // Ty check args
+        ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);
+
+        if self.get_cmd_name() == SELECT_CMD_NAME {
+            if let Some(key) = do_extra_ty_check_select_cmd(self, args, ty_state) {
+                return Some(key);
+            }
+        }
+        Some(ty_state.new_term_key_equated(self.to_item(), cmd_keys.ret_key))
+    }
+}
+
+fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
+    cmd_node: &CmdStmtNode,
+    mut args: ArgIter,
+    called_func: &TcFunc,
+    ty_state: &mut TyCheckState,
+) {
+    let mut called_func_arg_tc_iter = called_func.args_keys.iter();
+    // Flags that are required but not passed
+    let mut missing_called_func_req_flags: Vec<_> = called_func
+        .flags_keys
+        .iter()
+        .filter(|(flag, _)| flag.is_required())
+        .map(|(flag, _)| flag.clone())
+        .collect();
+
+    while let Some(next_arg) = args.next() {
+        match next_arg {
+            CmdArgElement::ShortFlag(n) => ty_check_flag(
+                &mut args,
+                |flag_sign| flag_sign.short_name == Some(n.flag_name()),
+                called_func,
+                n.to_item(),
+                &mut missing_called_func_req_flags,
+                ty_state,
+            ),
+            CmdArgElement::LongFlag(n) => ty_check_flag(
+                &mut args,
+                |flag_sign| flag_sign.long_name == Some(n.flag_name()),
+                called_func,
+                n.to_item(),
+                &mut missing_called_func_req_flags,
+                ty_state,
+            ),
+            CmdArgElement::ValueExpr(arg) => {
+                match called_func_arg_tc_iter.next() {
+                    Some((_, called_func_arg_tc)) => {
+                        ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);
+                    }
+                    None => {
+                        if let Some(var_arg_ty) = called_func.var_arg_key {
+                            ty_check_cmd_arg(arg, &var_arg_ty, cmd_node, ty_state);
+                        } else {
+                            // Found unexpected argument
+                            let called_func_decl =
+                                ty_state.get_item_of(&called_func.self_key).clone();
+                            ty_state.push_err(
+                                TyErr::UnexpectedArg {
+                                    arg: arg.to_item(),
+                                    fn_decl: called_func_decl.clone(),
+                                }
+                                .into(),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (arg, non_passed_arg) in called_func_arg_tc_iter {
+        if arg.is_opt {
+            // Okay. optional arg not passed.
+            continue;
+        }
+        let arg_decl = ty_state.get_item_of(non_passed_arg).clone();
+        ty_state.push_err(
+            TyErr::UnsatisfiedArg {
+                arg_decl,
+                cmd_stmt: cmd_node.to_item(),
+            }
+            .into(),
+        )
+    }
+
+    for non_passed_flag in missing_called_func_req_flags {
+        ty_state.push_err(
+            TyErr::NotPassedRequiredFlag {
+                flag_decl: non_passed_flag.decl.clone(),
+                cmd_stmt: cmd_node.to_item(),
+            }
+            .into(),
+        );
+    }
+}
+
+fn ty_check_flag<ArgIter: Iterator<Item = CmdArgElement>, P>(
+    args: &mut ArgIter,
+    mut flag_sign_matches_usage: P,
+    called_func: &TcFunc,
+    flag_usage: SourceCodeItem,
+    missing_called_func_req_flags: &mut Vec<FlagSignature>,
+    ty_state: &mut TyCheckState,
+) where
+    P: FnMut(&FlagSignature) -> bool,
+{
+    if let Some((flag, key)) = called_func.flags_keys.iter().find_map(|(flag, key)| {
+        if flag_sign_matches_usage(flag) {
+            Some((flag, key))
+        } else {
+            None
+        }
+    }) {
+        // Found passed flag.
+        if flag.is_required() {
+            if let Some(flag_pos) = missing_called_func_req_flags
+                .iter()
+                .position(|missing_flag| missing_flag == flag)
+            {
+                missing_called_func_req_flags.remove(flag_pos);
+            }
+        }
+
+        if flag.ty != ValueType::Bool {
+            // next arg must be argument to flag
+            match args.next() {
+                Some(CmdArgElement::ValueExpr(arg_val)) => {
+                    warn!("Not promoting math expr to function");
+                    let arg_val_key = arg_val.typecheck(ty_state).unwrap();
+                    ty_state.concretizes_key(arg_val_key, flag.ty.clone());
+                }
+                _ => {
+                    ty_state.push_err(TyErr::FlagWithoutArgument(flag_usage).into());
+                }
+            }
+        }
+    } else {
+        ty_state.push_err(TyErr::PassingOfNotDeclaredFlag(flag_usage).into());
+    }
+}
+
+fn ty_check_cmd_arg(
+    passed_arg: ValueExprElement,
+    called_func_arg_tc: &TcKey,
+    cmd_node: &CmdStmtNode,
+    ty_state: &mut TyCheckState,
+) {
+    debug!(
+        "TyChecking passed_arg: {}, against {}",
+        passed_arg.text(),
+        ty_state.get_item_of(called_func_arg_tc).content
+    );
+
+    // Check whether we have to fixup the MathExpr to become a function
+    let passed_arg_key = if let (Some(passed_math_expr), Some(expected_fn_ty)) = (
+        passed_arg.as_math_expr(),
+        ty_state.get_tc_func(called_func_arg_tc).cloned(),
+    ) {
+        ty_check_math_expr_as_fn(passed_math_expr, expected_fn_ty, ty_state);
+    } else {
+        let passed_arg_key = passed_arg
+            .typecheck(ty_state)
+            .expect("Arg always returns a key");
+        ty_state.equate_keys(passed_arg_key, *called_func_arg_tc);
+    };
+}
+
+fn ty_check_math_expr_as_fn(
+    passed_math_expr: &MathExprNode,
+    expected_fn_ty: TcFunc,
+    ty_state: &mut TyCheckState,
+) {
+    // TODO assert expected_fn_ty is simple
+    let fn_frame = ScopeFrameTag::TyCFnFrame(MATH_FN_NAME.into(), vec![]);
+    let (_, frame) = ty_state.scope.push_frame(fn_frame.clone());
+    // Insert vars
+    for (arg, key) in &expected_fn_ty.args_keys {
+        let arg_key = ty_state.insert_var(arg.to_var());
+        ty_state.equate_keys(arg_key, key.clone());
+    }
+    let in_key = ty_state.insert_var(Variable::new_in(Value::Nil, lu_source_code_item!().into()));
+    ty_state.equate_keys(in_key, expected_fn_ty.in_key.clone());
+
+    if let Some(math_expr_ret) = passed_math_expr.typecheck(ty_state) {
+        ty_state.equate_keys(math_expr_ret, expected_fn_ty.ret_key.clone());
+    } else {
+        ty_state.concretizes_key(expected_fn_ty.ret_key.clone(), ValueType::Nil);
+    }
+
+    ty_state.scope.pop_frame(&fn_frame);
+}
+"#####)
 ,("crates/lu_interpreter/src/typecheck/if_stmt.rs",r#####"use lu_error::lu_source_code_item;
 use lu_interpreter_structs::{ScopeFrameTag, ValueType, Variable};
 use lu_syntax::{
@@ -1223,10 +1458,11 @@ pub fn get_silence_stmt_returns(scope: &Scope<Variable>) -> Option<bool> {
     VarDeclNode, Variable,
 };
 use derive_builder::Builder;
+use derive_more::From;
 use derive_new::new;
 use log::trace;
 use lu_error::{lu_source_code_item, LuResult, SourceCodeItem};
-use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, SignatureNode};
+use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, MathExprNode, SignatureNode};
 use lu_syntax::{AstNode, AstToken};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use serde::{Deserialize, Serialize};
@@ -1459,6 +1695,20 @@ impl Signature {
     }
 }
 
+/// A node in the ast which is evaluable as a cmd
+#[derive(From, Debug, Clone)]
+pub enum CmdEvaluableNode {
+    FnStmt(FnStmtNode),
+    MathExpr(MathExprNode),
+}
+impl CmdEvaluableNode {
+    pub fn to_item(&self) -> SourceCodeItem {
+        match self {
+            CmdEvaluableNode::FnStmt(n) => n.to_item(),
+            CmdEvaluableNode::MathExpr(n) => n.to_item(),
+        }
+    }
+}
 /// Function is a struct containing all needed information for a function/closure
 /// This should allow for less lookup in the ast later on (and easier handling of funcs)
 #[derive(Educe)]
@@ -1468,7 +1718,7 @@ pub struct Function {
     pub name: String,
     /// A signature is always present (if not user provided, defaulted.)
     pub signature: Signature,
-    pub fn_node: FnStmtNode,
+    pub fn_node: CmdEvaluableNode,
     // For closures only
     pub captured_vars: Vec<Variable>,
 
@@ -1483,7 +1733,7 @@ impl Function {
         name: String,
         signature: Signature,
         attributes: Vec<CmdAttribute>,
-        fn_node: FnStmtNode,
+        fn_node: CmdEvaluableNode,
         source_file_id: ModPath,
     ) -> Self {
         Self {
@@ -1502,7 +1752,7 @@ impl Function {
         let sign = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
         let attrs = Self::attrs_from_node(fn_stmt);
 
-        Function::new(name, sign, attrs, fn_stmt.clone(), source_file_id)
+        Function::new(name, sign, attrs, fn_stmt.clone().into(), source_file_id)
     }
 
     fn attrs_from_node(fn_stmt: &FnStmtNode) -> Vec<CmdAttribute> {
@@ -1556,7 +1806,7 @@ impl Command for Function {
     }
 
     fn signature_item(&self) -> SourceCodeItem {
-        self.fn_node.decl_item()
+        self.fn_node.to_item()
     }
 
     fn parent_module(&self) -> Option<&ModPath> {

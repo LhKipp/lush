@@ -1,0 +1,54 @@
+Math as func works
+===
+use std:iter
+[1 2 3] | map $arg + 1
+---
+{
+  "Ok": {
+    "Array": {
+      "inner_ty": {
+        "Generic": "U"
+      },
+      "inner_ty_decl": {
+        "content": "U",
+        "range": [
+          54,
+          55
+        ]
+      }
+    }
+  }
+}
+...
+Math expr with wrong ret ty errors
+===
+use std:iter
+[1 2 3] | filter $arg + 1
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "ret: bool",
+            "range": [
+              290,
+              299
+            ]
+          },
+          "lhs_ty": "bool",
+          "rhs_decl": {
+            "content": " arg: T",
+            "range": [
+              299,
+              306
+            ]
+          },
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...

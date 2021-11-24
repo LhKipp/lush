@@ -1,13 +1,15 @@
 #![allow(unused_imports)]
 #![allow(unused_variables)]
 use log::{debug, warn};
-use lu_error::{SourceCodeItem, TyErr};
+use lu_error::{lu_source_code_item, SourceCodeItem, TyErr};
 use lu_interpreter_structs::{
-    external_cmd, special_cmds::SELECT_CMD_NAME, FlagSignature, FlagVariant, Value,
+    external_cmd,
+    special_cmds::{MATH_FN_NAME, SELECT_CMD_NAME},
+    FlagSignature, FlagVariant, ScopeFrameTag, Value,
 };
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
-    ast::{CmdArgElement, CmdStmtNode, LetStmtNode, ValueExprElement},
+    ast::{CmdArgElement, CmdStmtNode, LetStmtNode, MathExprNode, ValueExprElement},
     AstElement, AstNode, AstToken,
 };
 use rusttyc::TcKey;
@@ -166,6 +168,7 @@ fn ty_check_flag<ArgIter: Iterator<Item = CmdArgElement>, P>(
             // next arg must be argument to flag
             match args.next() {
                 Some(CmdArgElement::ValueExpr(arg_val)) => {
+                    warn!("Not promoting math expr to function");
                     let arg_val_key = arg_val.typecheck(ty_state).unwrap();
                     ty_state.concretizes_key(arg_val_key, flag.ty.clone());
                 }
@@ -196,13 +199,36 @@ fn ty_check_cmd_arg(
         passed_arg.as_math_expr(),
         ty_state.get_tc_func(called_func_arg_tc).cloned(),
     ) {
-        todo!("Expected func, provided math expr. This should work. Hack around here ")
-        // We need to make the math expr to a func
+        ty_check_math_expr_as_fn(passed_math_expr, expected_fn_ty, ty_state);
     } else {
-        passed_arg
+        let passed_arg_key = passed_arg
             .typecheck(ty_state)
-            .expect("Arg always returns a key")
+            .expect("Arg always returns a key");
+        ty_state.equate_keys(passed_arg_key, *called_func_arg_tc);
     };
+}
 
-    ty_state.equate_keys(passed_arg_key, *called_func_arg_tc);
+fn ty_check_math_expr_as_fn(
+    passed_math_expr: &MathExprNode,
+    expected_fn_ty: TcFunc,
+    ty_state: &mut TyCheckState,
+) {
+    // TODO assert expected_fn_ty is simple
+    let fn_frame = ScopeFrameTag::TyCFnFrame(MATH_FN_NAME.into(), vec![]);
+    let (_, frame) = ty_state.scope.push_frame(fn_frame.clone());
+    // Insert vars
+    for (arg, key) in &expected_fn_ty.args_keys {
+        let arg_key = ty_state.insert_var(arg.to_var());
+        ty_state.equate_keys(arg_key, key.clone());
+    }
+    let in_key = ty_state.insert_var(Variable::new_in(Value::Nil, lu_source_code_item!().into()));
+    ty_state.equate_keys(in_key, expected_fn_ty.in_key.clone());
+
+    if let Some(math_expr_ret) = passed_math_expr.typecheck(ty_state) {
+        ty_state.equate_keys(math_expr_ret, expected_fn_ty.ret_key.clone());
+    } else {
+        ty_state.concretizes_key(expected_fn_ty.ret_key.clone(), ValueType::Nil);
+    }
+
+    ty_state.scope.pop_frame(&fn_frame);
 }

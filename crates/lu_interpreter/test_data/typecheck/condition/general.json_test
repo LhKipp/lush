@@ -39,10 +39,10 @@ end
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
-            "content": "3",
+            "content": "3 + 3",
             "range": [
               3,
-              4
+              8
             ]
           },
           "lhs_ty": "num",

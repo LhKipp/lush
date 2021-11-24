@@ -1,0 +1,21 @@
+Math as func works
+===
+use std:iter
+[1 2 3] | map $arg + 1
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 2.0
+      },
+      {
+        "Number": 3.0
+      },
+      {
+        "Number": 4.0
+      }
+    ]
+  }
+}
+...

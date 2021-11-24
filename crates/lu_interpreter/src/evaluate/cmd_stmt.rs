@@ -2,8 +2,8 @@ use super::handle_dbg_intervention_before;
 use crate::special_cmds::{self, SELECT_CMD_NAME};
 use crate::{eval_function, evaluate::eval_prelude::*};
 use crate::{Command, RunExternalCmd};
-use lu_interpreter_structs::special_cmds::SELECT_DEF_STRCT_DECL_ARG_NAME;
-use lu_syntax::ast::{CmdArgElement, CmdStmtNode, HasAstId};
+use lu_interpreter_structs::special_cmds::{MATH_FN_NAME, SELECT_DEF_STRCT_DECL_ARG_NAME};
+use lu_syntax::ast::{CmdArgElement, CmdStmtNode, HasAstId, MathExprNode};
 use std::rc::Rc;
 
 impl Evaluable for CmdStmtNode {
@@ -19,7 +19,7 @@ impl Evaluable for CmdStmtNode {
                 RunExternalCmd::new(self.clone(), cmd_name).rced()
             };
 
-        let grouped_args = evaluate_and_group_args(self.args(), &cmd.signature().flags, scope)?;
+        let grouped_args = evaluate_and_group_args(self.args(), &cmd.signature(), scope)?;
 
         // FROM HERE ONLY EVALUATION OF CMD FOLLOWS
         // REASON: Otherwise the following dbg_stmt may return this func to early
@@ -207,16 +207,17 @@ macro_rules! insert_if_bool_flag_or_set_as_last_seen {
 
 fn evaluate_and_group_args(
     args: impl Iterator<Item = CmdArgElement>,
-    cmd_flags: &[FlagSignature],
+    cmd_signature: &Signature,
     scope: &mut SyScope,
 ) -> Result<GroupedArgs, RetValOrErr> {
+    let cmd_flags = &cmd_signature.flags;
     let mut arg_vals = vec![];
     // Flag name with value
     let mut flag_vals: Vec<(String, Value, SourceCodeItem)> = vec![];
     let mut last_seen_flag = None;
     debug!("Evaluating all cmd args");
 
-    for arg in args {
+    for (i, arg) in args.enumerate() {
         match arg {
             CmdArgElement::LongFlag(long_flag) => {
                 insert_if_bool_flag_or_set_as_last_seen!(
@@ -237,7 +238,22 @@ fn evaluate_and_group_args(
                 );
             }
             CmdArgElement::ValueExpr(n) => {
-                let val = n.evaluate(scope)?;
+                let expected_val_ty = last_seen_flag
+                    .as_ref()
+                    .map(|(flag_sign, _)| &flag_sign.ty)
+                    .or_else(|| {
+                        cmd_signature
+                            .args
+                            .get(i)
+                            .map(|arg| &arg.ty)
+                            .or(cmd_signature.var_arg.as_ref().map(|var_arg| &var_arg.ty))
+                    });
+                let val = match (n.as_math_expr(), expected_val_ty) {
+                    (Some(math_node), Some(ValueType::Func(expected_sign))) => {
+                        math_expr_to_cmd_value(math_node, expected_sign, scope)
+                    }
+                    _ => n.evaluate(scope)?,
+                };
                 if let Some((flag_sign, passed_flag_decl)) = last_seen_flag.take() {
                     let val = if flag_sign.is_opt {
                         Value::Optional {
@@ -265,4 +281,27 @@ fn evaluate_and_group_args(
         arg_vals,
         flag_vals,
     })
+}
+
+fn math_expr_to_cmd_value(
+    math_node: &MathExprNode,
+    expected_sign: &Signature,
+    scope: &mut SyScope,
+) -> Value {
+    // a math_expr as fn runs in the source_file where it has been declared
+    let mod_path = scope
+        .lock()
+        .get_cur_mod_frame()
+        .expect("Math expr always inside lufile")
+        .get_mod_tag()
+        .id
+        .clone();
+    let math_as_func = Function::new(
+        MATH_FN_NAME.into(),
+        expected_sign.clone(),
+        vec![],
+        math_node.clone().into(),
+        mod_path,
+    );
+    Value::new_func(Rc::new(math_as_func))
 }

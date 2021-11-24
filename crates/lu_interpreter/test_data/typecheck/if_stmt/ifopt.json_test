@@ -22,10 +22,10 @@ end
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
-            "content": "let x: num",
+            "content": "$x",
             "range": [
-              0,
-              10
+              29,
+              31
             ]
           },
           "lhs_ty": "num",

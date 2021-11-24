@@ -36,7 +36,7 @@ impl TypeCheck for MathExprNode {
             | OperatorExprElement::MultSign(_)
             | OperatorExprElement::DivSign(_) => {
                 let (lhs, _) = equate(&self.lhs(), &self.rhs(), state);
-                Some(lhs)
+                Some(state.new_term_key_equated(self.to_item(), lhs))
             }
             OperatorExprElement::LessThanSign(_)
             | OperatorExprElement::LessOrEqualSign(_)

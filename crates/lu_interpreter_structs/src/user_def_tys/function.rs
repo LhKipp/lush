@@ -3,10 +3,11 @@ use crate::{
     VarDeclNode, Variable,
 };
 use derive_builder::Builder;
+use derive_more::From;
 use derive_new::new;
 use log::trace;
 use lu_error::{lu_source_code_item, LuResult, SourceCodeItem};
-use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, SignatureNode};
+use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, MathExprNode, SignatureNode};
 use lu_syntax::{AstNode, AstToken};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use serde::{Deserialize, Serialize};
@@ -239,6 +240,20 @@ impl Signature {
     }
 }
 
+/// A node in the ast which is evaluable as a cmd
+#[derive(From, Debug, Clone)]
+pub enum CmdEvaluableNode {
+    FnStmt(FnStmtNode),
+    MathExpr(MathExprNode),
+}
+impl CmdEvaluableNode {
+    pub fn to_item(&self) -> SourceCodeItem {
+        match self {
+            CmdEvaluableNode::FnStmt(n) => n.to_item(),
+            CmdEvaluableNode::MathExpr(n) => n.to_item(),
+        }
+    }
+}
 /// Function is a struct containing all needed information for a function/closure
 /// This should allow for less lookup in the ast later on (and easier handling of funcs)
 #[derive(Educe)]
@@ -248,7 +263,7 @@ pub struct Function {
     pub name: String,
     /// A signature is always present (if not user provided, defaulted.)
     pub signature: Signature,
-    pub fn_node: FnStmtNode,
+    pub fn_node: CmdEvaluableNode,
     // For closures only
     pub captured_vars: Vec<Variable>,
 
@@ -263,7 +278,7 @@ impl Function {
         name: String,
         signature: Signature,
         attributes: Vec<CmdAttribute>,
-        fn_node: FnStmtNode,
+        fn_node: CmdEvaluableNode,
         source_file_id: ModPath,
     ) -> Self {
         Self {
@@ -282,7 +297,7 @@ impl Function {
         let sign = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
         let attrs = Self::attrs_from_node(fn_stmt);
 
-        Function::new(name, sign, attrs, fn_stmt.clone(), source_file_id)
+        Function::new(name, sign, attrs, fn_stmt.clone().into(), source_file_id)
     }
 
     fn attrs_from_node(fn_stmt: &FnStmtNode) -> Vec<CmdAttribute> {
@@ -336,7 +351,7 @@ impl Command for Function {
     }
 
     fn signature_item(&self) -> SourceCodeItem {
-        self.fn_node.decl_item()
+        self.fn_node.to_item()
     }
 
     fn parent_module(&self) -> Option<&ModPath> {
