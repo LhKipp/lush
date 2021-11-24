@@ -62,11 +62,12 @@ end
 ls_in_home_dir Music                 # passed as 1 argument
 ls_in_home_dir Music/**/*bob_marley* # passed as 1 argument
 ```
-(This choice has been taken for better compatability with external cmds, while making internal commands more convenient. A call like "git_branch_wrapper --list ma*" would not require you to qoute "ma*", if git_branch_wrapper's --list flag takes an `path` argument.)
+(This choice has been taken for better compatability with external cmds, while making internal commands more convenient. A call like "git_branch_wrapper --list ma*" would not require you to qoute "ma*", if git_branch_wrapper's --list flag takes a `path` argument.)
 
 ## Control structures
 ### if - ifopt - elif - elifopt - else
-`ifopt` stands for "if optional", while `elifopt` stands for "else if optional". They can be used to check whether an optional is Some and get the inner value at the same time.
+`if`, `elif` and `else` behave as usual.
+`ifopt` stands for "if optional", while `elifopt` stands for "else if optional". They can be used to check whether an optional is `Some` and get the inner value at the same time.
 ```lush
 let lush = 1
 let world = Some{"world"}
@@ -117,7 +118,7 @@ echo hello world "!" # Better quote operators.
 ## Pipes
 Commands do not only receive arguments via arguments and flags, but also by what is "piped" into them.
 ```lush
-echo "This value gets passed to stdin of cat" | cat
+echo "This value gets passed to cat" | cat
 ```
 
 ## Structs
@@ -162,16 +163,17 @@ fn func2 (arg: int)
     ret $arg # The return type of func2 is inferred to be int
 end
 ```
-If the return type of a function is not declared, it will be inferred. However all `ret` statements within a function have to be type consistent.
-```lush
-fn fn_with_type_error(arg: int)
-    if $arg < 1
-        ret "Less than 1" # Type 'str' here
-    end 
-        ret $arg          # Type 'int' here
-    end
-end
-```
+If the return type of a function is not declared, it will be inferred based on the values returned.
+<!-- However all `ret` statements within a function have to be type consistent. -->
+<!-- ```lush -->
+<!-- fn fn_with_type_error(arg: int) -->
+<!--     if $arg < 1 -->
+<!--         ret "Less than 1" # Type 'str' here -->
+<!--     end --> 
+<!--         ret $arg          # Type 'int' here -->
+<!--     end -->
+<!-- end -->
+<!-- ``` -->
 
 ### Input
 Values can be "piped" into a function. Those values can be handled via the special `in` argument.
@@ -210,10 +212,11 @@ fn_with_args 1     2 3 4            # Okay
              ^arg1 ^----rest
 fn_with_args 1                      # Okay
              ^arg1 (rest left empty)
-fn_with_args 1                      # Error. Required argument not passed
+fn_with_args                        # Error. Required argument not passed
 ```
 #### Optional arguments
-Optional arguments (arguments which can be passed, but don't have to) can be declared by appending a questionmark ('?') to the end of an arguments name. Users can either pass a value or not. An optional argument get
+Optional arguments (arguments which can be passed, but don't have to be) can be declared by appending a questionmark ('?') to the end of an arguments name. Users can either pass a value or not. 
+If the user passes a value, the argument is `Some{<passed_value>}`, otherwise its `None`.
 ```lush
 fn fn_with_opt_arg (arg?)
     ifopt val = $arg
