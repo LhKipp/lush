@@ -415,6 +415,7 @@ impl TyCheckState {
     fn expect_strct_from_key(&mut self, key: &TcKey) -> Option<&TcStrct> {
         if !self.tc_strct_table.contains_key(key) {
             let item = self.get_item_of(key).clone();
+            debug!("Expected key {:?} with item {} to be a struct", key, item);
             self.push_err(TyErr::ItemExpectedToBeStruct(item).into());
         };
         self.tc_strct_table.get(key)
@@ -627,6 +628,14 @@ impl TcFunc {
             "Finished Substituting generics in: {}",
             ty_state.get_item_of(&result.self_key)
         );
+        debug!(
+            "Inserting with self_key {:?} TcFunc {:?}",
+            result.self_key, result
+        );
+        ty_state
+            .tc_func_table
+            .insert(result.self_key.clone(), result.clone());
+        trace!("{:?}", result);
         result
     }
 
@@ -669,7 +678,9 @@ impl TcFunc {
                     ty_state.get_item_of(&tc_func.self_key)
                 );
                 let key = tc_func.self_key.clone();
-                tc_func.substitute_generics_rec(seen_generics, ty_state);
+                let new_tc_func = tc_func.substitute_generics_rec(seen_generics, ty_state);
+                //Update changed tc_func
+                ty_state.tc_func_table.insert(new_tc_func.self_key, new_tc_func);
                 key
             } else if let Some(inner_arr_key) = ty_state.get_arr_inner_tc(&key).cloned() {
                 trace!("Substitute Generics: Found inner array_ty. Recursing into that");
@@ -755,6 +766,10 @@ impl TcFunc {
         ty_state
             .tc_func_table
             .insert(ty_func.self_key.clone(), ty_func.clone());
+        debug!(
+            "Generated TcFunc with keys: in: {:?}, ret: {:?}",
+            ty_func.in_key, ty_func.ret_key
+        );
 
         ty_func
     }

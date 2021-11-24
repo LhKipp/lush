@@ -328,6 +328,7 @@ impl TypeCheck for CmdStmtNode {
         };
 
         if let Some(in_key) = args.iter().find_map(|arg| arg.as_cmd_stmt()) {
+            debug!("Equating in key with cmds in key");
             ty_state.equate_keys(cmd_keys.in_key.clone(), *in_key);
         } else {
             warn!("Cmd stmt arg should always be passed");
@@ -382,11 +383,11 @@ fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
             CmdArgElement::ValueExpr(arg) => {
                 match called_func_arg_tc_iter.next() {
                     Some((_, called_func_arg_tc)) => {
-                        ty_check_cmd_arg(arg, called_func_arg_tc, cmd_node, ty_state);
+                        ty_check_cmd_arg(arg, called_func_arg_tc, called_func, cmd_node, ty_state);
                     }
                     None => {
                         if let Some(var_arg_ty) = called_func.var_arg_key {
-                            ty_check_cmd_arg(arg, &var_arg_ty, cmd_node, ty_state);
+                            ty_check_cmd_arg(arg, &var_arg_ty, called_func, cmd_node, ty_state);
                         } else {
                             // Found unexpected argument
                             let called_func_decl =
@@ -479,13 +480,15 @@ fn ty_check_flag<ArgIter: Iterator<Item = CmdArgElement>, P>(
 fn ty_check_cmd_arg(
     passed_arg: ValueExprElement,
     called_func_arg_tc: &TcKey,
+    called_func: &TcFunc,
     cmd_node: &CmdStmtNode,
     ty_state: &mut TyCheckState,
 ) {
     debug!(
-        "TyChecking passed_arg: {}, against {}",
+        "TyChecking passed_arg: {}, against {} ({:?})",
         passed_arg.text(),
-        ty_state.get_item_of(called_func_arg_tc).content
+        ty_state.get_item_of(called_func_arg_tc),
+        called_func_arg_tc
     );
 
     // Check whether we have to fixup the MathExpr to become a function

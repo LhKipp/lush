@@ -29,21 +29,21 @@ use std:iter
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
+            "content": "1",
+            "range": [
+              14,
+              15
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": {
             "content": "ret: bool",
             "range": [
               290,
               299
             ]
           },
-          "lhs_ty": "bool",
-          "rhs_decl": {
-            "content": " arg: T",
-            "range": [
-              299,
-              306
-            ]
-          },
-          "rhs_ty": "num"
+          "rhs_ty": "bool"
         }
       }
     }
@@ -67,62 +67,6 @@ use std:iter
         ]
       }
     }
-  }
-}
-...
-complex pipeline with math expr
-===
-use std:array
-use std:iter
-
-struct Person {
-    name: str
-    age: num
-    female: bool
-}
-fn f (ret: [Person])
-    ret [(Person)
-            ["Lisa" 8 true]
-            ["Bart" 10 false]
-            ["Homer" 35 false]
-            ["Marge" 40 true]
-        ]
-end
-fn name_in_array(arg)
-    push [] $arg
-end
-f | filter $arg.age < 36 | select name female | map $arg.name
----
-{
-  "Ok": {
-    "Array": [
-      {
-        "Strct": [
-          "Select_textrange_195:206",
-          [
-            [
-              "name",
-              {
-                "String": "Lisa"
-              }
-            ]
-          ]
-        ]
-      },
-      {
-        "Strct": [
-          "Select_textrange_195:206",
-          [
-            [
-              "name",
-              {
-                "String": "Bart"
-              }
-            ]
-          ]
-        ]
-      }
-    ]
   }
 }
 ...
