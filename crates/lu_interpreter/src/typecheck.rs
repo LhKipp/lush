@@ -12,6 +12,7 @@ use std::collections::hash_map::Entry;
 use std::fmt::Display;
 use std::rc::Rc;
 use std::sync::{Arc, Weak};
+use std::time::Duration;
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Scope, ValueType, Variable};
@@ -264,7 +265,9 @@ impl TyCheckState {
         } else if let Some(strct_decl) = ty.as_strct() {
             // panic!("When does this ever happen?");
             let strct_decl = Weak::upgrade(strct_decl).unwrap();
-            let l_strct_decl = strct_decl.read();
+            let l_strct_decl = strct_decl
+                .try_read_recursive_for(Duration::new(5, 0))
+                .expect("Could not acquire lock");
             concretize_key_with_strct(&l_strct_decl.name, key.clone());
             let res = self.checker.impose(concretizes_lib_key(
                 key,
@@ -389,20 +392,20 @@ impl TyCheckState {
                         .insert(var.clone(), tc_func.self_key.clone());
                     Some(tc_func.self_key)
                 } else if let Some(strct) = var.val.as_strct_decl().cloned() {
-                    {
-                        debug!(
-                            "First time usage of a strct {}. Inserting new tc_strct.",
-                            strct.read().name
-                        );
-                    }
+                    let strct_name = { strct.read_recursive().name.clone() };
+                    debug!(
+                        "First time usage of a strct {}. Inserting new tc_strct.",
+                        strct_name
+                    );
                     let tc_strct = TcStrct::from_strct(&strct, self);
                     self.tc_var_table
                         .insert(var.clone(), tc_strct.self_key.clone());
 
                     // TODO TcStrct cant concretize itself because of recursion...
+                    debug!("Concretizing tc strct to be of strctname ty");
                     self.concretizes_key(
                         tc_strct.self_key.clone(),
-                        ValueType::Strct(Arc::downgrade(&strct)),
+                        ValueType::StrctName(strct_name),
                     );
 
                     Some(tc_strct.self_key)
@@ -601,7 +604,7 @@ pub struct TcStrct {
 impl TcStrct {
     pub fn from_strct(strct: &Arc<RwLock<Strct>>, ty_state: &mut TyCheckState) -> Self {
         let tc_strct = {
-            let l_strct = strct.read();
+            let l_strct = strct.read_recursive();
             debug!("Generating TcStrct for Struct: {:?}", strct);
             // TODO when cocnretizing self_key its stack overflow because of recursie func call
             // from_strct -> concretize_key -> expect_strct_from_key -> from_strct
@@ -611,6 +614,7 @@ impl TcStrct {
                 .iter()
                 .map(|field| TcStrctField {
                     name: field.name.clone(),
+                    // This may deadlock if field.ty is same strct as this one
                     ty: ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
                     field_num: field.field_num,
                 })

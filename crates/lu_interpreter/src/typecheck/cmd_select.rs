@@ -35,14 +35,16 @@ pub(crate) fn do_extra_ty_check_select_cmd(
         if let ValueType::Array { inner_ty, .. } = passed_ty {
             if let ValueType::Strct(strct_decl) = &*inner_ty {
                 let strct_decl = Weak::upgrade(strct_decl).unwrap();
-                let l_strct_decl = strct_decl.read();
 
                 // Parse args
                 let args = get_select_args(cmd_stmt);
                 let args = ty_state.ok_and_record(args);
 
                 // Generate new strct decl according to columns
-                let fields = get_selected_fields(args, &l_strct_decl);
+                let fields = {
+                    let l_strct_decl = strct_decl.read_recursive();
+                    get_selected_fields(args, &l_strct_decl)
+                };
                 let fields = ty_state.ok_and_record(fields);
                 let decl = cmd_stmt.to_item();
                 let name = special_cmds::select_def_strct_name(&decl);
