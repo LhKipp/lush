@@ -19,3 +19,40 @@ use std:iter
   }
 }
 ...
+Math as func with table
+===
+use std:iter
+
+struct Person{
+    name: str
+    salary: num
+}
+let persons: [Person] = [(Person) ["she" 100] ["he" 200] ["them" 300]]
+$persons | filter $arg.salary > 200
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Person",
+          [
+            [
+              "name",
+              {
+                "String": "them"
+              }
+            ],
+            [
+              "salary",
+              {
+                "Number": 300.0
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}
+...

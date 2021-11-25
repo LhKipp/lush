@@ -29,18 +29,18 @@ map maps structs
 use std:iter
 
 struct Person{
-    sallary: num
+    salary: num
 }
 
-fn increase_sallary(arg: Person ret: Person)
+fn increase_salary(arg: Person ret: Person)
     ret Person{
-        sallary: $arg.sallary + 100
+        salary: $arg.salary + 100
     }
 end
 
 let persons: [Person] = [(Person) [100] [200] [300]]
 
-$persons | map $increase_sallary
+$persons | map $increase_salary
 ---
 {
   "Ok": {
@@ -50,7 +50,7 @@ $persons | map $increase_sallary
           "Person",
           [
             [
-              "sallary",
+              "salary",
               {
                 "Number": 200.0
               }
@@ -63,7 +63,7 @@ $persons | map $increase_sallary
           "Person",
           [
             [
-              "sallary",
+              "salary",
               {
                 "Number": 300.0
               }
@@ -76,7 +76,7 @@ $persons | map $increase_sallary
           "Person",
           [
             [
-              "sallary",
+              "salary",
               {
                 "Number": 400.0
               }

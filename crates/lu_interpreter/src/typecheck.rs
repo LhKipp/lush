@@ -42,6 +42,9 @@ pub struct TyCheckState {
     // is enough
     tc_expr_table: HashMap<TcKey, SourceCodeItem>,
 
+    // TcKey to its equated keys
+    tc_equated_keys: HashMap<TcKey, Vec<TcKey>>,
+
     /// Variable to tckey (for simple variables + strcts)
     tc_var_table: BiHashMap<Variable, TcKey>,
     /// Command to tckey
@@ -86,6 +89,7 @@ impl TyCheckState {
             ty_table: HashMap::new(),
             result: None,
             tc_var_cmd_table: Vec::new(),
+            tc_equated_keys: HashMap::new(),
         }
     }
 
@@ -149,6 +153,26 @@ impl TyCheckState {
     }
 
     pub(crate) fn equate_keys(&mut self, key1: TcKey, key2: TcKey) {
+        self.equate_keys_inner(key1.clone(), key2.clone());
+        // After equating we have to register this fact
+        for (a, b) in [(&key1, &key2), (&key2, &key1)] {
+            self.tc_equated_keys
+                .entry(a.clone())
+                .or_default()
+                .push(b.clone())
+        }
+    }
+    pub(crate) fn equate_keys_inner(&mut self, key1: TcKey, key2: TcKey) {
+        let equated_keys_with_key = |key: TcKey, ty_checker: &mut TyCheckState| -> Vec<TcKey> {
+            ty_checker
+                .tc_equated_keys
+                .entry(key)
+                .or_default()
+                .iter()
+                .chain(Some(&key))
+                .cloned()
+                .collect()
+        };
         debug!(
             "Equating({}({:?}),{}({:?}))",
             self.get_item_of(&key1),
@@ -196,27 +220,43 @@ impl TyCheckState {
         // We do so by inserting cloning and reinserting the tc_func
         /* For Funcs */
         if let Some(tc_func) = self.tc_func_table.get(&key2).cloned() {
-            self.tc_func_table.insert(key1, tc_func);
+            for key in equated_keys_with_key(key1.clone(), self) {
+                self.tc_func_table.insert(key.clone(), tc_func.clone());
+            }
         } else if let Some(tc_func) = self.tc_func_table.get(&key1).cloned() {
-            self.tc_func_table.insert(key2, tc_func);
+            for key in equated_keys_with_key(key2.clone(), self) {
+                self.tc_func_table.insert(key.clone(), tc_func.clone());
+            }
         }
         /* For structs*/
         else if let Some(tc_strct) = self.tc_strct_table.get(&key2).cloned() {
-            self.tc_strct_table.insert(key1, tc_strct);
+            for key in equated_keys_with_key(key1.clone(), self) {
+                self.tc_strct_table.insert(key, tc_strct.clone());
+            }
         } else if let Some(tc_strct) = self.tc_strct_table.get(&key1).cloned() {
-            self.tc_strct_table.insert(key2, tc_strct);
+            for key in equated_keys_with_key(key2.clone(), self) {
+                self.tc_strct_table.insert(key, tc_strct.clone());
+            }
         }
         /* for arrays */
         else if let Some(tc_array) = self.tc_array_table.get(&key2).cloned() {
-            self.tc_array_table.insert(key1, tc_array);
+            for key in equated_keys_with_key(key1.clone(), self) {
+                self.tc_array_table.insert(key, tc_array.clone());
+            }
         } else if let Some(tc_array) = self.tc_array_table.get(&key1).cloned() {
-            self.tc_array_table.insert(key2, tc_array);
+            for key in equated_keys_with_key(key2.clone(), self) {
+                self.tc_array_table.insert(key, tc_array.clone());
+            }
         }
         /* for optionals */
         else if let Some(tc_opt) = self.tc_optional_table.get(&key2).cloned() {
-            self.tc_optional_table.insert(key1, tc_opt);
+            for key in equated_keys_with_key(key1.clone(), self) {
+                self.tc_optional_table.insert(key, tc_opt.clone());
+            }
         } else if let Some(tc_opt) = self.tc_optional_table.get(&key1).cloned() {
-            self.tc_optional_table.insert(key2, tc_opt);
+            for key in equated_keys_with_key(key2.clone(), self) {
+                self.tc_optional_table.insert(key, tc_opt.clone());
+            }
         }
     }
 
@@ -376,7 +416,6 @@ impl TyCheckState {
     /// Returns the key of the var (if present, (or still has to be inserted))
     fn get_key_of_var(&mut self, var_name: &str) -> Option<TcKey> {
         if let Some(var) = self.scope.find_var(var_name).cloned() {
-            debug!("{:#?}", self.tc_var_table);
             if let Some(var_key) = self.tc_var_table.get_by_left(&var) {
                 Some(*var_key)
             } else {

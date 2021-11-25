@@ -18,3 +18,39 @@ end
   }
 }
 ...
+filter filters table
+===
+use std:iter
+
+struct Person{
+    salary: num
+}
+
+fn has_nice_salary(arg: Person)
+    ret $arg.salary > 200
+end
+
+let persons: [Person] = [(Person) [100] [200] [300]]
+
+$persons | filter $has_nice_salary
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Person",
+          [
+            [
+              "salary",
+              {
+                "Number": 300.0
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}
+...
