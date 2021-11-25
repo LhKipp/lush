@@ -1,4 +1,5 @@
 use enum_as_inner::EnumAsInner;
+use log::{debug, warn};
 use lu_error::lu_source_code_item;
 use lu_stdx::AMtx;
 use lu_syntax::ast::{BareWordToken, NumberExprNode, StringExprNode};
@@ -49,6 +50,7 @@ pub enum Value {
 
 impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
+        debug!("Checking eq values {} == {}", self, other);
         match (other, self) {
             (Value::Nil, Value::Nil) => true,
             (Value::Bool(lhs), Value::Bool(rhs)) => lhs == rhs,
@@ -60,7 +62,16 @@ impl PartialEq for Value {
             (Value::Strct(lhs_name, lhs_fields), Value::Strct(rhs_name, rhs_fields)) => {
                 lhs_name == rhs_name && lhs_fields == rhs_fields
             }
-            _ => false,
+            (Value::StrctDecl(lhs_decl), Value::StrctDecl(rhs_decl)) => {
+                Arc::as_ptr(lhs_decl) == Arc::as_ptr(rhs_decl)
+            }
+            _ => {
+                warn!(
+                    "Not doing equality comparison for values {} {}",
+                    self, other
+                );
+                false
+            }
         }
     }
 }

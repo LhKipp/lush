@@ -1,7 +1,7 @@
 Select returns new struct
 ===
 use std:fs
-ls | select Name Type Size
+ls | select name type size
 ---
 {
   "Ok": {
@@ -10,7 +10,7 @@ ls | select Name Type Size
         "StrctName": "Select_textrange_16:37"
       },
       "inner_ty_decl": {
-        "content": "select Name Type Size",
+        "content": "select name type size",
         "range": [
           16,
           37
@@ -133,7 +133,7 @@ ls | select --no_such_flag
 multiple select works
 ===
 use std:fs
-ls | select Name Type Size | select Name Type | select Name
+ls | select name type size | select name type | select name
 ---
 {
   "Ok": {
@@ -142,7 +142,7 @@ ls | select Name Type Size | select Name Type | select Name
         "StrctName": "Select_textrange_59:70"
       },
       "inner_ty_decl": {
-        "content": "select Name",
+        "content": "select name",
         "range": [
           59,
           70

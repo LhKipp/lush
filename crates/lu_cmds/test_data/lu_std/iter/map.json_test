@@ -24,3 +24,67 @@ end
   }
 }
 ...
+map maps structs
+===
+use std:iter
+
+struct Person{
+    sallary: num
+}
+
+fn increase_sallary(arg: Person ret: Person)
+    ret Person{
+        sallary: $arg.sallary + 100
+    }
+end
+
+let persons: [Person] = [(Person) [100] [200] [300]]
+
+$persons | map $increase_sallary
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Strct": [
+          "Person",
+          [
+            [
+              "sallary",
+              {
+                "Number": 200.0
+              }
+            ]
+          ]
+        ]
+      },
+      {
+        "Strct": [
+          "Person",
+          [
+            [
+              "sallary",
+              {
+                "Number": 300.0
+              }
+            ]
+          ]
+        ]
+      },
+      {
+        "Strct": [
+          "Person",
+          [
+            [
+              "sallary",
+              {
+                "Number": 400.0
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  }
+}
+...

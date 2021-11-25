@@ -1,5 +1,5 @@
 use itertools::{EitherOrBoth, Itertools};
-use log::warn;
+use log::{debug, warn};
 use lu_pipeline_stage::PipelineStage;
 use lu_syntax::{
     ast::{
@@ -142,6 +142,7 @@ impl TypeCheck for StrctCtorExprNode {
             {
                 match either_or {
                     EitherOrBoth::Both(field, (_, usage_key)) => {
+                        debug!("Equating key: {:?} with field {:?}", usage_key, field);
                         ty_state.equate_keys(field.ty.clone(), usage_key);
                     }
                     EitherOrBoth::Left(_) => todo!("Generate error for missing key."),

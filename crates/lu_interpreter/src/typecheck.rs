@@ -1,7 +1,7 @@
 use bimap::BiHashMap;
 use enum_as_inner::EnumAsInner;
 use itertools::Itertools;
-use log::{debug, trace};
+use log::{debug, trace, warn};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
 use lu_interpreter_structs::{ArgSignature, Command, FlagVariant};
@@ -11,7 +11,7 @@ use rusttyc::{TcErr, TcKey, VarlessTypeChecker};
 use std::collections::hash_map::Entry;
 use std::fmt::Display;
 use std::rc::Rc;
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 use std::{collections::HashMap, fmt::Debug};
 
 use crate::{visit_arg::VisitArg, FlagSignature, Scope, ValueType, Variable};
@@ -182,6 +182,8 @@ impl TyCheckState {
             return; // No more work to do
         }
 
+        warn!("Not checking whether both are structs and equating all fields");
+
         // Both are some atomic tys. Simple ty check is enough
         let res = key1.equate_with(key2);
         let res = self.checker.impose(res);
@@ -222,6 +224,17 @@ impl TyCheckState {
             key.concretizes_explicit(ty.subst_generic_ty(ValueType::Unspecified))
         };
 
+        let mut concretize_key_with_strct = |strct_name: &str, key: TcKey| {
+            if let Some(tc_strct) = self
+                .expect_strct_from_usage(strct_name, self.get_item_of(&key).clone())
+                .cloned()
+            {
+                self.tc_strct_table.insert(key, tc_strct);
+            } else {
+                warn!("Could not find strct with name {}", strct_name);
+            }
+        };
+
         if let Some(func_ty) = ty.as_func() {
             let tc_func = TcFunc::from_signature(&*func_ty, self); // Generate func first
             self.equate_keys(key, tc_func.self_key) // Set term equal to func
@@ -248,7 +261,18 @@ impl TyCheckState {
 
             let res = self.checker.impose(concretizes_lib_key(key, ty.clone()));
             self.handle_tc_result(res);
-        } else if let Some(_) = ty.as_strct() {
+        } else if let Some(strct_decl) = ty.as_strct() {
+            // panic!("When does this ever happen?");
+            let strct_decl = Weak::upgrade(strct_decl).unwrap();
+            let l_strct_decl = strct_decl.read();
+            concretize_key_with_strct(&l_strct_decl.name, key.clone());
+            let res = self.checker.impose(concretizes_lib_key(
+                key,
+                ValueType::StrctName(l_strct_decl.name.clone()),
+            ));
+            self.handle_tc_result(res);
+        } else if let Some(strct_name) = ty.as_strct_name() {
+            concretize_key_with_strct(strct_name, key.clone());
             let res = self.checker.impose(concretizes_lib_key(key, ty.clone()));
             self.handle_tc_result(res);
         } else {
@@ -349,6 +373,7 @@ impl TyCheckState {
     /// Returns the key of the var (if present, (or still has to be inserted))
     fn get_key_of_var(&mut self, var_name: &str) -> Option<TcKey> {
         if let Some(var) = self.scope.find_var(var_name).cloned() {
+            debug!("{:#?}", self.tc_var_table);
             if let Some(var_key) = self.tc_var_table.get_by_left(&var) {
                 Some(*var_key)
             } else {
@@ -569,6 +594,9 @@ impl TcStrct {
     pub fn from_strct(strct: &Arc<RwLock<Strct>>, ty_state: &mut TyCheckState) -> Self {
         let l_strct = strct.read();
         debug!("Generating TcStrct for Struct: {:?}", strct);
+        // TODO when cocnretizing self_key its stack overflow because of recursie func call
+        // from_strct -> concretize_key -> expect_strct_from_key -> from_strct
+        let self_key = ty_state.new_term_key(l_strct.decl.clone());
         let field_keys = l_strct
             .fields
             .iter()
@@ -580,10 +608,10 @@ impl TcStrct {
             .sorted_by(|a, b| Ord::cmp(&a.name, &b.name))
             .collect();
 
-        let self_key = ty_state.new_term_key_concretiziesd(
-            l_strct.decl.clone(),
-            ValueType::new_strct(Arc::downgrade(strct)),
-        );
+        // let self_key = ty_state.new_term_key_concretiziesd(
+        //     l_strct.decl.clone(),
+        //     ValueType::new_strct(Arc::downgrade(strct)),
+        // );
 
         let tc_strct = Self {
             self_key,
@@ -680,7 +708,9 @@ impl TcFunc {
                 let key = tc_func.self_key.clone();
                 let new_tc_func = tc_func.substitute_generics_rec(seen_generics, ty_state);
                 //Update changed tc_func
-                ty_state.tc_func_table.insert(new_tc_func.self_key, new_tc_func);
+                ty_state
+                    .tc_func_table
+                    .insert(new_tc_func.self_key, new_tc_func);
                 key
             } else if let Some(inner_arr_key) = ty_state.get_arr_inner_tc(&key).cloned() {
                 trace!("Substitute Generics: Found inner array_ty. Recursing into that");

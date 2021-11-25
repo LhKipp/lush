@@ -22,7 +22,7 @@ fn ls_gives_back_table() {
     assert_eq!(
         formatted.trim(),
         r#"
- Name     | Type      | Size 
+ name     | type      | size 
  dir_a    | Directory | 40 
  file.txt | File      | 1 
  plugins  | Directory | 40 
