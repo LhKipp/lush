@@ -1,12 +1,9 @@
 #!/bin/lush
+use std:fs
+use std:iter
 
-fn f
-    if 1 == 2
-        echo hi
-    end
-    let x = Some{1}
-    ifopt x = $x
-        ret $x
-    end
+fn is_dir(arg)
+    $arg.name == "Directory"
 end
-f
+
+ls | filter $is_dir

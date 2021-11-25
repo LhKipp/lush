@@ -851,9 +851,9 @@ static LS_CMD_ATTRS: Lazy<Vec<CmdAttribute>> =
     Lazy::new(|| vec![CmdAttribute::new(Pure, lu_source_code_item!())]);
 
 const LS_ENTRY_STRCT_NAME: &str = "LsEntry";
-const LS_ENTRY_FIELD_0: &str = "Name";
-const LS_ENTRY_FIELD_1: &str = "Type";
-const LS_ENTRY_FIELD_2: &str = "Size";
+const LS_ENTRY_FIELD_0: &str = "name";
+const LS_ENTRY_FIELD_1: &str = "type";
+const LS_ENTRY_FIELD_2: &str = "size";
 
 pub(crate) static LS_ENTRY_STRCT: Lazy<Arc<RwLock<Strct>>> = Lazy::new(|| {
     let decl = lu_source_code_item!(-1);
