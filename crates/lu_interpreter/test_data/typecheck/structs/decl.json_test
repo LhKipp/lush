@@ -23,7 +23,7 @@ let x:str = Ip { v: 1 }
               19
             ]
           },
-          "rhs_ty": "Ip{ v: num}"
+          "rhs_ty": "Ip"
         }
       }
     }

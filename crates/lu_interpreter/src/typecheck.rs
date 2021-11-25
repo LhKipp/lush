@@ -389,14 +389,22 @@ impl TyCheckState {
                         .insert(var.clone(), tc_func.self_key.clone());
                     Some(tc_func.self_key)
                 } else if let Some(strct) = var.val.as_strct_decl().cloned() {
-                    let l_strct = strct.read();
-                    debug!(
-                        "First time usage of a strct {}. Inserting new tc_strct.",
-                        l_strct.name
-                    );
+                    {
+                        debug!(
+                            "First time usage of a strct {}. Inserting new tc_strct.",
+                            strct.read().name
+                        );
+                    }
                     let tc_strct = TcStrct::from_strct(&strct, self);
                     self.tc_var_table
                         .insert(var.clone(), tc_strct.self_key.clone());
+
+                    // TODO TcStrct cant concretize itself because of recursion...
+                    self.concretizes_key(
+                        tc_strct.self_key.clone(),
+                        ValueType::Strct(Arc::downgrade(&strct)),
+                    );
+
                     Some(tc_strct.self_key)
                 } else {
                     panic!("Var is present, but not func: {}", var_name)
@@ -592,30 +600,27 @@ pub struct TcStrct {
 
 impl TcStrct {
     pub fn from_strct(strct: &Arc<RwLock<Strct>>, ty_state: &mut TyCheckState) -> Self {
-        let l_strct = strct.read();
-        debug!("Generating TcStrct for Struct: {:?}", strct);
-        // TODO when cocnretizing self_key its stack overflow because of recursie func call
-        // from_strct -> concretize_key -> expect_strct_from_key -> from_strct
-        let self_key = ty_state.new_term_key(l_strct.decl.clone());
-        let field_keys = l_strct
-            .fields
-            .iter()
-            .map(|field| TcStrctField {
-                name: field.name.clone(),
-                ty: ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
-                field_num: field.field_num,
-            })
-            .sorted_by(|a, b| Ord::cmp(&a.name, &b.name))
-            .collect();
+        let tc_strct = {
+            let l_strct = strct.read();
+            debug!("Generating TcStrct for Struct: {:?}", strct);
+            // TODO when cocnretizing self_key its stack overflow because of recursie func call
+            // from_strct -> concretize_key -> expect_strct_from_key -> from_strct
+            let self_key = ty_state.new_term_key(l_strct.decl.clone());
+            let field_keys = l_strct
+                .fields
+                .iter()
+                .map(|field| TcStrctField {
+                    name: field.name.clone(),
+                    ty: ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
+                    field_num: field.field_num,
+                })
+                .sorted_by(|a, b| Ord::cmp(&a.name, &b.name))
+                .collect();
 
-        // let self_key = ty_state.new_term_key_concretiziesd(
-        //     l_strct.decl.clone(),
-        //     ValueType::new_strct(Arc::downgrade(strct)),
-        // );
-
-        let tc_strct = Self {
-            self_key,
-            field_keys,
+            Self {
+                self_key,
+                field_keys,
+            }
         };
 
         ty_state
