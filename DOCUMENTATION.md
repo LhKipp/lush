@@ -483,6 +483,20 @@ cmd_taking_anything 1         # passed argument has type number
 cmd_taking_anything "hello"   # passed argument has type str
 ```
 
+### Math-Expressions as functions
+A Math-Expression which is used where a function-argument is expected, gets "converted" to a function. This allows for a terse syntax.
+```lush
+fn apply_pred(pred: fn(ret: bool arg1 arg2))
+    ret pred 1 2
+end
+apply_pred $arg1 < $arg2    # $arg1 and $arg2 are the declared function arguments
+
+# A more realistic example (std:iter, std:fs and select are mentioned below)
+use std:iter
+use std:fs
+# Returns all file names which are less than 100kb in size.
+ls | filter $arg.type == "File" | filter $arg.size < 100 | select name
+```
 
 ##  Debugging
 `lush` offers the ability to run the code in an simple REPL debugger. Try `lush --debug <file>` to try it out.
