@@ -110,6 +110,7 @@ impl TyCheckState {
     /// Expect to get the ty behind key. The ty behind key may not yet be inferred. In that case an
     /// error is recorded.
     /// This is an expensive operation
+    #[allow(dead_code)]
     pub(crate) fn expect_ty_of_key(&mut self, key: TcKey) -> Option<ValueType> {
         if let Ok(t) = self.checker.clone().type_check() {
             if let Some(ty) = t.get(&key) {
@@ -630,6 +631,7 @@ impl PipelineStage for TyCheckState {
 pub struct TcStrctField {
     pub name: String,
     pub ty: TcKey,
+    pub val_ty: ValueType,
     pub field_num: u32,
 }
 #[derive(Debug, Clone, new)]
@@ -656,6 +658,7 @@ impl TcStrct {
                     // This may deadlock if field.ty is same strct as this one
                     ty: ty_state.new_term_key_concretiziesd(field.decl.clone(), field.ty.clone()),
                     field_num: field.field_num,
+                    val_ty: field.ty.clone(),
                 })
                 .sorted_by(|a, b| Ord::cmp(&a.name, &b.name))
                 .collect();

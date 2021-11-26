@@ -2,8 +2,8 @@
 use std:fs
 use std:iter
 
-fn is_dir(arg)
-    $arg.name == "Directory"
-end
+# fn is_dir(arg)
+#     $arg.name == "Directory"
+# end
 
-ls | filter $is_dir
+ls | filter $arg.type == "Directory" | map $arg.name

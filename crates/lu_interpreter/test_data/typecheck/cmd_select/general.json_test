@@ -62,15 +62,12 @@ f | select
   "Err": [
     {
       "Ty": {
-        "ExpectedStmtToReturnAnArrayOfStrcts": {
-          "stmt_with_wrong_ret": {
-            "content": "f",
-            "range": [
-              32,
-              33
-            ]
-          },
-          "found_ty": "[any]"
+        "ItemExpectedToBeStruct": {
+          "content": "any",
+          "range": [
+            11,
+            14
+          ]
         }
       }
     }
