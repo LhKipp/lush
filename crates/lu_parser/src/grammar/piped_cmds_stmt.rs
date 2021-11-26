@@ -1,4 +1,4 @@
-use super::{Rule};
+use super::Rule;
 use crate::{
     grammar::{OrRule, ValueExprRule},
     parser::{CompletedMarker, Parser, CMT_NL_WS},

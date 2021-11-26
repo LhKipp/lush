@@ -9,6 +9,7 @@ let x = 1
 - Token: "Whitespace (len: 1)"
 - Token: "AssignSign (len: 1)"
 - Token: "Whitespace (len: 1)"
+- Start: Tombstone
 - Start: NumberExpr
 - Token: "Number (len: 1)"
 - Finish: ""
@@ -25,6 +26,7 @@ let x = func_1
 - Token: "Whitespace (len: 1)"
 - Token: "AssignSign (len: 1)"
 - Token: "Whitespace (len: 1)"
+- Start: Tombstone
 - Start: CmdStmt
 - Token: "BareWord (len: 6)"
 - Finish: ""

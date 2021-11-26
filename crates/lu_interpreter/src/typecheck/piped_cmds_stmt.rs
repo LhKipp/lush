@@ -1,5 +1,8 @@
 use lu_interpreter_structs::ValueType;
-use lu_syntax::{ast::PipedCmdsStmtNode, AstElement};
+use lu_syntax::{
+    ast::{PipeOrValueExprElement, PipedCmdsStmtNode},
+    AstElement,
+};
 use rusttyc::TcKey;
 
 use crate::{TypeCheck, TypeCheckArg};
@@ -41,5 +44,19 @@ impl TypeCheck for PipedCmdsStmtNode {
                 .expect("Cmd always returns");
         }
         Some(ret_key)
+    }
+}
+
+impl TypeCheck for PipeOrValueExprElement {
+    fn do_typecheck(
+        &self,
+        args: &[TypeCheckArg],
+        ty_state: &mut crate::TyCheckState,
+    ) -> Option<TcKey> {
+        match self {
+            PipeOrValueExprElement::PipedCmdsStmt(n) => n.typecheck_with_args(args, ty_state),
+            PipeOrValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, ty_state),
+            PipeOrValueExprElement::ValueExpr(n) => n.typecheck_with_args(args, ty_state),
+        }
     }
 }

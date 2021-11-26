@@ -1,9 +1,4 @@
-use crate::{
-    grammar::{LuTypeRule, ValueExprRule},
-    parser::{CompletedMarker, Parser, CMT_NL_WS},
-    SyntaxKind::*,
-    T,
-};
+use crate::{SyntaxKind::*, T, grammar::{LuTypeRule, PipedCmdsStmtRule}, parser::{CompletedMarker, Parser, CMT_NL_WS}};
 
 use super::Rule;
 
@@ -31,7 +26,7 @@ impl Rule for LetStmtRule {
             LuTypeRule {}.parse(p);
         }
         if p.eat_after(T![=], CMT_NL_WS) {
-            ValueExprRule {}.parse(p);
+            PipedCmdsStmtRule {}.parse(p);
         }
         Some(m.complete(p, LetStmt))
     }

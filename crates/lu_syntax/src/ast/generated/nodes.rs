@@ -5039,3 +5039,78 @@ impl Display for IfElifElseStmtPartElement {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
+pub enum PipeOrValueExprElement {
+    PipedCmdsStmt(PipedCmdsStmtNode),
+    CmdStmt(CmdStmtNode),
+    ValueExpr(ValueExprElement),
+    }
+
+impl PipeOrValueExprElement {
+}
+
+impl AstElement for PipeOrValueExprElement {
+    fn can_cast(kind: SyntaxKind) -> bool { 
+        
+        
+        
+        ValueExprElement::can_cast(kind) ||
+        
+        
+        match kind{
+            PipedCmdsStmt | CmdStmt | ValueExpr => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
+        
+        if let Some(casted) = ValueExprElement::cast(syntax.clone()){
+                return Some(Self::ValueExpr(casted));
+            }
+        
+        
+        let res = match syntax.kind() {
+            PipedCmdsStmt => PipeOrValueExprElement::PipedCmdsStmt(PipedCmdsStmtNode { syntax: syntax.into_node().unwrap() }),
+            CmdStmt => PipeOrValueExprElement::CmdStmt(CmdStmtNode { syntax: syntax.into_node().unwrap() }),
+            _ => return None,
+        };
+        Some(res)
+    }
+
+    fn syntax(&self) -> SyntaxElement {
+        match self {
+            
+            PipeOrValueExprElement::PipedCmdsStmt(it) => it.syntax.clone().into(),
+            
+            
+            PipeOrValueExprElement::CmdStmt(it) => it.syntax.clone().into(),
+            
+            
+            PipeOrValueExprElement::ValueExpr(it) => it.syntax().clone().into(),
+            
+            }
+    }
+}
+impl HasSyntaxKind for PipeOrValueExprElement{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        match self {
+            PipeOrValueExprElement::PipedCmdsStmt(it) => it.get_syntax_kind(),
+            PipeOrValueExprElement::CmdStmt(it) => it.get_syntax_kind(),
+            PipeOrValueExprElement::ValueExpr(it) => it.get_syntax_kind(),
+            }
+    }
+}
+
+impl HasTextRange for PipeOrValueExprElement{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for PipeOrValueExprElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+

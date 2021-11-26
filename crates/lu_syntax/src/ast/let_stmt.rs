@@ -5,7 +5,7 @@ use crate::{AstNode, AstToken};
 
 use super::{
     addr_of_mod_node_contained_in, support, LetKeywordToken, LetStmtNode, LuTypeNode,
-    ValueExprElement, VarDeclNameToken,
+    PipeOrValueExprElement, VarDeclNameToken,
 };
 
 impl LetStmtNode {
@@ -18,7 +18,7 @@ impl LetStmtNode {
     }
 
     /// Returns the rhs of the assignment
-    pub fn value(&self) -> Option<ValueExprElement> {
+    pub fn value(&self) -> Option<PipeOrValueExprElement> {
         support::element_child(self.syntax())
     }
 

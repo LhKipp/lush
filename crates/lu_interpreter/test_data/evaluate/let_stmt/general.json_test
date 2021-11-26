@@ -41,3 +41,14 @@ $x
   }
 }
 ...
+let with assignment to pipe
+===
+let x = echo hi | xargs echo
+$x
+---
+{
+  "Ok": {
+    "BareWord": "hi\n"
+  }
+}
+...

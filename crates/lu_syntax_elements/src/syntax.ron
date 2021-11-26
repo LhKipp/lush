@@ -236,5 +236,11 @@ Config(
             "IfElifStmt",
             "ElseStmt",
         ],),
+    (name: "PipeOrValueExpr", is_generic: true,
+        represents_element_names: [
+            "ValueExpr",
+            "PipedCmdsStmt",
+            "CmdStmt"
+        ],),
     ]
 )

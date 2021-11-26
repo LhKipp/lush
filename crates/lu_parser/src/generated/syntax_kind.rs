@@ -207,6 +207,7 @@ pub enum SyntaxKind {
     FileName,
     FileNamePart,
     IfElifElseStmtPart,
+    PipeOrValueExpr,
     __LAST,
 }
 
@@ -344,6 +345,7 @@ impl SyntaxKind{
             SyntaxKind::FileName => "FileName",
             SyntaxKind::FileNamePart => "FileNamePart",
             SyntaxKind::IfElifElseStmtPart => "IfElifElseStmtPart",
+            SyntaxKind::PipeOrValueExpr => "PipeOrValueExpr",
             #[allow(unreachable_patterns)]
             _ => "", // For the future
         }
