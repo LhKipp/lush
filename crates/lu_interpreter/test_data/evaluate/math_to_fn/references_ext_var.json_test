@@ -1,0 +1,22 @@
+local var
+===
+use std:iter
+let increase = 100
+[1 2 3] | map $arg + $increase
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 101.0
+      },
+      {
+        "Number": 102.0
+      },
+      {
+        "Number": 103.0
+      }
+    ]
+  }
+}
+...

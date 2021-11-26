@@ -19,6 +19,32 @@ use std:iter
   }
 }
 ...
+Math as func works 2
+===
+fn take_pred(pred: fn(arg1 arg2 ret: bool))
+    ret pred 1 2
+end
+take_pred $arg1 < $arg2
+---
+{
+  "Ok": {
+    "Bool": true
+  }
+}
+...
+Math as func works 3
+===
+fn take_generator(generator: fn(ret: num))
+    ret generator
+end
+take_generator 1 + 1
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...
 Math as func with table
 ===
 use std:iter
