@@ -10,7 +10,7 @@ use pretty_env_logger::env_logger;
 
 use lu_cmds::builtin;
 use lu_interpreter::InterpreterCfg;
-use lu_interpreter_structs::{ScopeFrame, ScopeFrameTag, Variable};
+use lu_interpreter_structs::{ScopeFrame, ScopeFrameTag, Value, Variable};
 pub use temp_file::TempFile as TmpFile;
 
 pub fn init_logger() {
@@ -43,10 +43,11 @@ fn make_test_global_frame(pwd: String) -> ScopeFrame<Variable> {
     }
     frame.insert_var(Variable::new(
         "PWD".into(),
-        pwd.clone().into(),
+        Value::FileName(pwd.clone()),
         lu_source_code_item!().into(),
     ));
-    std::env::set_var("PWD", pwd);
+    std::env::set_var("PWD", pwd.clone());
+    std::env::set_current_dir(pwd).expect("Must work");
     frame
 }
 

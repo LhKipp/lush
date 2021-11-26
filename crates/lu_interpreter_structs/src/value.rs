@@ -239,6 +239,17 @@ impl Value {
             _ => None,
         }
     }
+
+    pub fn coerce_to_filename(&self) -> Option<&String> {
+        match self {
+            Value::BareWord(s) | Value::FileName(s) | Value::String(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    pub fn expect_optional_inner_val(&self) -> &Option<Box<Value>> {
+        self.as_optional().unwrap().1
+    }
 }
 
 impl std::fmt::Debug for Value {

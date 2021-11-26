@@ -31,6 +31,10 @@ pub enum EvalErr {
         value_ty: String,
     },
     DbgAbort,
+    PathIsNotDirectory {
+        path: String,
+        path_item: SourceCodeItem,
+    },
 }
 
 impl<S: Into<String>> From<S> for EvalErr {

@@ -1,7 +1,7 @@
 use std::{rc::Rc, sync::Arc};
 
 use derive_more::From;
-use lu_error::SourceCodeItem;
+use lu_error::{lu_source_code_item, LuResult, SourceCodeItem};
 use lu_syntax::{
     ast::{CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StrctStmtNode},
     AstNode, AstToken,
@@ -44,6 +44,11 @@ impl VarDeclNode {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, new, Serialize, Deserialize, Hash)]
+pub enum VarAttributes {
+    EnvVar,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, new, Serialize, Deserialize, Hash)]
 pub struct Variable {
     /// The name of the variable
     pub name: String,
@@ -51,6 +56,8 @@ pub struct Variable {
     pub val: Value,
     #[serde(skip)]
     pub decl: VarDeclNode,
+    #[new(default)]
+    pub attrs: Vec<VarAttributes>,
 }
 
 impl Variable {
@@ -95,18 +102,18 @@ impl Variable {
     }
 
     pub fn new_in(val: Value, decl: VarDeclNode) -> Self {
-        Self {
-            name: IN_ARG_NAME.to_string(),
-            val,
-            decl,
-        }
+        Self::new(IN_ARG_NAME.to_string(), val, decl)
     }
     pub fn new_args(val: Value) -> Self {
-        Self {
-            name: "args".into(),
-            val,
-            // TODO correct val
-            decl: VarDeclNode::Dummy,
+        Self::new("args".into(), val, lu_source_code_item!(-1).into())
+    }
+
+    pub fn set_val(&mut self, val: Value) -> LuResult<()> {
+        if self.attrs.contains(&VarAttributes::EnvVar) {
+            std::env::set_var(&self.name, val.to_string());
         }
+
+        self.val = val;
+        Ok(())
     }
 }

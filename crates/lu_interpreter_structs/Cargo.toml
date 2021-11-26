@@ -40,3 +40,4 @@ ordered-float = { version = "2.0", features = ["serde"] }
 derive_is_enum_variant = "0.1.1"
 num-traits = "0.2.14"
 prettytable-rs = "0.8.0"
+fs-err = "2.6.0"

@@ -21,7 +21,7 @@ impl Rule for ValuePathExprRule {
         let m = p.start();
         p.expect(T![$]);
         loop {
-            if !p.expect_as([BareWord, InKeyword], BareWord) {
+            if !p.expect_as([BareWord, StrctName, InKeyword], BareWord) {
                 // in`$in` in is represented as in keyword
                 break;
             }

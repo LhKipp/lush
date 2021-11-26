@@ -413,6 +413,12 @@ impl Scope<Variable> {
         }
         None
     }
+
+    pub fn all_vars(&self) -> impl Iterator<Item = &Variable> {
+        self.get_all_frames()
+            .map(|frame| frame.elems.values())
+            .flatten()
+    }
 }
 
 impl<T: fmt::Debug + 'static> fmt::Debug for Scope<T> {

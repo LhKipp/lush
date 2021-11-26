@@ -73,5 +73,11 @@ pub(crate) fn eval_err_to_diagnostic(err: &EvalErr) -> Diagnostic<usize> {
                         value_ty, expected_ty
                     )),
             ]),
+        EvalErr::PathIsNotDirectory { path, path_item } => Diagnostic::error()
+            .with_message(format!("Provided path {} is not a directory", path))
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&path_item),
+                byte_range_of_item(&path_item),
+            )]),
     }
 }

@@ -75,7 +75,7 @@ pub struct TyCheckState {
 
 impl TyCheckState {
     pub fn new(scope: Scope<Variable>) -> Self {
-        Self {
+        let mut ty_state = Self {
             scope,
             checker: VarlessTypeChecker::new(),
             errors: Vec::new(),
@@ -90,7 +90,15 @@ impl TyCheckState {
             result: None,
             tc_var_cmd_table: Vec::new(),
             tc_equated_keys: HashMap::new(),
+        };
+
+        let vars: Vec<_> = ty_state.scope.all_vars().cloned().collect();
+        for var in vars {
+            let key = ty_state.new_term_key(var.decl.to_item());
+            ty_state.tc_var_table.insert(var.clone(), key);
         }
+
+        ty_state
     }
 
     pub fn typecheck(&mut self, node: impl TypeCheck) {
@@ -450,7 +458,8 @@ impl TyCheckState {
 
                     Some(tc_strct.self_key)
                 } else {
-                    panic!("Var is present, but not func: {}", var_name)
+                    warn!("Var is present, but not func: {}. inserting it", var_name);
+                    Some(self.insert_var(var))
                 }
             }
         } else {
