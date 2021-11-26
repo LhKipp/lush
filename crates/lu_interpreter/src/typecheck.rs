@@ -4,6 +4,7 @@ use itertools::Itertools;
 use log::{debug, trace, warn};
 use lu_error::{AstErr, LuErr, LuResults};
 use lu_error::{SourceCodeItem, TyErr};
+use lu_interpreter_structs::prelude::VarAttributes;
 use lu_interpreter_structs::{ArgSignature, Command, FlagVariant};
 use lu_pipeline_stage::PipelineStage;
 use parking_lot::RwLock;
@@ -94,6 +95,13 @@ impl TyCheckState {
 
         let vars: Vec<_> = ty_state.scope.all_vars().cloned().collect();
         for var in vars {
+            if !var.attrs.contains(&VarAttributes::EnvVar) {
+                continue;
+            }
+            trace!(
+                "Inserted env var {} from start scope in tychecker",
+                var.name
+            );
             let key = ty_state.new_term_key(var.decl.to_item());
             ty_state.tc_var_table.insert(var.clone(), key);
         }

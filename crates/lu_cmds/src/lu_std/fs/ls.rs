@@ -87,9 +87,9 @@ impl Command for FsLsCmd {
         let pwd = scope
             .lock()
             .find_var("PWD")
-            .map(|var| var.val.as_string())
+            .map(|var| var.val.as_file_name())
             .flatten()
-            .expect("pwd always string")
+            .expect("pwd always filename")
             .clone();
         assert!(!pwd.ends_with("/"));
 
