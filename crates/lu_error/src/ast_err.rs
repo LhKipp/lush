@@ -31,6 +31,10 @@ pub enum AstErr {
         opt_arg: SourceCodeItem,
         var_arg: SourceCodeItem,
     },
+    NoSuchStdPath {
+        path: String,
+        path_usage: SourceCodeItem,
+    },
 }
 
 impl<S: Into<String>> From<S> for AstErr {

@@ -5,6 +5,7 @@ mod lu_native_std_mod;
 mod test;
 
 use log::debug;
+use lu_error::{util::Outcome, AstErr, SourceCodeItem};
 use lu_interpreter_structs::{ModPath, ScopeFrame, Variable};
 pub(crate) use lu_native_std_mod::{LuNativeStdMod, LuRustStdMod, LuStdMod};
 use once_cell::sync::Lazy;
@@ -29,10 +30,25 @@ static STD_MODULES: Lazy<HashMap<String, LuStdMod>> = Lazy::new(|| {
 
 /// Source the module specified by path
 // TODO error if no such module
-pub fn load_std_module(path: &ModPath) -> Vec<ScopeFrame<Variable>> {
-    let path = path.as_std_path().expect("ModPath must be stdpath");
-    debug!("load_std_module: {}", path);
-    debug!("{:?}", STD_MODULES.keys().collect::<Vec<_>>());
-    let module = STD_MODULES.get(path).expect("TODO");
-    vec![module.frame()]
+pub fn load_std_module(
+    path: &ModPath,
+    path_usage: &SourceCodeItem,
+) -> Outcome<Vec<ScopeFrame<Variable>>> {
+    if let Some(path) = path.as_std_path() {
+        debug!("load_std_module: {}", path);
+        if let Some(module) = STD_MODULES.get(path) {
+            vec![module.frame()].into()
+        } else {
+            Outcome::new(
+                vec![],
+                vec![AstErr::NoSuchStdPath {
+                    path: path.clone(),
+                    path_usage: path_usage.clone(),
+                }
+                .into()],
+            )
+        }
+    } else {
+        todo!("Impl error for path not std_path");
+    }
 }

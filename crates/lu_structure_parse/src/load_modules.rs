@@ -50,12 +50,16 @@ pub fn load_mod_paths(
             debug!("Loading module: {}", use_path);
             match &use_path.mod_path {
                 ModPath::StdPath(_) => {
-                    let frame = (cfg.load_std_module_func)(&use_path.mod_path)[0].clone();
-                    let modi = frame.get_mod_tag();
-                    paths_to_source
-                        // std never includes relative
-                        .extend(modi.use_paths.clone().into_iter().map(|path| (path, None)));
-                    all_frames.push(frame);
+                    let (frames, load_std_mod_errs) =
+                        (cfg.load_std_module_func)(&use_path.mod_path, &use_path.decl).split();
+                    errs.extend(load_std_mod_errs);
+                    for frame in frames {
+                        let modi = frame.get_mod_tag();
+                        paths_to_source
+                            // std never includes relative
+                            .extend(modi.use_paths.clone().into_iter().map(|path| (path, None)));
+                        all_frames.push(frame);
+                    }
                 }
                 ModPath::PlugPath(plug_f_path) => {
                     let plug_f_path = cfg.plugin_dir.join(plug_f_path);
@@ -151,5 +155,5 @@ pub fn load_mod_paths(
         }
     }
 
-    Outcome::ok(all_frames)
+    Outcome::new(all_frames, errs)
 }

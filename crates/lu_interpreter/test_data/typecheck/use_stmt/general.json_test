@@ -1,0 +1,23 @@
+wrong std module raises error this test should be in resolve
+===
+use std:ls
+---
+{
+  "Err": [
+    {
+      "Ast": {
+        "NoSuchStdPath": {
+          "path": "std:ls",
+          "path_usage": {
+            "content": "use std:ls",
+            "range": [
+              0,
+              10
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+...

@@ -63,5 +63,12 @@ pub(crate) fn ast_err_to_diagnostic(err: &AstErr) -> Diagnostic<usize> {
                 Label::secondary(f_id_of_item(&opt_arg), byte_range_of_item(&opt_arg))
                     .with_message("Optional argument declared here"),
             ]),
+        AstErr::NoSuchStdPath { path_usage, .. } => Diagnostic::error()
+            .with_message("No such standard module")
+            .with_code("E-Ast0007")
+            .with_labels(vec![Label::primary(
+                f_id_of_item(&path_usage),
+                byte_range_of_item(&path_usage),
+            )]),
     }
 }
