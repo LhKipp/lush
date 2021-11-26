@@ -862,7 +862,7 @@ pub(crate) static LS_ENTRY_STRCT: Lazy<Arc<RwLock<Strct>>> = Lazy::new(|| {
         vec![
             StrctField::new(LS_ENTRY_FIELD_0.into(), ValueType::String, 0, decl.clone()),
             StrctField::new(LS_ENTRY_FIELD_1.into(), ValueType::String, 1, decl.clone()),
-            StrctField::new(LS_ENTRY_FIELD_2.into(), ValueType::String, 1, decl.clone()),
+            StrctField::new(LS_ENTRY_FIELD_2.into(), ValueType::Number, 2, decl.clone()),
         ],
         decl,
     );
