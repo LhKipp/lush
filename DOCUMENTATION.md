@@ -421,6 +421,7 @@ use ./greet.lush # Won't execute "echo hello"
 ## Math-Expressions
 Operators in lush behave like they do in many popular programming languages (e.G. python). Math can be done directly and does not need special function calls / expressions. 
 
+### Math-Operators
 The following math-operators are currently supported
 * "+"     : Addition
 * "-"     : Subtraction
@@ -537,3 +538,13 @@ Builtins are commands that are always available. Currently the following builtin
     - Returns whether a var with name `to_check` exists
 - `type_of`: fn type_of(ret: str, val: any)
     - Returns the type of `val` as a string
+- `select`: fn select(in: [<struct_type>] ret: [<struct_type>] ...column_names: str)
+    - Select all columns with names `column_names` from the incoming table `in` (must be an array of structs) and return them as a new table. All `column_names` have to be either a string expression or a bareword expression.
+    ```lush
+    use std:fs
+    ls | select name "size"
+    
+    let x = size
+    ls | select name $x  # Wrong
+    # $x is an variable expression, expected a string or bareword expression
+    ```

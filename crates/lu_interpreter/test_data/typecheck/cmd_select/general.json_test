@@ -149,3 +149,25 @@ ls | select name type size | select name type | select name
   }
 }
 ...
+select allows string
+===
+use std:fs
+ls | select "name"
+---
+{
+  "Ok": {
+    "Array": {
+      "inner_ty": {
+        "StrctName": "Select_textrange_16:29"
+      },
+      "inner_ty_decl": {
+        "content": "select \"name\"",
+        "range": [
+          16,
+          29
+        ]
+      }
+    }
+  }
+}
+...

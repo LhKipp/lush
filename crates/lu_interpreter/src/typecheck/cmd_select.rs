@@ -72,7 +72,14 @@ fn get_select_args(cmd_stmt: &CmdStmtNode) -> Outcome<SelectArgs> {
         if let CmdArgElement::ValueExpr(ValueExprElement::BareWord(bw)) = arg {
             args.columns.push((bw.text_trimmed(), bw.to_item()))
         } else if let CmdArgElement::ValueExpr(ValueExprElement::StringExpr(string)) = arg {
-            args.columns.push((string.text_trimmed(), string.to_item()))
+            let mut string_val = string.text_trimmed();
+            if string_val.starts_with("\"") || string_val.starts_with("\'") {
+                string_val.remove(0);
+            }
+            if string_val.ends_with("\"") || string_val.ends_with("\'") {
+                string_val.pop();
+            }
+            args.columns.push((string_val, string.to_item()))
         } else if let CmdArgElement::ValueExpr(ValueExprElement::ValuePathExpr(var)) = arg {
             errs.push(TyErr::SelectArgMustBeBareWordOrString { arg: var.to_item() }.into())
         }
