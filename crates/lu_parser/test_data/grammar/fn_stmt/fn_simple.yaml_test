@@ -59,6 +59,7 @@ end
 - Token: "Whitespace (len: 4)"
 - Token: "RetKeyword (len: 3)"
 - Token: "Whitespace (len: 1)"
+- Start: Tombstone
 - Start: NumberExpr
 - Token: "Number (len: 1)"
 - Finish: ""

@@ -1,9 +1,9 @@
 use crate::AstNode;
 
-use super::{support, RetKeywordToken, RetStmtNode, ValueExprElement};
+use super::{support, PipeOrValueExprElement, RetKeywordToken, RetStmtNode};
 
 impl RetStmtNode {
-    pub fn returned_val(&self) -> Option<ValueExprElement> {
+    pub fn returned_val(&self) -> Option<PipeOrValueExprElement> {
         support::element_child(self.syntax())
     }
     pub fn ret_kw(&self) -> RetKeywordToken {

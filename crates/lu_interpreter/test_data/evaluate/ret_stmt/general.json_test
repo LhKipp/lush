@@ -27,3 +27,17 @@ func_1
   }
 }
 ...
+ret stmt accepts piped cmds
+===
+fn func_1(ret: str)
+    ret echo hi | xargs echo
+end
+
+func_1
+---
+{
+  "Ok": {
+    "BareWord": "hi\n"
+  }
+}
+...

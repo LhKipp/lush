@@ -22,7 +22,7 @@ impl Rule for RetStmtRule {
             return None;
         }
 
-        ValueExprRule {}.parse(p);
+        PipedCmdsStmtRule {}.parse(p);
 
         Some(m.complete(p, RetStmt))
     }
