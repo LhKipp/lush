@@ -1637,14 +1637,12 @@ use lu_syntax::{AstNode, AstToken};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use serde::{Deserialize, Serialize};
 
-pub type ArgDecl = SourceCodeItem;
-
 #[derive(Clone, Debug, Hash, new, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ArgSignature {
     pub name: String,
     pub ty: ValueType,
     pub is_opt: bool, // TODO this is prob a bad idea???
-    pub decl: ArgDecl,
+    pub decl: SourceCodeItem,
 }
 
 impl ArgSignature {
@@ -1655,28 +1653,28 @@ impl ArgSignature {
         Self::new(name, ty, true, decl)
     }
 
-    pub fn void(decl: ArgDecl) -> ArgSignature {
+    pub fn void(decl: SourceCodeItem) -> ArgSignature {
         ArgSignature::req("unused".into(), ValueType::Nil, decl)
     }
 
     /// ArgSignature with default in name
-    pub fn in_(ty: ValueType, decl: ArgDecl) -> ArgSignature {
+    pub fn in_(ty: ValueType, decl: SourceCodeItem) -> ArgSignature {
         ArgSignature::req(IN_ARG_NAME.into(), ty, decl)
     }
 
     /// ArgSignature with default ret name
-    pub fn ret(ty: ValueType, decl: ArgDecl) -> ArgSignature {
+    pub fn ret(ty: ValueType, decl: SourceCodeItem) -> ArgSignature {
         ArgSignature::req(RET_ARG_NAME.into(), ty, decl)
     }
 
     pub fn from_node(
         n: Option<ArgSignatureNode>,
         fallback_name: &str,
-        fallback_decl: ArgDecl,
+        fallback_decl: SourceCodeItem,
     ) -> Self {
         let name = n.as_ref().map(|n| n.name()).unwrap_or(fallback_name.into());
         let fallback_ty = ValueType::Unspecified;
-        let decl: ArgDecl = n
+        let decl: SourceCodeItem = n
             .as_ref()
             .map(|n| n.to_item())
             .unwrap_or_else(|| fallback_decl.into());
