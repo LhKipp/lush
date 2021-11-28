@@ -53,7 +53,7 @@ impl Command for CdBuiltin {
             if let Some(dir_arg_some_val) = dir_arg.val.expect_optional_inner_val() {
                 (
                     dir_arg_some_val.coerce_to_filename().unwrap().into(),
-                    dir_arg.decl.to_item(),
+                    dir_arg.decl.clone(),
                 )
             } else {
                 // Cd into home dir
@@ -63,7 +63,7 @@ impl Command for CdBuiltin {
                             .as_file_name()
                             .expect("HOME is always FileName")
                             .into(),
-                        home.decl.to_item(),
+                        home.decl.clone(),
                     )
                 } else {
                     return Err(EvalErr::Message("Uups. $HOME is not set.".into()).into());

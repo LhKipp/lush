@@ -1,6 +1,6 @@
 use crate::{
     CmdAttribute, CmdAttributeVariant, Command, FlagVariant, ModPath, SyScope, Value, ValueType,
-    VarDeclNode, Variable,
+    Variable,
 };
 use derive_builder::Builder;
 use derive_more::From;
@@ -118,7 +118,7 @@ impl FlagSignature {
             .clone()
             .or(self.short_name.map(|c| c.to_string()))
             .expect("Either long or shortname set");
-        Variable::new(name, Value::Nil, VarDeclNode::CatchAll(self.decl.clone()))
+        Variable::new(name, Value::Nil, self.decl.clone())
     }
 }
 

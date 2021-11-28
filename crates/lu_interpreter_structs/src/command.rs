@@ -1,9 +1,7 @@
 use std::fmt::Debug;
 use std::rc::Rc;
 
-use crate::{
-    FlagVariant, Function, ModPath, Scope, Signature, SyScope, Value, VarDeclNode, Variable,
-};
+use crate::{FlagVariant, Function, ModPath, Scope, Signature, SyScope, Value, Variable};
 
 use log::debug;
 use lu_error::{LuResult, SourceCodeItem};
@@ -210,6 +208,6 @@ impl Into<Variable> for Rc<dyn Command> {
         let name = self.name().to_string();
         let decl = self.signature().decl.clone();
         let value = Value::new_func(self);
-        Variable::new(name, value, VarDeclNode::CatchAll(decl))
+        Variable::new(name, value, decl)
     }
 }

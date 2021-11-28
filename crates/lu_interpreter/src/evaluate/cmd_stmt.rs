@@ -115,14 +115,14 @@ fn insert_cmd_args_into_scope(
         scope.lock().get_cur_frame_mut().insert_var(Variable::new(
             arg.name.clone(),
             val,
-            VarDeclNode::CatchAll(arg.decl.clone()),
+            arg.decl.clone(),
         ));
     }
     if let Some(var_arg) = &cmd_sign.var_arg {
         scope.lock().get_cur_frame_mut().insert_var(Variable::new(
             var_arg.name.clone(),
             Value::new_array(arg_iter.collect()),
-            VarDeclNode::CatchAll(var_arg.decl.clone()),
+            var_arg.decl.clone(),
         ));
     } else {
         assert!(
@@ -156,11 +156,10 @@ fn insert_cmd_args_into_scope(
 
     // Insert passed flags
     for (flag_name, val, usage_item) in flag_vals {
-        scope.lock().get_cur_frame_mut().insert_var(Variable::new(
-            flag_name,
-            val,
-            VarDeclNode::CatchAll(usage_item),
-        ));
+        scope
+            .lock()
+            .get_cur_frame_mut()
+            .insert_var(Variable::new(flag_name, val, usage_item));
     }
 }
 

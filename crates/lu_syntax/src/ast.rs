@@ -93,7 +93,7 @@ pub trait AstNode {
         let sf_addr = addr_of_mod_node_contained_in(self.syntax().clone());
         SourceCodeItem::new(
             self.syntax().text_range().into(),
-            self.syntax().text(),
+            self.text_trimmed(),
             sf_addr,
         )
     }

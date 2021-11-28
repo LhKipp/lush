@@ -50,11 +50,7 @@ impl Evaluable for ForStmtNode {
                 handle_dbg_intervention_before!(result, scope);
             }
             {
-                let var = Variable::new(
-                    var_names[0].clone(),
-                    val,
-                    VarDeclNode::ForStmt(self.clone(), 0),
-                );
+                let var = Variable::new(var_names[0].clone(), val, self.to_item());
                 scope
                     .lock()
                     .push_frame(ScopeFrameTag::ForStmtFrame)

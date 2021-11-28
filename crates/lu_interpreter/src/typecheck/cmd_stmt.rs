@@ -16,7 +16,7 @@ use rusttyc::TcKey;
 use std::{collections::HashMap, iter};
 
 use crate::typecheck::cmd_select::do_extra_ty_check_select_cmd;
-use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
+use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, Variable};
 
 impl TypeCheck for CmdStmtNode {
     fn do_typecheck(

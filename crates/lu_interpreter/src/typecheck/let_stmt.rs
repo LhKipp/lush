@@ -3,7 +3,7 @@ use lu_pipeline_stage::ErrorContainer;
 use lu_syntax::ast::LetStmtNode;
 use rusttyc::TcKey;
 
-use crate::{TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
+use crate::{TypeCheck, TypeCheckArg, ValueType, Variable};
 
 impl TypeCheck for LetStmtNode {
     fn do_typecheck(
@@ -12,7 +12,7 @@ impl TypeCheck for LetStmtNode {
         ty_state: &mut crate::TyCheckState,
     ) -> Option<TcKey> {
         if let Some(var_name) = self.var_name() {
-            let var = Variable::new(var_name, Value::Nil, VarDeclNode::LetStmt(self.clone()));
+            let var = Variable::new(var_name, Value::Nil, self.item_till_assign());
             // TODO get ty first and then insert var once
             let let_stmt_key = ty_state.insert_var(var.clone());
 

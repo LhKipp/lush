@@ -313,7 +313,7 @@ use rusttyc::TcKey;
 use std::{collections::HashMap, iter};
 
 use crate::typecheck::cmd_select::do_extra_ty_check_select_cmd;
-use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, VarDeclNode, Variable};
+use crate::{TcFunc, TyCheckState, TypeCheck, TypeCheckArg, ValueType, Variable};
 
 impl TypeCheck for CmdStmtNode {
     fn do_typecheck(
@@ -1310,7 +1310,7 @@ impl Command for CdBuiltin {
             if let Some(dir_arg_some_val) = dir_arg.val.expect_optional_inner_val() {
                 (
                     dir_arg_some_val.coerce_to_filename().unwrap().into(),
-                    dir_arg.decl.to_item(),
+                    dir_arg.decl.clone(),
                 )
             } else {
                 // Cd into home dir
@@ -1320,7 +1320,7 @@ impl Command for CdBuiltin {
                             .as_file_name()
                             .expect("HOME is always FileName")
                             .into(),
-                        home.decl.to_item(),
+                        home.decl.clone(),
                     )
                 } else {
                     return Err(EvalErr::Message("Uups. $HOME is not set.".into()).into());
@@ -1625,7 +1625,7 @@ pub fn get_silence_stmt_returns(scope: &Scope<Variable>) -> Option<bool> {
 "#####)
 ,("crates/lu_interpreter_structs/src/user_def_tys/function.rs",r#####"use crate::{
     CmdAttribute, CmdAttributeVariant, Command, FlagVariant, ModPath, SyScope, Value, ValueType,
-    VarDeclNode, Variable,
+    Variable,
 };
 use derive_builder::Builder;
 use derive_more::From;
@@ -1743,7 +1743,7 @@ impl FlagSignature {
             .clone()
             .or(self.short_name.map(|c| c.to_string()))
             .expect("Either long or shortname set");
-        Variable::new(name, Value::Nil, VarDeclNode::CatchAll(self.decl.clone()))
+        Variable::new(name, Value::Nil, self.decl.clone())
     }
 }
 
@@ -2344,48 +2344,12 @@ impl From<&NumberExprNode> for Value {
 "#####)
 ,("crates/lu_interpreter_structs/src/variable.rs",r#####"use std::{rc::Rc, sync::Arc};
 
-use derive_more::From;
 use lu_error::{lu_source_code_item, LuResult, SourceCodeItem};
-use lu_syntax::{
-    ast::{CmdStmtNode, FnStmtNode, ForStmtNode, LetStmtNode, StrctStmtNode},
-    AstNode, AstToken,
-};
 use lu_syntax_elements::constants::IN_ARG_NAME;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 
 use crate::{Command, CommandCollection, Strct, Value};
-
-#[derive(Educe)]
-#[educe(Default)]
-#[derive(Clone, Debug, Eq, PartialEq, new, Hash, From)]
-pub enum VarDeclNode {
-    #[educe(Default)]
-    Dummy,
-    LetStmt(LetStmtNode),
-    FnStmt(FnStmtNode),
-    StrctStmt(StrctStmtNode),
-    /// For stmt with usize being index into exact param
-    ForStmt(ForStmtNode, usize),
-    // For $in (before it is mapped to the correct name)
-    PrevCmdStmt(CmdStmtNode),
-    // Used for errors and arg signature and others :)
-    CatchAll(SourceCodeItem),
-}
-
-impl VarDeclNode {
-    pub fn to_item(&self) -> SourceCodeItem {
-        match self {
-            VarDeclNode::LetStmt(n) => n.item_till_assign(),
-            VarDeclNode::FnStmt(n) => n.decl_item(),
-            VarDeclNode::ForStmt(n, i) => n.var_names()[i.clone()].to_item(),
-            VarDeclNode::Dummy => SourceCodeItem::tmp_todo_item(),
-            VarDeclNode::PrevCmdStmt(n) => n.to_item(),
-            VarDeclNode::StrctStmt(n) => n.to_item(),
-            VarDeclNode::CatchAll(item) => item.clone(),
-        }
-    }
-}
 
 #[derive(Clone, Debug, Eq, PartialEq, new, Serialize, Deserialize, Hash)]
 pub enum VarAttributes {
@@ -2398,24 +2362,19 @@ pub struct Variable {
     pub name: String,
     /// The evaluation value of this variable, Value::Nil in other stages of interpretation
     pub val: Value,
-    #[serde(skip)]
-    pub decl: VarDeclNode,
+    pub decl: SourceCodeItem,
     #[new(default)]
     pub attrs: Vec<VarAttributes>,
 }
 
 impl Variable {
-    pub fn new_nil(name: String, decl: VarDeclNode) -> Self {
+    pub fn new_nil(name: String, decl: SourceCodeItem) -> Self {
         Variable::new(name, Value::Nil, decl)
     }
     pub fn new_func(func: Rc<dyn Command>) -> Variable {
         // TODO better decl here
         let decl = func.signature().decl.clone();
-        Variable::new(
-            func.name().to_string(),
-            Value::new_func(func),
-            VarDeclNode::CatchAll(decl),
-        )
+        Variable::new(func.name().to_string(), Value::new_func(func), decl)
     }
 
     pub fn new_func_collection(funcs: Vec<Rc<dyn Command>>) -> Variable {
@@ -2423,29 +2382,21 @@ impl Variable {
         let collection = CommandCollection::new(funcs);
         let name = collection.name();
         let decl = collection.pseudo_decl();
-        Variable::new(
-            name.to_string(),
-            Value::CommandCollection(collection),
-            VarDeclNode::CatchAll(decl),
-        )
+        Variable::new(name.to_string(), Value::CommandCollection(collection), decl)
     }
 
     pub fn new_strct_decl(strct: Strct) -> Variable {
         let decl = strct.decl.clone();
-        Variable::new(
-            strct.name.clone(),
-            Value::new_strct_decl(strct),
-            VarDeclNode::CatchAll(decl),
-        )
+        Variable::new(strct.name.clone(), Value::new_strct_decl(strct), decl)
     }
 
     pub fn new_strct_decl_arc(strct: Arc<RwLock<Strct>>) -> Variable {
         let name = strct.read().name.clone();
         let decl = strct.read().decl.clone();
-        Variable::new(name, Value::StrctDecl(strct), VarDeclNode::CatchAll(decl))
+        Variable::new(name, Value::StrctDecl(strct), decl)
     }
 
-    pub fn new_in(val: Value, decl: VarDeclNode) -> Self {
+    pub fn new_in(val: Value, decl: SourceCodeItem) -> Self {
         Self::new(IN_ARG_NAME.to_string(), val, decl)
     }
     pub fn new_args(val: Value) -> Self {

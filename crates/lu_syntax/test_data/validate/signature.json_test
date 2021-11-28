@@ -16,7 +16,7 @@ end
             ]
           },
           "req_arg": {
-            "content": " arg2",
+            "content": "arg2",
             "range": [
               11,
               16
@@ -39,7 +39,7 @@ end
       "Ast": {
         "VarArgAfterOptionalArg": {
           "var_arg": {
-            "content": " ...rest",
+            "content": "...rest",
             "range": [
               11,
               19

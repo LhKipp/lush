@@ -10,11 +10,10 @@ impl Evaluable for LetStmtNode {
             Value::Nil
         };
 
-        scope.lock().get_cur_frame_mut().insert_var(Variable::new(
-            var_name,
-            val,
-            VarDeclNode::LetStmt(self.clone()),
-        ));
+        scope
+            .lock()
+            .get_cur_frame_mut()
+            .insert_var(Variable::new(var_name, val, self.to_item()));
 
         Ok(Value::Nil)
     }

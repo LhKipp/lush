@@ -20,7 +20,7 @@ func 1 "text"
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
-            "content": " ret: T1",
+            "content": "ret: T1",
             "range": [
               25,
               33

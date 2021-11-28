@@ -1,5 +1,5 @@
-use lu_interpreter_structs::{ScopeFrameTag, Value, VarDeclNode, Variable};
-use lu_syntax::{ast::ForStmtNode, AstToken};
+use lu_interpreter_structs::{ScopeFrameTag, Value, Variable};
+use lu_syntax::{ast::ForStmtNode, AstNode, AstToken};
 use rusttyc::TcKey;
 
 use crate::{TypeCheck, TypeCheckArg};
@@ -22,7 +22,7 @@ impl TypeCheck for ForStmtNode {
         ty_state.insert_var(Variable::new(
             var_names[0].clone(),
             Value::Nil,
-            VarDeclNode::ForStmt(self.clone(), 0),
+            self.to_item(),
         ));
 
         // TODO check that iterated_value is either array or string. Currently thats not possible

@@ -20,7 +20,7 @@ let x_v: num = $x.v
       "Ty": {
         "TypesNotEqual": {
           "lhs_decl": {
-            "content": " v: str",
+            "content": "v: str",
             "range": [
               10,
               17

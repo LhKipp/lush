@@ -102,7 +102,7 @@ impl TyCheckState {
                 "Inserted env var {} from start scope in tychecker",
                 var.name
             );
-            let key = ty_state.new_term_key(var.decl.to_item());
+            let key = ty_state.new_term_key(var.decl.clone());
             ty_state.tc_var_table.insert(var.clone(), key);
         }
 
@@ -608,7 +608,7 @@ impl TyCheckState {
     /// Insert var var with ty ty
     fn insert_var(&mut self, var: Variable) -> TcKey {
         self.scope.get_cur_frame_mut().insert_var(var.clone());
-        let key = self.new_term_key(var.decl.to_item());
+        let key = self.new_term_key(var.decl.clone());
         self.tc_var_table.insert(var, key.clone());
         key
     }
