@@ -43,7 +43,8 @@ impl Rule for RelFileNameRule {
     fn parse_rule(&self, p: &mut Parser) -> Option<CompletedMarker> {
         let m = p.start();
         if p.eat_after(T![.], CMT_NL_WS) {
-            if !p.expect(T![/]) {
+            if !(p.eat(T![/]) || p.eat(T![.])) {
+                p.error("Expected / or .".into());
                 m.abandon(p);
                 return None;
             }

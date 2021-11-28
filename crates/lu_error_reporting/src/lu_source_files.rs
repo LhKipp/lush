@@ -97,11 +97,12 @@ fn make_global_frame() -> ScopeFrame<Variable> {
     let mut frame = ScopeFrame::new(ScopeFrameTag::GlobalFrame);
     //insert env vars
     for (key, value) in env::vars() {
-        frame.insert_var(Variable::new(
-            key,
-            value.into(),
-            lu_source_code_item!().into(),
-        ));
+        let val = if key == "PWD" || key == "HOME" {
+            Value::FileName(value)
+        } else {
+            Value::String(value)
+        };
+        frame.insert_var(Variable::new(key, val, lu_source_code_item!().into()));
     }
 
     // insert builtin cmds
