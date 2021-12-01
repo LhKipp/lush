@@ -433,6 +433,8 @@ The following math-operators are currently supported
 * "<="    : Less or equal than
 * "=="    : Equality
 * "!="    : Inequality
+* "and"   : Logical and
+* "or"    : Logical or
 * "as"    : Typecast for any
 
 ### Examples with a word of caution

@@ -235,6 +235,70 @@ impl Display for ReqKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct OrKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for OrKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::OrKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for OrKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for OrKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for OrKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct AndKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for AndKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::AndKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for AndKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for AndKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for AndKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct UseKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -4302,6 +4366,8 @@ impl Display for ConditionElement {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum OperatorExprElement {
     AsKeyword(AsKeywordToken),
+    AndKeyword(AndKeywordToken),
+    OrKeyword(OrKeywordToken),
     PlusSign(PlusSignToken),
     MinusSign(MinusSignToken),
     MultSign(MultSignToken),
@@ -4341,8 +4407,10 @@ impl AstElement for OperatorExprElement {
         
         
         
+        
+        
         match kind{
-            AsKeyword | PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | DivAssignSign | MulAssignSign | AddAssignSign | MinAssignSign | AssignSign => true,
+            AsKeyword | AndKeyword | OrKeyword | PlusSign | MinusSign | MultSign | DivSign | LessThanSign | LessOrEqualSign | EqualitySign | InequalitySign | BiggerThanSign | BiggerOrEqualSign | DivAssignSign | MulAssignSign | AddAssignSign | MinAssignSign | AssignSign => true,
             _ => false,
         }
     }
@@ -4364,8 +4432,12 @@ impl AstElement for OperatorExprElement {
         
         
         
+        
+        
         let res = match syntax.kind() {
             AsKeyword => OperatorExprElement::AsKeyword(AsKeywordToken { syntax: syntax.into_token().unwrap() }),
+            AndKeyword => OperatorExprElement::AndKeyword(AndKeywordToken { syntax: syntax.into_token().unwrap() }),
+            OrKeyword => OperatorExprElement::OrKeyword(OrKeywordToken { syntax: syntax.into_token().unwrap() }),
             PlusSign => OperatorExprElement::PlusSign(PlusSignToken { syntax: syntax.into_token().unwrap() }),
             MinusSign => OperatorExprElement::MinusSign(MinusSignToken { syntax: syntax.into_token().unwrap() }),
             MultSign => OperatorExprElement::MultSign(MultSignToken { syntax: syntax.into_token().unwrap() }),
@@ -4390,6 +4462,12 @@ impl AstElement for OperatorExprElement {
         match self {
             
             OperatorExprElement::AsKeyword(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::AndKeyword(it) => it.syntax.clone().into(),
+            
+            
+            OperatorExprElement::OrKeyword(it) => it.syntax.clone().into(),
             
             
             OperatorExprElement::PlusSign(it) => it.syntax.clone().into(),
@@ -4443,6 +4521,8 @@ impl HasSyntaxKind for OperatorExprElement{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             OperatorExprElement::AsKeyword(it) => it.get_syntax_kind(),
+            OperatorExprElement::AndKeyword(it) => it.get_syntax_kind(),
+            OperatorExprElement::OrKeyword(it) => it.get_syntax_kind(),
             OperatorExprElement::PlusSign(it) => it.get_syntax_kind(),
             OperatorExprElement::MinusSign(it) => it.get_syntax_kind(),
             OperatorExprElement::MultSign(it) => it.get_syntax_kind(),

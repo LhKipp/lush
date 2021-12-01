@@ -92,7 +92,7 @@ impl Rule for IfElifOptRulePart {
                     LuTypeRule {}.parse(p);
                 }
                 if p.expect_after(T![=], CMT_NL_WS) {
-                    ValueExprRule {}.parse(p);
+                    ValueExprRule {}.parse(p); // TODO should be piped_cmds_stmt
                 }
             }
             _ => unreachable!(),

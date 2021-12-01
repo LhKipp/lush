@@ -8,6 +8,8 @@ Config(
     ( name: "NoneKeyword"                , token_text: "None"                         , is_token: true   , ) ,
     ( name: "AsKeyword"                  , token_text: "as"                         , is_token: true   , ) ,
     ( name: "ReqKeyword"                 , token_text: "req"                            , is_token: true   , ) ,
+    ( name: "OrKeyword"                  , token_text: "or"                            , is_token: true   , ) ,
+    ( name: "AndKeyword"                 , token_text: "and"                            , is_token: true   , ) ,
     ( name: "UseKeyword"                 , token_text: "use"                            , is_token: true   , ) ,
     ( name: "LetKeyword"                 , token_text: "let"                            , is_token: true   , ) ,
     ( name: "FnKeyword"                  , token_text: "fn"                             , is_token: true   , ) ,
@@ -170,6 +172,8 @@ Config(
     (name: "OperatorExpr", is_generic: true,
         represents_element_names: [
             "AsKeyword",
+            "AndKeyword",
+            "OrKeyword",
             "PlusSign",
             "MinusSign",
             "MultSign",

@@ -1,0 +1,100 @@
+Lhs must be bool in and
+===
+1 and true
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "1",
+            "range": [
+              0,
+              1
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...
+Rhs must be bool in and
+===
+true and 1
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "1",
+            "range": [
+              9,
+              10
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...
+Lhs must be bool in or
+===
+1 or true
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "1",
+            "range": [
+              0,
+              1
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...
+Rhs must be bool in or
+===
+true or 1
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "1",
+            "range": [
+              8,
+              9
+            ]
+          },
+          "lhs_ty": "num",
+          "rhs_decl": null,
+          "rhs_ty": "bool"
+        }
+      }
+    }
+  ]
+}
+...

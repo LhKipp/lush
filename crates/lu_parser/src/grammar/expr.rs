@@ -37,6 +37,8 @@ fn next_op(p: &mut Parser) -> (u8, SyntaxKind) {
     let next_token = p.next_non(CMT_NL_WS);
     let result = match next_token {
         // Left associative
+        T![or]                        => (3,  T![or]),
+        T![and]                       => (4,  T![and]),
         T![>=]                        => (5,  T![>=]),
         T![>]                         => (5,  T![>]),
         T![==]                        => (5,  T![==]),

@@ -29,7 +29,7 @@ impl Rule for ForStmtRule {
         p.eat_while(CMT_NL_WS);
         p.expect(InKeyword);
         p.eat_while(CMT_NL_WS);
-        ValueExprRule {}.parse(p);
+        ValueExprRule {}.parse(p); // TODO this should be PipedCmdsStmtRule
         p.eat_until(Newline);
         p.expect(Newline);
         BlockStmtRule::fn_for_block().parse(p);

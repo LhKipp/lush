@@ -47,6 +47,11 @@ impl TypeCheck for MathExprNode {
                 equate(&self.lhs(), &self.rhs(), state);
                 Some(state.new_term_key_concretiziesd(self.to_item(), ValueType::Bool))
             }
+            OperatorExprElement::OrKeyword(_) | OperatorExprElement::AndKeyword(_) => {
+                concretize(&self.lhs(), ValueType::Bool, state);
+                concretize(&self.rhs(), ValueType::Bool, state);
+                Some(state.new_term_key_concretiziesd(self.to_item(), ValueType::Bool))
+            }
             OperatorExprElement::DivAssignSign(_) => todo!(),
             OperatorExprElement::MulAssignSign(_) => todo!(),
             OperatorExprElement::AddAssignSign(_) => todo!(),
@@ -70,4 +75,8 @@ fn equate(
     let rhs_key = rhs.typecheck(ty_state).unwrap();
     ty_state.equate_keys(lhs_key, rhs_key);
     (lhs_key, rhs_key)
+}
+fn concretize(expr: &ValueExprElement, ty: ValueType, ty_state: &mut TyCheckState) {
+    let key = expr.typecheck(ty_state).unwrap();
+    ty_state.concretizes_key(key, ty);
 }

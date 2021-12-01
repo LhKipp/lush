@@ -27,6 +27,14 @@ impl LuNativeStdMod for IterFuncsMod {
             end
             ret $result
         end
+
+        fn count (in: [T] ret: num)
+            let result = 0
+            for row in $in
+                result += 1
+            end
+            ret $result
+        end
         "#
     }
 }

@@ -1,0 +1,10 @@
+and has higher precedence than or
+===
+true or true and false
+---
+{
+  "Ok": {
+    "Bool": true
+  }
+}
+...

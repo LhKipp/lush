@@ -83,7 +83,12 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::InequalitySign(_) => Ok((lhs_val != rhs_val).into()),
             OperatorExprElement::BiggerThanSign(_) => Ok((lhs_val > rhs_val).into()),
             OperatorExprElement::BiggerOrEqualSign(_) => Ok((lhs_val >= rhs_val).into()),
-
+            OperatorExprElement::AndKeyword(_) => {
+                Ok((lhs_val.coerce_to_bool().unwrap() && rhs_val.coerce_to_bool().unwrap()).into())
+            }
+            OperatorExprElement::OrKeyword(_) => {
+                Ok((lhs_val.coerce_to_bool().unwrap() || rhs_val.coerce_to_bool().unwrap()).into())
+            }
             OperatorExprElement::DivAssignSign(_) => todo!(),
             OperatorExprElement::MulAssignSign(_) => todo!(),
             OperatorExprElement::AddAssignSign(_) => todo!(),

@@ -1,9 +1,3 @@
 #!/bin/lush
-use std:fs
-use std:iter
-
-# fn is_dir(arg)
-#     $arg.name == "Directory"
-# end
-
-ls | filter $arg.type == "Directory" | map $arg.name
+# Ein fehlerhaftes Beispielprogramm
+let x: num = "Hello world"

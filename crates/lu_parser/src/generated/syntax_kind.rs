@@ -21,6 +21,10 @@ pub enum SyntaxKind {
     AsKeyword,
     #[token("req")]
     ReqKeyword,
+    #[token("or")]
+    OrKeyword,
+    #[token("and")]
+    AndKeyword,
     #[token("use")]
     UseKeyword,
     #[token("let")]
@@ -221,6 +225,8 @@ impl SyntaxKind{
             SyntaxKind::NoneKeyword => "NoneKeyword",
             SyntaxKind::AsKeyword => "AsKeyword",
             SyntaxKind::ReqKeyword => "ReqKeyword",
+            SyntaxKind::OrKeyword => "OrKeyword",
+            SyntaxKind::AndKeyword => "AndKeyword",
             SyntaxKind::UseKeyword => "UseKeyword",
             SyntaxKind::LetKeyword => "LetKeyword",
             SyntaxKind::FnKeyword => "FnKeyword",
@@ -361,6 +367,8 @@ macro_rules! T {
     [None] => {$crate::SyntaxKind::NoneKeyword };
     [as] => {$crate::SyntaxKind::AsKeyword };
     [req] => {$crate::SyntaxKind::ReqKeyword };
+    [or] => {$crate::SyntaxKind::OrKeyword };
+    [and] => {$crate::SyntaxKind::AndKeyword };
     [use] => {$crate::SyntaxKind::UseKeyword };
     [let] => {$crate::SyntaxKind::LetKeyword };
     [fn] => {$crate::SyntaxKind::FnKeyword };
