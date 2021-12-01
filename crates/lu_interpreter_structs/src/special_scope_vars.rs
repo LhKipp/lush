@@ -42,3 +42,11 @@ pub fn get_silence_stmt_returns(scope: &Scope<Variable>) -> Option<bool> {
         .flatten()
         .cloned()
 }
+
+const PWD_ENV_VAR: &str = "PWD";
+pub fn get_pwd_var(scope: &Scope<Variable>) -> (&Variable, &String) {
+    let pwd = scope.find_var(PWD_ENV_VAR).unwrap();
+    let pwd_val = pwd.val.as_file_name().expect("PWD always FileName");
+    assert!(!pwd_val.ends_with("/"));
+    (pwd, pwd_val)
+}

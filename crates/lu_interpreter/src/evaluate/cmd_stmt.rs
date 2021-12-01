@@ -16,7 +16,7 @@ impl Evaluable for CmdStmtNode {
             if let Some(cmd) = scope.lock().find_func(&cmd_name, &passed_flags) {
                 cmd.clone()
             } else {
-                RunExternalCmd::new(self.clone(), cmd_name).rced()
+                RunExternalCmd::new(self.to_item(), cmd_name).rced()
             };
 
         let grouped_args = evaluate_and_group_args(self.args(), &cmd.signature(), scope)?;

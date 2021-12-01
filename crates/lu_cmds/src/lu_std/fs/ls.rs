@@ -1,4 +1,7 @@
-use std::sync::Arc;
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use crate::cmd_prelude::*;
 use glob::Paths;
@@ -84,41 +87,51 @@ impl Command for FsLsCmd {
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let mut entries = vec![];
 
-        let pwd = scope
-            .lock()
-            .find_var("PWD")
-            .map(|var| var.val.as_file_name())
-            .flatten()
-            .expect("pwd always filename")
-            .clone();
-        assert!(!pwd.ends_with("/"));
-
         let mut l_scope = scope.lock();
+        let (_, pwd) = get_pwd_var(&l_scope);
+        let pwd = pwd.clone();
+
         let patterns = {
             let mut patterns: Vec<_> = self
                 .expect_args(PATHS_VAR_ARG_NAME, &mut l_scope)
                 .iter()
-                .map(|pattern| match pattern {
-                    Value::FileName(pattern) => pattern.clone(),
-                    _ => unreachable!(),
-                })
+                .map(|pattern| pattern.coerce_to_filename().unwrap().to_string())
                 .collect();
             if patterns.is_empty() {
                 patterns.push("*".into())
             }
             patterns
         };
+        debug!("Found pwd: {} and patterns {:?}", pwd, patterns);
 
         let matching_paths: Result<Vec<Paths>, EvalErr> = patterns
             .into_iter()
             .map(|pattern| {
-                let glob_pattern = format!("{}/{}", pwd, pattern);
+                let glob_pattern = {
+                    let path: PathBuf = format!("{}/{}", pwd, pattern).into();
+                    if path.is_dir() {
+                        format!("{}/*", path.display())
+                    } else {
+                        path.display().to_string()
+                    }
+                };
+
+                if !glob_pattern.contains(|c| c == '*') && !Path::new(&glob_pattern).exists() {
+                    // normal path, not containing any wildcards. Must exist
+                    return Err(EvalErr::Message(format!(
+                        "ls: cannot access '{}': No such file or directory",
+                        glob_pattern
+                    )));
+                }
+
                 glob::glob(&glob_pattern).map_err(|e| EvalErr::Message(e.to_string()))
             })
             .collect();
+        let matching_paths: Result<Vec<PathBuf>, _> =
+            matching_paths?.into_iter().flatten().collect();
+        let matching_paths = matching_paths.map_err(|e| EvalErr::Message(e.to_string()))?;
 
-        for path in matching_paths?.into_iter().flatten() {
-            let path = path.map_err(|e| EvalErr::Message(e.to_string()))?;
+        for path in matching_paths {
             let path_name = path
                 .display()
                 .to_string()

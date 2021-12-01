@@ -844,7 +844,10 @@ impl LuRustStdMod for StdArrayMod {
     }
 }
 "#####)
-,("crates/lu_cmds/src/lu_std/fs/ls.rs",r#####"use std::sync::Arc;
+,("crates/lu_cmds/src/lu_std/fs/ls.rs",r#####"use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use crate::cmd_prelude::*;
 use glob::Paths;
@@ -930,41 +933,51 @@ impl Command for FsLsCmd {
     fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
         let mut entries = vec![];
 
-        let pwd = scope
-            .lock()
-            .find_var("PWD")
-            .map(|var| var.val.as_file_name())
-            .flatten()
-            .expect("pwd always filename")
-            .clone();
-        assert!(!pwd.ends_with("/"));
-
         let mut l_scope = scope.lock();
+        let (_, pwd) = get_pwd_var(&l_scope);
+        let pwd = pwd.clone();
+
         let patterns = {
             let mut patterns: Vec<_> = self
                 .expect_args(PATHS_VAR_ARG_NAME, &mut l_scope)
                 .iter()
-                .map(|pattern| match pattern {
-                    Value::FileName(pattern) => pattern.clone(),
-                    _ => unreachable!(),
-                })
+                .map(|pattern| pattern.coerce_to_filename().unwrap().to_string())
                 .collect();
             if patterns.is_empty() {
                 patterns.push("*".into())
             }
             patterns
         };
+        debug!("Found pwd: {} and patterns {:?}", pwd, patterns);
 
         let matching_paths: Result<Vec<Paths>, EvalErr> = patterns
             .into_iter()
             .map(|pattern| {
-                let glob_pattern = format!("{}/{}", pwd, pattern);
+                let glob_pattern = {
+                    let path: PathBuf = format!("{}/{}", pwd, pattern).into();
+                    if path.is_dir() {
+                        format!("{}/*", path.display())
+                    } else {
+                        path.display().to_string()
+                    }
+                };
+
+                if !glob_pattern.contains(|c| c == '*') && !Path::new(&glob_pattern).exists() {
+                    // normal path, not containing any wildcards. Must exist
+                    return Err(EvalErr::Message(format!(
+                        "ls: cannot access '{}': No such file or directory",
+                        glob_pattern
+                    )));
+                }
+
                 glob::glob(&glob_pattern).map_err(|e| EvalErr::Message(e.to_string()))
             })
             .collect();
+        let matching_paths: Result<Vec<PathBuf>, _> =
+            matching_paths?.into_iter().flatten().collect();
+        let matching_paths = matching_paths.map_err(|e| EvalErr::Message(e.to_string()))?;
 
-        for path in matching_paths?.into_iter().flatten() {
-            let path = path.map_err(|e| EvalErr::Message(e.to_string()))?;
+        for path in matching_paths {
             let path_name = path
                 .display()
                 .to_string()
@@ -1332,8 +1345,8 @@ impl Command for CdBuiltin {
         let path = if path.is_absolute() {
             path
         } else {
-            let pwd: PathBuf = pwd.val.as_file_name().unwrap().into();
-            pwd.join(path)
+            let pwd_: PathBuf = pwd.val.as_file_name().unwrap().into();
+            pwd_.join(path)
         };
 
         if !path.is_dir() {
@@ -1466,13 +1479,12 @@ use std::{io::Write, process::Stdio};
 
 use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
 use lu_interpreter_structs::external_cmd;
-use lu_syntax::{ast::CmdStmtNode, AstNode};
 use once_cell::unsync::OnceCell;
 
 #[derive(Debug, Clone, new)]
 pub struct RunExternalCmd {
     /// The node in the AST which is evaluated by this Command
-    pub cmd_node: CmdStmtNode,
+    pub cmd_node: SourceCodeItem,
     pub cmd_name: String,
     // TODO this could be global..., but would need adaptation of the signature() method from
     // Command
@@ -1551,7 +1563,7 @@ impl Command for RunExternalCmd {
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| {
-                EvalErr::SpawningExternalProcessFailed(self.cmd_node.to_item(), e.to_string())
+                EvalErr::SpawningExternalProcessFailed(self.cmd_node.clone(), e.to_string())
             })?;
 
         if !stdin.is_nil() {
@@ -1561,19 +1573,19 @@ impl Command for RunExternalCmd {
                 .expect("Cmd stdin always correctly captured :)")
                 .write_all(stdin.to_string().as_bytes())
                 .map_err(|e| {
-                    EvalErr::ExternalCmdStdinWriteErr(self.cmd_node.to_item(), format!("{:?}", e))
+                    EvalErr::ExternalCmdStdinWriteErr(self.cmd_node.clone(), format!("{:?}", e))
                 })?;
         }
 
         let output = child.wait_with_output().map_err(|e| {
-            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.to_item(), format!("{:?}", e))
+            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.clone(), format!("{:?}", e))
         })?;
 
         if output.status.success() {
             let raw_output = String::from_utf8(output.stdout)?;
             Ok(Value::BareWord(raw_output))
         } else {
-            Err(EvalErr::ExternalCmdFailed(self.cmd_node.to_item()).into())
+            Err(EvalErr::ExternalCmdFailed(self.cmd_node.clone()).into())
         }
     }
 }
@@ -1621,6 +1633,14 @@ pub fn get_silence_stmt_returns(scope: &Scope<Variable>) -> Option<bool> {
         .map(|var| var.val.as_bool())
         .flatten()
         .cloned()
+}
+
+const PWD_ENV_VAR: &str = "PWD";
+pub fn get_pwd_var(scope: &Scope<Variable>) -> (&Variable, &String) {
+    let pwd = scope.find_var(PWD_ENV_VAR).unwrap();
+    let pwd_val = pwd.val.as_file_name().expect("PWD always FileName");
+    assert!(!pwd_val.ends_with("/"));
+    (pwd, pwd_val)
 }
 "#####)
 ,("crates/lu_interpreter_structs/src/user_def_tys/function.rs",r#####"use crate::{
