@@ -11,6 +11,7 @@ mod command_collection;
 pub mod dbg_state;
 mod evaluate;
 pub mod external_cmd;
+mod external_cmds_attr;
 mod flag;
 mod module;
 pub mod prelude;

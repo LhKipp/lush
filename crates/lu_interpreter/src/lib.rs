@@ -17,5 +17,5 @@ pub use interactive_interpreter::InteractiveInterpreter;
 pub use resolve::*;
 pub use typecheck::*;
 
-pub use lu_cmds::RunExternalCmd;
+pub use lu_interpreter_structs::RunExternalCmd;
 pub(crate) use lu_interpreter_structs::*;

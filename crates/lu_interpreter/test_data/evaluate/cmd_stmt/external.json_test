@@ -18,3 +18,13 @@ External takes arguments
   }
 }
 ...
+External takes flags
+===
+echo -n hi
+---
+{
+  "Ok": {
+    "BareWord": "hi"
+  }
+}
+...

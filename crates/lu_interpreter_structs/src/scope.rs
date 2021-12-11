@@ -437,7 +437,7 @@ impl<T: fmt::Debug + 'static> fmt::Debug for Scope<T> {
                     } else {
                         ""
                     };
-                    &write!(
+                    write!(
                         f,
                         "{:indent$}{}{}\n",
                         "",

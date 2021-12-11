@@ -1014,6 +1014,7 @@ dependencies = [
  "enum-as-inner",
  "enum_dispatch",
  "fs-err",
+ "glob",
  "if_chain",
  "indexmap",
  "indextree",

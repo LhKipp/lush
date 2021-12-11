@@ -302,7 +302,7 @@ use lu_error::{lu_source_code_item, SourceCodeItem, TyErr};
 use lu_interpreter_structs::{
     external_cmd,
     special_cmds::{MATH_FN_NAME, SELECT_CMD_NAME},
-    FlagSignature, FlagVariant, ScopeFrameTag, Value,
+    CmdAttributeVariant, Command, FlagSignature, FlagVariant, RunExternalCmd, ScopeFrameTag, Value,
 };
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
@@ -329,13 +329,20 @@ impl TypeCheck for CmdStmtNode {
             .scope
             .find_func(&self.get_cmd_name(), &passed_flags)
             .cloned();
-        let cmd_keys = if let Some(cmd) = called_cmd {
-            ty_state
-                // TODO use get_tc_cmd_from_cmd_usage
-                .get_tc_cmd_from_rc_cmd(&cmd)
-                .expect("If cmd is found in scope it must be found in ty_state")
+        let (cmd_keys, called_cmd) = if let Some(cmd) = called_cmd {
+            (
+                ty_state
+                    // TODO use get_tc_cmd_from_cmd_usage
+                    .get_tc_cmd_from_rc_cmd(&cmd)
+                    .expect("If cmd is found in scope it must be found in ty_state"),
+                cmd,
+            )
         } else {
-            TcFunc::from_signature(&external_cmd::external_cmd_signature(), ty_state)
+            let ext_cmd = RunExternalCmd::new(self.to_item(), self.get_cmd_name()).rced();
+            (
+                TcFunc::from_signature(ext_cmd.signature(), ty_state),
+                ext_cmd,
+            )
         };
 
         if let Some(in_key) = args.iter().find_map(|arg| arg.as_cmd_stmt()) {
@@ -347,7 +354,14 @@ impl TypeCheck for CmdStmtNode {
         }
 
         // Ty check args
-        ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);
+        if called_cmd
+            .find_attr(CmdAttributeVariant::DontParseArguments)
+            .is_none()
+        {
+            ty_check_cmd_args_and_flags_based_on_signature(self, self.args(), &cmd_keys, ty_state);
+        } else {
+            ty_check_cmd_args(self.args(), ty_state);
+        }
 
         if self.get_cmd_name() == SELECT_CMD_NAME {
             if let Some(key) = do_extra_ty_check_select_cmd(self, args, ty_state) {
@@ -358,7 +372,21 @@ impl TypeCheck for CmdStmtNode {
     }
 }
 
-fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
+fn ty_check_cmd_args<ArgIter: Iterator<Item = CmdArgElement>>(
+    args: ArgIter,
+    ty_state: &mut TyCheckState,
+) {
+    for arg in args {
+        match arg {
+            CmdArgElement::ShortFlag(_) | CmdArgElement::LongFlag(_) => {}
+            CmdArgElement::ValueExpr(expr) => {
+                expr.typecheck(ty_state);
+            }
+        }
+    }
+}
+
+fn ty_check_cmd_args_and_flags_based_on_signature<ArgIter: Iterator<Item = CmdArgElement>>(
     cmd_node: &CmdStmtNode,
     mut args: ArgIter,
     called_func: &TcFunc,
@@ -647,55 +675,6 @@ fn typecheck_block(block: Option<BlockStmtNode>, ty_state: &mut crate::TyCheckSt
         );
     }
 }
-"#####)
-,("crates/lu_cmds/src/external_cmds_attr.rs",r#####"use std::collections::HashMap;
-
-use lu_error::lu_source_code_item;
-use lu_interpreter_structs::{CmdAttribute, CmdAttributeVariant::*};
-use once_cell::sync::Lazy;
-
-pub(crate) static EXT_CMDS_DEF_ATTRIBUTES: Lazy<Vec<CmdAttribute>> =
-    Lazy::new(|| vec![(PurityUnknown, lu_source_code_item!()).into()]);
-
-pub(crate) static EXT_CMDS_ATTRIBUTES: Lazy<HashMap<&str, Vec<CmdAttribute>>> = Lazy::new(|| {
-    let mut m = HashMap::new();
-    m.insert("awk", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("bc", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("cat", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("col", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("comm", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("cut", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("date", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("diff", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("echo", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("fmt", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("grep", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("groff", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("gzip", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("gunzip", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("head", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("iconv", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("jobs", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("nl", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("pandoc", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("paste", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("pr", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("ps", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("readelf", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("sed", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("seq", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("sha256sum", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("shuf", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("sort", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("tac", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("tail", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("tee", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("tr", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("uniq", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("wc", vec![(Pure, lu_source_code_item!()).into()]);
-    m.insert("xargs", vec![(Pure, lu_source_code_item!()).into()]);
-    m
-});
 "#####)
 ,("crates/lu_cmds/src/lu_std/fs.rs",r#####"mod ls;
 
@@ -1473,122 +1452,268 @@ impl Command for TyOfBuiltin {
     }
 }
 "#####)
-,("crates/lu_cmds/src/run_external_cmd.rs",r#####"use crate::external_cmds_attr::EXT_CMDS_ATTRIBUTES;
-use crate::{cmd_prelude::*, external_cmds_attr::EXT_CMDS_DEF_ATTRIBUTES};
-use std::{io::Write, process::Stdio};
+,("crates/lu_interpreter_structs/src/external_cmds_attr.rs",r#####"use std::collections::HashMap;
 
-use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
-use lu_interpreter_structs::external_cmd;
-use once_cell::unsync::OnceCell;
+use crate::{CmdAttribute, CmdAttributeVariant::*};
+use lu_error::lu_source_code_item;
+use once_cell::sync::Lazy;
 
-#[derive(Debug, Clone, new)]
-pub struct RunExternalCmd {
-    /// The node in the AST which is evaluated by this Command
-    pub cmd_node: SourceCodeItem,
-    pub cmd_name: String,
-    // TODO this could be global..., but would need adaptation of the signature() method from
-    // Command
-    #[new(default)]
-    signature: OnceCell<Signature>,
-}
+pub(crate) static EXT_CMDS_DEF_ATTRIBUTES: Lazy<Vec<CmdAttribute>> = Lazy::new(|| {
+    vec![
+        (PurityUnknown, lu_source_code_item!()).into(),
+        (DontParseArguments, lu_source_code_item!()).into(),
+    ]
+});
 
-impl Command for RunExternalCmd {
-    fn name(&self) -> &str {
-        &self.cmd_name
-    }
-
-    fn signature(&self) -> &Signature {
-        self.signature
-            .get_or_init(|| external_cmd::external_cmd_signature())
-    }
-
-    fn signature_item(&self) -> SourceCodeItem {
-        lu_source_code_item!() // TODO fixup line number
-    }
-
-    fn parent_module(&self) -> Option<&lu_interpreter_structs::ModPath> {
-        None
-    }
-
-    fn attributes(&self) -> &[CmdAttribute] {
-        EXT_CMDS_ATTRIBUTES
-            .get(self.name())
-            .map(|attrs| attrs.as_ref())
-            .unwrap_or(&EXT_CMDS_DEF_ATTRIBUTES)
-    }
-
-    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
-        let l_scope = scope.lock();
-
-        let args = self.expect_args(
-            &self
-                .signature()
-                .var_arg
-                .as_ref()
-                .expect("ExternalCmd has vararg")
-                .name,
-            &l_scope,
-        );
-
-        // Historic shells expand wildcards (*, **) to all files matching the pattern in the
-        // current PWD. Lush doesn't do the same automatically for internal cmds. For better
-        // compatability, we now expand filenames
-        let mut args_as_str = vec![];
-        for arg in &**args {
-            if let Value::FileName(f_name) = arg {
-                match glob::glob(&f_name) {
-                    Ok(entries) => {
-                        for entry in entries {
-                            match entry {
-                                Ok(path) => args_as_str.push(path.display().to_string()),
-                                Err(e) => {
-                                    return Err(EvalErr::Message(e.to_string()).into());
-                                }
-                            }
-                        }
-                    }
-                    Err(e) => unreachable!("TODO check all globs are valid: {}", e),
-                }
-            } else {
-                args_as_str.push(arg.to_string())
-            }
-        }
-
-        let args = args_as_str;
-        let stdin = self.get_in(&l_scope).cloned().unwrap_or(Value::Nil);
-
-        let mut child = std::process::Command::new(self.cmd_name.clone())
-            .args(args)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn()
-            .map_err(|e| {
-                EvalErr::SpawningExternalProcessFailed(self.cmd_node.clone(), e.to_string())
-            })?;
-
-        if !stdin.is_nil() {
-            child
-                .stdin
-                .as_mut()
-                .expect("Cmd stdin always correctly captured :)")
-                .write_all(stdin.to_string().as_bytes())
-                .map_err(|e| {
-                    EvalErr::ExternalCmdStdinWriteErr(self.cmd_node.clone(), format!("{:?}", e))
-                })?;
-        }
-
-        let output = child.wait_with_output().map_err(|e| {
-            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.clone(), format!("{:?}", e))
-        })?;
-
-        if output.status.success() {
-            let raw_output = String::from_utf8(output.stdout)?;
-            Ok(Value::BareWord(raw_output))
-        } else {
-            Err(EvalErr::ExternalCmdFailed(self.cmd_node.clone()).into())
-        }
-    }
-}
+pub(crate) static EXT_CMDS_ATTRIBUTES: Lazy<HashMap<&str, Vec<CmdAttribute>>> = Lazy::new(|| {
+    let mut m = HashMap::new();
+    m.insert(
+        "awk",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "bc",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "cat",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "col",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "comm",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "cut",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "date",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "diff",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "echo",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "fmt",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "grep",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "groff",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "gzip",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "gunzip",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "head",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "iconv",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "jobs",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "nl",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "pandoc",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "paste",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "pr",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "ps",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "readelf",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "sed",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "seq",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "sha256sum",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "shuf",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "sort",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "tac",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "tail",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "tee",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "tr",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "uniq",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "wc",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m.insert(
+        "xargs",
+        vec![
+            (DontParseArguments, lu_source_code_item!()).into(),
+            (Pure, lu_source_code_item!()).into(),
+        ],
+    );
+    m
+});
 "#####)
 ,("crates/lu_interpreter_structs/src/special_scope_vars.rs",r#####"use log::debug;
 use lu_error::lu_source_code_item;
@@ -2006,10 +2131,15 @@ impl Command for Function {
     }
 }
 "#####)
-,("crates/lu_interpreter_structs/src/external_cmd.rs",r#####"use lu_error::lu_source_code_item;
+,("crates/lu_interpreter_structs/src/external_cmd.rs",r#####"use crate::{CmdAttribute, SyScope, Value, external_cmds_attr::{EXT_CMDS_ATTRIBUTES, EXT_CMDS_DEF_ATTRIBUTES}};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
+use std::{io::Write, process::Stdio};
 
-use crate::{ArgSignature, Signature, ValueType};
+use crate::external_cmd;
+use lu_error::{lu_source_code_item, EvalErr, LuResult, SourceCodeItem};
+use once_cell::unsync::OnceCell;
+
+use crate::{ArgSignature, Command, Signature, ValueType};
 
 pub fn external_cmd_signature() -> Signature {
     let lu_item = lu_source_code_item!();
@@ -2025,6 +2155,115 @@ pub fn external_cmd_signature() -> Signature {
         ArgSignature::req(RET_ARG_NAME.into(), ValueType::Any, lu_item.clone()),
         lu_item,
     )
+}
+
+#[derive(Debug, Clone, new)]
+pub struct RunExternalCmd {
+    /// The node in the AST which is evaluated by this Command
+    pub cmd_node: SourceCodeItem,
+    pub cmd_name: String,
+    // TODO this could be global..., but would need adaptation of the signature() method from
+    // Command
+    #[new(default)]
+    signature: OnceCell<Signature>,
+}
+
+impl Command for RunExternalCmd {
+    fn name(&self) -> &str {
+        &self.cmd_name
+    }
+
+    fn signature(&self) -> &Signature {
+        self.signature
+            .get_or_init(|| external_cmd::external_cmd_signature())
+    }
+
+    fn signature_item(&self) -> SourceCodeItem {
+        lu_source_code_item!() // TODO fixup line number
+    }
+
+    fn parent_module(&self) -> Option<&crate::ModPath> {
+        None
+    }
+
+    fn attributes(&self) -> &[CmdAttribute] {
+        EXT_CMDS_ATTRIBUTES
+            .get(self.name())
+            .map(|attrs| attrs.as_ref())
+            .unwrap_or(&EXT_CMDS_DEF_ATTRIBUTES)
+    }
+
+    fn do_run_cmd(&self, scope: &mut SyScope) -> LuResult<Value> {
+        let l_scope = scope.lock();
+
+        let args = self.expect_args(
+            &self
+                .signature()
+                .var_arg
+                .as_ref()
+                .expect("ExternalCmd has vararg")
+                .name,
+            &l_scope,
+        );
+
+        // Historic shells expand wildcards (*, **) to all files matching the pattern in the
+        // current PWD. Lush doesn't do the same automatically for internal cmds. For better
+        // compatability, we now expand filenames
+        let mut args_as_str = vec![];
+        for arg in &**args {
+            if let Value::FileName(f_name) = arg {
+                match glob::glob(&f_name) {
+                    Ok(entries) => {
+                        for entry in entries {
+                            match entry {
+                                Ok(path) => args_as_str.push(path.display().to_string()),
+                                Err(e) => {
+                                    return Err(EvalErr::Message(e.to_string()).into());
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => unreachable!("TODO check all globs are valid: {}", e),
+                }
+            } else {
+                args_as_str.push(arg.to_string())
+            }
+        }
+
+        let args = args_as_str;
+        let stdin = self.get_in(&l_scope).cloned().unwrap_or(Value::Nil);
+
+        let mut child = std::process::Command::new(self.cmd_name.clone())
+            .args(args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .map_err(|e| {
+                EvalErr::SpawningExternalProcessFailed(self.cmd_node.clone(), e.to_string())
+            })?;
+
+        if !stdin.is_nil() {
+            child
+                .stdin
+                .as_mut()
+                .expect("Cmd stdin always correctly captured :)")
+                .write_all(stdin.to_string().as_bytes())
+                .map_err(|e| {
+                    EvalErr::ExternalCmdStdinWriteErr(self.cmd_node.clone(), format!("{:?}", e))
+                })?;
+        }
+
+        let output = child.wait_with_output().map_err(|e| {
+            EvalErr::ExternalCmdStdoutReadErr(self.cmd_node.clone(), format!("{:?}", e))
+        })?;
+
+        if output.status.success() {
+            let raw_output = String::from_utf8(output.stdout)?;
+            Ok(Value::BareWord(raw_output))
+        } else {
+            Err(EvalErr::ExternalCmdFailed(self.cmd_node.clone()).into())
+        }
+    }
 }
 "#####)
 ,("crates/lu_interpreter_structs/src/value.rs",r#####"use enum_as_inner::EnumAsInner;

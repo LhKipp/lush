@@ -5,7 +5,7 @@ use lu_error::{lu_source_code_item, SourceCodeItem, TyErr};
 use lu_interpreter_structs::{
     external_cmd,
     special_cmds::{MATH_FN_NAME, SELECT_CMD_NAME},
-    FlagSignature, FlagVariant, ScopeFrameTag, Value,
+    CmdAttributeVariant, Command, FlagSignature, FlagVariant, RunExternalCmd, ScopeFrameTag, Value,
 };
 use lu_pipeline_stage::{ErrorContainer, PipelineStage};
 use lu_syntax::{
@@ -32,13 +32,20 @@ impl TypeCheck for CmdStmtNode {
             .scope
             .find_func(&self.get_cmd_name(), &passed_flags)
             .cloned();
-        let cmd_keys = if let Some(cmd) = called_cmd {
-            ty_state
-                // TODO use get_tc_cmd_from_cmd_usage
-                .get_tc_cmd_from_rc_cmd(&cmd)
-                .expect("If cmd is found in scope it must be found in ty_state")
+        let (cmd_keys, called_cmd) = if let Some(cmd) = called_cmd {
+            (
+                ty_state
+                    // TODO use get_tc_cmd_from_cmd_usage
+                    .get_tc_cmd_from_rc_cmd(&cmd)
+                    .expect("If cmd is found in scope it must be found in ty_state"),
+                cmd,
+            )
         } else {
-            TcFunc::from_signature(&external_cmd::external_cmd_signature(), ty_state)
+            let ext_cmd = RunExternalCmd::new(self.to_item(), self.get_cmd_name()).rced();
+            (
+                TcFunc::from_signature(ext_cmd.signature(), ty_state),
+                ext_cmd,
+            )
         };
 
         if let Some(in_key) = args.iter().find_map(|arg| arg.as_cmd_stmt()) {
@@ -50,7 +57,14 @@ impl TypeCheck for CmdStmtNode {
         }
 
         // Ty check args
-        ty_check_cmd_args_and_flags(self, self.args(), &cmd_keys, ty_state);
+        if called_cmd
+            .find_attr(CmdAttributeVariant::DontParseArguments)
+            .is_none()
+        {
+            ty_check_cmd_args_and_flags_based_on_signature(self, self.args(), &cmd_keys, ty_state);
+        } else {
+            ty_check_cmd_args(self.args(), ty_state);
+        }
 
         if self.get_cmd_name() == SELECT_CMD_NAME {
             if let Some(key) = do_extra_ty_check_select_cmd(self, args, ty_state) {
@@ -61,7 +75,21 @@ impl TypeCheck for CmdStmtNode {
     }
 }
 
-fn ty_check_cmd_args_and_flags<ArgIter: Iterator<Item = CmdArgElement>>(
+fn ty_check_cmd_args<ArgIter: Iterator<Item = CmdArgElement>>(
+    args: ArgIter,
+    ty_state: &mut TyCheckState,
+) {
+    for arg in args {
+        match arg {
+            CmdArgElement::ShortFlag(_) | CmdArgElement::LongFlag(_) => {}
+            CmdArgElement::ValueExpr(expr) => {
+                expr.typecheck(ty_state);
+            }
+        }
+    }
+}
+
+fn ty_check_cmd_args_and_flags_based_on_signature<ArgIter: Iterator<Item = CmdArgElement>>(
     cmd_node: &CmdStmtNode,
     mut args: ArgIter,
     called_func: &TcFunc,

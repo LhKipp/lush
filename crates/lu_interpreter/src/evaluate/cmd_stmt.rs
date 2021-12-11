@@ -19,7 +19,14 @@ impl Evaluable for CmdStmtNode {
                 RunExternalCmd::new(self.to_item(), cmd_name).rced()
             };
 
-        let grouped_args = evaluate_and_group_args(self.args(), &cmd.signature(), scope)?;
+        let grouped_args = if cmd
+            .find_attr(CmdAttributeVariant::DontParseArguments)
+            .is_none()
+        {
+            evaluate_and_group_args(self.args(), &cmd.signature(), scope)?
+        } else {
+            evaluate_args_no_grouping(self.args(), scope)?
+        };
 
         // FROM HERE ONLY EVALUATION OF CMD FOLLOWS
         // REASON: Otherwise the following dbg_stmt may return this func to early
@@ -202,6 +209,32 @@ macro_rules! insert_if_bool_flag_or_set_as_last_seen {
             $last_seen_flag = Some((flag_sign, $passed_flag.to_item()));
         }
     }};
+}
+
+// Evaluates all arguments withouth grouping arguments to flags
+// Flags are inserted as string value-arguments
+fn evaluate_args_no_grouping(
+    args: impl Iterator<Item = CmdArgElement>,
+    scope: &mut SyScope,
+) -> Result<GroupedArgs, RetValOrErr> {
+    let mut arg_vals = vec![];
+    for arg in args {
+        match arg {
+            CmdArgElement::ShortFlag(short_flag) => {
+                arg_vals.push(Value::String(short_flag.to_string()));
+            }
+            CmdArgElement::LongFlag(long_flag) => {
+                arg_vals.push(Value::String(long_flag.to_string()));
+            }
+            CmdArgElement::ValueExpr(expr) => {
+                arg_vals.push(expr.evaluate(scope)?);
+            }
+        }
+    }
+    Ok(GroupedArgs {
+        arg_vals,
+        flag_vals: vec![],
+    })
 }
 
 fn evaluate_and_group_args(

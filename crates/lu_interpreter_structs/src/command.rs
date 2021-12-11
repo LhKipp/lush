@@ -11,9 +11,13 @@ pub const IN_VAR_NAME: &str = "in";
 
 #[derive(Debug, Clone, Serialize, Deserialize, is_enum_variant, PartialEq, Eq)]
 pub enum CmdAttributeVariant {
+    // Purity
     Pure,
     Impure,
     PurityUnknown,
+
+    // Arguments (including flags) will not be parsed or validated
+    DontParseArguments,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, new)]
