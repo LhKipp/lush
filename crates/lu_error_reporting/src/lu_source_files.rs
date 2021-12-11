@@ -1345,8 +1345,8 @@ impl Command for CdBuiltin {
         let path = if path.is_absolute() {
             path
         } else {
-            let pwd_: PathBuf = pwd.val.as_file_name().unwrap().into();
-            pwd_.join(path)
+            let pwd: PathBuf = pwd.val.as_file_name().unwrap().into();
+            pwd.join(path)
         };
 
         if !path.is_dir() {

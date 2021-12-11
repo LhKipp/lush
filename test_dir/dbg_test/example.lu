@@ -1,3 +1,8 @@
 #!/bin/lush
-# Ein fehlerhaftes Beispielprogramm
-let x: num = "Hello world"
+
+fn cmd_with_flag(--flag)
+    echo $flag
+end
+let x = "--flag"
+
+cmd_with_flag $x
