@@ -34,8 +34,8 @@ ls | select NotExistent
           "strct_decl": {
             "content": "crates/lu_cmds/src/lu_std/fs/ls.rs",
             "range": [
-              23,
-              23
+              26,
+              26
             ]
           },
           "usage": {
