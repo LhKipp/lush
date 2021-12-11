@@ -36,3 +36,55 @@ $x = "Err"
   ]
 }
 ...
+AddAssign with non number rhs raises error
+===
+let x:num
+$x += "Hi"
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "\"Hi\"",
+            "range": [
+              16,
+              20
+            ]
+          },
+          "lhs_ty": "str",
+          "rhs_decl": null,
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...
+AddAssign with non number lhs raises error
+===
+let x:str
+$x += 1
+---
+{
+  "Err": [
+    {
+      "Ty": {
+        "TypesNotEqual": {
+          "lhs_decl": {
+            "content": "$x",
+            "range": [
+              10,
+              12
+            ]
+          },
+          "lhs_ty": "str",
+          "rhs_decl": null,
+          "rhs_ty": "num"
+        }
+      }
+    }
+  ]
+}
+...

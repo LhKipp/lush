@@ -52,10 +52,14 @@ impl TypeCheck for MathExprNode {
                 concretize(&self.rhs(), ValueType::Bool, state);
                 Some(state.new_term_key_concretiziesd(self.to_item(), ValueType::Bool))
             }
-            OperatorExprElement::DivAssignSign(_) => todo!(),
-            OperatorExprElement::MulAssignSign(_) => todo!(),
-            OperatorExprElement::AddAssignSign(_) => todo!(),
-            OperatorExprElement::MinAssignSign(_) => todo!(),
+            OperatorExprElement::DivAssignSign(_)
+            | OperatorExprElement::MulAssignSign(_)
+            | OperatorExprElement::AddAssignSign(_)
+            | OperatorExprElement::MinAssignSign(_) => {
+                concretize(&self.lhs(), ValueType::Number, state);
+                concretize(&self.rhs(), ValueType::Number, state);
+                None
+            }
             OperatorExprElement::AssignSign(_) => {
                 equate(&self.lhs(), &self.rhs(), state);
                 // Assignment does not return type

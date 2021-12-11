@@ -10,3 +10,51 @@ $x
   }
 }
 ...
+AddAssignment updates value
+===
+let x = 1
+$x += 2
+$x
+---
+{
+  "Ok": {
+    "Number": 3.0
+  }
+}
+...
+MinAssignment updates value
+===
+let x = 1
+$x -= 2
+$x
+---
+{
+  "Ok": {
+    "Number": -1.0
+  }
+}
+...
+MulAssignment updates value
+===
+let x = 3
+$x *= 2
+$x
+---
+{
+  "Ok": {
+    "Number": 6.0
+  }
+}
+...
+DivAssignment updates value
+===
+let x = 4
+$x /= 2
+$x
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...

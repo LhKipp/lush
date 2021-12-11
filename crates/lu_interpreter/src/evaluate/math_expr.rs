@@ -40,7 +40,11 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::AsKeyword(_) => {
                 unreachable!("Handled above")
             }
-            OperatorExprElement::AssignSign(_) => {
+            OperatorExprElement::AssignSign(_)
+            | OperatorExprElement::AddAssignSign(_)
+            | OperatorExprElement::MinAssignSign(_)
+            | OperatorExprElement::MulAssignSign(_)
+            | OperatorExprElement::DivAssignSign(_) => {
                 let lhs_var = if let ValueExprElement::ValuePathExpr(e) = lhs {
                     e
                 } else {
@@ -52,7 +56,29 @@ impl Evaluable for MathExprNode {
                 let var =
                     Evaluator::lu_result_to_eval_result(l_scope.expect_var_mut(&var_name, usage))?;
 
-                var.val = rhs_val;
+                if let OperatorExprElement::AssignSign(_) = operator {
+                    // Simple asign
+                    var.val = rhs_val;
+                } else if let Value::Number(val) = &mut var.val {
+                    let rhs_val = rhs_val.as_number().unwrap();
+                    match operator {
+                        OperatorExprElement::AddAssignSign(_) => {
+                            *val += rhs_val;
+                        }
+                        OperatorExprElement::MinAssignSign(_) => {
+                            *val -= rhs_val;
+                        }
+                        OperatorExprElement::MulAssignSign(_) => {
+                            *val *= rhs_val;
+                        }
+                        OperatorExprElement::DivAssignSign(_) => {
+                            *val /= rhs_val;
+                        }
+                        _ => unreachable!(),
+                    }
+                } else {
+                    unreachable!();
+                }
 
                 // Assignment does not return value
                 Ok(Value::Nil)
@@ -89,10 +115,6 @@ impl Evaluable for MathExprNode {
             OperatorExprElement::OrKeyword(_) => {
                 Ok((lhs_val.coerce_to_bool().unwrap() || rhs_val.coerce_to_bool().unwrap()).into())
             }
-            OperatorExprElement::DivAssignSign(_) => todo!(),
-            OperatorExprElement::MulAssignSign(_) => todo!(),
-            OperatorExprElement::AddAssignSign(_) => todo!(),
-            OperatorExprElement::MinAssignSign(_) => todo!(),
         }
     }
 }
