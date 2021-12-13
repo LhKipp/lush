@@ -1,4 +1,4 @@
-# LUSH - Lu-Shell
+# LuShell - A typed shell
 
 ## Goals
 
