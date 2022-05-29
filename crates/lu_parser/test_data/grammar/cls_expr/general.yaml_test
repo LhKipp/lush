@@ -1,0 +1,26 @@
+simple cls expr
+===
+cls $arg > 3 end
+---
+- Start: ClosureExpr
+- Token: "ClsKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Start: BlockStmt
+- Start: Tombstone
+- Start: "ValuePathExpr (parent: 5)"
+- Token: "Dollar (len: 1)"
+- Token: "BareWord (len: 3)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: MathExpr
+- Token: "BiggerThanSign (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+...

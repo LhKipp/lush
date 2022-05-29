@@ -32,3 +32,38 @@ let x = func_1
 - Finish: ""
 - Finish: ""
 ...
+let with closure
+===
+let x = cls $arg > 3 end
+---
+- Start: LetStmt
+- Token: "LetKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Token: "VarDeclName (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Token: "AssignSign (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: Tombstone
+- Start: ClosureExpr
+- Token: "ClsKeyword (len: 3)"
+- Token: "Whitespace (len: 1)"
+- Start: BlockStmt
+- Start: Tombstone
+- Start: "ValuePathExpr (parent: 5)"
+- Token: "Dollar (len: 1)"
+- Token: "BareWord (len: 3)"
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Start: MathExpr
+- Token: "BiggerThanSign (len: 1)"
+- Token: "Whitespace (len: 1)"
+- Start: NumberExpr
+- Token: "Number (len: 1)"
+- Finish: ""
+- Finish: ""
+- Token: "Whitespace (len: 1)"
+- Token: "EndKeyword (len: 3)"
+- Finish: ""
+- Finish: ""
+- Finish: ""
+...

@@ -27,6 +27,7 @@ impl TypeCheck for ValueExprElement {
             ValueExprElement::CmdStmt(n) => n.typecheck_with_args(args, state),
             ValueExprElement::FileName(n) => n.typecheck_with_args(args, state),
             ValueExprElement::OptionalExpr(n) => n.typecheck_with_args(args, state),
+            ValueExprElement::ClosureExpr(_) => todo!(),
         }
     }
 }

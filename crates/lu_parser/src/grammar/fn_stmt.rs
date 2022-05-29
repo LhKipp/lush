@@ -5,7 +5,8 @@ use crate::{
     SyntaxKind::*,
 };
 
-pub struct FnStmtRule;
+pub struct FnStmtRule {}
+
 impl Rule for FnStmtRule {
     fn matches(&self, p: &mut Parser) -> bool {
         let next_token = p.next_non(CMT_NL_WS);

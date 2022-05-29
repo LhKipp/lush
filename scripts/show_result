@@ -10,7 +10,7 @@ function debug
 end
 
 function run_test
-    set result (cargo test $argv 2>/dev/null |
+    set result (cargo test --all $argv 2>/dev/null |
         sed -n -e '/left:/p' |   # Left is the computed value, right is the stored value
         grep -o "`.*`" | # take only text inside "``"
         xargs -0 unescape)

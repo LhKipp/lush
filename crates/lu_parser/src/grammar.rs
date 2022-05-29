@@ -29,6 +29,7 @@
 //! caller is responsible for branching on the first token.
 
 mod block_stmt;
+mod cls_expr;
 mod cmd_stmt;
 mod comments;
 mod expr;
@@ -60,6 +61,7 @@ use crate::{
 };
 
 pub use block_stmt::BlockStmtRule;
+pub use cls_expr::ClsExprRule;
 pub use cmd_stmt::CmdStmtRule;
 pub use expr::{ArrayExprRule, NumberExprRule, StringExprRule, TableExprRule, ValueExprRule};
 pub use fn_stmt::FnStmtRule;

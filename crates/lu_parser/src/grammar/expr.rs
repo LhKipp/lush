@@ -123,6 +123,7 @@ pub(crate) fn value_expr_rule() -> OrRule {
     OrRule {
         kind: Some("value expr".into()),
         rules: vec![
+            Box::new(ClsExprRule {}),
             Box::new(NumberExprRule {}),
             Box::new(ValuePathExprRule {}),
             Box::new(StringExprRule {}),

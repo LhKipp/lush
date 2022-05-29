@@ -67,6 +67,8 @@ pub enum SyntaxKind {
     NumberKeyword,
     #[token("str")]
     StringKeyword,
+    #[token("cls")]
+    ClsKeyword,
     #[token("ret")]
     RetKeyword,
     #[regex("[TU][0-9]?", priority = 1000)]
@@ -192,6 +194,7 @@ pub enum SyntaxKind {
     ArgSignature,
     LuType,
     MathExpr,
+    ClosureExpr,
     ParentherizedExpr,
     StringExpr,
     NumberExpr,
@@ -248,6 +251,7 @@ impl SyntaxKind{
             SyntaxKind::FalseKeyword => "FalseKeyword",
             SyntaxKind::NumberKeyword => "NumberKeyword",
             SyntaxKind::StringKeyword => "StringKeyword",
+            SyntaxKind::ClsKeyword => "ClsKeyword",
             SyntaxKind::RetKeyword => "RetKeyword",
             SyntaxKind::GenericType => "GenericType",
             SyntaxKind::ArrayType => "ArrayType",
@@ -332,6 +336,7 @@ impl SyntaxKind{
             SyntaxKind::ArgSignature => "ArgSignature",
             SyntaxKind::LuType => "LuType",
             SyntaxKind::MathExpr => "MathExpr",
+            SyntaxKind::ClosureExpr => "ClosureExpr",
             SyntaxKind::ParentherizedExpr => "ParentherizedExpr",
             SyntaxKind::StringExpr => "StringExpr",
             SyntaxKind::NumberExpr => "NumberExpr",
@@ -390,6 +395,7 @@ macro_rules! T {
     [false] => {$crate::SyntaxKind::FalseKeyword };
     [num] => {$crate::SyntaxKind::NumberKeyword };
     [str] => {$crate::SyntaxKind::StringKeyword };
+    [cls] => {$crate::SyntaxKind::ClsKeyword };
     [ret] => {$crate::SyntaxKind::RetKeyword };
     ["("] => {$crate::SyntaxKind::LeftParenthesis };
     [")"] => {$crate::SyntaxKind::RightParenthesis };

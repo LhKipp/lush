@@ -31,6 +31,7 @@ Config(
     ( name: "FalseKeyword"               , token_text: "false"                           , is_token: true   , ) ,
     ( name: "NumberKeyword"              , token_text: "num"                            , is_token: true   , ) ,
     ( name: "StringKeyword"              , token_text: "str"                            , is_token: true   , ) ,
+    ( name: "ClsKeyword"             , token_text: "cls"                            , is_token: true   , ) ,
     ( name: "RetKeyword"              , token_text: "ret"                            , is_token: true   , ) ,
 
     // === TYPES ===
@@ -111,7 +112,7 @@ Config(
     ( name: "StrctCtorExpr"                 , is_node: true                                , has_rule: false   , ) , // TODO has rule but w/e
     ( name: "StrctFieldCtorStmt"                , is_node: true                                , has_rule: false   , ) , // TODO has rule but not needed
     ( name: "LetStmt"                    , is_node: true                                , has_rule: true   , ) ,
-    ( name: "FnStmt"                     , is_node: true                                , has_rule: true   , ) ,
+    ( name: "FnStmt"                     , is_node: true                                , has_rule: false   , ) ,
     ( name: "RetStmt"                    , is_node: true                                , has_rule: true   , ) ,
     ( name: "IfElifElseStmt"             , is_node: true                                , has_rule: false  , ) ,
     ( name: "IfOptElifOptStmt"           , is_node: true                                , has_rule: false   , ) ,
@@ -131,6 +132,7 @@ Config(
     ( name: "LuType"                     , is_node: true                                , has_rule: true   , ) ,
     // === EXPRESSION RULES ===
     ( name: "MathExpr"                   , is_node: true                                , )                ,
+    ( name: "ClosureExpr"                , is_node: true                                , )                ,
     ( name: "ParentherizedExpr"          , is_node: true                                , )                ,
     ( name: "StringExpr"                 , is_node: true                                , has_rule: true   , ) ,
     ( name: "NumberExpr"                 , is_node: true                                , has_rule: true   , ) ,
@@ -142,6 +144,7 @@ Config(
     // === GENERIC META NODES === 
     ( name: "ValueExpr", is_generic: true, has_rule: true, represents_element_names: [
         "BareWord",
+        "ClosureExpr",
         "NumberExpr",
         "BooleanExpr",
         "MathExpr",

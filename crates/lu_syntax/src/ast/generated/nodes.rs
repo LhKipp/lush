@@ -971,6 +971,38 @@ impl Display for StringKeywordToken {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct ClsKeywordToken {
+    pub(crate) syntax: SyntaxToken,
+}
+impl AstToken for ClsKeywordToken {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ClsKeyword }
+    fn cast(syntax: SyntaxToken) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxToken { &self.syntax }
+}
+impl HasSyntaxKind for ClsKeywordToken{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for ClsKeywordToken{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for ClsKeywordToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RetKeywordToken {
     pub(crate) syntax: SyntaxToken,
 }
@@ -3129,13 +3161,6 @@ impl HasTextRange for FnStmtNode{
     }
 }
 
-
-use lu_parser::grammar::FnStmtRule;
-impl HasRule for FnStmtNode{
-    fn get_belonging_rule() -> Box<dyn Rule>{
-        Box::new(FnStmtRule{})
-    }
-}
 impl Display for FnStmtNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.text())
@@ -3729,6 +3754,38 @@ impl Display for MathExprNode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+pub struct ClosureExprNode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AstNode for ClosureExprNode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SyntaxKind::ClosureExpr }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl HasSyntaxKind for ClosureExprNode{
+    fn get_syntax_kind(&self) -> SyntaxKind{
+        self.syntax().kind()
+    }
+}
+impl HasTextRange for ClosureExprNode{
+    fn get_text_range(&self) -> TextRange{
+        self.syntax().text_range()
+    }
+}
+
+impl Display for ClosureExprNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.text())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct ParentherizedExprNode {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4022,6 +4079,7 @@ impl Display for BooleanExprNode {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, EnumAsInner)]
 pub enum ValueExprElement {
     BareWord(BareWordToken),
+    ClosureExpr(ClosureExprNode),
     NumberExpr(NumberExprNode),
     BooleanExpr(BooleanExprNode),
     MathExpr(MathExprNode),
@@ -4052,15 +4110,17 @@ impl AstElement for ValueExprElement {
         
         
         
+        
         FileNameElement::can_cast(kind) ||
         
         
         match kind{
-            BareWord | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | OptionalExpr | ArrayExpr | TableExpr | CmdStmt | FileName => true,
+            BareWord | ClosureExpr | NumberExpr | BooleanExpr | MathExpr | StringExpr | ValuePathExpr | StrctCtorExpr | OptionalExpr | ArrayExpr | TableExpr | CmdStmt | FileName => true,
             _ => false,
         }
     }
     fn cast(syntax: SyntaxElement) -> Option<Self> {
+        
         
         
         
@@ -4079,6 +4139,7 @@ impl AstElement for ValueExprElement {
         
         let res = match syntax.kind() {
             BareWord => ValueExprElement::BareWord(BareWordToken { syntax: syntax.into_token().unwrap() }),
+            ClosureExpr => ValueExprElement::ClosureExpr(ClosureExprNode { syntax: syntax.into_node().unwrap() }),
             NumberExpr => ValueExprElement::NumberExpr(NumberExprNode { syntax: syntax.into_node().unwrap() }),
             BooleanExpr => ValueExprElement::BooleanExpr(BooleanExprNode { syntax: syntax.into_node().unwrap() }),
             MathExpr => ValueExprElement::MathExpr(MathExprNode { syntax: syntax.into_node().unwrap() }),
@@ -4098,6 +4159,9 @@ impl AstElement for ValueExprElement {
         match self {
             
             ValueExprElement::BareWord(it) => it.syntax.clone().into(),
+            
+            
+            ValueExprElement::ClosureExpr(it) => it.syntax.clone().into(),
             
             
             ValueExprElement::NumberExpr(it) => it.syntax.clone().into(),
@@ -4139,6 +4203,7 @@ impl HasSyntaxKind for ValueExprElement{
     fn get_syntax_kind(&self) -> SyntaxKind{
         match self {
             ValueExprElement::BareWord(it) => it.get_syntax_kind(),
+            ValueExprElement::ClosureExpr(it) => it.get_syntax_kind(),
             ValueExprElement::NumberExpr(it) => it.get_syntax_kind(),
             ValueExprElement::BooleanExpr(it) => it.get_syntax_kind(),
             ValueExprElement::MathExpr(it) => it.get_syntax_kind(),
