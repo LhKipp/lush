@@ -7,6 +7,7 @@ mod fn_stmt;
 mod for_stmt;
 mod generated;
 mod if_stmt;
+mod cls_expr;
 mod let_stmt;
 mod math_expr;
 mod optional_expr;

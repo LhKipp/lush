@@ -136,7 +136,7 @@ impl ModInfo {
             .collect();
         let funcs = block
             .fn_stmts()
-            .map(|fn_stmt| Function::from_node(&fn_stmt, source_node_id.clone()))
+            .map(|fn_stmt| Function::func_from_node(fn_stmt, source_node_id.clone()))
             .collect();
         let strcts = block
             .struct_stmts()

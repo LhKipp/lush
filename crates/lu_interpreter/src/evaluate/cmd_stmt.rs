@@ -284,6 +284,7 @@ fn evaluate_and_group_args(
                     (Some(math_node), Some(ValueType::Func(expected_sign))) => {
                         math_expr_to_cmd_value(math_node, expected_sign, scope)
                     }
+                    // TODO closures need to capture its environment?
                     _ => n.evaluate(scope)?,
                 };
                 if let Some((flag_sign, passed_flag_decl)) = last_seen_flag.take() {
@@ -320,6 +321,7 @@ fn math_expr_to_cmd_value(
     expected_sign: &Signature,
     scope: &mut SyScope,
 ) -> Value {
+    // TODO this should prob return an closure, and let it capture its environment
     // a math_expr as fn runs in the source_file where it has been declared
     let mod_path = scope
         .lock()
@@ -328,12 +330,19 @@ fn math_expr_to_cmd_value(
         .get_mod_tag()
         .id
         .clone();
-    let math_as_func = Function::new(
-        MATH_FN_NAME.into(),
-        expected_sign.clone(),
-        vec![],
-        math_node.clone().into(),
-        mod_path,
-    );
+    let math_as_func = {
+        let name = MATH_FN_NAME.into();
+        let signature = expected_sign.clone();
+        let attributes = vec![];
+        let fn_node = math_node.clone().into();
+        Function {
+            name,
+            signature,
+            fn_node,
+            captured_vars: Vec::new(),
+            parent_module: Some(mod_path),
+            attributes,
+        }
+    };
     Value::new_func(Rc::new(math_as_func))
 }

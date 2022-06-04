@@ -1777,7 +1777,9 @@ use derive_more::From;
 use derive_new::new;
 use log::trace;
 use lu_error::{lu_source_code_item, LuResult, SourceCodeItem};
-use lu_syntax::ast::{ArgSignatureNode, FnStmtNode, MathExprNode, SignatureNode};
+use lu_syntax::ast::{
+    ArgSignatureNode, ClosureExprNode, FnStmtNode, ImpureKeywordToken, MathExprNode, SignatureNode,
+};
 use lu_syntax::{AstNode, AstToken};
 use lu_syntax_elements::constants::{IN_ARG_NAME, RET_ARG_NAME, VAR_ARGS_DEF_NAME};
 use serde::{Deserialize, Serialize};
@@ -2012,21 +2014,28 @@ impl Signature {
 #[derive(From, Debug, Clone)]
 pub enum CmdEvaluableNode {
     FnStmt(FnStmtNode),
+    ClsExpr(ClosureExprNode),
     MathExpr(MathExprNode),
 }
 impl CmdEvaluableNode {
     pub fn to_item(&self) -> SourceCodeItem {
         match self {
-            CmdEvaluableNode::FnStmt(n) => n.to_item(),
+            CmdEvaluableNode::FnStmt(n) => n.decl_item(),
+            CmdEvaluableNode::ClsExpr(n) => n.decl_item(),
             CmdEvaluableNode::MathExpr(n) => n.to_item(),
+        }
+    }
+    pub fn name(&self) -> Option<String> {
+        match self {
+            CmdEvaluableNode::FnStmt(n) => n.name(),
+            CmdEvaluableNode::ClsExpr(_) => None,
+            CmdEvaluableNode::MathExpr(_) => None,
         }
     }
 }
 /// Function is a struct containing all needed information for a function/closure
 /// This should allow for less lookup in the ast later on (and easier handling of funcs)
-#[derive(Educe)]
-#[educe(Debug)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Function {
     pub name: String,
     /// A signature is always present (if not user provided, defaulted.)
@@ -2038,50 +2047,83 @@ pub struct Function {
     pub attributes: Vec<CmdAttribute>,
 
     /// Set when function is inserted into scope
-    pub parent_module: ModPath,
+    /// Some for regular Functions, none for closures
+    pub parent_module: Option<ModPath>,
 }
 
 impl Function {
-    pub fn new(
+    pub fn func_from_node(fn_stmt: FnStmtNode, source_file_id: ModPath) -> Function {
+        let name = fn_stmt.name().expect("Functions have a name");
+        Function::from_node(fn_stmt.into(), name, Some(source_file_id))
+    }
+
+    pub fn closure_from_node(fn_stmt: CmdEvaluableNode) -> Function {
+        assert!(fn_stmt.name().is_none(), "Closures dont have a name");
+        let name = Function::closure_name_from_node(&fn_stmt);
+        Function::from_node(
+            fn_stmt, // Provide internal name for closures
+            name, None,
+        )
+    }
+
+    pub fn closure_name_from_node(cls_stmt: &CmdEvaluableNode) -> String {
+        format!("closure_at_{:?}", cls_stmt.to_item().range)
+    }
+
+    fn from_node(
+        fn_stmt: CmdEvaluableNode,
         name: String,
-        signature: Signature,
-        attributes: Vec<CmdAttribute>,
-        fn_node: CmdEvaluableNode,
-        source_file_id: ModPath,
-    ) -> Self {
+        source_file_id: Option<ModPath>,
+    ) -> Function {
+        // Source the signature (either user provided or default)
+        let sign = match &fn_stmt {
+            CmdEvaluableNode::FnStmt(fn_stmt) => {
+                Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item())
+            }
+            CmdEvaluableNode::ClsExpr(cls_expr) => {
+                Signature::from_sign_and_stmt(cls_expr.signature(), cls_expr.decl_item())
+            }
+            CmdEvaluableNode::MathExpr(math_expr) => {
+                Signature::default_signature(math_expr.to_item())
+            }
+        };
+
+        let attrs = Self::attrs_from_node(&fn_stmt);
+
         Self {
             name,
-            signature,
-            fn_node,
+            signature: sign,
+            fn_node: fn_stmt,
             captured_vars: Vec::new(),
             parent_module: source_file_id,
-            attributes,
+            attributes: attrs,
         }
     }
 
-    pub fn from_node(fn_stmt: &FnStmtNode, source_file_id: ModPath) -> Function {
-        let name = fn_stmt.name().unwrap_or("".to_string());
-        // Source the signature (either user provided or default)
-        let sign = Signature::from_sign_and_stmt(fn_stmt.signature(), fn_stmt.decl_item());
-        let attrs = Self::attrs_from_node(fn_stmt);
-
-        Function::new(name, sign, attrs, fn_stmt.clone().into(), source_file_id)
-    }
-
-    fn attrs_from_node(fn_stmt: &FnStmtNode) -> Vec<CmdAttribute> {
+    fn attrs_from_node(cmd_node: &CmdEvaluableNode) -> Vec<CmdAttribute> {
         let mut attrs = vec![];
-        if let Some(impure_token) = fn_stmt.impure_attr() {
-            attrs.push(CmdAttribute::new(
-                CmdAttributeVariant::Impure,
-                impure_token.to_item(),
-            ));
-        } else {
-            // By default all lu-functions are pure :)
-            // This is okay, as there will be a warning for all impure function calls
-            attrs.push(CmdAttribute::new(
+        let mut cls_fn_handler = |impure_attr: &Option<ImpureKeywordToken>| {
+            if let Some(impure_token) = impure_attr {
+                attrs.push(CmdAttribute::new(
+                    CmdAttributeVariant::Impure,
+                    impure_token.to_item(),
+                ));
+            } else {
+                // By default all lu-functions are pure :)
+                // This is okay, as there will be a warning for all impure function calls
+                attrs.push(CmdAttribute::new(
+                    CmdAttributeVariant::Pure,
+                    lu_source_code_item!(),
+                ));
+            }
+        };
+        match cmd_node {
+            CmdEvaluableNode::FnStmt(fn_stmt) => cls_fn_handler(&fn_stmt.impure_attr()),
+            CmdEvaluableNode::ClsExpr(cls_expr) => cls_fn_handler(&cls_expr.impure_attr()),
+            CmdEvaluableNode::MathExpr(_) => attrs.push(CmdAttribute::new(
                 CmdAttributeVariant::Pure,
                 lu_source_code_item!(),
-            ));
+            )),
         }
         attrs
     }
@@ -2123,7 +2165,7 @@ impl Command for Function {
     }
 
     fn parent_module(&self) -> Option<&ModPath> {
-        Some(&self.parent_module)
+        self.parent_module.as_ref()
     }
 
     fn attributes(&self) -> &[crate::CmdAttribute] {

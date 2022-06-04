@@ -1037,6 +1037,7 @@ dependencies = [
  "prettytable-rs",
  "rusttyc",
  "serde 1.0.129",
+ "take-until",
  "tap",
  "walkdir",
 ]
@@ -1885,6 +1886,12 @@ checksum = "a393066ed9010ebaed60b9eafa373d4b1baac186dd7e008555b0f702b51945b6"
 dependencies = [
  "unicode-xid 0.0.4",
 ]
+
+[[package]]
+name = "take-until"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4e17d8598067a8c134af59cd33c1c263470e089924a11ab61cf61690919fe3b"
 
 [[package]]
 name = "tap"

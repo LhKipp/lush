@@ -20,10 +20,12 @@ use crate::{visit_arg::VisitArg, FlagSignature, Scope, ValueType, Variable};
 use crate::{Signature, Strct, ValueTypeErr};
 
 mod block_stmt;
+mod cls_expr;
 pub mod cmd_select;
 mod cmd_stmt;
 mod condition;
 mod expr;
+mod fn_cls_ty_check;
 mod fn_stmt;
 mod for_stmt;
 mod if_stmt;
@@ -816,7 +818,10 @@ impl TcFunc {
     /// will be inserted as a seperate pseudo variable
     pub fn from_signature(sign: &Signature, ty_state: &mut TyCheckState) -> Self {
         debug!("Generating TcFunc for Signature: {:?}", sign);
-        let self_key = ty_state.new_term_key(sign.decl.clone()); // TODO shouldn't self key be concretizied to be fn???
+        // TODO concretizising the self_key with ValueType::Func will result in endless recursion
+        let self_key = ty_state.new_term_key(sign.decl.clone()); 
+        // let self_key = ty_state
+        //     .new_term_key_concretiziesd(sign.decl.clone(), ValueType::Func(Box::new(sign.clone())));
 
         let in_key =
             ty_state.new_term_key_concretiziesd(sign.in_arg.decl.clone(), sign.in_arg.ty.clone());

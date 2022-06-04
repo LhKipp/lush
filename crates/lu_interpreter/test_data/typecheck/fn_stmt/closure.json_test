@@ -1,0 +1,8 @@
+Closure is of fn type TODO THIS TEST IS BROKEN
+===
+let x = cls ret 1 end
+---
+{
+  "Ok": null
+}
+...

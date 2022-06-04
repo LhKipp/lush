@@ -1,10 +1,10 @@
-use lu_interpreter_structs::{FlagVariant, ValueType};
+use lu_interpreter_structs::Signature;
 use lu_syntax::ast::FnStmtNode;
 use rusttyc::TcKey;
 
 use crate::{ScopeFrameTag, TyCheckState};
 
-use super::TypeCheck;
+use super::{fn_cls_ty_check::insert_arguments_into_scope, TypeCheck};
 
 impl TypeCheck for FnStmtNode {
     fn do_typecheck(
@@ -17,72 +17,18 @@ impl TypeCheck for FnStmtNode {
         } else {
             return None;
         };
-        let required_flags = self
-            .signature()
-            .map(|sign| {
-                sign.flags()
-                    .filter(|flag_node| flag_node.is_required())
-                    .map(|flag_node| FlagVariant::from_sign_node(&flag_node))
-                    .collect()
-            })
-            .unwrap_or(vec![]);
 
-        let fn_frame = ScopeFrameTag::TyCFnFrame(fn_name.clone(), required_flags.clone());
+        let sign = Signature::from_sign_and_stmt(self.signature(), self.decl_item());
+        let req_flags = sign.req_flags();
+
+        let tc_func = ty_state
+            .expect_tc_cmd_from_cmd_usage(&fn_name, &req_flags, self.decl_item())
+            .expect("Always works");
+
+        let fn_frame = ScopeFrameTag::TyCFnFrame(fn_name.clone(), req_flags);
         ty_state.scope.push_frame(fn_frame.clone());
 
-        let var_key_to_insert = {
-            let own_tc_func = ty_state
-                .expect_tc_cmd_from_cmd_usage(&fn_name, &required_flags, self.decl_item())
-                .expect("Always works");
-            let mut var_ty_to_insert = Vec::new();
-
-            for (arg, key) in own_tc_func.args_keys {
-                if arg.is_opt {
-                    // optional arg is inserted as optional<ty>
-                    let key = ty_state.new_term_key_concretiziesd(
-                        arg.decl.clone(),
-                        ValueType::Optional {
-                            inner_ty: Box::new(arg.ty.clone()),
-                            inner_ty_decl: arg.decl.clone(),
-                        },
-                    );
-                    var_ty_to_insert.push((arg.to_var(), key))
-                } else {
-                    var_ty_to_insert.push((arg.to_var(), key));
-                }
-            }
-
-            let own_signature = ty_state
-                .scope
-                .find_func(&fn_name, &required_flags)
-                .expect("FnNode will be sourced")
-                .signature();
-            var_ty_to_insert.push((own_signature.in_arg.to_var(), own_tc_func.in_key));
-            if let Some(var_arg) = &own_signature.var_arg {
-                var_ty_to_insert.push((var_arg.to_var(), own_tc_func.var_arg_key.unwrap()));
-            }
-            for (flag, key) in own_tc_func.flags_keys {
-                if flag.ty.is_bool() || flag.is_required() {
-                    var_ty_to_insert.push((flag.to_var(), key))
-                } else {
-                    // optional flag and ty is not bool, inserted flag is optional then
-                    let key = ty_state.new_term_key_concretiziesd(
-                        flag.decl.clone(),
-                        ValueType::Optional {
-                            inner_ty: Box::new(flag.ty.clone()),
-                            inner_ty_decl: flag.decl.clone(), // TODO fixup ty decl
-                        },
-                    );
-                    var_ty_to_insert.push((flag.to_var(), key))
-                }
-            }
-            var_ty_to_insert
-        };
-
-        for (var, key) in var_key_to_insert {
-            let var_key = ty_state.insert_var(var);
-            ty_state.equate_keys(var_key, key);
-        }
+        insert_arguments_into_scope(tc_func, &sign, ty_state);
 
         if let Some(fn_block) = self.block_stmt() {
             fn_block.typecheck(ty_state);

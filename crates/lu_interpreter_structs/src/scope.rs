@@ -12,6 +12,7 @@ use std::{
     rc::Rc,
     sync::Arc,
 };
+use take_until::TakeUntilExt;
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
@@ -412,6 +413,15 @@ impl Scope<Variable> {
             }
         }
         None
+    }
+
+    pub fn all_vars_inside_fn(&self) -> impl Iterator<Item = &Variable> {
+        let all_frames = self.get_all_frames();
+        // take_until includes the fn frame.
+        all_frames
+            .take_until(|f| !f.get_tag().is_ty_c_fn_frame())
+            .map(|frame| frame.elems.values())
+            .flatten()
     }
 
     pub fn all_vars(&self) -> impl Iterator<Item = &Variable> {
