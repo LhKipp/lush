@@ -1,0 +1,25 @@
+cls without signature wrong ret_ty TODO BROKEN TEST
+===
+fn func_1
+    let cls_ = cls ret 1 end
+    let str_ : str = cls_
+end
+func_1
+---
+{
+    "Ok": "Unspecified"
+}
+...
+cls without signature different args TODO BROKEN TEST
+===
+fn func_1
+    let cls_ = cls ret "cls" end  # VarArg will be of ty Any. Therefore any kind of arg is possible
+    cls_ 42
+    cls_ "42"
+end
+func_1
+---
+{
+  "Ok": "Unspecified"
+}
+...

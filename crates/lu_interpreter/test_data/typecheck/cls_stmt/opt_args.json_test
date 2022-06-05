@@ -1,0 +1,12 @@
+Not passed opt arg does not raise error TODO BROKEN TEST
+===
+fn f1()
+    let cls_ = cls (arg?) ret $arg end
+    ret cls_
+end
+f1
+---
+{
+  "Ok": "Any"
+}
+...

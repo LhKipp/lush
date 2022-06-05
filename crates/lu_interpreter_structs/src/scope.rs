@@ -90,6 +90,7 @@ impl<Elem: fmt::Debug> ScopeFrame<Elem> {
 
 impl ScopeFrame<Variable> {
     pub fn insert_var(&mut self, var: Variable) -> Option<Variable> {
+        trace!("Inserting into frame {:?}, var {}", self.get_tag(), var.name);
         self.elems.insert(var.name.clone(), var)
     }
 
@@ -317,6 +318,7 @@ impl Scope<Variable> {
             .map(|frame_id| self.arena[*frame_id].get())
             .find_map(|frame| {
                 if let Some(var) = frame.get(name) {
+                    trace!("Found var {:?} with matching name", var);
                     if let Some(func) = var.val.as_command() {
                         Some(func)
                     } else if let Some(cmd_collect) = var.val.as_command_collection() {

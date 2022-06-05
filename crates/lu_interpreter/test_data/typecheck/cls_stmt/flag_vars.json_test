@@ -1,0 +1,24 @@
+required flag var is of declared ty TODO BROKEN TEST
+===
+fn f1
+    let cls_ = cls (ret: num req --flag: num) ret $flag end
+    ret cls_ --flag 1
+end
+f1
+---
+{
+  "Ok": "Any"
+}
+...
+optional flag var is optional of declared ty TODO BROKEN TEST
+===
+fn f1()
+    let cls_ = cls (--flag: num) ret $flag end
+    ret cls_ --flag 1
+end
+f1
+---
+{
+  "Ok": "Any"
+}
+...
