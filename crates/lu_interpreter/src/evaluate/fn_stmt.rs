@@ -1,8 +1,10 @@
 use crate::evaluate::eval_prelude::*;
+use log::trace;
 use lu_interpreter_structs::Function;
 use lu_syntax::ast::{BlockStmtNode, FnStmtNode};
 
 pub fn eval_function(fn_stmt: &Function, scope: &mut SyScope) -> LuResult<Value> {
+    trace!("Evaluating Function: {}", fn_stmt.name);
     match &fn_stmt.fn_node {
         CmdEvaluableNode::MathExpr(math_expr) => {
             Evaluator::eval_result_to_lu_result(math_expr.evaluate(scope))

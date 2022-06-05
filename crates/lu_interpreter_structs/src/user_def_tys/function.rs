@@ -287,16 +287,13 @@ impl Function {
         Function::from_node(fn_stmt.into(), name, Some(source_file_id))
     }
 
-    pub fn closure_from_node(fn_stmt: CmdEvaluableNode) -> Function {
-        assert!(fn_stmt.name().is_none(), "Closures dont have a name");
-        let name = Function::closure_name_from_node(&fn_stmt);
-        Function::from_node(
-            fn_stmt, // Provide internal name for closures
-            name, None,
-        )
+    pub fn closure_from_node(cls_expr: ClosureExprNode) -> Function {
+        let name = Function::closure_name_from_node(&cls_expr);
+        Function::from_node(cls_expr.into(), name, None)
     }
 
-    pub fn closure_name_from_node(cls_stmt: &CmdEvaluableNode) -> String {
+    pub fn closure_name_from_node(cls_stmt: &ClosureExprNode) -> String {
+        // default internal name for closures
         format!("closure_at_{:?}", cls_stmt.to_item().range)
     }
 

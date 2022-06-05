@@ -1,0 +1,46 @@
+Calling closures which were defined in scope works
+===
+fn func_1
+    let cls_ = cls ret 1 end
+    ret cls_
+end
+func_1
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
+Returning closure and then calling it works
+===
+fn func_1
+    ret cls ret 1 end
+end
+let cls_ = func_1
+cls_
+---
+{
+  "Ok": {
+    "Number": 1.0
+  }
+}
+...
+Passing closure to HOF works
+===
+use std:iter
+[ 1 2 3 ] | filter cls(arg) ret $arg > 1 end
+---
+{
+  "Ok": {
+    "Array": [
+      {
+        "Number": 2.0
+      },
+      {
+        "Number": 3.0
+      }
+    ]
+  }
+}
+...
