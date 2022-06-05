@@ -24,11 +24,7 @@ impl TypeCheck for ClosureExprNode {
 
         let cls_frame = ScopeFrameTag::TyCFnFrame(name.clone(), required_flags.clone());
         // Closures capture variables in their environment.
-        let all_vars_inside_fn = ty_state
-            .scope
-            .all_vars_inside_fn()
-            .cloned()
-            .collect::<Vec<_>>();
+        let all_vars_inside_fn = ty_state.scope.all_vars_captured_by_closure();
         let (_, frame) = ty_state.scope.push_frame(cls_frame.clone());
         for v in all_vars_inside_fn {
             frame.insert_var(v);

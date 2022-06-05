@@ -2011,7 +2011,7 @@ impl Signature {
 }
 
 /// A node in the ast which is evaluable as a cmd
-#[derive(From, Debug, Clone)]
+#[derive(From, Debug, Clone, is_enum_variant)]
 pub enum CmdEvaluableNode {
     FnStmt(FnStmtNode),
     ClsExpr(ClosureExprNode),
@@ -2123,6 +2123,10 @@ impl Function {
             )),
         }
         attrs
+    }
+
+    pub fn is_closure(&self) -> bool {
+        self.fn_node.is_cls_expr()
     }
 }
 

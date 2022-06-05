@@ -1,6 +1,7 @@
 use derive_more::Display;
 use enum_as_inner::EnumAsInner;
 use indextree::{Arena, NodeId};
+use itertools::Itertools;
 use log::trace;
 use lu_error::{AstErr, LuErr, LuResult, SourceCodeItem};
 use lu_stdx::AMtx;
@@ -12,7 +13,6 @@ use std::{
     rc::Rc,
     sync::Arc,
 };
-use take_until::TakeUntilExt;
 use tap::Tap;
 
 pub use indextree::NodeId as ScopeFrameId;
@@ -90,7 +90,11 @@ impl<Elem: fmt::Debug> ScopeFrame<Elem> {
 
 impl ScopeFrame<Variable> {
     pub fn insert_var(&mut self, var: Variable) -> Option<Variable> {
-        trace!("Inserting into frame {:?}, var {}", self.get_tag(), var.name);
+        trace!(
+            "Inserting into frame {:?}, var {}",
+            self.get_tag(),
+            var.name
+        );
         self.elems.insert(var.name.clone(), var)
     }
 
@@ -221,6 +225,17 @@ impl<T: fmt::Debug + 'static> Scope<T> {
             .iter()
             .filter(|node| !node.is_removed())
             .map(|node| node.get())
+    }
+
+    pub fn ctx_is_within_func(&self) -> bool {
+        let cur_id = self.get_cur_frame_id();
+        cur_id.ancestors(&self.arena).any(|n_id| {
+            let tag = self.arena[n_id].get().get_tag();
+            // while ty checking
+            tag.is_ty_c_fn_frame() ||
+            // while eval
+            tag.is_cmd_call_frame()
+        })
     }
 }
 
@@ -417,13 +432,18 @@ impl Scope<Variable> {
         None
     }
 
-    pub fn all_vars_inside_fn(&self) -> impl Iterator<Item = &Variable> {
-        let all_frames = self.get_all_frames();
+    pub fn all_vars_captured_by_closure(&self) -> Vec<Variable> {
+        let all_frames = self.frames_to_find_var_in();
+
         // take_until includes the fn frame.
         all_frames
-            .take_until(|f| !f.get_tag().is_ty_c_fn_frame())
+            .into_iter()
+            .map(|frame_id| self.arena[frame_id].get())
+            .take_while(|f| !f.get_tag().is_global_frame())
             .map(|frame| frame.elems.values())
             .flatten()
+            .cloned()
+            .collect_vec()
     }
 
     pub fn all_vars(&self) -> impl Iterator<Item = &Variable> {

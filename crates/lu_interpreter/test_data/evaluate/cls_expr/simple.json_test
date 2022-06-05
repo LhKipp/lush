@@ -44,3 +44,20 @@ use std:iter
   }
 }
 ...
+Closure captures its environment on return
+===
+fn f1
+    let a = 1
+    let cls_ = cls ret $a end
+    $a = 2
+    ret $cls_
+end
+let cls_returned = f1
+cls_returned
+---
+{
+  "Ok": {
+    "Number": 2.0
+  }
+}
+...
