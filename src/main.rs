@@ -1,6 +1,7 @@
-use std::env;
+use std::{env, ffi::OsString};
 
 use clap::App;
+use log::debug;
 use lu_cli::start_cli;
 use lu_cmds::builtin;
 use lu_error::lu_source_code_item;
@@ -27,6 +28,20 @@ fn ret_code_main() -> i32 {
         return 1;
     }
 
+    // All arguments after the first file/script argument (if existent)
+    // are treated as positional arguments for the file/script
+    // So when invoking lush as `lush --debug script.lu --version`
+    // Only --debug has to be treated as an option to lush, while --version is an
+    // argument to script.lu
+    // (Note: When lush is invoked through a #!, the file(name) containing the #!
+    //      is passed as an argument to lush. Further arguments are passed
+    //      as additional args after the file(name).
+    //      Through this mechanic we are treating script-arguments in the #! case
+    //      as script arguments (and not as lush-arguments)
+    let args = env::args_os().collect::<Vec<_>>();
+    let file_arg_pos = find_file_arg(&args).unwrap_or(args.len());
+    debug!("Started lush with args {:?}", args);
+
     let arg_matches = App::new("lush")
         .version("0.1")
         .author("Leonhard Kipp. <leonhard.kipp@alumni.fh-aachen.de>")
@@ -35,7 +50,7 @@ fn ret_code_main() -> i32 {
             "--debug      'Runs in debug mode'
             [FILE]      'File to run. If no file is provided a REPL is started'",
         )
-        .get_matches();
+        .get_matches_from(&args[0..file_arg_pos]);
 
     let mut global_frame = make_global_frame();
 
@@ -44,7 +59,16 @@ fn ret_code_main() -> i32 {
         set_new_dbg_session(&mut global_frame);
     }
 
-    if let Some(file_to_run) = arg_matches.value_of("FILE") {
+    if file_arg_pos != args.len() {
+        let file_to_run = &args[file_arg_pos];
+        let args = &args[(file_arg_pos + 1)..];
+        debug!(
+            "Found file to execute: {:?} with arguments {:?}",
+            file_to_run.to_string_lossy(),
+            args.iter()
+                .map(|arg| arg.as_os_str().to_string_lossy())
+                .collect::<Vec<_>>()
+        );
         let code = match SourceCode::new_file(file_to_run.into()) {
             Ok(code) => code,
             Err(e) => {
@@ -88,6 +112,15 @@ fn ret_code_main() -> i32 {
         start_cli(global_frame);
         0
     }
+}
+
+fn find_file_arg(args: &Vec<OsString>) -> Option<usize> {
+    return args
+        .iter()
+        .enumerate()
+        .skip(1) // First arg is lush executable itself
+        .find(|(_, unparsed_arg)| return !unparsed_arg.to_string_lossy().starts_with("-"))
+        .map(|(i, _)| i);
 }
 
 fn make_global_frame() -> ScopeFrame<Variable> {
