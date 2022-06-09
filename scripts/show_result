@@ -1,7 +1,6 @@
 #!/bin/fish
 function unescape
-    set s "$argv"
-    printf '%b\n' "$s"
+    printf '%b\n' "$argv"
 end
 
 function debug
