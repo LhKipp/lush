@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, ffi::OsString};
 
 use clap::App;
 use lu_cli::start_cli;
@@ -27,6 +27,19 @@ fn ret_code_main() -> i32 {
         return 1;
     }
 
+    // All arguments after the first file/script argument (if existent)
+    // are treated as positional arguments for the file/script
+    // So when invoking lush as `lush --debug script.lu --version`
+    // Only --debug has to be treated as an option to lush, while --version is an
+    // argument to script.lu
+    // (Note: When lush is invoked through a #!, the file(name) containing the #!
+    //      is passed as an argument to lush. Further arguments are passed
+    //      as additional args after the file(name).
+    //      Through this mechanic we are treating script-arguments in the #! case
+    //      as script arguments (and not as lush-arguments)
+    let args = env::args_os().collect::<Vec<_>>();
+    let file_arg_pos = find_file_arg(&args).unwrap_or(args.len());
+
     let arg_matches = App::new("lush")
         .version("0.1")
         .author("Leonhard Kipp. <leonhard.kipp@alumni.fh-aachen.de>")
@@ -35,7 +48,7 @@ fn ret_code_main() -> i32 {
             "--debug      'Runs in debug mode'
             [FILE]      'File to run. If no file is provided a REPL is started'",
         )
-        .get_matches();
+        .get_matches_from(&args[0..file_arg_pos]);
 
     let mut global_frame = make_global_frame();
 
@@ -88,6 +101,14 @@ fn ret_code_main() -> i32 {
         start_cli(global_frame);
         0
     }
+}
+
+fn find_file_arg(args: &Vec<OsString>) -> Option<usize> {
+    return args
+        .iter()
+        .enumerate()
+        .find(|(_, unparsed_arg)| return !unparsed_arg.to_string_lossy().starts_with("-"))
+        .map(|(i, _)| i);
 }
 
 fn make_global_frame() -> ScopeFrame<Variable> {
