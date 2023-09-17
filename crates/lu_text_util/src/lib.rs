@@ -47,6 +47,13 @@ impl SourceCode {
         })
     }
 
+    pub fn new_os_arg(text: String, arg_num: usize) -> SourceCode {
+        SourceCode {
+            text,
+            path: format!("OS_ARG: {}", arg_num).into(),
+        }
+    }
+
     // TODO this func is very convenient but crosses all boundaries, and knows much more, than it
     // actually should
     // TODO currently only used in one place, maybe move it there

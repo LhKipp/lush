@@ -1,5 +1,8 @@
 use enum_as_inner::EnumAsInner;
-use lu_syntax::ast::HasAstId;
+use lu_syntax::{
+    ast::{HasAstId, HasRule},
+    AstNode,
+};
 use std::fmt::{Debug, Display};
 
 use log::debug;
@@ -7,6 +10,7 @@ use lu_error::{LuErr, LuResult, LuResults, SourceCodeItem};
 use lu_interpreter_structs::{EvalResult, RetValOrErr, SyScope, Value};
 
 mod block_stmt;
+mod cls_expr;
 mod cmd_stmt;
 mod condition;
 mod eval_prelude;
@@ -17,7 +21,6 @@ mod if_stmt;
 mod let_stmt;
 mod math_expr;
 mod piped_cmds_stmt;
-mod cls_expr;
 mod ret_stmt;
 mod source_file;
 mod statement;
@@ -144,15 +147,4 @@ impl Evaluator {
             RetValOrErr::Err(e) => e,
         })
     }
-
-    // /// Evaluate code as T
-    // pub fn evaluate_as<T: Evaluable + HasRule + AstNode>(
-    //     code: SourceCode,
-    //     &mut self,
-    // ) -> Result<Value, RetValOrErr> {
-    //     let parse_result = Parse::rule(&code.to_string()?, &*T::get_belonging_rule());
-    //     // We don't allow evaluation if errors happend.
-    //     let source_file = parse_result.ok::<T>()?;
-    //     source_file.evaluate(self)
-    // }
 }

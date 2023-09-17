@@ -35,7 +35,7 @@ pub struct Parse {
 
 impl Parse {
     pub fn cli_line(line: SourceCode, offset: TextSize) -> Outcome<Parse> {
-        Self::parse(
+        Self::parse_source_file(
             line,
             &SourceFileRule {
                 mark_as_cli_line: true,
@@ -44,7 +44,7 @@ impl Parse {
         )
     }
     pub fn source_file(source: SourceCode) -> Outcome<Parse> {
-        Self::parse(
+        Self::parse_source_file(
             source,
             &SourceFileRule {
                 mark_as_cli_line: false,
@@ -53,13 +53,31 @@ impl Parse {
         )
     }
 
-    fn parse(source: SourceCode, rule: &SourceFileRule) -> Outcome<Parse> {
+    pub fn parse_source_file(source: SourceCode, sf_rule: &SourceFileRule) -> Outcome<Parse> {
+        let result = Self::parse(source, sf_rule);
+
+        result.map_flattened(|(source_code, node)| {
+            let sf_node = SourceFileNode::cast(node).unwrap();
+
+            // General validation
+            let ast_errs = validate::validate(&sf_node);
+
+            Outcome::new(
+                Parse {
+                    source: source_code,
+                    sf_node,
+                },
+                ast_errs,
+            )
+        })
+    }
+
+    pub fn parse(source: SourceCode, rule: &dyn Rule) -> Outcome<(SourceCode, SyntaxNode)> {
         let (green, errors) = TreeBuilder::build(&source.text, rule);
         let sf_node = SyntaxNode::new_root(green);
-        let sf_node = SourceFileNode::cast(sf_node).unwrap();
-        let sf_node_addr = addr_of_node(sf_node.syntax().clone());
+        let sf_node_addr = addr_of_node(sf_node.clone());
 
-        let mut errors: Vec<_> = errors
+        let errors: Vec<_> = errors
             .into_iter()
             .map(|e| match e {
                 ParseErr::MessageAt(msg, txt_pos) => ParseErr::MessageAtItem(
@@ -78,16 +96,12 @@ impl Parse {
             .map(|e| e.into())
             .collect();
 
-        // General validation
-        if let Err(ast_errs) = validate::validate(&sf_node) {
-            errors.extend(ast_errs);
-        }
-
         debug!(
             "Result of build_tree: {:#?}\nWith {} errors",
             sf_node,
             errors.len()
         );
-        Outcome::new(Parse::new(source, sf_node), errors)
+
+        Outcome::new((source, sf_node), errors)
     }
 }

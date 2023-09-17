@@ -1,18 +1,25 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
+use itertools::Itertools;
 use log::debug;
 use lu_cmds::load_std_module;
 use lu_error::{util::Outcome, LuErr, LuResult, LuResults, ParseErr};
 use lu_interpreter_structs::*;
-use lu_parser::grammar::SourceFileRule;
+use lu_parser::{
+    grammar::{SourceFileRule, ValueExprRule},
+    Parser,
+};
 use lu_pipeline_stage::PipelineStage;
 use lu_structure_parse::{modules_from_start_parse, LoadModulesConfig};
-use lu_syntax::{ast::SourceFileNode, AstNode, Parse};
+use lu_syntax::{
+    ast::{SourceFileNode, ValueExprElement},
+    AstElement, AstNode, Parse,
+};
 use lu_text_util::SourceCode;
 
 use parking_lot::Mutex;
-use std::{path::PathBuf, rc::Rc, sync::Arc};
+use std::{ffi::OsString, path::PathBuf, rc::Rc, sync::Arc};
 
 use crate::{typecheck::TyCheckState, Evaluable, Evaluator, Scope, Variable};
 
@@ -149,5 +156,45 @@ impl Interpreter {
             .unwrap();
         ty_state.typecheck(sf_node);
         ty_state
+    }
+
+    ///
+    fn parse_args(os_args: &[OsString], scope: &mut SyScope) -> LuResults<Vec<Variable>> {
+        let (parses, errors): (Vec<_>, Vec<_>) = os_args
+            .iter()
+            .enumerate()
+            .map(|(i, os_arg)| {
+                Parse::parse(
+                    SourceCode::new_os_arg(
+                        os_arg
+                            .clone()
+                            .into_string()
+                            .expect("The provided argument is not a utf8 string"),
+                        i,
+                    ),
+                    &ValueExprRule {},
+                )
+                .split()
+            })
+            .unzip();
+
+        let errors = errors.into_iter().flatten().collect::<Vec<_>>();
+
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+
+        let mut all_values = vec![];
+        for (i,(source, node)) in parses.enumerate(){
+            let value_node = ValueExprElement::cast(node.into()).unwrap();
+            let result = value_node.evaluate(scope);
+            let value = Evaluator::eval_result_to_lu_result(result)?;
+            // TODO insert args with correct names and argv into scope
+            // the scope should be the called file scope
+            scope.get_mut().get_glo
+            all_vars.push(Variable::new_os_arg(
+                value, i, SourceCodeItem::new()
+            ))
+        }
     }
 }

@@ -61,7 +61,7 @@ fn ret_code_main() -> i32 {
 
     if file_arg_pos != args.len() {
         let file_to_run = &args[file_arg_pos];
-        let args = &args[(file_arg_pos + 1)..];
+        let args = &args[file_arg_pos..];
         debug!(
             "Found file to execute: {:?} with arguments {:?}",
             file_to_run.to_string_lossy(),

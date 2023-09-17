@@ -64,7 +64,7 @@ fn ret_code_main() -> i32 {
 
     if file_arg_pos != args.len() {
         let file_to_run = &args[file_arg_pos];
-        let args = &args[(file_arg_pos + 1)..];
+        let args = &args[file_arg_pos..];
         debug!(
             "Found file to execute: {:?} with arguments {:?}",
             file_to_run.to_string_lossy(),
@@ -218,14 +218,22 @@ impl From<AstErr> for LuErr {
 //     }
 // }
 
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
+pub enum SourceCodeItemKind {
+    UserCode, // User provide shell code.
+    LushCode, // LuShell rust code.
+    OsArg,    // OsArgument. `range` contains the range of OsArgs specified by this SourceCodeItem
+}
+
 /// An item in the source code to be used in the `Error` enum.
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
 pub struct SourceCodeItem {
-    pub content: String,
+    pub content: String, // DON'T use this field. Only here for debugging purposes
     pub range: TextRange,
     // #[educe(Debug(ignore))]
     #[serde(skip)]
     pub sf_node_addr: usize,
+    pub kind: SourceCodeItemKind,
 }
 
 impl SourceCodeItem {
@@ -234,6 +242,7 @@ impl SourceCodeItem {
         range: Range<usize>,
         content: impl Into<String>,
         sf_node_addr: impl Into<usize>,
+        kind: SourceCodeItemKind,
     ) -> SourceCodeItem {
         let content = content.into();
         SourceCodeItem {
@@ -243,6 +252,7 @@ impl SourceCodeItem {
             ),
             content,
             sf_node_addr: sf_node_addr.into(),
+            kind,
         }
     }
 
@@ -264,7 +274,12 @@ impl SourceCodeItem {
     }
 
     pub fn tmp_todo_item() -> SourceCodeItem {
-        SourceCodeItem::new(999..999, "TMP_ITEM", 1337 as usize)
+        SourceCodeItem::new(
+            999..999,
+            "TMP_ITEM",
+            1337 as usize,
+            SourceCodeItemKind::UserCode,
+        )
     }
 }
 
@@ -285,6 +300,7 @@ macro_rules! lu_source_code_item {
                 (line as usize)..(line as usize),
                 f_name.clone(),
                 usize::MAX,
+                SourceCodeItemKind::LushCode,
             )
         }
     }};

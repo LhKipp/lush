@@ -2,7 +2,7 @@ use log::debug;
 use std::mem;
 
 use lu_error::ParseErr;
-use lu_parser::{grammar::SourceFileRule, Event};
+use lu_parser::{grammar::Rule, Event};
 use rowan::GreenNode;
 
 use crate::{
@@ -93,7 +93,7 @@ impl<'a> TreeBuilder<'a> {
         }
     }
 
-    pub fn build(text: &'a str, sf_rule: &SourceFileRule) -> (GreenNode, Vec<ParseErr>) {
+    pub fn build(text: &'a str, sf_rule: &dyn Rule) -> (GreenNode, Vec<ParseErr>) {
         let mut sink = Self::new(text);
         let mut events = lu_parser::parse_as(text, sf_rule);
         let mut forward_parents = Vec::new();

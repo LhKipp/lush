@@ -1,19 +1,14 @@
 use log::debug;
-use lu_error::LuResults;
+use lu_error::LuErr;
 
 use crate::ast::SourceFileNode;
 
 pub mod cmd_signature;
 
-pub fn validate(node: &SourceFileNode) -> LuResults<()> {
+pub fn validate(node: &SourceFileNode) -> Vec<LuErr> {
     let all = cmd_signature::validate_sign(node);
-
     debug!("Ast-Validation found {} errors", all.len());
-    if all.is_empty() {
-        Ok(())
-    } else {
-        Err(all)
-    }
+    all
 }
 
 #[cfg(test)]
