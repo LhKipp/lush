@@ -11,6 +11,10 @@ The goal of lush is to make writing shell-scripts
 
 The shell is currently in its very first steps. While parsing, basic type-checking and evaluation of common constructs found in structured programming-languages and shells work, there is still a lot to do 😉
 
+## Documentation
+
+[Documentation can be found in DOCUMENTATION.md](DOCUMENTATION.md)
+
 ## Installation
 
 ```bash
